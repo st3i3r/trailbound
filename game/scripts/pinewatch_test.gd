@@ -1,11 +1,13 @@
 extends Node2D
-## Pinewatch art test — composes the palette-locked sprites exactly like
-## tools/scene_comp.py does: 32px tile grid, sprites anchored
-## bottom-center under a YSort, seeded scatter decals, flame layer.
+## Pinewatch art + pad-grid test — composes palette-locked sprites:
+## 32px tile ground, seeded scatter, y-sort world props, pad markers
+## driven by game/data/layouts/pinewatch.json, tents snapped to the
+## open pads, hover highlight on open pad cells.
 ## Run: godot --path game res://scenes/pinewatch_test.tscn
 
 const A := "res://assets/pinewatch/"
 const T := 32
+const CELL := 64
 
 var pond := Rect2(0, 8, 4, 4)                      # tiles
 var path := [Vector2i(8,11), Vector2i(8,10), Vector2i(9,10), Vector2i(9,9),
@@ -21,12 +23,17 @@ var props := [
     ["tree_pine_green_2", 610, 70],
     ["prop_van_p_0", 585, 108], ["prop_supply_crate_0", 545, 118],
     ["prop_signpost_0", 305, 330],
-    ["prop_tent_olive_0", 165, 205], ["prop_tent_rust_0", 500, 195],
     ["prop_boulder_0", 415, 235], ["prop_lantern_post_0", 255, 190],
     ["prop_log_bench_0", 300, 250], ["campfire_0", 350, 230],
     ["prop_stump_0", 390, 255], ["player_front_0", 345, 265],
     ["prop_stump_0", 290, 285],
 ]
+var occupants := {"p1": "prop_tent_olive_0", "p2": "prop_tent_rust_0"}
+
+var layout: Dictionary
+var origin: Vector2
+var pad_cells := {}                                # pid -> Rect2 (px)
+var hover: Sprite2D
 
 func _tex(n: String) -> Texture2D:
     return load(A + n + ".png")
@@ -38,6 +45,9 @@ func _sprite(n: String) -> Sprite2D:
     return s
 
 func _ready() -> void:
+    layout = Catalog.data["layouts"]["pinewatch"]
+    var opx: Array = layout["camp_core_origin_px"]
+    origin = Vector2(opx[0], opx[1])
     var rng := RandomNumberGenerator.new()
     rng.seed = 7
 
@@ -77,6 +87,40 @@ func _ready() -> void:
                                  ty * T + rng.randi() % 8)
             scatter.add_child(d)
 
+    var pads_node := Node2D.new()
+    pads_node.name = "Pads"
+    add_child(pads_node)
+    var spots: Dictionary = layout["pads"]["spots"]
+    var open_pads: Array = layout["pads"]["open"]
+    for pid in spots:
+        var c: Array = spots[pid]
+        var rect := Rect2(origin + Vector2(c[0], c[1]) * CELL,
+                          Vector2(CELL, CELL))
+        pad_cells[pid] = rect
+        if occupants.has(pid):
+            continue                                   # tent sprite is the state
+        if pid in open_pads:
+            var m := _sprite("pad_open")
+            m.position = rect.position
+            pads_node.add_child(m)
+        else:
+            for gy in 2:
+                for gx in 2:
+                    var o := _sprite("terrain_grass_lush_v2_0")
+                    o.position = rect.position + Vector2(gx * T, gy * T)
+                    pads_node.add_child(o)
+            var m2 := _sprite("pad_locked")
+            m2.position = rect.position
+            pads_node.add_child(m2)
+            var tuft := _sprite("decal_fern_0")
+            tuft.position = rect.position + Vector2(
+                8 + rng.randi() % 40, 8 + rng.randi() % 40)
+            pads_node.add_child(tuft)
+
+    hover = _sprite("pad_hover")
+    hover.visible = false
+    pads_node.add_child(hover)
+
     var world := Node2D.new()
     world.name = "World"
     world.y_sort_enabled = true
@@ -85,6 +129,12 @@ func _ready() -> void:
         var s: Sprite2D = _sprite(p[0])
         var size: Vector2 = s.texture.get_size()
         s.position = Vector2(p[1] - size.x / 2.0, p[2] - size.y)
+        world.add_child(s)
+    for pid in occupants:
+        var s: Sprite2D = _sprite(occupants[pid])
+        var r: Rect2 = pad_cells[pid]
+        s.position = r.position + Vector2(CELL / 2.0 - s.texture.get_size().x / 2.0,
+                                          CELL - s.texture.get_size().y)
         world.add_child(s)
 
     # flame layer over the ring
@@ -109,3 +159,17 @@ func _ready() -> void:
         var out := "D:/monet/trail-bound/assets_src/cleanup/pinewatch_engine.png"
         print("scene shot ->", out, " err:", img.save_png(out))
         get_tree().quit()
+
+func _unhandled_input(event: InputEvent) -> void:
+    if event is InputEventMouseMotion:
+        var pid := _pad_at(get_global_mouse_position())
+        hover.visible = pid != "" and pid in layout["pads"]["open"] \
+            and not occupants.has(pid)
+        if hover.visible:
+            hover.position = pad_cells[pid].position
+
+func _pad_at(px: Vector2) -> String:
+    for pid in pad_cells:
+        if pad_cells[pid].has_point(px):
+            return pid
+    return ""

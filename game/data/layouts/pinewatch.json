@@ -1,14 +1,40 @@
 {
   "site_id": "pinewatch",
   "camp_core_max_cells": [10, 4],
-  "pads": {"total": 8, "start_open": 2, "spots": [], "neighbours": {}, "tags": {}},
+  "camp_core_origin_px": [0, 96],
+  "pads": {
+    "total": 8,
+    "start_open": 2,
+    "spots": {
+      "p1": [1, 0], "p2": [4, 0], "p3": [7, 0],
+      "p4": [0, 1], "p5": [9, 1],
+      "p6": [1, 2],
+      "p7": [4, 3], "p8": [7, 3]
+    },
+    "open": ["p1", "p2"],
+    "neighbours": {
+      "p1": ["p2", "p4"],
+      "p2": ["p1", "p3", "p7"],
+      "p3": ["p2", "p5"],
+      "p4": ["p1", "p6"],
+      "p5": ["p3", "p8"],
+      "p6": ["p4", "p7"],
+      "p7": ["p6", "p8", "p2"],
+      "p8": ["p5", "p7"]
+    },
+    "tags": {}
+  },
   "bank_cells": [],
-  "errand_spots": [],
-  "lookout": null,
+  "errand_spots": {
+    "forage": [96, 72],
+    "pond": [64, 296],
+    "lookout": [600, 88]
+  },
+  "lookout": [600, 88],
   "crew_plots": [
-    {"id": "crew_structure", "structure": "wardens_hut", "kind": "structure", "cells": []},
-    {"id": "vol2_plot_a", "kind": "reserved_overgrown", "cells": []},
-    {"id": "vol2_plot_b", "kind": "reserved_overgrown", "cells": []}
+    {"id": "crew_structure", "structure": "wardens_hut", "kind": "structure", "cells": [], "px": [96, 40]},
+    {"id": "vol2_plot_a", "kind": "reserved_overgrown", "cells": [], "px": [440, 40]},
+    {"id": "vol2_plot_b", "kind": "reserved_overgrown", "cells": [], "px": [560, 40]}
   ],
-  "note": "pad spots, neighbour lists, tags, errand/lookout cells — Phase 0/1 layout work (§5.1, §21.2); crew plots sit outside the 10x4 camp core"
+  "note": "8 pads in the 10x4 core (cell = 64x64 px, origin y=96 below the tree line); 2-3 hand-authored neighbours per pad (§5.1); Pinewatch pads carry no tags (§11); fire circle sits between the north and south pad rows; pond errand marks the bank at px 64,296"
 }
