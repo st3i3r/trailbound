@@ -339,11 +339,11 @@ brown, ember orange, dusk violet), clean cel shading, no background
 | **dog** | small scruffy brown-and-white terrier, red bandana, quadruped (`body_type=quadrupedal`) | walk×4 + sit_s + dig_s | 1+10+4+2 = **17** |
 | **ranger** | friendly park ranger, olive shirt, wide-brim hat, khaki pants, enamel mug | idle_s + wave_s | 1+0+0+2 = **3** |
 
-#### P1 cast — ~10 gens (idles only; walks deferred to P2)
+#### P1 cast — ~20 gens (idles only; walks deferred to P2)
 
 Travelers mostly *sit at camp* — south-facing idle is 80% of their screen time.
 Generate sprites + idle now; add walk×4 (~14 gens/char) only for those who
-visibly hike in (hiker, photographer).
+visibly hike in (hiker, photographer, family arrival).
 
 | Char | Prompt | Anims | Gens |
 |---|---|---|---|
@@ -352,6 +352,20 @@ visibly hike in (hiker, photographer).
 | old angler | elderly fisherman, grey beard, bucket hat, green vest, fishing rod | idle_s | 2 |
 | kid scout | small kid scout, oversized green backpack, cap, freckles | idle_s | 2 |
 | van-lifer | relaxed woman, denim overalls, purple bandana, coffee mug | idle_s | 2 |
+| **dad (family)** | dad camper, beanie, green plaid shirt, holding thermos | idle_s | 2 |
+| **mom (family)** | mom camper, fleece vest, ponytail, holding trail map | idle_s | 2 |
+| **boy (family)** | ~10yo boy, oversized backpack, backwards cap, stick in hand | idle_s + **run×4 later** | 2 |
+| **girl (family)** | ~7yo girl, pigtails, tiny backpack, marshmallow on stick | idle_s + **run×4 later** | 2 |
+| cyclist | cyclist, helmet, sporty jersey, sunglasses pushed up | idle_s | 2 |
+
+**The family unit** (dad+mom+boy+girl) is a first-class visitor archetype:
+arrives as a group, takes two blankets, places a group meal order (bigger
+reward), kids run around the fire — the best "alive camp" moment per gen spent.
+Kid anims: `run` ×4 + `play` — they never walk calmly anyway.
+
+**Player skins** — v1 ships ONE protagonist (the campsite keeper = you).
+Variants later: palette-swap recolors ≈ 0 gens; alternate body sprites
+~15-17 gens each → natural Stars cosmetic item.
 
 Variant trick (Tier-1-safe): `edit-image-pro` / `create-sl-image-pro` with the
 approved sprite as reference → outfit/color variants. (`try-on` is Tier 2.)
