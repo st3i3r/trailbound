@@ -606,7 +606,7 @@ or get added as one.
 | player | 1 + 10 rotate | idle, walk×4, gather, cast, reel, carry, sit, sleep, **celebrate** ⛔, **eat** ⛔ = 11 |
 | dog | 1 + 10 rotate | idle, walk×4, sit, dig, bark, sleep, **heart-react** ⛔ = 9 |
 | ranger | 1 | idle, wave, talk = 3 |
-| travelers ×5-6 | 5-6 | idle×5-6, sit-var×3, eat×2 ⛔, walk×8 (hiker+photo) = ~18 |
+| travelers ×10 (incl. family) | 10 | idle×10, sit-var×4, eat×2, walk×8 (hiker+photo), **kid run×8 + play×2** = ~36 |
 | portraits ×8 | 8 | — |
 | critters ×6 | 6 | fly/hop/flutter/jump/gull/graze = ~8 |
 
