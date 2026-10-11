@@ -9,6 +9,7 @@ signal phase_changed(phase: Phase)
 signal crew_stage_ready(structure: StringName)
 signal crew_collected(structure: StringName, keepsake: StringName, finished: bool)
 signal page_completed(site: StringName, page: int, gift: int, unlocks: Array)
+signal letter_delivered(letter: Dictionary)
 
 enum Phase { BOOT, TITLE, MORNING, PREP, EVENING, NIGHT }
 
@@ -22,6 +23,8 @@ var phase: Phase = Phase.BOOT
 var day: int = 0
 var site_id: StringName = &"pinewatch"
 var sites_visited: Dictionary = {}          # site_id -> first in-game day
+var letters_read: Array = []                # letter ids (§8.2 journal)
+var vignettes_seen: Array = []              # §13.4 unseen plays first
 var crew: Dictionary = {}                   # §22 save shape, see _crew_reset()
 var coins: int = 0                          # §6.1: one currency, starts at 0
 var seed: int = 0                           # save seed feeding every stream (§21.3)
@@ -133,6 +136,63 @@ func _inject_regulars(st: Dictionary) -> void:
 			st["board"].append(req)
 
 
+# ------------------------------------------------------------- letters (§8.2/§13)
+#
+# Letters arrive in order, at most one per morning; event-triggered
+# letters go first and unread ones wait in the journal.
+
+func _letters_for(site := site_id) -> Array:
+	return Catalog.data.get("letters", []).filter(
+		func(l): return l.get("site") == site)
+
+
+func _letter_due(l: Dictionary, st: Dictionary) -> bool:
+	var tr: Dictionary = l.get("trigger", {})
+	if tr.has("morning"):
+		return site_day() >= int(tr["morning"])
+	var ev: String = tr.get("event", "")
+	match ev:
+		"family_booked":
+			return st["counters"]["events"].has("family_booked")
+		"chapter_done":
+			return chapter_done(site_id)
+		_:
+			if ev.begins_with("regular_done:"):
+				return _story_done(ev.get_slice(":", 1))
+			if ev.begins_with("page:"):
+				return page_done(int(ev.get_slice(":", 1)))
+	return false
+
+
+## One letter per morning, event triggers before morning triggers,
+## both in written order (§8.2).
+func _deliver_letter(st: Dictionary) -> void:
+	var delivered: Array = st["letters_delivered"]
+	for want_event in [true, false]:
+		for l in _letters_for():
+			if l["id"] in delivered:
+				continue
+			if (l.get("trigger", {}).has("event")) != want_event:
+				continue
+			if _letter_due(l, st):
+				delivered.append(l["id"])
+				letter_delivered.emit(l)
+				return
+
+
+## Journal API: delivered-but-unread letters for this site.
+func unread_letters(site := site_id) -> Array:
+	var st := site_state(site)
+	return _letters_for(site).filter(func(l):
+		return l["id"] in st["letters_delivered"] \
+			and l["id"] not in letters_read)
+
+
+func read_letter(id: String) -> void:
+	if id not in letters_read:
+		letters_read.append(id)
+
+
 # ------------------------------------------------------------- crew (§8.4)
 
 func _crew_reset() -> void:
@@ -213,6 +273,9 @@ func crew_collect() -> Dictionary:
 	if finished:
 		crew["structure"] = ""
 		crew["seconds_left"] = 0.0
+		for sr in Catalog.data.get("sites", []):
+			if sr.get("crew_structure") == structure:
+				site_state(sr["id"])["vignette_restored"] = structure
 		_try_start_next()
 	else:
 		crew["seconds_left"] = float(s["stages"][crew["stage"]]["seconds"])
@@ -315,7 +378,8 @@ func _fresh_site(site: StringName) -> Dictionary:
 		"seats": 0, "reviews": [], "weather": "clear",
 		"board": [], "guests": {}, "assignments": {},
 		"blogger_bonus": false, "forage_nodes": [], "fish_taken": {},
-		"pages_done": [],
+		"pages_done": [], "letters_delivered": [],
+		"vignette_restored": "",
 		"counters": {"guests_welcomed": 0, "families": 0,
 			"anglers_water": 0, "fish_kinds": [], "oven_recipes": 0,
 			"regular_visits": {}, "events": {}}}
@@ -377,6 +441,10 @@ func new_day() -> void:
 		rating(), _rng_for("board"), _has_free_pair(st),
 		_favourite_pool())
 	_inject_regulars(st)
+	if st["board"].any(func(b): return b.get("archetype") == "family") \
+			or int(st["counters"]["families"]) > 0:
+		st["counters"]["events"]["family_booked"] = true
+	_deliver_letter(st)
 	for r in st["board"]:
 		st["guests"][r["id"]] = r
 
@@ -502,6 +570,7 @@ func goodnight() -> Dictionary:
 	for m in sold:
 		meal_sales += int(m.get("price", 0))
 	st["blogger_bonus"] = elite5
+	var vig := _pick_vignette(st, seated)
 	st["assignments"] = {}
 	st["guests"] = {}
 	meals.clear()                                    # leftovers to the dog
@@ -517,7 +586,86 @@ func goodnight() -> Dictionary:
 		"walk_ins": sold.size(), "meal_sales": meal_sales,
 		"income": fees + tips + meal_sales, "rating": rating(),
 		"pages": pages.map(func(p): return int(p["n"])),
-		"best": best}
+		"best": best, "vignette": vig}
+
+
+## §13.4: one vignette per night. A crew-restoration scene preempts
+## everything on the first night at that site; otherwise unseen
+## triggers play first and the one matching the most guests wins.
+func _pick_vignette(st: Dictionary, seated: Array) -> String:
+	var rows: Array = Catalog.data.get("vignettes", [])
+	var restored: String = st.get("vignette_restored", "")
+	if restored != "":
+		st["vignette_restored"] = ""
+		for v in rows:
+			if v.get("trigger", {}).get("crew_restored") == restored:
+				vignettes_seen.append(v["id"])
+				return v["id"]
+	var world := _world()
+	var spots: Dictionary = world["layout"]["pads"]["spots"]
+	var best_id := ""
+	var best_weight := -1
+	for v in rows:
+		var tr: Dictionary = v.get("trigger", {})
+		if tr.has("crew_restored"):
+			continue
+		var w := _vignette_weight(tr, seated, st, world, spots)
+		if w < 0:
+			continue                                   # not eligible
+		# unseen first; then the trigger matching the most guests
+		var key := w if v["id"] not in vignettes_seen else w - 100
+		if key > best_weight:
+			best_weight = key
+			best_id = v["id"]
+	if best_id != "":
+		vignettes_seen.append(best_id)
+	return best_id
+
+
+## -1 = ineligible; otherwise how many seated guests match the
+## trigger (the tiebreak §13.4 wants).
+func _vignette_weight(tr: Dictionary, seated: Array, st: Dictionary,
+		world: Dictionary, spots: Dictionary) -> int:
+	var meal_ids: Array = meals.map(func(m): return m["id"])
+	var n := 0
+	for s in seated:
+		var g: Dictionary = s["guest"]
+		var ok := true
+		if tr.has("trait"):
+			ok = ok and tr["trait"] in g.get("traits", [])
+		if tr.has("archetype"):
+			ok = ok and g.get("archetype") == tr["archetype"]
+		if tr.has("regular"):
+			ok = ok and g.get("regular", "") == tr["regular"]
+		if tr.has("effect"):
+			var hit := false
+			for pid in s["pad_ids"]:
+				var cell := Vector2i(spots[pid][0], spots[pid][1])
+				if Seating.effects_at(cell, world).has(tr["effect"]):
+					hit = true
+			ok = ok and hit
+		if ok:
+			n += 1
+	if tr.has("trait") or tr.has("archetype") or tr.has("regular") \
+			or tr.has("effect"):
+		if n == 0:
+			return -1
+	if tr.has("decor"):
+		if not st["decor"].any(func(d): return d["id"] == tr["decor"]):
+			return -1
+	if tr.has("weather") and st["weather"] != tr["weather"]:
+		return -1
+	if tr.has("meal") and tr["meal"] not in meal_ids:
+		return -1
+	var dm: Dictionary = tr.get("decor_effect_min", {})
+	if dm:
+		var count := 0
+		for d in st["decor"]:
+			if d.get("effect") == dm["effect"]:
+				count += 1
+		if count < int(dm.get("n", 1)):
+			return -1
+	return maxi(n, 1)
 
 
 # ------------------------------------------------------------- journal (§8)
@@ -936,6 +1084,8 @@ func state_dict() -> Dictionary:
 		"pantry": pantry.duplicate(), "gear": gear.duplicate(),
 		"recipes": recipes_cooked.duplicate(),
 		"pairs_tried": pairs_tried.duplicate(),
+		"letters": letters_read.duplicate(),
+		"journal": {"vignettes_seen": vignettes_seen.duplicate()},
 		"sites": _sites_to_json()}
 
 
@@ -987,6 +1137,9 @@ func load_state(state: Dictionary) -> void:
 	gear = state.get("gear", gear)
 	recipes_cooked = state.get("recipes", recipes_cooked)
 	pairs_tried = state.get("pairs_tried", pairs_tried)
+	letters_read = state.get("letters", letters_read)
+	vignettes_seen = state.get("journal", {}).get(
+		"vignettes_seen", vignettes_seen)
 	if state.has("sites"):
 		sites = _sites_from_json(state["sites"])
 	var saved: Dictionary = state.get("crew", {})

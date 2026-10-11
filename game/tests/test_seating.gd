@@ -371,6 +371,52 @@ func _ready() -> void:
 		and Game.buy_decor("koi_pond", [Vector2i(2, 1)]),
 		"pages %s" % [Game.site_state()["pages_done"]])
 
+	# --- letters + vignettes (§8.2, §13) ---------------------------------
+	# Morning letters landed one per morning while days advanced above.
+	var pdel: Array = Game.site_state(&"pinewatch")["letters_delivered"]
+	check("P letters one per morning",
+		"p01" in pdel and "p02" in pdel and "p03" in pdel,
+		"got %s" % [pdel])
+	# w01 arrived on the morning we traveled to Whisper River.
+	var wdel: Array = Game.site_state()["letters_delivered"]
+	check("W arrival letter", "w01" in wdel,
+		"got %s" % [wdel])
+	check("unread waits in journal",
+		Game.unread_letters().size() == wdel.size())
+	Game.read_letter("w01")
+	check("read clears unread",
+		Game.unread_letters().size() == wdel.size() - 1)
+	# Event letters go first: the Minh family's day-6 weekend board
+	# already stamped p08 that morning — ahead of the m6 letter p06 —
+	# and chapter_done delivers p10 as the last event letter.
+	Game.visit_site(&"pinewatch")
+	Game.new_day()
+	var pdel2: Array = Game.site_state(&"pinewatch")["letters_delivered"]
+	check("family letter preempted mornings",
+		pdel2.find("p08") < pdel2.find("p06")
+		and pdel2.back() == "p10", "got %s" % [pdel2])
+
+	# Vignettes: unseen first, guest-match wins, restoration preempts.
+	Game.visit_site(&"whisper_river")
+	Game.vignettes_seen = []
+	Game.site_state()["weather"] = "clear"
+	Game.site_state()["guests"]["reg_old_ba"] = old_ba
+	Game.site_state()["assignments"] = {"reg_old_ba": ["p6"]}
+	var rep3 := Game.goodnight()
+	check("Old Ba's story vignette", rep3["vignette"] == "old_ba_story",
+		"got %s" % rep3["vignette"])
+	Game.vignettes_seen = []
+	Game.site_state()["vignette_restored"] = "boathouse"
+	Game.site_state()["guests"]["reg_old_ba"] = old_ba
+	Game.site_state()["assignments"] = {"reg_old_ba": ["p6"]}
+	var rep4 := Game.goodnight()
+	check("restoration preempts",
+		rep4["vignette"] == "boat_on_the_river"
+		and Game.site_state()["vignette_restored"] == "",
+		"got %s" % rep4["vignette"])
+	check("letters+journal persist", Game.state_dict().has("letters")
+		and Game.state_dict()["journal"].has("vignettes_seen"))
+
 	print("=== %s ===" % ("ALL CHECKS PASS" if failures == 0
 		else "%d FAILURES" % failures))
 	get_tree().quit(failures)
