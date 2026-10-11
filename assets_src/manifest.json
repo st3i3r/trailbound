@@ -18,12 +18,12 @@
       "id": "campfire_flame",
       "category": "anims",
       "status": "generated",
-      "files": ["gen/flame_frames_0.png"],
+      "files": ["gen/flame_frames_0.png", "gen/flame_00.png", "gen/flame_01.png", "gen/flame_02.png", "gen/flame_03.png"],
       "canvas": "128x32",
       "frames": "4x32x32 strip",
       "batch": 0,
       "source": "pixellab pixen 'side'",
-      "notes": "flicker loop 1-2-4-2; frame 3 doubles as wind-gust variant; sits on campfire_ring + glow layer"
+      "notes": "flicker loop 1-2-4-2; frame 3 doubles as wind-gust variant; sits on campfire_ring + glow layer; sliced + despeckled via tools/slice_sheet.py"
     },
     {
       "id": "player_idle",
@@ -55,6 +55,267 @@
       "frames": 1,
       "batch": 0,
       "notes": "water edge sample for palette lock"
+    },
+
+    {
+      "id": "wardens_hut_ruin",
+      "category": "structures",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "§8.4 Pinewatch structure, state 1/4: overgrown ruin on the crew plot; brambles + fallen porch"
+    },
+    {
+      "id": "wardens_hut_brambles_cleared",
+      "category": "structures",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "state 2/4: cleared ground, sagging roof; scaffold overlay optional"
+    },
+    {
+      "id": "wardens_hut_roof_fixed",
+      "category": "structures",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "state 3/4: new roof, porch still broken"
+    },
+    {
+      "id": "wardens_hut_restored",
+      "category": "structures",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "state 4/4: porch rebuilt, warm light for the 'porch_light' vignette"
+    },
+    {
+      "id": "boathouse_states",
+      "category": "structures",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 4,
+      "batch": "crew",
+      "notes": "§8.4 Whisper River: ruin → stage_1 → stage_2 → restored (boat afloat); boat-on-river vignette state"
+    },
+    {
+      "id": "lantern_workshop_states",
+      "category": "structures",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 4,
+      "batch": "crew",
+      "notes": "§8.4 Lantern Valley: ruin → stage_1 → stage_2 → restored; lanterns-over-the-valley vignette state"
+    },
+    {
+      "id": "overgrown_plot_pinewatch",
+      "category": "structures",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "reserved_overgrown scenery, pine undergrowth — v1 placeholder for Fire Tower + Pond Dock (§6.11)"
+    },
+    {
+      "id": "overgrown_plot_whisper_river",
+      "category": "structures",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "riverbank weeds — placeholder for Bamboo Treehouse + Bathhouse"
+    },
+    {
+      "id": "overgrown_plot_lantern_valley",
+      "category": "structures",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "meadow grass mound — placeholder for Observatory + Long Table"
+    },
+    {
+      "id": "crew_scaffold_overlay",
+      "category": "structures",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "bamboo scaffold + tarp layer shown on any structure while a stage is being worked"
+    },
+    {
+      "id": "crew_volunteer_a",
+      "category": "characters",
+      "status": "planned",
+      "files": [],
+      "canvas": "64x64",
+      "frames": "4-frame work loop + idle",
+      "batch": "crew",
+      "notes": "volunteer: hammer/saw loop while a stage runs, idle otherwise; hard hat + hi-vis over hoodie, cozy chunky style"
+    },
+    {
+      "id": "crew_volunteer_b",
+      "category": "characters",
+      "status": "planned",
+      "files": [],
+      "canvas": "64x64",
+      "frames": "4-frame work loop + idle",
+      "batch": "crew",
+      "notes": "second volunteer silhouette (carry planks, sweep); same work/idle set"
+    },
+    {
+      "id": "keepsake_thermos",
+      "category": "journal",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "§8.4 stage 1 keepsake art (Warden's Hut): grandpa's dented thermos, journal illustration style"
+    },
+    {
+      "id": "keepsake_register",
+      "category": "journal",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "old trail register, weathered logbook"
+    },
+    {
+      "id": "keepsake_photo",
+      "category": "journal",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "faded photo of grandpa on the porch — the one image of him (§12.1)"
+    },
+    {
+      "id": "keepsake_oar",
+      "category": "journal",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "oar carved with two sets of initials (Boathouse)"
+    },
+    {
+      "id": "keepsake_chart",
+      "category": "journal",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "grandpa's river chart, hand-drawn bends and notes"
+    },
+    {
+      "id": "keepsake_boat",
+      "category": "journal",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "the boat shared with Old Ba, afloat again"
+    },
+    {
+      "id": "keepsake_frames",
+      "category": "journal",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "bamboo frames and rice paper (Lantern Workshop)"
+    },
+    {
+      "id": "keepsake_book",
+      "category": "journal",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "grandpa's lantern pattern book"
+    },
+    {
+      "id": "keepsake_lantern",
+      "category": "journal",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": "crew",
+      "notes": "his last unfinished lantern, finished — may foreshadow the cove (Q8)"
+    },
+    {
+      "id": "crew_ready_bubble",
+      "category": "ui",
+      "status": "planned",
+      "files": [],
+      "canvas": "32x32",
+      "frames": "2-frame bob",
+      "batch": "crew",
+      "notes": "stage-ready bubble over the structure and the site's trail-map marker (§8.4, §17.2)"
+    },
+    {
+      "id": "crew_sheet_ui",
+      "category": "ui",
+      "status": "planned",
+      "files": [],
+      "canvas": "kit",
+      "frames": "panel + buttons",
+      "batch": "crew",
+      "notes": "crew sheet panel: stage label, time-left bar, Collect, speed-up '▶ −40 min', Finish (§17.2)"
+    },
+    {
+      "id": "collect_sparkle_vfx",
+      "category": "vfx",
+      "status": "planned",
+      "files": [],
+      "canvas": "64x64",
+      "frames": "6-8 frame strip",
+      "batch": "crew",
+      "notes": "2-4 s collect ceremony (§17.3): sparkle burst + keepsake rise; warm dust motes"
+    },
+    {
+      "id": "restore_dust_vfx",
+      "category": "vfx",
+      "status": "planned",
+      "files": [],
+      "canvas": "96x96",
+      "frames": "6-frame strip",
+      "batch": "crew",
+      "notes": "plank-dust poof + falling leaf puff when a structure state swaps"
+    },
+    {
+      "id": "vol2_structures",
+      "category": "structures",
+      "status": "draft",
+      "files": [],
+      "canvas": "96x96",
+      "frames": "6 structures x ~3 states",
+      "batch": "v1.1",
+      "notes": "§6.11 draft: fire_tower, pond_dock (P), bamboo_treehouse, bathhouse (W), observatory, long_table (L); scaffold + restored states; sizing/design may change at the v1.1 gate"
     }
   ]
 }
