@@ -972,6 +972,31 @@ assets; placement is rules + a small human pass. ~0 extra gens.
 is a pixel artist's full-scene judgment — acceptable gap at our scale; the
 day/night tint + glow layer covers a lot of the residual difference.
 
+### 7.18 Local flavor — the subtle Vietnamese signature (Easter-egg layer)
+
+Design intent: the game never says "Vietnam" — but players who know will feel it
+over weeks: *"this seems to be a Vietnamese dev."* Every element must have
+plausible deniability alone; only the accumulated pattern reveals it.
+
+**THE RULE: no VN text, no flag, no named places. Detail choices only —
+most fold into already-budgeted sprites.**
+
+| Channel | Detail | Note |
+|---|---|---|
+| Food `[+gen]` | **phin filter + condensed-milk glass** (cà phê sữa đá) on ranger's table · **phở bowl** + **bánh mì** in meal set | strongest signal; invisible to others |
+| Props `[+gen]` | **tiny red/blue plastic stools** (low-tier guest seating — THE insider detail) · **nón lá** on kiosk + worn by a traveler · **Hội An silk lanterns** in light set · **bamboo bridge** at river · **lotus pads** on pond (sen) · **Honda Cub-style moped** by the van · pennant strings (cờ hoa) | each reads as "cute detail" alone |
+| Vegetation `[free]` | bamboo clumps in forest · **banyan** as the big tree | choices within tree sprites |
+| Backgrounds `[+gen]` | **limestone karst islets** in coast sea-bg (Hạ Long) · **terraced paddies** in valley/mtn parallax (Sa Pa) | the deep-cut recognition |
+| Costumes `[free]` | **kid scout's red pioneer scarf** (khăn quàng) · **old angler's green pith helmet** (mũ cối) · nón lá on one traveler | detail choices in char prompts |
+| Animation `[free]` | kids' `play` anim = **đá cầu** (feather shuttlecock) | alive + subtle |
+| Critters/audio `[free]` | free-range **chicken** + rooster crow at dawn + cicada ambience | the *sound* of VN countryside |
+| Seasonal `[existing]` | Tết reskin = "Lunar Festival" (kumquat, peach/apricot blossom, bánh chưng) · **Trung Thu** lantern festival + mooncakes — reuses lantern systems | signature hidden in the events layer |
+| Names `[free]` | guestbook signatures: Lan, Minh, Hùng, Bích, "Bác Ba" | pattern only |
+
+**Cost: ~+8-12 gens** (one "local flavor" batch: phở, bánh mì, phin set, nón lá,
+shuttlecock, moped, stools, karst bg) — everything else is prompt/detail choices
+inside assets already in the manifest.
+
 ### Operational notes (from docs)
 - **Map objects auto-delete after 8h** → download PNGs immediately at generation time.
 - Downloads are unauthenticated UUID URLs (`/mcp/characters/{id}/download`, `/mcp/tilesets/{id}/image`) — safe to fetch then archive locally.
