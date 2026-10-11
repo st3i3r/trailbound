@@ -146,8 +146,11 @@ def main():
         m = json.load(open(MANIFEST))
         paths += [os.path.join(ROOT, "assets_src", f)
                   for e in m["assets"] if e.get("batch") == a.batch
-                  for f in e.get("files", []) if f.endswith("_0.png")
-                  or "frames" not in str(e.get("frames"))]
+                  for f in e.get("files", [])]
+    elif not a.files:
+        m = json.load(open(MANIFEST))
+        paths += [os.path.join(ROOT, "assets_src", f)
+                  for e in m["assets"] for f in e.get("files", [])]
     paths = [p for p in dict.fromkeys(paths) if os.path.exists(p)]
     if not paths:
         sys.exit("no input files")
@@ -168,15 +171,17 @@ def main():
         print(f"  {os.path.basename(p):28s} {uniq:4d} uniq -> "
               f"{len(used):2d} ramp colors, {far} far-mapped")
 
+    name = f"batch{a.batch}_palette" if a.batch is not None else "site_palette"
     w, h, rows = swatch(ramp)
-    pngmod.write(os.path.join(OUT, "batch0_palette.png"), w, h, rows)
-    json.dump({"batch": a.batch, "colors": a.colors,
+    pngmod.write(os.path.join(OUT, name + ".png"), w, h, rows)
+    json.dump({"batch": a.batch if a.batch is not None else "all",
+               "colors": a.colors,
                "sources": [os.path.relpath(p, ROOT) for p in paths],
                "ramp": ["#%02x%02x%02x" % c for c in ramp]},
-              open(os.path.join(OUT, "batch0_palette.json"), "w"), indent=2)
+              open(os.path.join(OUT, name + ".json"), "w"), indent=2)
     print(f"coverage: {len(coverage)}/{len(ramp)} ramp colors used, "
           f"{far_tot} far-mapped px")
-    print(f"-> {os.path.relpath(OUT, ROOT)}/batch0_palette.*")
+    print(f"-> {os.path.relpath(OUT, ROOT)}/{name}.*")
 
 
 if __name__ == "__main__":

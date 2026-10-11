@@ -1,24 +1,32 @@
 {
   "project": "Trailbound",
-  "palette": "batch-0 first pass: 32-color ramp at cleanup/batch0_palette.json (tools/palette_lock.py --batch 0). Per-site ramps: Pinewatch = deep greens + ember-orange accents; Whisper River = river blues + bamboo green; Lantern Valley = golden meadow + dusk violet (§11). Dusk warmth is a §16.3 lighting layer — do NOT bake it into sprites",
+  "palette": "Pinewatch site ramp: 40 colors, cleanup/site_palette.json (tools/palette_lock.py pools all manifest files). Per-site ramps: Pinewatch = deep greens + ember-orange accents; Whisper River = river blues + bamboo green; Lantern Valley = golden meadow + dusk violet (\u00a711). Dusk warmth is a \u00a716.3 lighting layer \u2014 do NOT bake it into sprites",
   "sun_angle": "upper left",
   "assets": [
     {
       "id": "campfire_ring",
       "category": "structures",
       "status": "generated",
-      "files": ["gen/campfire_0.png"],
+      "files": [
+        "gen/campfire_0.png"
+      ],
       "canvas": "64x64",
       "frames": 1,
       "batch": 0,
       "source": "pixellab pixen 'high top-down'",
-      "notes": "stone ring only — flame is a separate animated layer (campfire_flame)"
+      "notes": "stone ring only \u00e2\u20ac\u201d flame is a separate animated layer (campfire_flame)"
     },
     {
       "id": "campfire_flame",
       "category": "anims",
       "status": "generated",
-      "files": ["gen/flame_frames_0.png", "gen/flame_00.png", "gen/flame_01.png", "gen/flame_02.png", "gen/flame_03.png"],
+      "files": [
+        "gen/flame_frames_0.png",
+        "gen/flame_00.png",
+        "gen/flame_01.png",
+        "gen/flame_02.png",
+        "gen/flame_03.png"
+      ],
       "canvas": "128x32",
       "frames": "4x32x32 strip",
       "batch": 0,
@@ -29,138 +37,276 @@
       "id": "player_idle",
       "category": "characters",
       "status": "generated",
-      "files": ["gen/player_front_0.png"],
+      "files": [
+        "gen/player_front_0.png"
+      ],
       "canvas": "64x64",
       "frames": 1,
       "batch": 0,
       "source": "pixellab pixen 'low top-down'",
-      "notes": "front-facing idle — the character style anchor; 4-dir sheet later via create_character"
+      "notes": "front-facing idle \u00e2\u20ac\u201d the character style anchor; 4-dir sheet later via create_character"
     },
     {
       "id": "player_walk_away",
       "category": "characters",
       "status": "generated",
-      "files": ["gen/player_0.png"],
+      "files": [
+        "gen/player_0.png"
+      ],
       "canvas": "64x64",
       "frames": 1,
       "batch": 0,
       "source": "pixellab pixen 'low top-down'",
-      "notes": "back-three-quarter pose — kept as the walk-away (north) pose for the 4-dir sheet"
+      "notes": "back-three-quarter pose \u00e2\u20ac\u201d kept as the walk-away (north) pose for the 4-dir sheet"
     },
     {
       "id": "terrain_grass_pinewatch",
       "category": "terrain",
       "status": "generated",
-      "files": ["gen/terrain_grass_p1_0.png", "gen/terrain_grass_p_0.png"],
+      "files": [
+        "gen/terrain_grass_p1_0.png",
+        "gen/terrain_grass_p_0.png"
+      ],
       "canvas": "32x32",
       "frames": 1,
       "batch": 0,
       "source": "pixellab pixen 'high top-down'",
-      "notes": "p1 (current candidate): sunlit yellow-green base, ember litter accents — matches eastward1.jpg ground; mild litter cluster right-center to thin in cleanup. p0 superseded: dark moss + dense amber"
+      "notes": "p1 (current candidate): sunlit yellow-green base, ember litter accents \u00e2\u20ac\u201d matches eastward1.jpg ground; mild litter cluster right-center to thin in cleanup. p0 superseded: dark moss + dense amber"
     },
     {
       "id": "terrain_shore_sample",
       "category": "terrain",
       "status": "generated",
-      "files": ["gen/terrain_shore_p_0.png"],
+      "files": [
+        "gen/terrain_shore_p_0.png"
+      ],
       "canvas": "32x32",
       "frames": 1,
       "batch": 0,
       "source": "pixellab pixen 'high top-down'",
-      "notes": "sandy bank → foam → blue water, horizontal transition for vertical tiling; sand tone is material-true warm tan"
+      "notes": "sandy bank \u00e2\u2020\u2019 foam \u00e2\u2020\u2019 blue water, horizontal transition for vertical tiling; sand tone is material-true warm tan"
     },
     {
       "id": "prop_outfitter_van",
       "category": "props",
       "status": "generated",
-      "files": ["gen/prop_van_p_0.png"],
+      "files": [
+        "gen/prop_van_p_0.png"
+      ],
       "canvas": "64x64",
       "frames": 1,
       "batch": 0,
       "source": "pixellab pixen 'high top-down'",
-      "notes": "vintage outfitter van, warm paint + cream roof — warmth on the prop is per the Eastward rule (structures/props carry the warm tones, ground stays green)"
+      "notes": "vintage outfitter van, warm paint + cream roof \u00e2\u20ac\u201d warmth on the prop is per the Eastward rule (structures/props carry the warm tones, ground stays green)"
     },
     {
       "id": "terrain_grass_lush",
-      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "denser under-canopy grass variant"
+      "category": "terrain",
+      "status": "generated",
+      "files": [
+        "gen/terrain_grass_lush_v2_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "v2 fills frame; diagonal sandy band needs cloning out or it will seam on repeat; v1 island superseded",
+      "source": "pixellab pixen 'high top-down'"
     },
     {
       "id": "terrain_grass_worn",
-      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "sparse/dry high-traffic grass variant"
+      "category": "terrain",
+      "status": "generated",
+      "files": [
+        "gen/terrain_grass_worn_v2_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "v2 full-bleed dry olive ground; v1 sparse/dark superseded",
+      "source": "pixellab pixen 'high top-down'"
     },
     {
       "id": "terrain_dirt",
-      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "bare packed-earth base"
+      "category": "terrain",
+      "status": "generated",
+      "files": [
+        "gen/terrain_dirt_v2_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "v2 full-bleed packed earth + pebbles; v1 island superseded",
+      "source": "pixellab pixen 'high top-down'"
     },
     {
       "id": "terrain_path_dirt",
-      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "worn footpath tile"
+      "category": "terrain",
+      "status": "generated",
+      "files": [
+        "gen/terrain_path_dirt_v2_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "v2 marginal \u2014 wear streaks read as diagonal tiger stripes; use dirt_v2 as fallback or fix streaks in cleanup; v1 island (paw print) superseded",
+      "source": "pixellab pixen 'high top-down'"
     },
     {
       "id": "terrain_forest_floor",
-      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "pine-needle bed under the pines"
+      "category": "terrain",
+      "status": "generated",
+      "files": [
+        "gen/terrain_forest_floor_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "full-bleed needle litter, tiles as-is",
+      "source": "pixellab pixen 'high top-down'"
     },
     {
       "id": "terrain_path_stone",
-      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "stepping-stone path"
+      "category": "terrain",
+      "status": "generated",
+      "files": [
+        "gen/terrain_path_stone_v2_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "v2 full-bleed flagstones + moss gaps; v1 island superseded",
+      "source": "pixellab pixen 'high top-down'"
     },
     {
       "id": "terrain_pond_water",
-      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "still pond water (§11 Pinewatch pond errand)"
+      "category": "terrain",
+      "status": "generated",
+      "files": [
+        "gen/terrain_pond_water_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "full-bleed dark water + ripples, tiles as-is",
+      "source": "pixellab pixen 'high top-down'"
     },
     {
       "id": "terrain_shore_corner_in",
-      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "inside shore corner, mates with terrain_shore_p_0 edges"
+      "category": "terrain",
+      "status": "generated",
+      "files": [
+        "gen/terrain_shore_cin_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "inside corner, mates with terrain_shore_p_0 straight edges",
+      "source": "pixellab pixen 'high top-down'"
     },
     {
       "id": "terrain_shore_corner_out",
-      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "outside shore corner (sandy point)"
+      "category": "terrain",
+      "status": "generated",
+      "files": [
+        "gen/terrain_shore_cout_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "outside corner (sandy point)",
+      "source": "pixellab pixen 'high top-down'"
     },
     {
       "id": "decal_grass_tuft_a",
-      "category": "clutter", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "seeded scatter layer (§16.4: tufts near trees)"
+      "category": "clutter",
+      "status": "generated",
+      "files": [
+        "gen/decal_tuft_a_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "clean tuft on transparency",
+      "source": "pixellab pixen 'high top-down'"
     },
     {
       "id": "decal_grass_tuft_b",
-      "category": "clutter", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "second tuft silhouette"
+      "category": "clutter",
+      "status": "generated",
+      "files": [
+        "gen/decal_tuft_b_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "second tuft silhouette",
+      "source": "pixellab pixen 'high top-down'"
     },
     {
       "id": "decal_pine_needles",
-      "category": "clutter", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "needle drift scatter"
+      "category": "clutter",
+      "status": "generated",
+      "files": [
+        "gen/decal_needles_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "needle drift scatter",
+      "source": "pixellab pixen 'high top-down'"
     },
     {
       "id": "decal_pebbles",
-      "category": "clutter", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "pebble cluster scatter"
+      "category": "clutter",
+      "status": "generated",
+      "files": [
+        "gen/decal_pebbles_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "pebble cluster \u2014 slightly clumpy, may shrink in cleanup",
+      "source": "pixellab pixen 'high top-down'"
     },
     {
       "id": "decal_fern",
-      "category": "clutter", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "fern clump scatter"
+      "category": "clutter",
+      "status": "generated",
+      "files": [
+        "gen/decal_fern_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "bluer-green fronds contrast grass nicely",
+      "source": "pixellab pixen 'high top-down'"
     },
     {
       "id": "decal_wildflower",
-      "category": "clutter", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "tiny flower dots scatter"
+      "category": "clutter",
+      "status": "generated",
+      "files": [
+        "gen/decal_flower_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "violet flower cluster \u2014 denser than spec'd 2-3 dots but usable",
+      "source": "pixellab pixen 'high top-down'"
     },
     {
       "id": "decal_mushroom",
-      "category": "clutter", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
-      "notes": "mushroom pair — forage hint"
+      "category": "clutter",
+      "status": "generated",
+      "files": [
+        "gen/decal_mushroom_v2_0.png"
+      ],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 1,
+      "notes": "v2 clean pair on transparency; v1 had a grass blob under it",
+      "source": "pixellab pixen 'high top-down'"
     },
-
     {
       "id": "wardens_hut_ruin",
       "category": "structures",
@@ -169,7 +315,7 @@
       "canvas": "96x96",
       "frames": 1,
       "batch": "crew",
-      "notes": "§8.4 Pinewatch structure, state 1/4: overgrown ruin on the crew plot; brambles + fallen porch"
+      "notes": "\u00c2\u00a78.4 Pinewatch structure, state 1/4: overgrown ruin on the crew plot; brambles + fallen porch"
     },
     {
       "id": "wardens_hut_brambles_cleared",
@@ -209,7 +355,7 @@
       "canvas": "96x96",
       "frames": 4,
       "batch": "crew",
-      "notes": "§8.4 Whisper River: ruin → stage_1 → stage_2 → restored (boat afloat); boat-on-river vignette state"
+      "notes": "\u00c2\u00a78.4 Whisper River: ruin \u00e2\u2020\u2019 stage_1 \u00e2\u2020\u2019 stage_2 \u00e2\u2020\u2019 restored (boat afloat); boat-on-river vignette state"
     },
     {
       "id": "lantern_workshop_states",
@@ -219,7 +365,7 @@
       "canvas": "96x96",
       "frames": 4,
       "batch": "crew",
-      "notes": "§8.4 Lantern Valley: ruin → stage_1 → stage_2 → restored; lanterns-over-the-valley vignette state"
+      "notes": "\u00c2\u00a78.4 Lantern Valley: ruin \u00e2\u2020\u2019 stage_1 \u00e2\u2020\u2019 stage_2 \u00e2\u2020\u2019 restored; lanterns-over-the-valley vignette state"
     },
     {
       "id": "overgrown_plot_pinewatch",
@@ -229,7 +375,7 @@
       "canvas": "96x96",
       "frames": 1,
       "batch": "crew",
-      "notes": "reserved_overgrown scenery, pine undergrowth — v1 placeholder for Fire Tower + Pond Dock (§6.11)"
+      "notes": "reserved_overgrown scenery, pine undergrowth \u00e2\u20ac\u201d v1 placeholder for Fire Tower + Pond Dock (\u00c2\u00a76.11)"
     },
     {
       "id": "overgrown_plot_whisper_river",
@@ -239,7 +385,7 @@
       "canvas": "96x96",
       "frames": 1,
       "batch": "crew",
-      "notes": "riverbank weeds — placeholder for Bamboo Treehouse + Bathhouse"
+      "notes": "riverbank weeds \u00e2\u20ac\u201d placeholder for Bamboo Treehouse + Bathhouse"
     },
     {
       "id": "overgrown_plot_lantern_valley",
@@ -249,7 +395,7 @@
       "canvas": "96x96",
       "frames": 1,
       "batch": "crew",
-      "notes": "meadow grass mound — placeholder for Observatory + Long Table"
+      "notes": "meadow grass mound \u00e2\u20ac\u201d placeholder for Observatory + Long Table"
     },
     {
       "id": "crew_scaffold_overlay",
@@ -289,7 +435,7 @@
       "canvas": "96x96",
       "frames": 1,
       "batch": "crew",
-      "notes": "§8.4 stage 1 keepsake art (Warden's Hut): grandpa's dented thermos, journal illustration style"
+      "notes": "\u00c2\u00a78.4 stage 1 keepsake art (Warden's Hut): grandpa's dented thermos, journal illustration style"
     },
     {
       "id": "keepsake_register",
@@ -309,7 +455,7 @@
       "canvas": "96x96",
       "frames": 1,
       "batch": "crew",
-      "notes": "faded photo of grandpa on the porch — the one image of him (§12.1)"
+      "notes": "faded photo of grandpa on the porch \u00e2\u20ac\u201d the one image of him (\u00c2\u00a712.1)"
     },
     {
       "id": "keepsake_oar",
@@ -369,7 +515,7 @@
       "canvas": "96x96",
       "frames": 1,
       "batch": "crew",
-      "notes": "his last unfinished lantern, finished — may foreshadow the cove (Q8)"
+      "notes": "his last unfinished lantern, finished \u00e2\u20ac\u201d may foreshadow the cove (Q8)"
     },
     {
       "id": "crew_ready_bubble",
@@ -379,7 +525,7 @@
       "canvas": "32x32",
       "frames": "2-frame bob",
       "batch": "crew",
-      "notes": "stage-ready bubble over the structure and the site's trail-map marker (§8.4, §17.2)"
+      "notes": "stage-ready bubble over the structure and the site's trail-map marker (\u00c2\u00a78.4, \u00c2\u00a717.2)"
     },
     {
       "id": "crew_sheet_ui",
@@ -389,7 +535,7 @@
       "canvas": "kit",
       "frames": "panel + buttons",
       "batch": "crew",
-      "notes": "crew sheet panel: stage label, time-left bar, Collect, speed-up '▶ −40 min', Finish (§17.2)"
+      "notes": "crew sheet panel: stage label, time-left bar, Collect, speed-up '\u00e2\u2013\u00b6 \u00e2\u02c6\u201940 min', Finish (\u00c2\u00a717.2)"
     },
     {
       "id": "collect_sparkle_vfx",
@@ -399,7 +545,7 @@
       "canvas": "64x64",
       "frames": "6-8 frame strip",
       "batch": "crew",
-      "notes": "2-4 s collect ceremony (§17.3): sparkle burst + keepsake rise; warm dust motes"
+      "notes": "2-4 s collect ceremony (\u00c2\u00a717.3): sparkle burst + keepsake rise; warm dust motes"
     },
     {
       "id": "restore_dust_vfx",
@@ -419,7 +565,7 @@
       "canvas": "96x96",
       "frames": "6 structures x ~3 states",
       "batch": "v1.1",
-      "notes": "§6.11 draft: fire_tower, pond_dock (P), bamboo_treehouse, bathhouse (W), observatory, long_table (L); scaffold + restored states; sizing/design may change at the v1.1 gate"
+      "notes": "\u00c2\u00a76.11 draft: fire_tower, pond_dock (P), bamboo_treehouse, bathhouse (W), observatory, long_table (L); scaffold + restored states; sizing/design may change at the v1.1 gate"
     }
   ]
 }
