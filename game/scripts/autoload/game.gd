@@ -1074,6 +1074,110 @@ func cook(a: String, b: String) -> Dictionary:
 		"name": r.get("name", "")}
 
 
+# ------------------------------------------------------------- Daily (§10)
+#
+# One shared puzzle per calendar day, seeded by hash("daily", date).
+# One scored attempt; unlimited practice afterwards. Unlocks with
+# Pinewatch letter 6 (p06).
+
+const DAILY_EPOCH := "2025-01-01"
+
+var daily_state := {"date": "", "score": -1}      # last scored attempt
+
+
+func daily_unlocked() -> bool:
+	return "p06" in site_state(&"pinewatch")["letters_delivered"]
+
+
+func _daily_date(date_str := "") -> String:
+	return date_str if date_str != "" \
+		else Time.get_date_string_from_system()
+
+
+func daily_n(date_str: String) -> int:
+	var a := Time.get_unix_time_from_datetime_string(
+		DAILY_EPOCH + "T00:00:00")
+	var b := Time.get_unix_time_from_datetime_string(
+		date_str + "T00:00:00")
+	return int((b - a) / 86400.0)
+
+
+## The seeded puzzle for a date — deterministic, so a reload shows
+## the same cards, kit and meals.
+func daily(date_str := "") -> Dictionary:
+	var d := _daily_date(date_str)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = absi(int(("daily|" + d).hash()))
+	var skip := ["seats", "warmth_upgrade", "none"]
+	var kit_pool: Array = Catalog.data.get("decor", []).filter(
+		func(x): return String(x.get("unlock", "")).begins_with("P") \
+			and x.get("effect") not in skip)
+	var pz := Seating.daily_puzzle(site_row(&"pinewatch"),
+		Catalog.data.get("archetypes", []), kit_pool,
+		_favourite_pool(&"pinewatch"), rng)
+	pz["date"] = d
+	pz["n"] = daily_n(d)
+	pz["attempted"] = daily_state["date"] == d \
+		and daily_state["score"] >= 0
+	return pz
+
+
+## Score an attempt. assignments: {guest_id: [pad_ids]};
+## placements: {kit_item_id: [Vector2i cells]}. submit=true records
+## the score if today's attempt is unused (§10 one scored attempt).
+func daily_score(puzzle: Dictionary, assignments: Dictionary,
+		placements: Dictionary, submit := false) -> Dictionary:
+	var kit_rows := {}
+	for k in puzzle["kit"]:
+		kit_rows[k["id"]] = k
+	var decor_items := []
+	for iid in placements:
+		var row: Dictionary = kit_rows.get(iid, {})
+		decor_items.append({"id": iid, "cells": placements[iid],
+			"effect": row.get("effect", ""),
+			"reach": int(row.get("reach", 1))})
+	var guests := {}
+	var occupants := {}
+	var seated := []
+	for r in puzzle["requests"]:
+		guests[r["id"]] = r
+	for gid in assignments:
+		if gid not in guests:
+			continue
+		for pid in assignments[gid]:
+			occupants[pid] = gid
+		seated.append({"guest": guests[gid],
+			"pad_ids": assignments[gid]})
+	var kinds := {}
+	for t in Catalog.data.get("traits", []):
+		kinds[t["id"]] = t.get("kind", "need")
+	var world := Seating.daily_world(puzzle, decor_items, occupants,
+		guests, kinds, Catalog.data.get("reviews", {}))
+	var plan := Seating.allocate_meals(puzzle["meals"], seated)
+	var results := []
+	var total := 0
+	for s in seated:
+		var rr := Seating.resolve_guest(s["guest"], s["pad_ids"],
+			world, int(plan["terms"].get(s["guest"]["id"], -1)))
+		results.append(rr)
+		total += rr["stars"]
+	if submit and puzzle.get("date") == _daily_date() \
+			and daily_state["date"] != puzzle.get("date"):
+		daily_state = {"date": puzzle["date"], "score": total}
+	return {"score": total, "results": results,
+		"share": daily_share(puzzle, results)}
+
+
+func daily_share(puzzle: Dictionary, results: Array) -> String:
+	var row := ""
+	for r in results:
+		row += "★".repeat(int(r["stars"])) + " "
+	return "Trailbound Daily #%d — %d/25\n%s" % [
+		int(puzzle.get("n", 0)), int(
+			results.reduce(func(a, x): return a + x["stars"], 0)),
+		row.strip_edges()]
+
+
 # ------------------------------------------------------------- save (§22)
 
 func state_dict() -> Dictionary:
@@ -1086,6 +1190,7 @@ func state_dict() -> Dictionary:
 		"pairs_tried": pairs_tried.duplicate(),
 		"letters": letters_read.duplicate(),
 		"journal": {"vignettes_seen": vignettes_seen.duplicate()},
+		"daily": daily_state.duplicate(),
 		"sites": _sites_to_json()}
 
 
@@ -1140,6 +1245,7 @@ func load_state(state: Dictionary) -> void:
 	letters_read = state.get("letters", letters_read)
 	vignettes_seen = state.get("journal", {}).get(
 		"vignettes_seen", vignettes_seen)
+	daily_state = state.get("daily", daily_state)
 	if state.has("sites"):
 		sites = _sites_from_json(state["sites"])
 	var saved: Dictionary = state.get("crew", {})

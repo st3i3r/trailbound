@@ -392,3 +392,76 @@ static func board(site: Dictionary, archetypes: Array, site_day: int,
 				reqs[reqs.size() - 1] = req
 				break
 	return reqs
+
+
+# ------------------------------------------------------------- Daily (§10)
+#
+# The shared puzzle: 5 pads around a campfire at the south edge
+# (Warmth only reaches the two near pads, so Chilly stays a real
+# choice), a 4-item kit, 6 requests of which 5 can be seated, and
+# 5 meals of 4 kinds — all seeded by hash("daily", date).
+
+const DAILY_PADS := {
+	"d1": {"cell": [0, 0], "neighbours": ["d2", "d4"]},
+	"d2": {"cell": [1, 0], "neighbours": ["d1", "d3"]},
+	"d3": {"cell": [2, 0], "neighbours": ["d2", "d5"]},
+	"d4": {"cell": [0, 1], "neighbours": ["d1", "d5"]},
+	"d5": {"cell": [2, 1], "neighbours": ["d3", "d4"]}}
+const DAILY_FIRE := {"cell": [1, 2], "radius": 1}
+const DAILY_SPOTS := [[0, -1], [1, -1], [2, -1], [0, 2], [2, 2], [1, 1]]
+
+
+## Seeded daily puzzle. kit_pool: Pinewatch decor rows; meal_pool:
+## recipes cookable at Pinewatch. Returns the static puzzle —
+## scoring is daily_score() below.
+static func daily_puzzle(site: Dictionary, archetypes: Array,
+		kit_pool: Array, meal_pool: Array,
+		rng: RandomNumberGenerator) -> Dictionary:
+	var kit := []
+	var bag := kit_pool.duplicate()
+	for i in mini(4, bag.size()):
+		kit.append(bag.pop_at(rng.randi() % bag.size()))
+	var meals := []
+	var mb := meal_pool.duplicate()
+	for i in mini(4, mb.size()):
+		meals.append({"id": mb.pop_at(rng.randi() % mb.size()),
+			"price": 0})
+	if meals.size() == 4:
+		var dup: Dictionary = meals[rng.randi() % 4]
+		meals.append(dup.duplicate())
+	var favs: Array = meals.map(func(m): return m["id"])
+	var requests := []
+	var pool: Dictionary = site.get("trait_pool", {})
+	var mix: Dictionary = site.get("archetype_mix", {})
+	var i := 0
+	while requests.size() < 6 and i < 40:      # §10: no families
+		i += 1
+		var arch := _pick_archetype(mix, archetypes,
+			site.get("id", ""), rng)
+		if arch.is_empty() or arch.get("id") == "family":
+			continue
+		requests.append(_request(arch, site["id"],
+			_draw_traits(arch, pool, 2, rng),
+			requests.size(), rng, favs))
+	return {"pads": DAILY_PADS, "campfire": DAILY_FIRE,
+		"decor_spots": DAILY_SPOTS, "kit": kit, "meals": meals,
+		"requests": requests}
+
+
+## A Daily world shaped like the evening world (§5 world dict).
+## decor_items: [{"id","cells","effect","reach"}] — the caller
+## resolves kit rows; pads have no shelter in the Daily.
+static func daily_world(puzzle: Dictionary, decor_items: Array,
+		occupants: Dictionary, guests: Dictionary,
+		trait_kinds: Dictionary, comments: Dictionary) -> Dictionary:
+	var layout := {"pads": {"spots": {}, "neighbours": {}, "tags": {}}}
+	for pid in puzzle["pads"]:
+		layout["pads"]["spots"][pid] = puzzle["pads"][pid]["cell"]
+		layout["pads"]["neighbours"][pid] = \
+			puzzle["pads"][pid]["neighbours"]
+	return {"layout": layout, "campfire": {"cell": Vector2i(
+			puzzle["campfire"]["cell"][0], puzzle["campfire"]["cell"][1]),
+			"radius": puzzle["campfire"]["radius"]},
+		"pads": {}, "occupants": occupants, "guests": guests,
+		"decor": decor_items, "weather": "clear",
+		"trait_kinds": trait_kinds, "comments": comments, "day": 0}

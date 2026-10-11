@@ -417,6 +417,63 @@ func _ready() -> void:
 	check("letters+journal persist", Game.state_dict().has("letters")
 		and Game.state_dict()["journal"].has("vignettes_seen"))
 
+	# --- Trail Daily (§10) -----------------------------------------------
+	check("daily unlocks with p06",
+		Game.daily_unlocked())          # p06 delivered during the run
+	var pz := Game.daily("2025-03-07")
+	var pz2 := Game.daily("2025-03-07")
+	check("daily deterministic",
+		pz["requests"].map(func(r): return r["id"]) ==
+			pz2["requests"].map(func(r): return r["id"])
+		and pz["kit"].map(func(k): return k["id"]) ==
+			pz2["kit"].map(func(k): return k["id"])
+		and pz["meals"] == pz2["meals"])
+	var mk := {}
+	for m in pz["meals"]:
+		mk[m["id"]] = true
+	check("daily shape: 5p/4kit/6req/5meals",
+		pz["pads"].size() == 5 and pz["kit"].size() == 4
+		and pz["requests"].size() == 6 and pz["meals"].size() == 5
+		and mk.size() == 4, "kinds %d" % mk.size())
+	check("no families in daily", not pz["requests"].any(
+		func(r): return r.get("archetype") == "family"))
+	var pz_other := Game.daily("2025-03-08")
+	check("different date, different board",
+		pz["requests"].map(func(r): return r["id"] + str(r["traits"])) !=
+			pz_other["requests"].map(
+				func(r): return r["id"] + str(r["traits"])))
+	# Seat 5 of 6, place the kit — score lands and the attempt locks.
+	var asg := {}
+	for i in 5:
+		asg[pz["requests"][i]["id"]] = ["d%d" % (i + 1)]
+	var plc := {}
+	var spots: Array = pz["decor_spots"]
+	for i in pz["kit"].size():
+		plc[pz["kit"][i]["id"]] = [Vector2i(spots[i][0], spots[i][1])]
+	var sc := Game.daily_score(pz, asg, plc)
+	check("daily score ≤25 w/ results", sc["score"] <= 25
+		and sc["results"].size() == 5
+		and sc["share"].contains("Trailbound Daily #"),
+		"got %d" % sc["score"])
+	# Submit only counts today's puzzle; practice never overwrites.
+	var today := Time.get_date_string_from_system()
+	var pzt := Game.daily(today)
+	var asg2 := {}
+	for i in mini(5, pzt["requests"].size()):
+		asg2[pzt["requests"][i]["id"]] = ["d%d" % (i + 1)]
+	var plc2 := {}
+	for i in pzt["kit"].size():
+		plc2[pzt["kit"][i]["id"]] = [Vector2i(spots[i][0], spots[i][1])]
+	Game.daily_state = {"date": "", "score": -1}
+	Game.daily_score(pzt, asg2, plc2, true)
+	var scored: int = Game.daily_state["score"]
+	check("one scored attempt recorded",
+		Game.daily_state["date"] == today and scored >= 0)
+	Game.daily_score(pzt, asg2, plc2, true)
+	check("no double submission",
+		Game.daily_state["score"] == scored
+		and Game.daily(today)["attempted"])
+
 	print("=== %s ===" % ("ALL CHECKS PASS" if failures == 0
 		else "%d FAILURES" % failures))
 	get_tree().quit(failures)
