@@ -309,6 +309,65 @@ perf gate= first check on Telegram Android WebView (weakest link)
 PixiJS earns its place at client/ scaffold time — not in the prototype — for filters,
 atlas packing, and particle headroom. Phaser/KAPLAY rejected: we own the game logic.
 
+### 7.9 Cast generation sheet (prompts + per-char cost)
+
+**Shared style block** appended to every character prompt (keep verbatim for
+consistency — it's our "house style"):
+
+```
+chibi pixel art game character, ~2.5 heads tall, big head and hands, thick
+dark-brown selective outline, saturated cozy palette (emerald green, warm
+brown, ember orange, dusk violet), clean cel shading, no background
+```
+
+**Shared options**: `view="high top-down"` (~35°, matches example.png),
+`direction="south"`, 64×64 canvas, transparent bg, `outline="selective outline"`.
+
+**Generation pipeline per character** (the identity-consistent path):
+1. `create-image-pixen` south-facing sprite — 1 gen; iterate prompt until right
+2. `create-8-rotations-pro` method *Rotate character* (ref = step 1) — 10 gens
+   @≤85px → take S/W/E/N, discard diagonals (fixed camera needs 4, mirror E→W)
+3. `animate-with-text` (new) `"walking"` per dir — **1 gen each** @64×64
+4. `animate-with-text` south-only extra actions — 1 gen each
+5. Optional: `animate-with-skeleton` polish pass for the player only
+   (fixed head → "always" keeps the chibi face stable across frames)
+
+#### P0 cast — ~40 gens
+
+| Char | Prompt (before style block) | Anims needed | Gens |
+|---|---|---|---|
+| **player** | young adult camper, teal hoodie, orange beanie, brown backpack, khaki shorts, hiking boots | idle_s + walk×4 + gather_s + fish_s + carry_s | 1+10+4+3 = **18** |
+| **dog** | small scruffy brown-and-white terrier, red bandana, quadruped (`body_type=quadrupedal`) | walk×4 + sit_s + dig_s | 1+10+4+2 = **17** |
+| **ranger** | friendly park ranger, olive shirt, wide-brim hat, khaki pants, enamel mug | idle_s + wave_s | 1+0+0+2 = **3** |
+
+#### P1 cast — ~10 gens (idles only; walks deferred to P2)
+
+Travelers mostly *sit at camp* — south-facing idle is 80% of their screen time.
+Generate sprites + idle now; add walk×4 (~14 gens/char) only for those who
+visibly hike in (hiker, photographer).
+
+| Char | Prompt | Anims | Gens |
+|---|---|---|---|
+| hiker | middle-aged hiker, red flannel, big grey backpack + bedroll, walking poles | idle_s (+walk later) | 2 |
+| photographer | young photographer, mustard rain jacket, camera on neck strap, beanie | idle_s (+walk) | 2 |
+| old angler | elderly fisherman, grey beard, bucket hat, green vest, fishing rod | idle_s | 2 |
+| kid scout | small kid scout, oversized green backpack, cap, freckles | idle_s | 2 |
+| van-lifer | relaxed woman, denim overalls, purple bandana, coffee mug | idle_s | 2 |
+
+Variant trick: `try-on` outfit transfer on one base sprite → near-free extra
+travelers once a body silhouette is approved.
+
+#### P2 — ambient + upgrades (~30-60 gens)
+walk×4 for hiker/photographer (~14 each) · cyclist traveler · ambient wildlife
+(bird, squirrel — `map_object` + `animate_image`, ~3 each) · seasonal reskins.
+
+#### Totals
+- **Full P0 cast ≈ 40 gens · P1 idles ≈ 10 gens · walks-when-needed +15/char**
+- Everything lands in `prototype/assets/gen/` then manifest-swapped into
+  `client/src/assets/manifest.ts` (`char.*` keys already reserved)
+- Consistency controls: same style-image ref for all calls, `reduce_colors`
+  batch at the end, feet-anchored south at bottom-center, 64×64
+
 ### Operational notes (from docs)
 - **Map objects auto-delete after 8h** → download PNGs immediately at generation time.
 - Downloads are unauthenticated UUID URLs (`/mcp/characters/{id}/download`, `/mcp/tilesets/{id}/image`) — safe to fetch then archive locally.

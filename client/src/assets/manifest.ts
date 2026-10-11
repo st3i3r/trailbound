@@ -45,6 +45,8 @@ export const SPRITES = {
   "char.traveler.hiker": "chars/hiker_sheet.png",
   "char.traveler.photo": "chars/photographer_sheet.png",
   "char.traveler.angler": "chars/angler_sheet.png",
+  "char.traveler.kid": "chars/kid_sheet.png",
+  "char.traveler.vanlifer": "chars/vanlifer_sheet.png",
   // activities
   "node.mushroom": "nodes/mushroom.png",
   "node.berries": "nodes/berries.png",
