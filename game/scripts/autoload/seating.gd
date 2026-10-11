@@ -84,6 +84,7 @@ static func eval_guest(guest: Dictionary, pad_ids: Array,
 	for trait_id: String in guest.get("traits", []):
 		var met := false
 		var tripped := false
+		var cause := ""
 		for ctx in ctxs:
 			match trait_id:
 				"chilly": met = met or ctx["eff"].has("warmth")
@@ -99,18 +100,30 @@ static func eval_guest(guest: Dictionary, pad_ids: Array,
 				"shutterbug": met = met or "view" in ctx["tags"]
 				"stargazer":
 					met = met or ctx["eff"].has("stars")
-					tripped = tripped or ctx["eff"].has("light")
+					if ctx["eff"].has("light"):
+						tripped = true
+						cause = "light"
 				"light_sleeper":
-					tripped = tripped or ctx["eff"].has("music") \
-						or ctx["loud"]
-				"dog_wary": tripped = tripped or ctx["eff"].has("dog")
+					if ctx["eff"].has("music"):
+						tripped = true
+						cause = "music"
+					elif ctx["loud"] and cause == "":
+						tripped = true
+						cause = "loud"
+				"dog_wary":
+					if ctx["eff"].has("dog"):
+						tripped = true
+						cause = "dog"
 		var kind: String = world["trait_kinds"].get(trait_id, "need")
 		if tripped and kind in ["aversion", "both"]:
 			aversions += 1
 		if met and kind in ["need", "both"]:
 			needs_met += 1
-		detail.append({"trait": trait_id, "kind": kind,
-			"met": met, "tripped": tripped})
+		var d := {"trait": trait_id, "kind": kind,
+			"met": met, "tripped": tripped}
+		if cause != "":
+			d["cause"] = cause
+		detail.append(d)
 	return {"needs_met": needs_met, "aversions": aversions,
 		"detail": detail}
 
@@ -135,8 +148,38 @@ static func is_covered(pad_ids: Array, world: Dictionary,
 	return true
 
 
-## §5.4 stars + §6.4 tip for one party. meal_term: +1 favourite,
-## 0 another meal, −1 no meal (§5.5).
+## Reviews carry one line about the strongest term (§5.6, ≤20
+## words, reviews.json). Complaints dominate, then the favourite,
+## then a met need — that ordering is the "strongest" the guest
+## would actually write home about.
+const TRAIT_KEYS := {"chilly": "warmth", "social": "company",
+	"introvert": "privacy", "nature_lover": "nature",
+	"night_owl": "light", "music_lover": "music",
+	"dog_lover": "dog", "kids": "play", "angler": "water",
+	"shutterbug": "view", "stargazer": "stars"}
+
+static func _comment_key(ev: Dictionary, comfort: int, meal_term: int,
+		weather_term: int) -> String:
+	for d in ev["detail"]:                       # aversions dominate
+		if d["tripped"]:
+			var c: String = d.get("cause", "")
+			return c + "_bad" if c in ["music", "light", "dog"] else c
+	if weather_term < 0:
+		return "rain"
+	if meal_term > 0:
+		return "favourite"
+	for d in ev["detail"]:
+		if d["met"]:
+			return TRAIT_KEYS.get(d["trait"], "neutral")
+	if comfort > 0:
+		return "comfort"
+	if meal_term < 0:
+		return "no_meal"
+	if comfort == 0:
+		return "bare"
+	return "neutral"
+
+
 static func resolve_guest(guest: Dictionary, pad_ids: Array,
 		world: Dictionary, meal_term := 0) -> Dictionary:
 	var ev := eval_guest(guest, pad_ids, world)
@@ -148,11 +191,16 @@ static func resolve_guest(guest: Dictionary, pad_ids: Array,
 	var stars := Econ.stars(comfort, meal_term, ev["needs_met"],
 		ev["aversions"], weather_term)
 	var fee := int(guest.get("fee", 0))
+	var key := _comment_key(ev, comfort, meal_term, weather_term)
+	var lines: Array = world.get("comments", {}).get(key,
+		["A fine night."])
 	return {"id": guest.get("id", ""), "stars": stars, "fee": fee,
 		"tip": Econ.tip(fee, stars), "comfort": comfort,
 		"weather": weather_term, "meal": meal_term,
 		"needs_met": ev["needs_met"], "aversions": ev["aversions"],
-		"detail": ev["detail"]}
+		"detail": ev["detail"], "comment_key": key,
+		"comment": lines[(String(guest.get("id", "")).hash()
+			+ int(world.get("day", 0))) % lines.size()]}
 
 
 ## §5.5 meal allocation: favourites first (the only +1), then cheapest

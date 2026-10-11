@@ -405,7 +405,9 @@ func _world() -> Dictionary:
 		"campfire": st["campfire"], "decor": st["decor"],
 		"pads": st["pads"], "occupants": occ,
 		"guests": st["guests"], "weather": st["weather"],
-		"trait_kinds": kinds}
+		"trait_kinds": kinds,
+		"comments": Catalog.data.get("reviews", {}),
+		"day": site_day()}
 
 
 ## §5 drag preview: what this party would score on those pads tonight.
@@ -506,10 +508,16 @@ func goodnight() -> Dictionary:
 	coins += fees + tips + meal_sales
 	var pages := _check_pages(night)
 	set_phase(Phase.NIGHT)
+	var best := {}
+	for r in results:
+		if best.is_empty() or int(r["stars"]) > int(best["stars"]):
+			best = {"id": r["id"], "stars": r["stars"],
+				"comment": r["comment"]}
 	return {"results": results, "fees": fees, "tips": tips,
 		"walk_ins": sold.size(), "meal_sales": meal_sales,
 		"income": fees + tips + meal_sales, "rating": rating(),
-		"pages": pages.map(func(p): return int(p["n"]))}
+		"pages": pages.map(func(p): return int(p["n"])),
+		"best": best}
 
 
 # ------------------------------------------------------------- journal (§8)

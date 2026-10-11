@@ -350,8 +350,8 @@ func _goodnight() -> void:
     var rep := Game.goodnight()
     var parts := []
     for r in rep["results"]:
-        parts.append("%s %d★ +%dc" % [names.get(r["id"], r["id"]),
-            r["stars"], r["fee"] + int(r["tip"])])
+        parts.append("%s %d★ +%dc  “%s”" % [names.get(r["id"], r["id"]),
+            r["stars"], r["fee"] + int(r["tip"]), r["comment"]])
     if rep["walk_ins"] > 0:
         parts.append("%d walk-in(s) +%dc" % [rep["walk_ins"],
             rep["meal_sales"]])

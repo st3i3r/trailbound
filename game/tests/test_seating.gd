@@ -95,6 +95,12 @@ func _ready() -> void:
 	check("1★: loud neighbour + rain + bare",
 		r["stars"] == 1 and r["aversions"] == 1
 		and r["weather"] == -1, "got %s" % r)
+	check("aversion writes the comment",
+		r["comment_key"] == "loud"
+		and r["comment"] in Catalog.data["reviews"]["loud"],
+		"got %s/%s" % [r["comment_key"], r["comment"]])
+	check("comments deterministic", Seating.resolve_guest(
+		couple, ["p1"], Game._world(), 0)["comment"] == r["comment"])
 
 	# Same couple behind a hedge under a tarp, away from the noise.
 	_put("hedge", "privacy", 1, [Vector2i(1, 3)])
@@ -166,6 +172,14 @@ func _ready() -> void:
 	check("favourite found, term +1",
 		rep["results"][0]["meal"] == 1
 		and rep["results"][0]["stars"] == 5, "got %s" % rep["results"])
+	# §5.6: the strongest term writes the review line.
+	check("favourite writes the comment",
+		rep["results"][0]["comment_key"] == "favourite"
+		and rep["results"][0]["comment"] in
+			Catalog.data["reviews"]["favourite"])
+	check("best review surfaced",
+		rep["best"]["stars"] == rep["results"][0]["stars"]
+		and rep["best"]["comment"] != "")
 	# Walk-ins = min(seats 2, floor(4.73)-2 = 2); one leftover sells.
 	check("walk-in buys leftover",
 		rep["walk_ins"] == 1 and rep["meal_sales"] == 25,
