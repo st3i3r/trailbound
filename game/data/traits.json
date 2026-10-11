@@ -1,0 +1,15 @@
+[
+  {"id": "chilly", "name": "Chilly", "kind": "need", "condition": "Warmth in range"},
+  {"id": "social", "name": "Social", "kind": "need", "condition": "At least 1 occupied neighbour pad"},
+  {"id": "introvert", "name": "Introvert", "kind": "need", "condition": "Privacy in range, or no occupied neighbour"},
+  {"id": "nature_lover", "name": "Nature Lover", "kind": "need", "condition": "Nature in range"},
+  {"id": "night_owl", "name": "Night Owl", "kind": "need", "condition": "Light in range"},
+  {"id": "music_lover", "name": "Music Lover", "kind": "need", "condition": "Music in range"},
+  {"id": "light_sleeper", "name": "Light Sleeper", "kind": "aversion", "condition": "Music in range, or a Loud neighbour"},
+  {"id": "dog_lover", "name": "Dog Lover", "kind": "need", "condition": "Dog in range"},
+  {"id": "dog_wary", "name": "Dog-Wary", "kind": "aversion", "condition": "Dog in range"},
+  {"id": "kids", "name": "Kids", "kind": "need", "condition": "Play in range of either pad"},
+  {"id": "angler", "name": "Angler", "kind": "need", "condition": "Seated on a Water pad"},
+  {"id": "shutterbug", "name": "Shutterbug", "kind": "need", "condition": "Seated on a View pad"},
+  {"id": "stargazer", "name": "Stargazer", "kind": "both", "condition": "Need: Stars in range; aversion: Light in range"}
+]

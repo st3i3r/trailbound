@@ -1,0 +1,43 @@
+; Engine configuration file.
+; Trailbound — locked stack per docs/GAME_DESIGN.md §20-21.
+
+config_version=5
+
+[application]
+
+config/name="Trailbound"
+config/version="0.1.0"
+run/main_scene="res://scenes/main.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+config/icon="res://icon.svg"
+
+[autoload]
+
+Game="*res://scripts/autoload/game.gd"
+Catalog="*res://scripts/autoload/catalog.gd"
+Econ="*res://scripts/autoload/econ.gd"
+Save="*res://scripts/autoload/save.gd"
+Audio="*res://scripts/autoload/audio.gd"
+Analytics="*res://scripts/autoload/analytics.gd"
+Ads="*res://scripts/autoload/ads.gd"
+Platform="*res://scripts/autoload/platform.gd"
+
+[display]
+
+window/size/viewport_width=640
+window/size/viewport_height=360
+window/size/window_width_override=1920
+window/size/window_height_override=1080
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/stretch/scale_mode="integer"
+window/handheld/orientation=0
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+2d/snap/snap_2d_transforms_to_pixel=true
+2d/snap/snap_2d_vertices_to_pixel=true
+textures/canvas_textures/default_texture_filter=0
+textures/vram_compression/import_etc2_astc=true

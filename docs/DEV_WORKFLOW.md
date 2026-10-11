@@ -55,7 +55,11 @@ Design source of truth: `docs/GAME_DESIGN.md` ("GDD §N" below points there).
 | Git 2.45 / Python 3.13 | already present; Appendix C sim output verified against GDD reference |
 | fastlane | deferred — needed at Phase 5/6 release pipeline |
 
-Disk note: C: ≈4 GB free, D: ≈3 GB free — keep `game/`, exports and caches lean.
+|| Gradle | `GRADLE_USER_HOME=D:\Gradle` (keeps ~1 GB of deps off C:). Debug keystore at `~/.android/debug.keystore` (androiddebugkey/android) |
+
+Disk note: C: ≈19 GB free after AVD cleanup, D: ≈3 GB free — keep `game/`, exports and caches lean.
+
+Headless Android export quirk (verified 2026-10-11): `use_gradle_build` needs the build template inside the project — replicate `Project → Install Android Build Template` with `unzip android_source.zip → game/android/build/` + write `game/android/.build_version` containing `4.7.2.stable` (GODOT_VERSION_FULL_CONFIG, *not* the banner string) + `touch game/android/build/.gdignore`. `game/android/` and `game/build/` are gitignored; export via `godot --headless --path game --export-debug "Android" build/trailbound.aab` — verified producing a valid arm64 AAB (minSdk 24, targetSdk 36).
 
 ### Wireless debugging (no cables)
 

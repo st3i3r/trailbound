@@ -1,0 +1,22 @@
+[
+  {"id": "stools", "name": "Stools", "price": 25, "effect": "seats", "seats": 1, "size": "1x1", "unlock": "P1"},
+  {"id": "bench", "name": "Bench", "price": 40, "effect": "seats", "seats": 1, "size": "1x1", "unlock": "P2"},
+  {"id": "picnic_table", "name": "Picnic Table", "price": 140, "effect": "seats", "seats": 2, "size": "2x1", "unlock": "P3"},
+  {"id": "lantern", "name": "Lantern", "price": 50, "effect": "light", "reach": 1, "size": "1x1", "unlock": "P1"},
+  {"id": "string_lights", "name": "String Lights", "price": 190, "effect": "light", "reach": 2, "size": "2x1", "unlock": "P4"},
+  {"id": "silk_lantern", "name": "Silk Lantern", "price": 225, "effect": "light", "reach": 2, "size": "1x1", "unlock": "W2"},
+  {"id": "planter", "name": "Planter", "price": 45, "effect": "nature", "reach": 1, "size": "1x1", "unlock": "P1"},
+  {"id": "lotus", "name": "Lotus Barrel", "price": 90, "effect": "nature", "reach": 1, "size": "1x1", "unlock": "W0"},
+  {"id": "flower_arch", "name": "Flower Arch", "price": 250, "effect": "nature", "reach": 2, "size": "2x1", "unlock": "L0"},
+  {"id": "tarp", "name": "Tarp", "price": 75, "effect": "cover", "reach": 1, "size": "1x1", "unlock": "P1"},
+  {"id": "hedge", "name": "Hedge", "price": 60, "effect": "privacy", "reach": 1, "size": "1x1", "unlock": "P1"},
+  {"id": "reed_screen", "name": "Reed Screen", "price": 75, "effect": "privacy", "reach": 1, "size": "1x1", "unlock": "W0"},
+  {"id": "dog_bed", "name": "Dog Bed", "price": 55, "effect": "dog", "reach": 2, "size": "1x1", "unlock": "P1"},
+  {"id": "guitar_stump", "name": "Guitar Stump", "price": 110, "effect": "music", "reach": 2, "size": "1x1", "unlock": "P2"},
+  {"id": "wind_chime", "name": "Wind Chime", "price": 90, "effect": "music", "reach": 1, "size": "1x1", "unlock": "W0"},
+  {"id": "radio", "name": "Radio", "price": 100, "effect": "music", "reach": 2, "size": "1x1", "unlock": "W1"},
+  {"id": "swing", "name": "Swing", "price": 150, "effect": "play", "reach": 2, "size": "2x1", "unlock": "P4"},
+  {"id": "kite", "name": "Kite Line", "price": 90, "effect": "play", "reach": 1, "size": "1x1", "unlock": "L0"},
+  {"id": "telescope", "name": "Telescope", "price": 275, "effect": "stars", "reach": 1, "size": "1x1", "unlock": "L0"},
+  {"id": "stone_fire_pit", "name": "Stone Fire Pit", "price": 300, "effect": "warmth_upgrade", "size": "campfire", "unlock": "P5"}
+]

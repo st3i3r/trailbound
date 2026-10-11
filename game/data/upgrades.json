@@ -1,0 +1,4 @@
+[
+  {"id": "platform", "name": "Platform", "comfort": 1, "unlock": "P2", "note": "per-site price, see sites.json platform_price"},
+  {"id": "cabin", "name": "Cabin", "comfort": 2, "unlock": "W0", "requires": "platform", "sites": ["whisper_river", "lantern_valley"], "note": "replaces a platform; per-site price in sites.json cabin_price"}
+]

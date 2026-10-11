@@ -24,6 +24,7 @@ Thumbs.db
 *.jks
 game/android/
 game/build/
+*.translation
 
 # local agent workspace
 .secwright/
