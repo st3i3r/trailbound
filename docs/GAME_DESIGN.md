@@ -11,25 +11,25 @@
 
 ## 1. Premise & Story
 
-**You're restoring the trail's forgotten rest stop.**
+**You're reopening the trail's chain of forgotten rest stops.**
 
-Deep in the woods sits an old campsite on the Grand Trail — once beloved, now overgrown.
-You arrive with a backpack, a battered tent, and your grandfather's **trail journal**: a
-guidebook he kept as the camp's last warden, stamped at every waypoint from Whisperwood to
-Glasscoast. The final pages are blank. *"The trail remembers those who tend it. Finish the
-book for me."*
+Your grandfather wasn't just a camper — he was the Grand Trail's last warden, keeper of a
+whole chain of rest stops from Pinewatch to Glasscoast, each stamped in his **trail
+journal**. The trail fell quiet when he stopped. You arrive at the first overgrown site
+with a backpack, a battered tent, and that journal. *"The trail remembers those who tend
+it. Finish the book for me."*
 
-So you hike out each day — foraging, fishing, photographing — earn a little money, spend it
-on gear and comfort, and slowly turn the clearing back into the place every traveler hopes
-to find at dusk. Travelers start stopping again. They pay, they tell stories, they leave
-hints about places your grandfather never reached.
+So you rebuild, one site at a time: open the clearing, host travelers, earn, decorate and
+upgrade until the site earns its stars — then walk further up the trail and open the next.
+Each site is grandpa's next journal chapter: river camps with docks, a valley meadow camp,
+a windblown coast camp. Travelers return, the trail wakes up, and the journal fills in.
 
 **Why this story:**
 
 | Design need | What the story provides |
 |---|---|
 | Reason to leave camp and return | Day trips outward, hosting in the evening |
-| Reason locations unlock in order | Journal chapters — the trail unfolds |
+| Reason sites unlock in order | Grandpa's chain — journal chapters = site arcs |
 | Long-term goal beyond money | **Complete the journal**: stamps, species, visitor autographs |
 | Emotional hook | Restoration + hospitality — cozy, not conquest |
 | Content runway | Grandfather's margins hide teasers (seasons 2+ = mountain, sea) |
@@ -77,11 +77,42 @@ that slowly becomes home.*
 → 😴 Sleep (save)
 ```
 
-### Meta loop (weeks)
+### Meta loop — v2: THE CAMPSITE CHAIN (progression = new sites)
 
-Coins → gear (each unlocks an activity/location) → new stamps/species → camp upgrades
-(comfort → charm → richer travelers) → **journal pages fill** → prestige = completed
-Grand Trail Guide.
+```
+Open site → visitors arrive & pay → upgrade site (decor/accessories = capacity+charm)
+→ hit milestone (★ rating / guests hosted / special event)
+→ OPEN THE NEXT SITE down the trail → new terrain + visitors + amenity → repeat
+```
+
+**Sites = progression.** Each campsite is a level:
+
+| # | Site | Amenity (its activity) | Milestone to next |
+|---|---|---|---|
+| 1 | Pinewatch Forest | foraging + campfire | host 20 guests / 2★ |
+| 2 | Whisper River | fishing + dock | 3★ + rod owned |
+| 3 | Lantern Valley | trail riding | 3★ + bike owned |
+| 4 | Glasscoast | kayak + shell hunt | 4★ + special event |
+| 5 | Snowpass Mountain | climbing | arc-2 |
+
+**How a site works (light management, v1):**
+- Site has **build slots** (plots, fire, tables, lights, amenity) — pick what goes in
+  each; free-form drag-placement deferred to P3
+- **Tonight's capacity = beds + food + fire** → how many guests arrive at dusk
+- Guests pay + rate → money buys decor/accessories → **charm/rating → better guests
+  + more capacity** (the camp visibly transforms = the reward)
+- **Money is for building the CURRENT site; milestones unlock the NEXT** — coins
+  never gate progress, achievement does
+- Old sites persist: revisit anytime (events, postcards); caretaker income later
+- **What carries:** coins, gear catalog, dog, journal, rating. Each site's build state
+  saves independently
+- The **trail map screen** becomes the site map: current / locked / reopened sites —
+  a literal visual of the trail waking up
+
+**Why this is stronger:** the old design's "unlock a location" was a paywall beat;
+the new one is an *achievement* beat — you earn the next site by running the current
+one well. Retention-wise each site is a self-contained mini-arc (~weekly), which is
+exactly the 3-month cadence: new site ≈ new arc ≈ one monthly content batch.
 
 ---
 
