@@ -1,8 +1,10 @@
 # TRAILBOUND — Game Design & Asset Bible
 
 > Working title. A cozy camping/travel game for Telegram Mini Apps (mobile-first, works on
-> desktop Telegram + web). Visual target: `example.png` — fixed 3/4 isometric diorama,
-> chunky outlined pixel art, saturated dusk palette.
+> desktop Telegram + web). **Visual target: `reference/eastward.jpg`** — fixed 3/4 tilted
+> top-down (flat ground, object fronts), painterly soft-dithered pixel art, bright
+> daylight lush palette. `reference/example.png` = secondary ref for prop density and
+> ember-light dusk mood (delivered by our day/night tint, not the base style).
 >
 > This doc is the contract: **story → gameplay → asset manifest → budget**.
 > No art is generated until this is approved.
@@ -284,7 +286,7 @@ trickle. 4-dir walk + sit + happy-bark + courier-bag frames needed.
 
 | Screen | Contents |
 |---|---|
-| **Scene view** | Fixed iso diorama. Tap-to-walk. Interactables glow. Fixed camera, pinch-zoom allowed |
+| **Scene view** | Fixed 3/4 tilted top-down (Eastward view). Tap-to-walk. Interactables glow. Fixed camera, pinch-zoom allowed |
 | **HUD** | Top pills: 🪙 coins · ⚡ energy · day · 🗺 map button. Sleep button floats right |
 | **Bottom sheet** (journal-page styled) | Context panel: camp = backpack + COOK + shop; forest = bag; river = tackle + log |
 | **Map overlay** | Location cards with unlock state — the trail map is itself a generated illustration |
@@ -320,10 +322,12 @@ are now the sites themselves, each a business to run.
 
 ## 7. ASSET MANIFEST — the PixelLab list
 
-Style lock: `example.png` as style reference on every call where supported
-(`style_image` / `style_images` / `color_image` on pixflux). Camera view:
-**"low top-down" (~20°, classic 3/4 RPG)** for characters/objects — that matches the
-steep example.png look. All props `no_background`.
+**Style lock v2 (Eastward, approved):** `reference/eastward.jpg` as style/color reference
+on every call where supported (`style_image` / `color_image`). Camera view:
+**"high top-down" (~35-40°)** for characters/objects AND terrain — the Eastward
+3/4 tilt: flat ground plane, object fronts visible, Y-sort depth. **No iso diamonds,
+no Wang sets.** All props `no_background`. Base mood: bright daylight; the
+example.png ember-dusk look is recreated at dusk via scene tint + glow (0 gens).
 
 ### Tool map — which tool for which asset (with REAL USD prices)
 
@@ -370,7 +374,7 @@ fantasy animals):
 | **Props** | chalkboard sign, food items on blankets | sign, meal items, tackle box, backpack |
 | **UI** | none — just the logo top-left (the diorama IS the presentation) | our HUD must be equally light: floating pills + journal sheet that doesn't fight the scene |
 
-### 7.2 P0 — the diorama (~$0.70 USD, ~55 gens)
+### 7.2 P0 — the diorama (~$0.70 USD, ~55 gens) — *superseded by §7.16 (Eastward view)*
 
 | Asset | Tool | Est. USD |
 |---|---|---|
@@ -448,7 +452,7 @@ UI widgets come from `create-ui-elements` (Pro adds concept+palette guidance): a
 
 ```
 client/  = Vite + TypeScript + PixiJS v8 + @twa-dev/sdk
-render   = PixiJS Container tree + iso painter-sort adapter
+render   = PixiJS Container tree + Y-sort depth adapter (3/4 tilted top-down)
            (game logic/entities engine-agnostic → Canvas-2D fallback stays possible)
 assets   = manifest-driven (sprite path swap = art upgrade, zero code change)
 sprites  = PixiJS Assets atlas packing, ScaleMode 'nearest'
@@ -603,13 +607,14 @@ enumeration:
 | waterfall | anim 4f | river |
 | snow | only if seasons ship — P2 defer | mountain |
 
-**Transitions (Wang 16-tile sets, 10-15 gens each):**
-grass→water · grass→path · grass→sand · sand→water · grass→rock ·
-dirt→water (muddy bank) · rock→water (sea cliff)
-→ **7 sets ≈ 70-105 gens** (this is what real terrain costs — not loose tiles)
+**Transitions — v2 (Eastward flat ground):** no Wang sets. Terrain meets terrain via
+**edge strips** — one soft border strip per material pair + corner caps where needed:
+shore edge (grass→water), bank edge (dirt→water), path edge (grass→path),
+sand→water shoreline, rock/cliff face strips.
+→ **~5 edge sets ≈ 25-40 gens** (was 7 Wang sets ≈ 70-105 — the iso switch saved ~50)
 
-**Island rim:** cliff edge N/E/S/W + 4 corners + terrain-height plateau edge
-(part of tiles_pro generation, counted above)
+**Perimeter frame:** each site's boundary = fence/cliff-band/forest-wall PROPS
+(the cozy enclosure reads as objects, not tiles) — counted in props, ~0 extra here.
 
 #### B. Scenes × tile mix
 
@@ -805,7 +810,7 @@ HTTPS) · Stars cosmetic catalog · LEGAL (have)
 
 | Block | Gens |
 |---|---|
-| Terrain (7 Wang sets + rims + scene tiles) | ~110-140 |
+| Terrain (Eastward flat: tiles + 5 edge strips, no Wang) | ~60-80 |
 | Props/accessories (all scenes, ~150 items, batched) | ~120-150 |
 | Characters (statics + rotations + all anims) | ~90-110 |
 | Scene/critter anims | ~25-35 |
@@ -813,10 +818,102 @@ HTTPS) · Stars cosmetic catalog · LEGAL (have)
 | Story/launch/meta art | ~30-40 |
 | Management-depth delta (§4.3-4.12) | ~40-55 |
 | Iteration buffer (~25% regen rate) | ~110-140 |
-| **COMPLETE GAME** | **≈ 590-755 gens** |
+| **COMPLETE GAME** | **≈ 545-695 gens** |
 
 **≈ 30-38% of the ~2,000/mo pool.** Remaining headroom covers misses,
 A/B art variants, and P3 content (seasons, tent interior, events).
+
+### 7.16 MASTER GENERATION LIST — consolidated build order
+
+Every asset we generate, deduplicated, in the order batches should run.
+`[A]` = animated (needs anim frames), `[S]` = has state variants (counted),
+`[B]` = batchable at 32px (64 items per ~10 gens via consistent-style).
+
+#### BATCH 0 — style lock (gate: approve before anything else) ~15 gens
+- player south sprite (iterate prompt until approved)
+- grass tile sample + shore-edge strip sample (grass→water)
+- 1 prop sample (tent t1) + `reduce_colors` palette lock
+
+#### BATCH 1 — terrain ~60-80 gens (Eastward flat ground — was 110-140)
+- **Ground tiles:** grass ×5 (plain/tuft/flowers/worn/sparkle) · dirt ×3 (bare/tilled/mud) · sand ×3 (plain/rippled/shell) · rock ×3 (boulder/gravel/smooth) · stone path · wood planks ×2 · shallow water ×2 · deep water ×2 · puddle decal ×3
+- **Path:** dirt-path tiles (straight/turn/end variants, ~6-8 tiles, no autotile needed at this view)
+- **Edge strips ×5 sets** (~5-8 gens each): shore edge · bank edge · path edge · shoreline (sand→water) · cliff-face strips
+- **Perimeter:** fence/cliff-band/forest-wall props — frame the enclosure (in batch 2/3)
+- **Waterfall:** static + [A] flow 4f
+
+#### BATCH 2 — camp props ~90 items, ~60-80 gens
+- **Sleep:** tent t1/t2/t3 `[S]` · tarp · hammock `[A]` · bedroll · sleeping bag · dog bed
+- **Cook/eat:** fire ring unlit/lit `[S+A]` · tripod+pot ×3 states `[S]` · stove · cooler · kettle · mugs · thermos · camp table · chairs ×2 · log bench · stump seats · picnic blankets ×2
+- **Storage:** crates · barrel · sack · backpack prop · gear rack · basket
+- **Light:** lantern post unlit/lit `[S]` · string lights `[A]` · torch `[A]` · tent lantern · fire-pit t2 `[A]` · embers
+- **Info:** notice board · chalkboard/menu board · trail signs ×3 · map table · guestbook stand · booking board · plot markers ×4
+- **Comfort:** guitar · books · camera tripod · binoculars · planter · welcome flag `[A]` · wind chime `[A]` · clothesline+towels `[A]`
+- **Dog:** doghouse · bowl · bone · leash post · courier bandana-bag
+- **Fishing:** rod prop · rod rack · tackle box · bait bucket · creel · net
+- **Bike:** bicycle · rack · repair stand · pump · trail markers
+- **Chores:** woodpile ×3 states `[S]` · axe-stump · log rounds · broom
+- **Boundaries:** fence straight/corner/gate · rope fence · stone wall
+- **Management:** supply crate · delivery box · loaded-pack variant · kids' play props (ball, kite) · mud decal · wet-firewood variant
+- **Shop:** outfitter van · ranger kiosk
+- **Clutter batch `[B]`:** mushrooms, flowers, tufts, pinecones, leaves, rocks, pebbles, stepping stones — 64 @32px in 1-2 calls
+
+#### BATCH 3 — site prop sets ~50 items, ~45-60 gens
+- **Forest:** forage nodes ×8 **×3 states** (sprout/full/harvested) `[S]` · hollow log · ferns · mossy rock · leaf piles · tall grass · cache dig-spot · dense trees ×3 `[A sway]`
+- **River:** dock · bridge · cattails · reeds · lilypads · stepping stones · canoe `[A bob]` · shore rocks
+- **Valley:** wildflower meadow tiles · vista rock · viewpoint bench · sign · stream `[A]` · kite `[A]`
+- **Coast:** shells · starfish · driftwood · tide pools · beach grass · kayak · umbrella · beach blanket · buoy · sea cliff
+- **Mountain:** boulders · summit flag `[A]` · climbing props · cairns · pine variants ×2
+
+#### BATCH 4 — characters ~90-110 gens (static + rotations + anims)
+- **player** — sprite + 8-rot + anims ×11 (idle, walk×4, gather, cast, reel, carry, sit, sleep, celebrate, eat)
+- **dog** — quadruped sprite + 8-rot + anims ×10 (idle, walk×4, sit, dig, bark, sleep, heart-react) + courier-bag variant
+- **ranger** — sprite + idle, wave, talk
+- **travelers ×10** (hiker, photographer, old angler, kid scout, van-lifer, dad, mom, boy, girl, cyclist) — sprites + idles; sit-variants ×4, eat ×2, walks for arrivals, kid run×4 + play
+- **portraits ×8** (32-48px busts for journal/dialogue)
+- **guest dogs ×2** (palette variants)
+- **hazards:** raccoon `[A scurry,steal]` · bear `[A wander]` (mountain)
+
+#### BATCH 5 — scene/world anims ~25-35 gens
+- **critters:** bird-fly · squirrel-hop · butterfly · frog-jump · seagull · goat (mtn)
+- **fire:** campfire loop · torch · fire-pit-t2 · ember-glow · smoke · steam
+- **water:** waterfall · fish-jump · fish-shadow · bobber · ripple-ring · canoe-bob · wave loop
+- **life:** tent flap · hammock sway · (tree/flag/chime/towels/lights counted in batch 2/3)
+
+#### BATCH 6 — items, food, UI, VFX ~60-80 gens
+- **Meals ×8** (stew, berry pie, skewers, sandwich, tea, grilled fish, s'mores, soup) + burnt variant + **signature dish cards ×5**
+- **Ingredients ×9** + bait ×3 + honey/acorn/catfish extras
+- **Gear icons ×12** · stamps ×8 · warden badges ×10 · HUD icons ×5 (coin/⚡/charm/day/★)
+- **Bubbles/markers:** want-bubble + tail · review-star pop · !/? marks · coin-fly · energy glow
+- **UI widget sheet** `[B]` — 64 widgets @32px (buttons, slots, bars, frames) in 1-2 calls + journal page frames + menu board frame
+- **Journal:** cover · stamps · recipe cards ×8 · dex entry frames
+- **Map screen:** 320px top-down illustration · pins ×6 ×locked/unlocked `[S]` · path line · you-are-here marker
+- **Story:** letter pages ×5-8 · sepia photos ×3 · grandfather portrait · journal prop
+- **Onboarding:** hand pointer · paw-trail decal · first-time dialog frames
+- **VFX `[A]` ×10:** unlock burst · sparkle · stamp-press · splash · level rays · heart pop · ZZZ · catch burst · serve ding · rank-up rays
+- **States/errors:** offline illustration · error toast frame · empty inventory · empty camp · postcard frame+template
+
+#### BATCH 7 — launch/meta ~30-40 gens
+- app icon 512px · splash/loading card · title card · promo key-art ·
+  bot avatar + banner · warden-rank banner
+
+#### FREE LAYER — 0 gens (engine-side)
+day/dusk/night tint · rain/fog particles · glow overlays · fireflies ·
+water shimmer · bob/tween micro-motion · palette-swap variants ·
+want-bubble pulse · wet-sheen · mirroring E→W
+
+#### Grand totals
+| Block | Gens |
+|---|---|
+| B0 style lock | ~15 |
+| B1 terrain (Eastward flat — no Wang) | ~60-80 |
+| B2 camp props | ~60-80 |
+| B3 site props | ~45-60 |
+| B4 characters | ~90-110 |
+| B5 world anims | ~25-35 |
+| B6 items/UI/VFX | ~60-80 |
+| B7 launch | ~30-40 |
+| Iteration buffer ~25% | ~110-140 |
+| **COMPLETE** | **≈ 545-695** |
 
 ### Operational notes (from docs)
 - **Map objects auto-delete after 8h** → download PNGs immediately at generation time.
