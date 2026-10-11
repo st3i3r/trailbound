@@ -655,7 +655,83 @@ A/B art variants, and P3 content (seasons, tent interior, events).
 
 ---
 
-## 8. Build order after approval
+## 8. The 10-day arc — retention design
+
+**Core insight:** cozy games don't retain through challenge — they retain through
+*unfinished business* (a journal half-filled, a camp half-built) and *tomorrow
+promises* (a letter arriving, rain ending, a rare spawn announced). Session
+length stays 3-5 min; the design goal is making **tomorrow's session feel
+worth having.**
+
+### 8.1 The story IS the retention mechanism
+
+- The journal has **10 blank pages**. Every morning the ranger delivers one
+  of grandpa's letters — story beat + hint about tomorrow's content +
+  occasional gift (his old tackle box → +fishing luck).
+- Each night the game **writes your day as a journal entry** — your own
+  progress becomes the story. Players return to see their journey written down.
+- **Day-10 letter** reveals grandpa's secret spot → first-arc finale →
+  "the trail continues" hook for arc 2.
+- **Forgiveness rule:** missed days deliver letters late. Never punish absence
+  in a cozy game — that kills the vibe harder than any churn.
+
+### 8.2 The actual 10 days
+
+| Day | What happens | Tomorrow's hook |
+|---|---|---|
+| 1 | Arrive; ranger greets; stray dog adopts you; first forage + cook | letter hints at the river |
+| 2 | Buy rod → **fishing unlocks** (first gear-gate dopamine) | angler visits, mentions the golden koi |
+| 3 | Letter gift: grandpa's tackle box; **family visits** (group order) | rain forecast |
+| 4 | **RAINY DAY** — fish bite more, forage halved, camp feels extra cozy | clear skies |
+| 5 | **Valley unlock** (500c) — new species, new diorama | photographer coming |
+| 6 | Photo-spot quest; angler returns to check your koi progress | bike in stock |
+| 7 | **Bike** → valley trail-riding activity | coast rumor |
+| 8 | **Rare spawn day** — goldcaps ×3; angler's big-fish story arc | letter: "the coast holds something" |
+| 9 | **Coast unlock** (1500c) — kayak, shells, new fish | journal ~70% |
+| 10 | **Grandpa's secret spot revealed** + stamp finale | arc-2 hook |
+
+### 8.3 Daily return drivers (habit systems)
+
+- **Breakfast forecast** — weather + rare-spawn hint at day start; different
+  day = different optimal plan (rain = fish day, not forage day)
+- **Daily quest card** — 3 small tasks → coin bonus + stamp progress
+- **Dog bond** — feed the dog daily → bond level → better cache finds;
+  a daily habit with mechanical payoff and emotional weight
+- **Visitors with memory** — the angler tracks your koi progress, the
+  photographer returns every 3 days, the family comes back on weekends.
+  NPCs remembering you is the cheapest retention mechanic there is
+- **Node regrowth** — yesterday's cleared spots are fresh again; no
+  location ever "dies"
+- **Guestbook** — travelers sign on departure; collecting signatures is
+  the relationship metagame
+
+### 8.4 The real reward: the camp grows
+
+The strongest retention lever is **visible progression on the diorama itself**:
+day 1 = bare clearing, old tent, cold pit → day 10 = string lights, tier-2 tent,
+flower beds, doghouse, kids playing by the fire. Every purchase changes the
+scene itself = screenshot-worthy = shareable (postcard feature).
+
+### 8.5 Economy pacing for 10 days
+
+Gear ladder — one purchase lands every ~1-2 days:
+rod 60 → net 90 → lantern 120 → tent2 200 → bike 300 → stove 400 → decor 50-500∞
+
+Unlock ladder: forest/river free → valley 500 (d4-5) → coast 1500 (d8-9) →
+mountain tease (arc 2). Income grows via group meals, rare fish, quest bonuses.
+
+### 8.6 What killed retention — and the fix
+
+| Problem | Fix |
+|---|---|
+| Foraging = walk+tap | sparkle→decay timing, dog-dug caches, announced rare spawns |
+| Interchangeable visitors | recurring cast with memory + the family unit |
+| Cleared locations dead | species rotate, rare-spawn days pull you back |
+| Identical days | weather/forecast changes optimal strategy daily |
+| No visual payoff | camp upgrades visibly transform the diorama |
+| Story as wallpaper | letters = delivery mechanism; your days become the journal entries |
+
+## 9. Build order after approval
 
 1. Approve this doc (story + loop + manifest).
 2. **P0 generation pass** (style-locked to example.png) → assets drop into manifest.
@@ -663,6 +739,6 @@ A/B art variants, and P3 content (seasons, tent interior, events).
 4. Playtest → adjust economy/pacing → P1 pass.
 5. Only then decide if the real client (Vite+React+TS+PixiJS + server.py rewrite) is warranted.
 
-## 9. Security note
+## 10. Security note
 DONE — token moved to `PIXELLAB_TOKEN` env var in `tools/pixellab_gen.py`
 (see `.env.example`). `.devin/config.json` references the same env var.
