@@ -17,3 +17,11 @@ __pycache__/
 nul
 Thumbs.db
 .DS_Store
+
+# godot (.godot/ also holds export_credentials.cfg)
+.godot/
+*.keystore
+*.jks
+
+# local agent workspace
+.secwright/

@@ -1,48 +1,66 @@
-# Terms of Service — My Café 3D
+# Terms of Service — Trailbound
 
-**Last updated:** 2026-10-10
-**Status:** DRAFT — placeholders marked TODO must be filled before launch.
+**Last updated:** 2026-10-11
+**Status:** DRAFT, not legal advice. Fill every TODO and have counsel review it before launch.
 
-## 1. The game
+## 1. The agreement
 
-My Café 3D ("the Game") is a free-to-play Telegram Mini App café builder simulation operated by TODO (legal entity). These Terms form the agreement between you and the operator.
+These terms are an agreement between you and TODO (developer's legal name) ("we") about Trailbound ("the game"), a single-player game for Android distributed through Google Play. By installing or playing the game, you accept these terms and our Privacy Policy (TODO: URL). Google Play's terms also apply to downloads and to purchases made through Google Play.
 
-## 2. Eligibility
+## 2. Who can play
 
-TODO: minimum age (commonly 13+; higher where local law requires). If you are under the age of majority in your jurisdiction, you may play only with a parent/guardian's permission.
+You must be at least 13 years old. If you are under the age of majority where you live, a parent or guardian must accept these terms for you. TODO: counsel to confirm the age wording for each launch country.
 
-## 3. Accounts
+## 3. Licence
 
-- Your account is your Telegram account. One account per person.
-- You are responsible for activity on your account. Do not share access or attempt to access others' accounts.
+We give you a personal, non-exclusive, non-transferable, revocable licence to install and play the game on devices you own or control, for non-commercial use. We and our licensors keep all rights in the game, including its art, music, text and code. Don't copy, modify, sell or redistribute the game, and don't reverse engineer it except where the law allows.
 
-## 4. Virtual items & currency
+## 4. Your progress
 
-- **Coins** are virtual, have no monetary value, and cannot be exchanged, sold, or transferred outside the Game.
-- **Telegram Stars** purchases (Golden Espresso Machine, Designer Decor Pack, Remove Ads, seasonal pass) are processed by Telegram under Telegram's terms; Stars are subject to Telegram's refund policies, not ours.
-- Virtual items are licensed, not sold. We may adjust, rebalance, or retire virtual items/economy parameters as needed for game health; no compensation is owed for balance changes.
-- No Stars purchase grants gameplay power over free players beyond the convenience/cosmetic scope described in-game (see our no-pay-to-win rule).
+There are no accounts. Your progress is saved on your device, and Android may back it up to your Google account if backup is turned on. We can't recover progress lost when you uninstall the game, clear its data, or reset or lose your device.
 
-## 5. Fair play
+## 5. Coins and items
 
-Prohibited: cheating, exploiting bugs, automating play (bots/scripts), tampering with client data or network requests, interfering with other players' experience, or attempting to disrupt the service. We may warn, suspend, or permanently ban accounts for violations, with or without notice for severe cases. Bug exploitation should be reported via TODO (contact) — thank you.
+Coins, items and other in-game content are earned only by playing. They have no real-world value, can't be bought, sold, transferred or exchanged for money, and are licensed to you, not sold. Updates may rebalance or change them.
 
-## 6. User content
+## 6. Remove Ads
 
-Café names and layouts you create remain yours, but you grant us a license to display them in-game (e.g. visit mode, leaderboards, showcases). Do not use offensive, infringing, or unlawful café names; we may rename or remove them.
+- Remove Ads is a one-time purchase made through Google Play. Google processes the payment; we never see your payment details.
+- It turns off the full-screen ads between days. Rewarded ads stay available because they are always optional.
+- It belongs to the Google account used to buy it. Use Settings → Restore purchases on a new device.
+- Refunds follow Google Play's refund policies and any rights you have under local law. If a purchase is refunded or reversed, the ads between days return.
 
-## 7. Availability
+## 7. Ads
 
-The Game is provided "as is." We aim for reliable service but do not guarantee uninterrupted or error-free operation. We may suspend or discontinue the Game (or parts of it) with reasonable notice; virtual items do not entitle you to refunds except where required by law or Telegram's policies.
+- The game shows ads served by Google AdMob. Advertisers, not us, are responsible for their ads and for the products and services they promote.
+- Rewarded ads are optional and give their reward only when the ad finishes. Ads may be unavailable, for example offline; the game never requires them.
+- Don't interfere with ads: no automated or fake views or clicks, and no tampering with rewards.
 
-## 8. Liability
+## 8. Fair use
 
-To the maximum extent permitted by law, the operator is not liable for indirect, incidental, or consequential damages arising from use of the Game. TODO: have counsel confirm limitation wording for your jurisdiction.
+Don't distribute modified versions of the game, tamper with its ads or purchases, or use it unlawfully.
 
-## 9. Changes to these Terms
+## 9. Updates and availability
 
-We may update these Terms; material changes will be announced in-game and/or via the game's Telegram channel. Continued play after the effective date constitutes acceptance.
+We may update the game to add, change or remove content and features, or to fix problems. We may stop offering the game or its online services (ads, analytics, remote settings); the core game keeps working offline on your device. TODO: counsel to confirm the wording on discontinuation and any refund rights.
 
-## 10. Governing law & contact
+## 10. Disclaimer
 
-TODO: governing law / jurisdiction and operator contact details (legal entity name, address, email).
+The game is provided "as is" and "as available". To the extent the law allows, we don't promise that it will be error-free or uninterrupted.
+
+## 11. Limitation of liability
+
+To the extent the law allows, we are not liable for indirect, incidental or consequential damages, or for lost progress, and our total liability is limited to what you paid for Remove Ads in the 12 months before the claim. Nothing in these terms limits liability or consumer rights that the law doesn't allow us to limit. TODO: counsel to confirm.
+
+## 12. Ending these terms
+
+You can stop at any time by uninstalling the game. We may end your licence if you break these terms. Sections 5, 10, 11 and 14 still apply after the terms end.
+
+## 13. Changes to these terms
+
+We will post changes at TODO (URL) and update the "Last updated" date. Material changes will also be announced in the release notes. If you keep playing after a change takes effect, you accept it.
+
+## 14. Governing law and contact
+
+- Governing law and courts: TODO (counsel). Mandatory consumer protection laws of your country of residence still apply.
+- Contact: TODO (legal name, address, email).

@@ -7,7 +7,7 @@ TOKEN = os.environ.get("PIXELLAB_TOKEN") or sys.exit(
     "Set PIXELLAB_TOKEN env var (see .env.example)")
 API = "https://api.pixellab.ai/v2"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-A = os.environ.get("GEN_OUT_DIR", ROOT + "/prototype/assets")
+A = os.environ.get("GEN_OUT_DIR", ROOT + "/assets_src")
 GEN = A + "/gen"
 os.makedirs(GEN, exist_ok=True)
 
@@ -82,7 +82,7 @@ def gen_image(description, w, h, prefix, style=None, no_bg=True, seed=None):
         im = __import__("PIL.Image", fromlist=["Image"]).open(style)
         body["style_image"] = {"image": b64img(style),
                                "size": {"width": im.width, "height": im.height},
-                               "usage_description": "copy this pixel art style: chunky sprites, thick dark outlines, saturated candy palette, cozy isometric game art"}
+                               "usage_description": "copy this pixel art style: palette, outlines, shading and level of detail"}
         body["style_options"] = {"color_palette": True, "outline": True,
                                  "detail": True, "shading": True}
     if seed is not None:
@@ -109,79 +109,30 @@ def gen_pixen(description, w, h, prefix, view="high top-down", no_bg=True):
     return saved
 
 if __name__ == "__main__":
-    style = ROOT + "/docs/reference/example.png"
-    which = sys.argv[1] if len(sys.argv) > 1 else "shop"
-    pixen = which.startswith("p_")
-    if pixen:
-        which = which[2:]
-    if pixen:
-        descs = {
-            "cauldron": "big black iron cauldron bubbling with glowing teal potion and green bubbles, small wooden stool beside it, pixel art game prop, thick dark outline",
-            "stall": "small wooden market stall with striped purple awning and glass potion bottles on the counter, pixel art game prop, thick dark outline",
-            "tree": "chunky stylized pine tree, deep teal green foliage with tiny warm fairy lights, pixel art game prop, thick dark outline",
-            "slime": "cute teal slime blob creature with big eyes and tiny wizard hat, chibi pixel art game character, thick dark outline",
-            "cat": "round chibi black cat familiar with amber eyes sitting, pixel art game character, thick dark outline",
-        }
-        sizes = {"cauldron": (120,120), "stall": (140,140), "tree": (112,152),
-                 "slime": (96,80), "cat": (96,80)}
-        w,h = sizes[which]
-        gen_pixen(descs[which], w, h, "p_"+which)
-        sys.exit(0)
-    if which == "shop":
-        gen_image(
-            "isometric cozy potion shop building for a pixel art game: a small "
-            "wooden cottage shop with a giant curved purple witch hat as its "
-            "roof, glowing warm windows, tiny chimney puffing teal smoke, "
-            "wooden signpost, hanging lantern, viewed at isometric angle on "
-            "transparent background",
-            240, 280, "shop", style=style)
-    elif which == "witch":
-        gen_image(
-            "chibi pixel art game character: cute little witch shopkeeper, big "
-            "head, oversized purple witch hat, orange dress, holding a wooden "
-            "spoon, standing facing camera, full body, thick dark outline, "
-            "transparent background",
-            96, 96, "witch", style=style)
-    elif which == "knight":
-        gen_image(
-            "chibi pixel art game character: small round knight customer with "
-            "big head, dented helmet with red plume, tiny sword, standing "
-            "facing camera, full body, thick dark outline, transparent",
-            96, 96, "knight", style=style)
-    elif which == "slime":
-        gen_image(
-            "chibi pixel art game creature: cute teal slime blob with big eyes "
-            "and a tiny wizard hat, thick dark outline, transparent",
-            96, 80, "slime", style=style)
-    elif which == "cat":
-        gen_image(
-            "chibi pixel art game creature: round black cat familiar with "
-            "amber eyes sitting, thick dark outline, transparent",
-            96, 80, "cat", style=style)
-    elif which == "cauldron":
-        gen_image(
-            "pixel art game prop: big black iron cauldron bubbling with "
-            "glowing teal potion, small wooden stool, isometric view, thick "
-            "dark outline, transparent background",
-            120, 120, "cauldron", style=style)
-    elif which == "stall":
-        gen_image(
-            "pixel art game prop: small wooden market stall with striped "
-            "purple awning, potion bottles on the counter, isometric view, "
-            "thick dark outline, transparent background",
-            140, 140, "stall", style=style)
-    elif which == "tree":
-        gen_image(
-            "pixel art game prop: single chunky stylized pine tree, deep teal "
-            "green with fairy lights wrapped around, isometric view, thick "
-            "dark outline, transparent background",
-            110, 150, "tree", style=style)
-    elif which == "scene":
-        gen_image(
-            "isometric cozy pixel art game diorama at dusk: a small potion "
-            "shop cottage with giant purple witch hat roof in a forest "
-            "clearing, bubbling cauldron on campfire, wooden market stall, "
-            "glowing mushrooms, teal pond, pine trees around the edges, "
-            "string lights, scattered flowers and crates, rich saturated "
-            "colors on a dark night background, chunky chibi style",
-            560, 420, "scene", style=style, no_bg=False)
+    import argparse
+    ap = argparse.ArgumentParser(
+        description="Generate PixelLab images into GEN_OUT_DIR/gen "
+                    "(default: assets_src/gen).")
+    ap.add_argument("description", help="prompt text")
+    ap.add_argument("width", type=int)
+    ap.add_argument("height", type=int)
+    ap.add_argument("prefix", help="output file prefix")
+    ap.add_argument("--style", default=ROOT + "/docs/reference/example.png",
+                    help="PNG style reference (default: docs/reference/example.png)")
+    ap.add_argument("--no-style", action="store_true",
+                    help="generate without a style reference")
+    ap.add_argument("--keep-bg", action="store_true",
+                    help="keep the background (default: transparent)")
+    ap.add_argument("--seed", type=int)
+    ap.add_argument("--pixen", action="store_true",
+                    help="cheaper synchronous generator; ignores --style and --seed")
+    ap.add_argument("--view", default="high top-down", help="view for --pixen")
+    a = ap.parse_args()
+    if a.pixen:
+        saved = gen_pixen(a.description, a.width, a.height, a.prefix,
+                          view=a.view, no_bg=not a.keep_bg)
+    else:
+        saved = gen_image(a.description, a.width, a.height, a.prefix,
+                          style=None if a.no_style else a.style,
+                          no_bg=not a.keep_bg, seed=a.seed)
+    sys.exit(0 if saved else 1)
