@@ -23,6 +23,46 @@ def cell_image(rows, x0, y0, w, h):
     return [bytearray(rows[y][x0 * 4:(x0 + w) * 4]) for y in range(y0, y0 + h)]
 
 
+def despeckle(cell, w, h, max_size):
+    """Zero the alpha of detached edge-touching components <= max_size.
+
+    8-connected flood fill on alpha>0. Keeps the largest component and
+    anything not touching the cell border (interior strays = detail).
+    Returns the number of pixels cleared.
+    """
+    seen = [[False] * w for _ in range(h)]
+    cleared = 0
+    comps = []
+    for y0 in range(h):
+        for x0 in range(w):
+            if seen[y0][x0] or not cell[y0][x0 * 4 + 3]:
+                continue
+            comp, stack = [], [(x0, y0)]
+            seen[y0][x0] = True
+            while stack:
+                x, y = stack.pop()
+                comp.append((x, y))
+                for dy in (-1, 0, 1):
+                    for dx in (-1, 0, 1):
+                        nx, ny = x + dx, y + dy
+                        if (0 <= nx < w and 0 <= ny < h
+                                and not seen[ny][nx] and cell[ny][nx * 4 + 3]):
+                            seen[ny][nx] = True
+                            stack.append((nx, ny))
+            comps.append(comp)
+    if len(comps) < 2:
+        return 0
+    biggest = max(len(c) for c in comps)
+    for comp in comps:
+        if len(comp) == biggest or len(comp) > max_size:
+            continue
+        if any(x in (0, w - 1) or y in (0, h - 1) for x, y in comp):
+            for x, y in comp:
+                cell[y][x * 4 + 3] = 0
+            cleared += len(comp)
+    return cleared
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("sheet")
@@ -35,6 +75,10 @@ def main():
                     help="repaint each frame's content onto the anchor")
     ap.add_argument("--anchor", default="bottom", choices=["bottom", "center"],
                     help="anchor for --recenter and the alignment report")
+    ap.add_argument("--despeckle", type=int, metavar="N", default=0,
+                    help="drop detached components <=N px that touch a cell "
+                         "border — kills neighbor-frame bleed; interior strays "
+                         "(sparks) and the main blob are kept")
     a = ap.parse_args()
 
     W, H, rows = png.read(a.sheet)
@@ -51,8 +95,12 @@ def main():
 
     for i in range(a.cols * a.rows):
         cx, cy = (i % a.cols) * cw, (i // a.cols) * ch
-        bb = png.bbox_alpha(rows, cx, cy, cw, ch)
+        cell = cell_image(rows, cx, cy, cw, ch)
+        dropped = despeckle(cell, cw, ch, a.despeckle) if a.despeckle else 0
+        bb = png.bbox_alpha(cell, 0, 0, cw, ch)
         tag = f"{i:02d} @({cx},{cy}) {cw}x{ch}"
+        if dropped:
+            tag += f" despeckled {dropped}px"
         if bb is None:
             print(f"{tag}: EMPTY")
             continue
@@ -63,22 +111,18 @@ def main():
         print(f"{tag}: bbox {bw}x{bh} at +{bx},+{by}  "
               f"drift-from-{a.anchor} {drift[0]:+d},{drift[1]:+d}px")
         if a.write:
-            cell = [bytearray(cw * 4) for _ in range(ch)]
-            for y in range(bh):
-                src = cx + bx
-                dst_y = want_y + y
-                dst_x = want_x
-                if not (0 <= dst_y < ch):
-                    continue
-                line = rows[cy + by + y]
-                for px in range(bw):
-                    dx = dst_x + px
-                    if 0 <= dx < cw:
-                        cell[dst_y][dx * 4:dx * 4 + 4] = \
-                            line[(src + px) * 4:(src + px) * 4 + 4]
-            else:
-                if not a.recenter:
-                    cell = cell_image(rows, cx, cy, cw, ch)
+            if a.recenter:
+                out_cell = [bytearray(cw * 4) for _ in range(ch)]
+                for y in range(bh):
+                    dst_y = want_y + y
+                    if not (0 <= dst_y < ch):
+                        continue
+                    for px in range(bw):
+                        dx = want_x + px
+                        if 0 <= dx < cw:
+                            out_cell[dst_y][dx * 4:dx * 4 + 4] = \
+                                cell[by + y][(bx + px) * 4:(bx + px) * 4 + 4]
+                cell = out_cell
             out = f"{prefix}_{i:02d}.png"
             png.write(out, cw, ch, cell)
             print(f"  wrote {out}")
