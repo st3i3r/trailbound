@@ -23,12 +23,13 @@ def cell_image(rows, x0, y0, w, h):
     return [bytearray(rows[y][x0 * 4:(x0 + w) * 4]) for y in range(y0, y0 + h)]
 
 
-def despeckle(cell, w, h, max_size):
-    """Zero the alpha of detached edge-touching components <= max_size.
+def despeckle(cell, w, h):
+    """Zero the alpha of every detached component touching a cell border.
 
-    8-connected flood fill on alpha>0. Keeps the largest component and
-    anything not touching the cell border (interior strays = detail).
-    Returns the number of pixels cleared.
+    8-connected flood fill on alpha>0. In a strip slice, anything
+    disconnected and edge-touching is a neighbor frame's bleed — its
+    continuation lives in the adjacent cell. The largest component and
+    interior strays (sparks = real detail) are kept. Returns px cleared.
     """
     seen = [[False] * w for _ in range(h)]
     cleared = 0
@@ -54,7 +55,7 @@ def despeckle(cell, w, h, max_size):
         return 0
     biggest = max(len(c) for c in comps)
     for comp in comps:
-        if len(comp) == biggest or len(comp) > max_size:
+        if len(comp) == biggest:
             continue
         if any(x in (0, w - 1) or y in (0, h - 1) for x, y in comp):
             for x, y in comp:
@@ -75,10 +76,10 @@ def main():
                     help="repaint each frame's content onto the anchor")
     ap.add_argument("--anchor", default="bottom", choices=["bottom", "center"],
                     help="anchor for --recenter and the alignment report")
-    ap.add_argument("--despeckle", type=int, metavar="N", default=0,
-                    help="drop detached components <=N px that touch a cell "
-                         "border — kills neighbor-frame bleed; interior strays "
-                         "(sparks) and the main blob are kept")
+    ap.add_argument("--despeckle", action="store_true",
+                    help="drop detached components touching a cell border — "
+                         "kills neighbor-frame bleed of any size; interior "
+                         "strays (sparks) and the main blob are kept")
     a = ap.parse_args()
 
     W, H, rows = png.read(a.sheet)
@@ -96,7 +97,7 @@ def main():
     for i in range(a.cols * a.rows):
         cx, cy = (i % a.cols) * cw, (i // a.cols) * ch
         cell = cell_image(rows, cx, cy, cw, ch)
-        dropped = despeckle(cell, cw, ch, a.despeckle) if a.despeckle else 0
+        dropped = despeckle(cell, cw, ch) if a.despeckle else 0
         bb = png.bbox_alpha(cell, 0, 0, cw, ch)
         tag = f"{i:02d} @({cx},{cy}) {cw}x{ch}"
         if dropped:
