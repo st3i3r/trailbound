@@ -1171,6 +1171,71 @@ never go negative (no debt).
   downloadable pack (Play allows non-code content)
 - CI: GH Actions → Gradle AAB → fastlane internal track → closed test
 
+### 8J. UX polish layer — the SOTA checklist (was ~70% specced)
+
+**What we had:** light HUD, journal sheets, want bubbles, plot drag, phases.
+**What SOTA cozy mobile adds on top:**
+
+#### Motion & feedback spec (was missing — the "feels premium" layer)
+- Screen transitions spec'd per route: sheet slides up, scene cross-fades
+  through **smoke/mist** (thematic loading!), map zooms into the site
+- Button squash on press · drag physics with momentum · sheet edge-overscroll
+- Anticipation beats: letter arrives = envelope bounces on HUD; guests
+  visibly WALK IN from the site edge before waiting (life, not spawn-pop)
+- **Ceremony beats:** rank-up, site unlock, 5★ night get 2-4s celebration
+  sequences (banner + particles + haptic + auto-screenshot offer) — the
+  moments players share
+
+#### Information architecture gaps
+- **Guest card** (tap any guest): bio, satisfaction history, wants, storyline
+  progress, times visited — turns travelers into people
+- **Site dashboard:** capacity/charm/upkeep/firewood at a glance (booking
+  board's home, not a separate screen)
+- **Recipe book:** undiscovered = "??" slots (collection dopamine)
+- **Journal cover shows %** per section — progress visible closed
+- **Inventory:** category tabs + quantities; no scroll-walls
+
+#### SOTA cozy patterns (adopt)
+- **Photo mode** — hide all UI + pan/zoom the campsite = postcard editor
+  (frame/sticker/caption picker), the genre's signature feature
+- **Attract mode** — idle 30s = slow camera drift + living diorama; the
+  scene markets itself on someone's desk
+- **Ambient return state** — reopen app = guests milling at the gate,
+  fire crackling; the world kept living
+- **Streak lantern** — daily return flame beside the journal badge
+- **Undo window** — 30s undo on placement/purchases (cozy = forgiving)
+
+#### Settings inventory (complete list — was partial)
+music/ambience/SFX sliders ×3 · haptics off/low/high · notifications per-type
+(letter/guest/event) · language · text size (pixel font scaling!) ·
+reduced motion · reduced flash (seizure-safe) · Play Games account link ·
+cloud save status · credits/legal · restore purchases · help/tutorial replay.
+
+#### Play-native UX (timing is the UX)
+- **Notification permission** (Android 13+ runtime): ask *after* the first
+  letter arrives — context makes it a feature, not a nag
+- **Review prompt:** Play in-app review fires after a 5★ night, never random
+- **IAP storefront:** cosmetic shop in the outfitter van (diegetic!), prices
+  local-currency, restore-purchases in settings, no countdown-pressure FOMO
+- **Play Games sign-in:** soft prompt day-2 (after the loop hooks), settings
+  toggle thereafter
+- **Update gate:** friendly "new site arrived — update to visit" framing
+
+#### A11y depth (beyond 44px)
+- **Never color-only:** want bubbles carry icon + shape, not just hue
+- Text-size setting scales pixel font + panels
+- Left-hand layout toggle (mirror bottom sheet)
+- Reduced-flash: sparkles/bursts capped at 3Hz luminance change
+
+#### What we deliberately skip
+screen-reader mode · full colorblind themes · landscape+portrait dual
+layouts (landscape only, §8F) · controller support (mobile-only) ·
+custom font upload — none serve this game's audience.
+
+**Verdict:** with this layer, the UI spec IS SOTA for the genre — the
+differentiators (diegetic storefront, ceremony beats, photo mode, attract
+mode) are all specced. Execution risk sits in motion-feel polish, not scope.
+
 ### 8I. Honest remaining gaps
 
 | Gap | Status |
