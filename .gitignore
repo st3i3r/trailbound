@@ -1,0 +1,19 @@
+# deps / build
+node_modules/
+dist/
+*.local
+
+# python
+__pycache__/
+*.pyc
+.venv/
+
+# secrets & data
+.env
+*.db
+*.sqlite
+
+# os/editor cruft
+nul
+Thumbs.db
+.DS_Store

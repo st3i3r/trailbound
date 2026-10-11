@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Potion Shop diorama</title>
+<style>
+  html,body{margin:0;height:100%;background:#14102a;overflow:hidden;
+    font-family:ui-rounded,"Segoe UI",system-ui,sans-serif}
+  #stage{position:fixed;inset:0;display:grid;place-items:center}
+  #frame{position:relative;width:min(96vmin,880px);height:min(96vmin,880px)}
+  canvas{position:absolute;inset:0;width:100%;height:100%;
+    image-rendering:pixelated;image-rendering:crisp-edges}
+  /* ---- game-UI overlay (only with ?ui=1) ---- */
+  #ui{position:absolute;inset:0;display:none;pointer-events:none}
+  .pill{display:flex;align-items:center;gap:6px;background:rgba(247,233,200,.94);
+    border-radius:999px;padding:7px 13px;font-size:14px;font-weight:800;color:#3A2A1A;
+    box-shadow:0 4px 14px rgba(10,6,24,.45);border:1px solid rgba(255,255,255,.5)}
+  .pill.dark{background:rgba(59,48,82,.94);color:#F7E9C8;border-color:#C9A8E0}
+  #hud{position:absolute;top:12px;left:12px;right:12px;display:flex;gap:8px;flex-wrap:wrap}
+  #shop{position:absolute;top:12px;left:14px;color:#FFF8EA;font-weight:900;font-size:17px;
+    text-shadow:0 2px 6px rgba(0,0,0,.7)}
+  #shop small{display:block;font-size:10px;font-weight:600;opacity:.7}
+  #bubble{position:absolute;transform:translate(-50%,-100%);background:#F7E9C8;
+    border:3px solid #F5C542;border-radius:14px;padding:8px 12px;display:flex;
+    align-items:center;gap:9px;box-shadow:0 4px 14px rgba(10,6,24,.5);white-space:nowrap}
+  #bubble::after{content:"";position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);
+    border:8px solid transparent;border-top-color:#F5C542;border-bottom:0}
+  #sheet{position:absolute;left:0;right:0;bottom:0;height:32%;
+    background:linear-gradient(180deg,#F7E9C8,#EFDDB4);border-radius:22px 22px 0 0;
+    box-shadow:0 -6px 24px rgba(10,6,24,.5);padding:10px 14px;pointer-events:auto}
+  #handle{width:44px;height:5px;border-radius:3px;background:rgba(58,42,26,.3);margin:0 auto 8px}
+  #order{display:flex;gap:10px;align-items:center;background:#FFFDF7;border:1px solid #E4D2AC;
+    border-radius:14px;padding:9px 11px}
+  #order .face{width:38px;height:38px;border-radius:11px;flex:none;
+    background:linear-gradient(160deg,#7B5CD6,#4C3A8C);display:grid;place-items:center;font-size:20px}
+  .who{font-size:13px;font-weight:800;color:#3A2A1A}
+  .ail{font-size:12px;color:#6B4A2F;font-style:italic}
+  .hint{font-size:11px;color:#2A9186;font-weight:800}
+  #ing{display:flex;gap:8px;margin:10px 0}
+  .ing{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 2px;
+    border-radius:12px;border:2px solid #E4D2AC;background:#FFFDF7}
+  .ing.on{border-color:#F5C542;background:#FFF6DD;box-shadow:0 4px 10px rgba(245,197,66,.4)}
+  .ing .ic{font-size:20px}.ing .nm{font-size:9px;font-weight:700;color:#6B4A2F}
+  .ing .st{font-size:8px;opacity:.55;color:#6B4A2F}
+  #acts{display:flex;gap:10px}
+  .big{flex:1;border:0;border-radius:14px;padding:14px 0;font-size:17px;font-weight:900;
+    color:#fff;letter-spacing:.5px}
+  #brew{background:linear-gradient(180deg,#35B5A8,#2A9186);box-shadow:0 4px 0 #1F746B}
+  #serve{background:linear-gradient(180deg,#F06A8A,#D14F70);box-shadow:0 4px 0 #A63A55}
+</style>
+</head>
+<body>
+<div id="stage"><div id="frame">
+  <canvas id="gl"></canvas>
+  <div id="ui">
+    <div id="shop">⚗️ Pip's Potions<small>prototype · dusk</small></div>
+    <div id="hud" style="top:38px">
+      <div class="pill">🪙 175</div><div class="pill">⭐ 3.0 guild</div>
+      <div class="pill">✨ 17 charm</div><div class="pill dark">🌙 Night 1</div>
+    </div>
+    <div id="bubble"><span style="font-size:18px">⚔️</span>
+      <b style="font-size:12px;color:#6B4A2F;font-style:italic">"I fight slimes at dawn…"</b></div>
+    <div id="sheet"><div id="handle"></div>
+      <div id="order"><div class="face">🗡️</div><div>
+        <div class="who">Kael the Sellsword</div>
+        <div class="ail">"Got a slime contract at dawn — need something that burns goo."</div>
+        <div class="hint">…brew to discover the remedy</div></div></div>
+      <div id="ing"></div>
+      <div id="acts"><button class="big" id="brew">⚗️ BREW</button>
+      <button class="big" id="serve">🧪 SERVE</button></div>
+    </div>
+  </div>
+</div></div>
+
+<script type="module">
+import * as THREE from '../vendor/three.module.js';
+
+const PIX = +(new URLSearchParams(location.search).get('pix') || 5);
+const SHOW_UI = new URLSearchParams(location.search).has('ui');
+const SQUARE = new URLSearchParams(location.search).has('sq');
+
+const cv = document.getElementById('gl'), frame = document.getElementById('frame');
+const renderer = new THREE.WebGLRenderer({canvas:cv, antialias:false});
+renderer.setPixelRatio(1);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x14102a);
+scene.fog = new THREE.Fog(0x14102a, 30, 70);
+
+const V = 10.6;
+const cam = new THREE.OrthographicCamera(-V,V,V,-V,.1,100);
+cam.position.set(16,15,16); cam.lookAt(6.5,-.2,6.5);
+
+/* ---------- lights: dusk potion-shop mood ---------- */
+scene.add(new THREE.HemisphereLight(0x8f86c9, 0x3a2f52, 1.2));
+const sun = new THREE.DirectionalLight(0xffd9a0, .85);
+sun.position.set(10,14,8); scene.add(sun);
+const fill = new THREE.DirectionalLight(0xfff0dd, .3);
+fill.position.set(14,8,14); scene.add(fill);
+const rim = new THREE.DirectionalLight(0x7f6fd0, .4);
+rim.position.set(-8,6,-6); scene.add(rim);
+
+/* ---------- palette ---------- */
+const P = {ink:0x1c122c, grass1:0x56a854, grass2:0x60b85c, dirt:0x96694a,
+  dirtD:0x7a5236, plank:0xb28050, wood:0x96623c, woodD:0x704628,
+  wall:0xf0dab0, wallD:0xd2b88c, roof:0x7e5ac8, roofD:0x5c3ea0,
+  roofHi:0x9e7ae8, win:0xffd678, potion:0x4ae0aa, potionHi:0x8cffd2,
+  caul:0x2a2040, caulHi:0x463864, fire1:0xff9e4f, fire2:0xffd93d,
+  pink:0xf06a8a, teal:0x35b5a8, lav:0xc9a8e0, gold:0xf5c542,
+  cream:0xfff8ea, water:0x4078c8, waterHi:0x6eaef0, mush:0x7858d2,
+  mushSpot:0xe6ebff, stem:0xdeceb4, pine:0x2e7d4f, pine2:0x3fae6a,
+  cloakP:0x684aa8, skin:0xf2c9a0, steel:0x96a0be, stone:0xa8a0ba};
+
+const M = c => new THREE.MeshLambertMaterial({color:c});
+const E = c => new THREE.MeshBasicMaterial({color:c});          // emissive-ish
+const geo = { box:(w,h,d)=>new THREE.BoxGeometry(w,h,d),
+  cyl:(r,h,s=8)=>new THREE.CylinderGeometry(r,r,h,s),
+  cylT:(rt,rb,h,s=8)=>new THREE.CylinderGeometry(rt,rb,h,s),
+  sph:(r,s=10)=>new THREE.SphereGeometry(r,s,Math.max(6,s-2)),
+  cone:(r,h,s=7)=>new THREE.ConeGeometry(r,h,s) };
+
+function mesh(g,c,x=0,y=0,z=0,o){const m=new THREE.Mesh(g,typeof c==='number'?M(c):c);
+  m.position.set(x,y,z); if(o)Object.assign(m,o); scene.add(m); return m;}
+function put(m,x,y,z){m.position.set(x,y,z);scene.add(m);return m;}
+function outline(m,s=1.07){const o=new THREE.Mesh(m.geometry,
+  new THREE.MeshBasicMaterial({color:P.ink,side:THREE.BackSide}));
+  o.scale.setScalar(s); m.add(o); return m;}
+function group(...ms){const g=new THREE.Group();ms.forEach(m=>{scene.remove(m);g.add(m)});scene.add(g);return g;}
+
+/* ---------- ground: iso slab with checker grass ---------- */
+const TILE=13;
+{ const g=document.createElement('canvas'); g.width=g.height=256;
+  const c=g.getContext('2d'), ts=256/TILE;
+  for(let i=0;i<TILE;i++)for(let j=0;j<TILE;j++){
+    c.fillStyle=(i+j)%2?'#60b85c':'#56a854'; c.fillRect(i*ts,j*ts,ts,ts);
+    c.fillStyle='rgba(0,0,0,.06)'; c.fillRect(i*ts,j*ts,ts,1);}
+  // tufts + flowers baked in
+  const rng=(s=>()=> (s=Math.imul(s^s>>>15,s|1),((s^=s>>>7)>>>0)/2**32))(7);
+  for(let k=0;k<60;k++){ const x=rng()*256,y=rng()*256;
+    c.fillStyle=k%5? 'rgba(30,90,40,.5)':'#f8d878';
+    c.fillRect(x,y,k%5?1.6:2.2,k%5?2.6:2.2);}
+  const t=new THREE.CanvasTexture(g); t.magFilter=THREE.NearestFilter;
+  t.colorSpace=THREE.SRGBColorSpace;
+  put(new THREE.Mesh(geo.box(TILE,.55,TILE),
+    new THREE.MeshLambertMaterial({map:t}),),TILE/2-.5,-.28,TILE/2-.5);
+  put(new THREE.Mesh(geo.box(TILE,.7,TILE),M(P.dirt)),TILE/2-.5,-.9,TILE/2-.5);
+  // darker skirt
+  put(new THREE.Mesh(geo.box(TILE+.05,.06,TILE+.05),M(0x346034)),TILE/2-.5,-.56,TILE/2-.5);
+}
+
+/* ---------- potion shop (back-left) ---------- */
+{ const g=new THREE.Group();
+  const walls=put(new THREE.Mesh(geo.box(4.6,3,4),M(P.wall)),0,1.5,0);
+  // timber frame
+  [-1.9,-.95,0,.95,1.9].forEach(x=>g.add(put(new THREE.Mesh(geo.box(.14,3,.14),M(P.wood)),x,1.5,2.02)));
+  g.add(put(new THREE.Mesh(geo.box(4.7,.24,4.1),M(P.woodD)),0,2.95,0));
+  g.add(put(new THREE.Mesh(geo.box(4.7,.24,4.1),M(P.woodD)),0,.12,0));
+  g.add(put(new THREE.Mesh(geo.box(.16,3,4.1),M(P.wood)),-2.3,1.5,0));
+  g.add(walls);
+  // crooked roof: stacked rotated cones
+  const roof=put(new THREE.Mesh(geo.cone(3.9,3.1,4),M(P.roof)),0,4.4,0);
+  roof.rotation.y=Math.PI/4; roof.rotation.z=.06; g.add(roof);
+  const tip=put(new THREE.Mesh(geo.cone(1.1,1.6,5),M(P.roofHi)),-.5,6.2,-.2);
+  tip.rotation.z=.5; g.add(tip);
+  // roof shingle lines
+  g.add(put(new THREE.Mesh(geo.box(4.4,.16,4.4),M(P.roofD)),0,3.35,0));
+  g.add(put(new THREE.Mesh(geo.box(3.4,.12,3.4),M(P.roofD)),-.1,4.05,-.1));
+  g.add(put(new THREE.Mesh(geo.box(2.4,.12,2.4),M(P.roofD)),-.2,4.75,-.2));
+  // chimney + smoke
+  g.add(put(new THREE.Mesh(geo.box(.6,1.6,.6),M(P.woodD)),1.5,4.7,-.8));
+  [[1.5,5.7,-.8,.36],[1.8,6.3,-.7,.5],[1.4,7.0,-.6,.66]].forEach(([x,y,z,r])=>
+    g.add(put(new THREE.Mesh(geo.sph(r,7),M(0xb8b4cc)),x,y,z)));
+  // round glowing window + cross
+  const win=put(new THREE.Mesh(geo.cyl(.55,.12,16),E(P.win)),0,1.9,2.06);
+  win.rotation.x=Math.PI/2; g.add(win);
+  g.add(put(new THREE.Mesh(geo.box(.09,1.1,.05),M(P.woodD)),0,1.9,2.1));
+  g.add(put(new THREE.Mesh(geo.box(1.1,.09,.05),M(P.woodD)),0,1.9,2.1));
+  // door + step
+  g.add(put(new THREE.Mesh(geo.box(1,1.7,.14),M(P.woodD)),-1.2,.95,2.03));
+  g.add(put(new THREE.Mesh(geo.box(.2,.2,.06),E(P.win)),-1.05,1.2,2.1));
+  g.add(put(new THREE.Mesh(geo.box(1.3,.16,.8),M(P.stone)),-1.2,.08,2.5));
+  // hanging sign: potion bottle
+  g.add(put(new THREE.Mesh(geo.box(.06,.7,.06),M(P.woodD)),2.35,2.2,1.6));
+  g.add(put(new THREE.Mesh(geo.cyl(.16,.4,7),E(P.potion)),2.35,1.7,1.6));
+  g.add(put(new THREE.Mesh(geo.cyl(.07,.14,6),M(P.woodD)),2.35,1.95,1.6));
+  // warm light from window
+  const wl=new THREE.PointLight(0xffc98f,.9,6); wl.position.set(0,1.9,2.6); g.add(wl);
+  g.position.set(2.6,0,1.9); g.rotation.y=Math.PI/4*.9; scene.add(g);   // face front-right
+}
+
+/* ---------- cauldron (center) ---------- */
+{ const g=new THREE.Group();
+  // fire logs + flames
+  g.add(put(new THREE.Mesh(geo.box(1.5,.18,.4),M(P.woodD)),0,.09,.2));
+  g.add(put(new THREE.Mesh(geo.box(1.5,.18,.4),M(P.woodD)),0,.09,-.2))
+  const f1=put(new THREE.Mesh(geo.cone(.5,.9,6),E(P.fire1)),0,.6,0);
+  const f2=put(new THREE.Mesh(geo.cone(.3,.6,6),E(P.fire2)),0,.62,.1);
+  g.add(f1);g.add(f2);
+  // pot: squashed sphere on legs + rim
+  const pot=put(new THREE.Mesh(geo.sph(1.05,12),M(P.caul)),0,1.15,0);
+  pot.scale.y=.82; outline(pot,1.06); g.add(pot);
+  g.add(put(new THREE.Mesh(geo.cyl(1.12,.22,14),M(P.caulHi)),0,1.78,0));
+  g.add(put(new THREE.Mesh(geo.cyl(.95,.1,14),E(P.potion)),0,1.86,0));
+  [[-.7,-.6],[.7,-.6],[0,.8]].forEach(([x,z])=>
+    g.add(put(new THREE.Mesh(geo.cyl(.1,.5,6),M(P.ink)),x,.55,z)));
+  // bubbles
+  g.add(put(new THREE.Mesh(geo.sph(.12,6),E(P.potionHi)),-.3,1.95,.1));
+  g.add(put(new THREE.Mesh(geo.sph(.09,6),E(P.potionHi)),.25,1.93,-.2));
+  // ladle
+  const l=put(new THREE.Mesh(geo.cyl(.05,1.4,5),M(P.wood)),.9,2.3,-.3);
+  l.rotation.z=-.4; g.add(l);
+  g.add(put(new THREE.Mesh(geo.sph(.14,6),M(P.wood)),1.15,2.9,-.3));
+  const gl=new THREE.PointLight(P.potion,1.1,7); gl.position.set(0,2.4,0); g.add(gl);
+  const fl=new THREE.PointLight(P.fire1,.7,4); fl.position.set(0,.8,0); g.add(fl);
+  g.position.set(6.4,0,6.2); g.userData.flames=[f1,f2]; scene.add(g); window._cauldron=g;
+}
+
+/* ---------- stall table + awning (right) ---------- */
+{ const g=new THREE.Group();
+  g.add(put(new THREE.Mesh(geo.box(2.6,.18,1.5),M(P.plank)),0,1,0));
+  [[-1.15,-.6],[1.15,-.6],[-1.15,.6],[1.15,.6]].forEach(([x,z])=>
+    g.add(put(new THREE.Mesh(geo.box(.14,1,.14),M(P.woodD)),x,.5,z)));
+  g.add(put(new THREE.Mesh(geo.box(2.6,.5,1.5),M(P.wood)),0,.55,0));
+  // bottles
+  [[-.7,P.potion],[0,P.pink],[.7,P.lav]].forEach(([x,c])=>{
+    g.add(put(new THREE.Mesh(geo.cyl(.14,.5,7),E(c)),x,1.35,0));
+    g.add(put(new THREE.Mesh(geo.cyl(.05,.12,5),M(P.woodD)),x,1.66,0));});
+  // awning poles + striped top
+  [[-1.3],[1.3]].forEach(([x])=>g.add(put(new THREE.Mesh(geo.box(.1,2.7,.1),M(P.woodD)),x,1.35,0)));
+  const aw=document.createElement('canvas'); aw.width=64; aw.height=16;
+  const ac=aw.getContext('2d');
+  for(let i=0;i<8;i++){ac.fillStyle=i%2?'#fff8ea':'#f06a8a';ac.fillRect(i*8,0,8,16);}
+  const at=new THREE.CanvasTexture(aw); at.magFilter=THREE.NearestFilter;
+  at.colorSpace=THREE.SRGBColorSpace;
+  const top=new THREE.Mesh(geo.box(2.8,.08,1.6),new THREE.MeshLambertMaterial({map:at}));
+  top.rotation.x=.09; g.add(put(top,0,2.45,-.1));
+  g.position.set(9.7,0,7.6); g.rotation.y=-.35; scene.add(g);
+}
+
+/* ---------- characters (chibi) ---------- */
+function chibi(bodyC){ const g=new THREE.Group(); g.scale.setScalar(1.22);
+  const body=put(new THREE.Mesh(geo.cone(.55,.95,7),M(bodyC)),0,.55,0);
+  outline(body,1.09); g.add(body);
+  const head=put(new THREE.Mesh(geo.sph(.52,10),M(P.skin)),0,1.3,0);
+  outline(head,1.09); g.add(head);
+  const eL=E(P.ink),eR=E(P.ink);
+  g.add(put(new THREE.Mesh(geo.box(.08,.16,.05),eL),-.17,1.32,.48));
+  g.add(put(new THREE.Mesh(geo.box(.08,.16,.05),eR), .17,1.32,.48));
+  g.add(put(new THREE.Mesh(geo.box(.1,.05,.04),M(0xd87a7a)),-.3,1.14,.38)); // blush
+  g.add(put(new THREE.Mesh(geo.box(.1,.05,.04),M(0xd87a7a)), .3,1.14,.38));
+  return g; }
+
+// witch: hat + wand
+{ const w=chibi(0x8a68d0);
+  w.add(put(new THREE.Mesh(geo.cyl(.72,.07,10),M(0x463282)),0,1.5,0));
+  const hat=put(new THREE.Mesh(geo.cone(.5,.95,7),M(P.cloakP)),0,2,0);
+  hat.rotation.z=.16; outline(hat,1.08); w.add(hat);
+  w.add(put(new THREE.Mesh(geo.cyl(.4,.1,8),M(P.gold)),0,1.62,0));
+  w.add(put(new THREE.Mesh(geo.cyl(.04,.8,5),M(P.woodD)),.6,.9,.2))
+     .children.at(-1).rotation.z=-.5;
+  w.add(put(new THREE.Mesh(geo.sph(.12,6),E(P.potionHi)),.78,1.25,.2));
+  w.position.set(4.6,0,7.4); w.rotation.y=.85; scene.add(w); window._witch=w; }
+
+// knight: helmet + plume + sword
+{ const k=chibi(P.steel);
+  const helm=put(new THREE.Mesh(geo.sph(.5,10,8,0,Math.PI*2,0,Math.PI/2),M(P.steel)),0,1.3,0);
+  outline(helm,1.08); k.add(helm);
+  k.add(put(new THREE.Mesh(geo.box(.34,.3,.34),M(P.pink)),0,1.86,0));      // plume
+  k.add(put(new THREE.Mesh(geo.box(.07,.9,.07),E(0xd8e2f5)),.55,1.1,.3));  // blade
+  k.add(put(new THREE.Mesh(geo.box(.2,.07,.07),M(P.gold)),.55,.7,.3));     // guard
+  k.position.set(7.6,0,7.1); k.rotation.y=.8; scene.add(k); window._knight=k; }
+
+// slime! (it's a potion shop for adventurers — a tame slime pet)
+{ const s=new THREE.Group();
+  const b=put(new THREE.Mesh(geo.sph(.42,10),new THREE.MeshLambertMaterial(
+    {color:P.potion,transparent:true,opacity:.88})),0,.38,0);
+  b.scale.y=.8; outline(b,1.1); s.add(b);
+  s.add(put(new THREE.Mesh(geo.box(.07,.1,.05),E(P.ink)),-.14,.42,.34));
+  s.add(put(new THREE.Mesh(geo.box(.07,.1,.05),E(P.ink)), .14,.42,.34));
+  s.add(put(new THREE.Mesh(geo.box(.14,.06,.04),E(0xffffff)),0,.28,.36));
+  s.position.set(4.3,0,9.4); scene.add(s); s.scale.setScalar(1.3); }
+
+// cat on the rug... white cat near pond
+{ const c=new THREE.Group();
+  c.add(put(new THREE.Mesh(geo.box(.5,.34,.34),M(0xebebf5)),0,.25,0));
+  c.add(put(new THREE.Mesh(geo.sph(.26,8),M(0xebebf5)),0,.55,.12));
+  const e1=put(new THREE.Mesh(geo.cone(.08,.16,4),M(0xebebf5)),-.14,.76,.12);
+  const e2=put(new THREE.Mesh(geo.cone(.08,.16,4),M(0xebebf5)), .14,.76,.12);
+  c.add(e1);c.add(e2);
+  c.add(put(new THREE.Mesh(geo.box(.05,.08,.04),E(P.ink)),-.09,.56,.36));
+  c.add(put(new THREE.Mesh(geo.box(.05,.08,.04),E(P.ink)), .09,.56,.36));
+  c.add(put(new THREE.Mesh(geo.cyl(.04,.5,5),M(0xd8d8e8)),-.28,.3,-.2))
+     .children.at(-1).rotation.z=1.2;
+  c.position.set(2.6,0,8.7); c.rotation.y=.9; scene.add(c); c.scale.setScalar(1.6); }
+
+/* ---------- nature: pines, mushrooms, pond, flowers ---------- */
+function pine(x,z,s=1){ const g=new THREE.Group();
+  g.add(put(new THREE.Mesh(geo.cyl(.14*s,.5*s,6),M(P.woodD)),0,.25*s,0));
+  [[1.15,.8],[.85,1.35],[.55,1.8]].forEach(([r,y])=>{
+    const c=put(new THREE.Mesh(geo.cone(r*s,.95*s,7),M(P.pine)),0,y*s,0);
+    outline(c,1.07); g.add(c);});
+  g.position.set(x,0,z); scene.add(g); }
+function mush(x,z,s=1,cap=P.mush){ const g=new THREE.Group();
+  const st=put(new THREE.Mesh(geo.cylT(.14*s,.2*s,.5*s,7),M(P.stem)),0,.25*s,0);
+  g.add(st);
+  const c=put(new THREE.Mesh(geo.sph(.5*s,9,7,0,Math.PI*2,0,Math.PI/2),M(cap)),0,.48*s,0);
+  c.scale.y=.8; outline(c,1.08); g.add(c);
+  g.add(put(new THREE.Mesh(geo.sph(.08*s,5),E(P.mushSpot)),-.18*s,.8*s,.12*s));
+  g.add(put(new THREE.Mesh(geo.sph(.06*s,5),E(P.mushSpot)),.2*s,.74*s,-.1*s));
+  g.add(put(new THREE.Mesh(geo.sph(.05*s,5),E(P.mushSpot)),.05*s,.86*s,.2*s));
+  g.position.set(x,0,z); scene.add(g); }
+
+pine(12,2,1.25); pine(11.4,.7,.9); pine(1,11.6,1.1); pine(12.2,11.4,1);
+pine(.6,4.6,.8);
+mush(.7,1,1.3); mush(1.5,.5,.8,P.teal); mush(12.4,4.4,1); mush(11.6,5.3,.7,P.teal);
+mush(3.4,10.9,.55,P.pink); mush(10.7,10.3,.5); mush(4.9,3.3,.45,P.pink);
+mush(9.4,1.7,.5,P.teal);
+
+// pond front-left: blue disc + lilypads + reeds
+{ const p=put(new THREE.Mesh(geo.cyl(1.7,.14,18),M(P.water)),1.7,-.04,10.3);
+  p.scale.x=1.25;
+  put(new THREE.Mesh(geo.cyl(1.7,.05,18),E(P.waterHi)),1.7,.01,10.3).scale.x=1.25;
+  const l1=put(new THREE.Mesh(geo.cyl(.3,.06,8),M(0x5abe5a)),1.2,.1,10);
+  const l2=put(new THREE.Mesh(geo.cyl(.2,.06,8),M(0x6ed06a)),2.2,.1,10.8);
+  [[.5,9.6],[.9,11],[2.8,9.2]].forEach(([x,z])=>
+    put(new THREE.Mesh(geo.cyl(.05,.8,5),M(P.pine2)),x,.4,z));
+}
+
+/* ---------- props: fences, path, crates, signpost, lights ---------- */
+function fence(x,z,ry){ const g=new THREE.Group();
+  [-.8,0,.8].forEach(o=>g.add(put(new THREE.Mesh(geo.box(.12,.7,.12),M(P.woodD)),o,.35,0)));
+  g.add(put(new THREE.Mesh(geo.box(1.9,.1,.08),M(P.wood)),0,.55,0));
+  g.position.set(x,0,z); g.rotation.y=ry; scene.add(g); }
+fence(11.9,8.6,-Math.PI/2+.26); fence(12.2,10.4,-Math.PI/2+.26);
+fence(.6,5.9,Math.PI/2+.26); fence(.8,7.7,Math.PI/2+.26);
+// stepping stones to cauldron
+[[4.4,5.3],[5.2,5.9],[6,6.7],[5.6,7.4]].forEach(([x,z])=>
+  put(new THREE.Mesh(geo.box(.6,.1,.5),M(P.stone)),x,.06,z));
+// crates + mushroom basket
+put(outline(new THREE.Mesh(geo.box(.7,.7,.7),M(P.wood)),1.05),2.3,.35,4.5);
+put(new THREE.Mesh(geo.cyl(.42,.7,10),M(P.wood)),3.1,.35,4.9);
+mush(3.1,4.9,.5);
+// signpost
+put(new THREE.Mesh(geo.cyl(.07,1.5,6),M(P.woodD)),7.6,.75,9.9);
+put(new THREE.Mesh(geo.box(1.2,.4,.08),M(P.plank)),7.9,1.25,9.9);
+// fairy lights: two poles + catenary of colored bulbs
+{ const p1=new THREE.Vector3(1,0,3.4), p2=new THREE.Vector3(8.6,0,.7);
+  put(new THREE.Mesh(geo.cyl(.08,3.3,6),M(P.woodD)),p1.x,1.65,p1.z);
+  put(new THREE.Mesh(geo.cyl(.08,3.3,6),M(P.woodD)),p2.x,1.65,p2.z);
+  put(new THREE.Mesh(geo.sph(.12,6),E(P.gold)),p1.x,3.4,p1.z);
+  put(new THREE.Mesh(geo.sph(.12,6),E(P.gold)),p2.x,3.4,p2.z);
+  const cols=[P.gold,P.pink,P.potionHi,P.lav];
+  for(let i=1;i<16;i++){ const t=i/16;
+    const x=p1.x+(p2.x-p1.x)*t, z=p1.z+(p2.z-p1.z)*t;
+    const y=3.3-Math.sin(t*Math.PI)*.55;
+    put(new THREE.Mesh(geo.sph(.07,5),E(cols[i%4])),x,y-.1,z); } }
+// pumpkins, bottom-right corner
+[[11,10.4,.5],[11.7,9.8,.35]].forEach(([x,z,s])=>{
+  const p=put(new THREE.Mesh(geo.sph(s,9),M(0xe07a3f)),x,s*.75,z);
+  p.scale.y=.8; outline(p,1.1);
+  put(new THREE.Mesh(geo.cyl(.05*s/.5,.25*s,5),M(0x3fae6a)),x,s*1.5,z); });
+// floating sparkles
+for(let i=0;i<14;i++){ const a=i*2.4;
+  put(new THREE.Mesh(geo.box(.09,.09,.09),E(P.gold)),
+    2+((a*3.7)%10),1.5+((a*1.3)%4),1.5+((a*2.9)%9)); }
+
+/* ---------- render loop ---------- */
+function resize(){ const r=frame.getBoundingClientRect();
+  renderer.setSize(Math.max(2,(r.width/PIX)|0),Math.max(2,(r.height/PIX)|0),false);
+  const a=r.width/r.height;
+  cam.left=-V*Math.min(1,a); cam.right=V*Math.min(1,a);
+  cam.top=V*Math.min(1,1/a); cam.bottom=-V*Math.min(1,1/a);
+  cam.updateProjectionMatrix(); }
+addEventListener('resize',resize); resize();
+
+const flames=window._cauldron?.userData.flames||[];
+let t0=performance.now();
+function loop(t){ t=(t-t0)/1000;
+  flames.forEach((f,i)=>f.scale.setScalar(1+Math.sin(t*9+i*2)*.14));
+  if(window._witch)window._witch.position.y=Math.sin(t*2)*.04;
+  if(window._knight)window._knight.rotation.y=.8+Math.sin(t*.8)*.1;
+  renderer.render(scene,cam); requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+
+/* ---------- UI overlay (project bubble over knight) ---------- */
+if(SHOW_UI){ document.getElementById('ui').style.display='block';
+  frame.style.width='min(430px,100vw)'; frame.style.height='min(880px,100vh)';
+  resize();
+  const ING=[["🔥","emberroot",1],["🌙","moonwater",0],["🍄","ghostcap",0],
+             ["✨","stardew",0],["❄️","frostfern",1],["🩸","drakeblood",0]];
+  const ing=document.getElementById('ing');
+  ING.forEach(([ic,nm,on])=>{const d=document.createElement('div');
+    d.className='ing'+(on?' on':'');d.innerHTML=`<span class="ic">${ic}</span>
+    <span class="nm">${nm}</span><span class="st">×30</span>`;ing.appendChild(d);});
+  const b=document.getElementById('bubble');
+  setInterval(()=>{ const v=new THREE.Vector3();
+    (window._knight||scene).getWorldPosition(v); v.y+=2.3; v.project(cam);
+    const r=frame.getBoundingClientRect();
+    b.style.left=((v.x+1)/2*r.width)+'px'; b.style.top=((-v.y+1)/2*r.height)+'px';
+  },50);
+}
+window.__ready=true;   // screenshot hook
+</script>
+</body>
+</html>

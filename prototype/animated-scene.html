@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Potion Shop — animated demo</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;background:#0d0b18;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif}
+  #cv{position:fixed;inset:0;display:block}
+  /* ---------- HUD pills ---------- */
+  .pills{position:fixed;top:14px;left:0;right:0;display:flex;gap:8px;justify-content:center;z-index:5;pointer-events:none}
+  .pill{display:flex;align-items:center;gap:8px;background:rgba(18,14,32,.92);border-radius:20px;
+        padding:9px 16px;color:#fff;font-weight:600;font-size:15px;border:1px solid rgba(255,255,255,.08)}
+  .pill .dot{width:18px;height:18px;border-radius:50%;display:inline-block}
+  .night b{color:#8fd8ff;font-weight:600}
+  /* ---------- speech bubble ---------- */
+  #bubble{position:fixed;z-index:6;width:250px;background:#f6eacc;border:3px solid #1e1430;border-radius:16px;
+          padding:10px 14px 12px;cursor:pointer;transform:translate(-50%,-100%);display:none;
+          box-shadow:0 6px 0 rgba(0,0,0,.35);transition:transform .15s}
+  #bubble::after{content:'';position:absolute;left:50%;bottom:-16px;transform:translateX(-50%);
+    border:8px solid transparent;border-top:14px solid #f6eacc;filter:drop-shadow(0 3px 0 #1e1430)}
+  #bubble .who{font-size:11px;letter-spacing:.08em;font-weight:800;color:#5a4470}
+  #bubble .ail{font-size:15px;color:#37294a;font-weight:600;margin-top:2px}
+  #bubble .ring{position:absolute;top:8px;right:8px;width:26px;height:26px}
+  #bubble .hint{font-size:11px;color:#8a76a0;margin-top:4px}
+  /* ---------- bottom sheet ---------- */
+  #sheet{position:fixed;left:0;right:0;bottom:0;z-index:7;background:rgba(22,16,40,.96);
+    border-top:2px solid rgba(208,176,124,.5);border-radius:26px 26px 0 0;padding:16px 18px 22px;
+    color:#fff;backdrop-filter:blur(8px)}
+  #sheet h2{text-align:center;font-size:19px;color:#ffedd0}
+  #sheet .sub{text-align:center;font-size:13px;color:#b8a6cf;margin:4px 0 12px}
+  #chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
+  .chip{background:#2a2140;border:2px solid #4a3f6e;border-radius:18px;padding:9px 14px;color:#cdc3e0;
+        font-size:14px;font-weight:600;cursor:pointer;user-select:none;transition:transform .1s,background .15s}
+  .chip.sel{background:#3a6249;border-color:#9fe8c0;color:#d6ffe4}
+  .chip:active{transform:scale(.93)}
+  #actions{display:flex;gap:10px}
+  .btn{flex:1;border:none;border-radius:20px;padding:17px 0;font-size:19px;font-weight:800;cursor:pointer;
+       letter-spacing:.04em;transition:transform .08s,filter .15s}
+  .btn:active{transform:scale(.95)}
+  #brew{background:#2cc4a8;color:#08231e;position:relative;overflow:hidden}
+  #brew .fill{position:absolute;inset:0;background:rgba(255,255,255,.35);width:0%}
+  #brew span{position:relative;z-index:1}
+  #serve{background:#3a3054;color:#9a8cc0}
+  #serve.ready{background:#e8a33d;color:#2c1a05}
+  .btn:disabled{opacity:.5;cursor:default}
+  #toast{position:fixed;top:100px;left:50%;transform:translateX(-50%);z-index:9;background:#2a2140;
+    border:1px solid #6a5a9e;padding:10px 18px;border-radius:14px;color:#ffe9b8;font-weight:600;
+    opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+</style></head><body>
+<canvas id="cv"></canvas>
+<div class="pills">
+  <div class="pill"><span class="dot" style="background:#ffc844"></span><span id="coins">2,450</span></div>
+  <div class="pill"><span class="dot" style="background:#7ae898"></span>Rep 12</div>
+  <div class="pill night"><span>🌙</span><b>Night 3</b></div>
+</div>
+<div id="bubble">
+  <svg class="ring" viewBox="0 0 26 26"><circle cx="13" cy="13" r="10" fill="none" stroke="#e0d4f0" stroke-width="4"/>
+    <circle id="pring" cx="13" cy="13" r="10" fill="none" stroke="#2cc4a8" stroke-width="4"
+      stroke-dasharray="63" stroke-dashoffset="0" transform="rotate(-90 13 13)"/></svg>
+  <div class="who" id="bwho">KAEL · SELLSWORD</div>
+  <div class="ail" id="bail">"I fight slimes at dawn…"</div>
+  <div class="hint">tap to take order</div>
+</div>
+<div id="sheet">
+  <h2 id="shtitle">The Witching Hour Potion Shop</h2>
+  <div class="sub" id="shsub">Tap a customer's bubble to take their order</div>
+  <div id="chips"></div>
+  <div id="actions">
+    <button class="btn" id="brew" disabled><span class="fill"></span><span>BREW</span></button>
+    <button class="btn" id="serve" disabled>SERVE</button>
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+/* ================= world constants (match compose2.py layout) ================= */
+const VW=1120, VH=1220, CX=VW/2, GY=250, DW=880, DH=560;
+const SPR='assets/gen/', SPR2='assets/sprites/';
+const IMGS={};
+const LIST={
+  shop:'shop_0.png', witch:'witch_1.png', slime:'p_slime_0.png',
+  cauldron:'p_cauldron_0.png', tree:'p_tree_0.png',
+  k0:'knight_0.png', k1:'knight_1.png', k2:'knight_2.png', k3:'knight_3.png',
+};
+for(const[k,f]of Object.entries(LIST)){const i=new Image();i.src=SPR+f;IMGS[k]=i}
+const barrel=new Image();barrel.src=SPR2+'fw_07_193x64_29x31.png';
+const crate=new Image();crate.src=SPR2+'fw_60_164x514_24x29.png';
+
+/* ================= canvas ================= */
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d');
+let SC=1, OX=0, OY=0;
+function resize(){
+  cv.width=innerWidth*devicePixelRatio; cv.height=innerHeight*devicePixelRatio;
+  cv.style.width=innerWidth+'px'; cv.style.height=innerHeight+'px';
+  SC=Math.min(innerWidth/VW, innerHeight/VH)*devicePixelRatio;
+  OX=(innerWidth*devicePixelRatio-VW*SC)/2; OY=10*devicePixelRatio;
+}
+addEventListener('resize',resize); resize();
+
+/* world->screen for DOM anchors */
+function toScreen(wx,wy){return{x:(OX+wx*SC)/devicePixelRatio,y:(OY+wy*SC)/devicePixelRatio}}
+
+/* ============ static layer (prerendered once) ============ */
+const staticCv=document.createElement('canvas');staticCv.width=VW;staticCv.height=VH;
+const sx=staticCv.getContext('2d');
+(function buildStatic(){
+  const R=(a,b)=>a+Math.random()*(b-a);
+  // stars handled dynamically; ground diamond:
+  const top=[CX,GY],right=[CX+DW/2,GY+DH/2],bot=[CX,GY+DH],left=[CX-DW/2,GY+DH/2],off=66;
+  sx.fillStyle='#4a302c';sx.beginPath();sx.moveTo(...left);sx.lineTo(...bot);
+  sx.lineTo(bot[0],bot[1]+off);sx.lineTo(left[0],left[1]+off);sx.fill();
+  sx.fillStyle='#583a33';sx.beginPath();sx.moveTo(...bot);sx.lineTo(...right);
+  sx.lineTo(right[0],right[1]+off);sx.lineTo(bot[0],bot[1]+off);sx.fill();
+  sx.fillStyle='#58a842';sx.beginPath();sx.moveTo(...top);sx.lineTo(...right);
+  sx.lineTo(...bot);sx.lineTo(...left);sx.fill();
+  // grass speckle clipped to diamond
+  sx.save();sx.beginPath();sx.moveTo(...top);sx.lineTo(...right);sx.lineTo(...bot);sx.lineTo(...left);sx.clip();
+  const cols=['#62b24a','#4c9a3c','#6cb94f','#5fad9a'];
+  for(let i=0;i<2400;i++){sx.fillStyle=cols[i%4];sx.fillRect(R(0,VW),R(GY,GY+DH),3,3)}
+  // stone path up from bottom point toward door
+  const path=[[CX-40,GY+DH-30],[CX-10,GY+DH-120],[CX-60,GY+DH-190],[CX-90,GY+DH-250]];
+  for(const[px,py]of path){sx.fillStyle='#a8a08c';sx.beginPath();sx.ellipse(px,py,34,15,0,0,7);sx.fill();
+    sx.fillStyle='#bcb4a0';sx.beginPath();sx.ellipse(px,py-2,30,12,0,0,7);sx.fill()}
+  // pond
+  sx.fillStyle='#3caac8';sx.beginPath();sx.ellipse(CX+260,GY+DH-120,110,62,0,0,7);sx.fill();
+  sx.fillStyle='#56cde4';sx.beginPath();sx.ellipse(CX+260,GY+DH-122,98,54,0,0,7);sx.fill();
+  sx.fillStyle='#78e1f0';sx.beginPath();sx.ellipse(CX+225,GY+DH-128,20,10,0,0,7);sx.fill();
+  sx.fillStyle='#50a05a';sx.beginPath();sx.ellipse(CX+310,GY+DH-118,22,12,0,0,7);sx.fill();
+  // mushroom dots
+  for(let i=0;i<8;i++){const mx=R(CX-420,CX+400),my=R(GY+180,GY+DH-50);
+    sx.fillStyle='#e65a78';sx.beginPath();sx.ellipse(mx,my,6,4.5,0,0,7);sx.fill();
+    sx.fillStyle='#f0dcc8';sx.fillRect(mx-2,my+3,4,7)}
+  // fire ring under cauldron
+  sx.fillStyle='#c86428';sx.beginPath();sx.ellipse(CX-15,GY+DH-140,46,20,0,0,7);sx.fill();
+  sx.fillStyle='#f09038';sx.beginPath();sx.ellipse(CX-15,GY+DH-143,36,15,0,0,7);sx.fill();
+  sx.restore();
+})();
+
+/* draw helper: feet-anchored sprite */
+function put(im,fx,fy,sc=1,flip=1,alpha=1,tilt=0){
+  if(!im.complete||!im.naturalWidth)return;
+  const w=im.naturalWidth*sc,h=im.naturalHeight*sc;
+  ctx.save();ctx.translate(fx,fy);ctx.scale(flip,1);ctx.rotate(tilt);ctx.globalAlpha=alpha;
+  ctx.drawImage(im,-w/2,-h,w,h);ctx.restore();
+}
+/* fake ground shadow */
+function shadow(fx,fy,r,a=.28){ctx.fillStyle=`rgba(10,8,20,${a})`;
+  ctx.beginPath();ctx.ellipse(fx,fy,r,r*.32,0,0,7);ctx.fill()}
+
+/* ================= particles ================= */
+const parts=[];
+function spawnP(x,y,vx,vy,life,size,col,grav=0){parts.push({x,y,vx,vy,life,size,col,grav,t:0})}
+function stepParts(dt){
+  for(const p of parts){p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.grav*dt}
+  for(let i=parts.length-1;i>=0;i--)if(parts[i].t>parts[i].life)parts.splice(i,1);
+}
+function drawParts(){
+  for(const p of parts){const a=1-p.t/p.life;
+    ctx.globalAlpha=a;ctx.fillStyle=p.col;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.size*(1-p.t/p.life*.4),0,7);ctx.fill()}
+  ctx.globalAlpha=1;
+}
+
+/* ================= scene layout ================= */
+/* depth-sorted static props: [img, fx, feetY, scale] */
+const PROPS=[
+  [IMGS.tree, CX+330,GY+150,1.35],[IMGS.tree,CX+400,GY+290,1.15],
+  [IMGS.tree, CX-390,GY+170,1.0],
+  [IMGS.shop, CX-210,GY+330,1.5],
+  [barrel,    CX-330,GY+330,1.0],
+  [crate,     CX+300,GY+DH-200,1.0],
+  [IMGS.cauldron,CX-15,GY+DH-140,1.35],
+];
+/* garland between shop edge and tree */
+const GAR=[];
+for(let i=0;i<=16;i++){const t=i/16;
+  GAR.push({x:CX-60+(180)*t,y:GY+170+60*t+Math.sin(t*Math.PI)*26,c:['#ffd878','#96f0c8','#ff96c8'][i%3],ph:i*.6})}
+
+/* ================= characters ================= */
+const CHS=[];  // active customer sprites
+const CAST=['k0','k1','k2','k3','slime'];
+let castIdx=0;
+const SPOTS=[[CX+80,GY+430],[CX+10,GY+470],[CX+150,GY+470]];
+const PATH_IN=[[CX+340,GY+DH-40],[CX+180,GY+DH-90],[CX+120,GY+DH-160],[CX+80,GY+DH-220]];
+const PATH_OUT=[[CX+60,GY+DH-160],[CX-30,GY+DH-90],[CX-160,GY+DH-40]];
+
+function spawnCustomer(){
+  const key=CAST[castIdx++%CAST.length];
+  const spot=SPOTS[CHS.length%SPOTS.length];
+  CHS.push({key,x:PATH_IN[0][0],y:PATH_IN[0][1],z:0,state:'walk',
+    wp:[...PATH_IN,[...spot]],wi:0,spot,t:0,bob:Math.random()*9,
+    ail:pick(AILMENTS),patience:1,happy:false,served:false});
+}
+const AILMENTS=[
+  {who:'KAEL · SELLSWORD',ail:'"I fight slimes at dawn… need something strong!"',pay:120},
+  {who:'SER BRAMBLE',ail:'"My shield-arm is cursed. Fix it?"',pay:95},
+  {who:'DAME ROOK',ail:'"I keep turning invisible at meetings."',pay:140},
+  {who:'PIP · SQUIRE',ail:'"Dragons breathe on me. A little help?"',pay:110},
+  {who:'MR. GOOP',ail:'"blub… blub blub!!" (it seems urgent)',pay:85},
+];
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+
+/* witch at cauldron */
+const witch={x:CX-95,y:GY+DH-150,z:0,t:0,stir:0};
+/* slime pet hops near pond */
+const pet={x:CX+230,y:GY+DH-110,z:0,t:0,dir:1,hx:CX+230,hy:GY+DH-110};
+
+/* ================= game state ================= */
+let coins=2450, selOrder=null, brewing=0, readyPot=null;
+const ING=['Emberroot','Moonwater','Ghostcap','Stardew','Frostfern'];
+const chipsEl=document.getElementById('chips');let selChips=new Set();
+for(const n of ING){const c=document.createElement('div');c.className='chip';c.textContent=n;
+  c.onclick=()=>{if(!selOrder)return;c.classList.toggle('sel');
+    c.classList.contains('sel')?selChips.add(n):selChips.delete(n);
+    brewBtn.disabled=!(selOrder&&selChips.size>=1)};
+  chipsEl.appendChild(c)}
+const bubbleEl=document.getElementById('bubble'),brewBtn=document.getElementById('brew'),
+      serveBtn=document.getElementById('serve'),toastEl=document.getElementById('toast');
+function toast(s){toastEl.textContent=s;toastEl.style.opacity=1;
+  clearTimeout(toastEl._t);toastEl._t=setTimeout(()=>toastEl.style.opacity=0,1600)}
+bubbleEl.onclick=()=>{const c=CHS.find(c=>c.state==='wait'&&!c.served);if(!c)return;
+  selOrder=c;document.getElementById('shtitle').textContent='Brew for '+c.ail.who.split(' ')[0];
+  document.getElementById('shsub').textContent='Pick 1–3 ingredients';
+  brewBtn.disabled=selChips.size<1};
+brewBtn.onclick=()=>{if(!selOrder||brewing>0)return;brewing=0.0001;
+  serveBtn.disabled=true;serveBtn.classList.remove('ready')};
+serveBtn.onclick=()=>{if(!readyPot||!selOrder)return;
+  const c=selOrder;c.served=true;c.state='leave';c.wp=PATH_OUT.map(p=>[...p]);c.wi=0;c.happy=true;
+  coins+=c.ail.pay;document.getElementById('coins').textContent=coins.toLocaleString();
+  // coin fountain at customer
+  for(let i=0;i<14;i++)spawnP(c.x,c.y-70,(Math.random()-.5)*160,-Math.random()*220-60,.9,5,'#ffd050',500);
+  toast('+'+c.ail.pay+' ✦ '+c.ail.who.split(' ')[0]+' loved it!');
+  selOrder=null;readyPot=null;serveBtn.disabled=true;serveBtn.classList.remove('ready');
+  selChips.clear();document.querySelectorAll('.chip').forEach(e=>e.classList.remove('sel'));
+  document.getElementById('shtitle').textContent='The Witching Hour Potion Shop';
+  document.getElementById('shsub').textContent='Tap a customer\u2019s bubble to take their order';
+};
+
+/* click anywhere else = tap world (deselect) */
+cv.addEventListener('pointerdown',()=>{});
+
+/* ================= main loop ================= */
+let last=performance.now(),spawnT=0;
+function frame(now){
+  const dt=Math.min(.05,(now-last)/1000);last=now;
+  ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#0d0b18';ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.setTransform(SC,0,0,SC,OX,OY);
+  const T=now/1000;
+
+  // stars
+  for(let i=0;i<70;i++){const x=(i*173)%VW,y=(i*97)%VH;
+    const a=.25+.55*Math.abs(Math.sin(T*.9+i));
+    ctx.fillStyle=['#fff0be','#beebff','#d2beff','#96ffd7'][i%4];
+    ctx.globalAlpha=a;ctx.fillRect(x,y,i%5?2:3,i%5?2:3)}
+  ctx.globalAlpha=1;
+
+  ctx.drawImage(staticCv,0,0);
+
+  // garland twinkle
+  for(const g of GAR){ctx.globalAlpha=.45+.55*Math.abs(Math.sin(T*2.4+g.ph));
+    ctx.fillStyle=g.c;ctx.beginPath();ctx.arc(g.x,g.y,3.2,0,7);ctx.fill()}
+  ctx.globalAlpha=1;
+
+  // pond shimmer
+  ctx.globalAlpha=.5+.3*Math.sin(T*1.7);ctx.fillStyle='#a8ecff';
+  ctx.beginPath();ctx.ellipse(CX+250,GY+DH-126,34,9,0,0,7);ctx.fill();ctx.globalAlpha=1;
+
+  // chimney smoke
+  if(Math.random()<.12)spawnP(CX-268,GY+64,(Math.random()-.3)*8,-26-Math.random()*14,3.4,7,'rgba(150,190,200,.5)');
+  // cauldron bubbles
+  if(Math.random()<.3)spawnP(CX-15+(Math.random()-.5)*34,GY+DH-178,0,-30-Math.random()*30,1.1,4,'#5fe8c8');
+  // fireflies
+  if(Math.random()<.05)spawnP(CX+(Math.random()-.5)*700,GY+Math.random()*300,10-Math.random()*20,-8,4,2.4,'#ffe898');
+
+  stepParts(dt);
+
+  /* --- spawn logic --- */
+  if(CHS.filter(c=>!c.served).length<2){spawnT-=dt;if(spawnT<=0){spawnCustomer();spawnT=2.5}}
+  // witch
+  witch.t+=dt;
+  const stir=brewing>0;
+  const wBob=Math.sin(witch.t*(stir?9:2.4))*(stir?4:2.5);
+  const wTilt=stir?Math.sin(witch.t*9)*.12:Math.sin(witch.t*2.4)*.03;
+  // pet slime wander/hop
+  pet.t+=dt;
+  pet.hx+=Math.sin(T*.35)*18*dt*pet.dir;pet.hy+=Math.cos(T*.5)*10*dt*pet.dir;
+  const hop=Math.abs(Math.sin(pet.t*3.2));
+  const sq=1-.28*Math.max(0,Math.cos(pet.t*6.4));
+
+  // customers physics
+  let bubbleTarget=null;
+  for(let i=CHS.length-1;i>=0;i--){
+    const c=CHS[i];c.t+=dt;
+    if(c.state==='walk'||c.state==='leave'){
+      const wp=c.wp[c.wi];if(!wp){if(c.state==='leave'){CHS.splice(i,1);continue}
+        c.state='wait';c.t=0;continue}
+      const dx=wp[0]-c.x,dy=wp[1]-c.y,d=Math.hypot(dx,dy);
+      if(d<4){c.wi++;continue}
+      const sp=c.happy?150:95;
+      c.x+=dx/d*sp*dt;c.y+=dy/d*sp*dt;
+      c.bob=Math.abs(Math.sin(c.t*11));
+      c.z=c.bob*5;c.flip=dx<0?-1:1;
+    }else if(c.state==='wait'){
+      c.patience-=dt/55;
+      c.z=Math.abs(Math.sin(c.t*2.2))*2;
+      if(c.patience<=0){c.state='leave';c.wp=PATH_OUT.map(p=>[...p]);c.wi=0;
+        if(selOrder===c){selOrder=null}
+        toast(c.ail.who.split(' ')[0]+' stormed off\u2026')}
+    }
+    if(c.state==='wait'&&!c.served&&!bubbleTarget)bubbleTarget=c;
+  }
+
+  /* --- depth-sorted draw: static props + all characters by feet-Y --- */
+  const DRAW=[];
+  for(const[im,fx,fy,sc]of PROPS)DRAW.push({fy,fn:()=>{
+    shadow(fx,fy,im.naturalWidth*sc*.36,.22);put(im,fx,fy,sc)}});
+  DRAW.push({fy:witch.y,fn:()=>{shadow(witch.x,witch.y,30);
+    put(IMGS.witch,witch.x,witch.y+Math.min(0,wBob*.3),1.25,1,1,wTilt)}});
+  DRAW.push({fy:pet.hy,fn:()=>{shadow(pet.hx,pet.hy,20);
+    ctx.save();ctx.translate(pet.hx,pet.hy-hop*22);ctx.scale(1,2-sq);
+    ctx.translate(-pet.hx,-pet.hy+hop*22);put(IMGS.slime,pet.hx,pet.hy,1.2);ctx.restore()}});
+  for(const c of CHS){DRAW.push({fy:c.y,fn:()=>{
+    shadow(c.x,c.y,c.key==='slime'?18:24);
+    const squash=c.key==='slime'?1+.18*Math.sin(c.t*6):1;
+    ctx.save();ctx.translate(c.x,c.y-c.z);ctx.scale(c.flip||1,squash);
+    ctx.translate(-c.x,-c.y+c.z*(1-squash));
+    put(IMGS[c.key],c.x,c.y,c.key==='slime'?1.1:1.25);ctx.restore()}})}
+  DRAW.sort((a,b)=>a.fy-b.fy);
+  for(const e of DRAW)e.fn();
+
+  drawParts();
+
+  /* brewing progress */
+  if(brewing>0){brewing+=dt/2.2;
+    brewBtn.querySelector('.fill').style.width=Math.min(100,brewing*100)+'%';
+    if(Math.random()<.5)spawnP(witch.x+30,witch.y-110,(Math.random()-.5)*30,-40-Math.random()*20,1,3.4,'#7dffd8');
+    if(brewing>=1){brewing=0;readyPot=true;serveBtn.disabled=false;serveBtn.classList.add('ready');
+      brewBtn.querySelector('.fill').style.width='0%';toast('✨ Potion ready — SERVE!')}}
+
+  /* bubble anchor */
+  const shown=bubbleTarget&&!selOrder;
+  if(shown){const c=bubbleTarget;const s=toScreen(c.x,c.y-135);
+    bubbleEl.style.display='block';
+    bubbleEl.style.left=s.x+'px';bubbleEl.style.top=s.y+'px';
+    document.getElementById('bwho').textContent=c.ail.who;
+    document.getElementById('bail').textContent=c.ail.ail;
+    const r=document.getElementById('pring');
+    r.setAttribute('stroke-dashoffset',63*(1-c.patience));
+    r.setAttribute('stroke',c.patience<.3?'#e04848':c.patience<.6?'#e8a33d':'#2cc4a8');
+  }else bubbleEl.style.display='none';
+
+  requestAnimationFrame(frame);
+}
+spawnCustomer();
+requestAnimationFrame(frame);
+</script></body></html>

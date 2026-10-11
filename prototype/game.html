@@ -1,0 +1,419 @@
+<!doctype html><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Trailbound — playable slice</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#0d0b18;overflow:hidden;font-family:'Segoe UI',system-ui,sans-serif;touch-action:none;user-select:none;-webkit-user-select:none}
+#cv{position:fixed;inset:0}
+.pill{position:fixed;padding:9px 15px;background:rgba(20,16,40,.85);border:1.5px solid rgba(255,255,255,.18);border-radius:999px;color:#fff;font-weight:700;font-size:13px;backdrop-filter:blur(8px);z-index:5;display:flex;gap:6px;align-items:center}
+#pCoins{top:max(12px,env(safe-area-inset-top));left:12px}
+#pDay{top:max(12px,env(safe-area-inset-top));right:12px}
+#pEnergy{top:calc(max(12px,env(safe-area-inset-top)) + 42px);left:12px}
+#mapBtn{top:calc(max(12px,env(safe-area-inset-top)) + 42px);right:12px;cursor:pointer;background:rgba(72,200,140,.22);border-color:rgba(140,255,190,.5)}
+#sheet{position:fixed;left:50%;transform:translateX(-50%);width:min(100%,620px);bottom:0;z-index:10;padding:14px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(rgba(24,18,46,.94),rgba(16,12,32,.98));border-top:2px solid rgba(255,220,130,.3);border-radius:20px 20px 0 0;max-height:46vh;overflow-y:auto}
+#sheet h2{color:#ffe6a8;font-size:19px;text-align:center;margin-bottom:2px}
+#sheet .sub{color:#bfb6e0;font-size:12px;text-align:center;margin-bottom:10px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
+.chip{display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:12px;border:1.5px solid #565090;background:#231d45;color:#e8e4ff;font-weight:600;font-size:13px;cursor:pointer}
+.chip.sel{border-color:#ffd76a;background:#3a2d10;box-shadow:0 0 12px rgba(255,215,106,.35)}
+.chip .n{color:#9a92c8;font-size:11px}
+.btns{display:flex;gap:10px}
+.btn{flex:1;padding:15px;border:none;border-radius:14px;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.5px}
+.btn:disabled{opacity:.35}
+#actBtn{background:linear-gradient(#ffd76a,#f7a83b);color:#3a2200}
+#altBtn{background:linear-gradient(#8ee08e,#46a864);color:#0f2d15}
+.card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:#241e48;border:1.5px solid #4a4480;margin-bottom:8px;color:#e8e4ff}
+.card img{width:40px;height:40px;image-rendering:pixelated}
+.card .grow{flex:1}
+.card .t{font-weight:700;font-size:14px}
+.card .d{font-size:11.5px;color:#a89ecf}
+.card .buy{padding:8px 14px;border-radius:10px;border:none;background:#ffd76a;color:#3a2200;font-weight:800;font-size:13px;cursor:pointer}
+.card .buy:disabled{opacity:.4}
+.card .buy.owned{background:#3a6d4a;color:#bff5c8}
+.loc{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;background:#241e48;border:1.5px solid #4a4480;margin-bottom:9px;cursor:pointer;color:#e8e4ff}
+.loc.locked{opacity:.55}
+.loc .em{font-size:26px}
+.loc .grow{flex:1}.loc .t{font-weight:800;font-size:15px}.loc .d{font-size:11.5px;color:#a89ecf}
+.loc .go{padding:8px 16px;border-radius:10px;background:#48c88c;color:#08251a;font-weight:800;font-size:13px;border:none}
+.loc .go:disabled{background:#555;color:#999}
+#toast{position:fixed;left:50%;bottom:calc(46vh + 30px);transform:translateX(-50%);background:rgba(30,24,60,.95);border:1.5px solid #ffd76a;color:#ffe9b0;padding:9px 20px;border-radius:999px;font-weight:700;font-size:13.5px;z-index:30;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
+#bubble{position:fixed;display:none;z-index:9;transform:translate(-50%,-115%);background:#fff;border:2.5px solid #2b2350;border-radius:14px;padding:9px 13px;font-size:12.5px;font-weight:600;color:#2b2350;max-width:190px;box-shadow:0 5px 16px rgba(0,0,0,.45);cursor:pointer}
+#bubble:after{content:'';position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);border:9px solid transparent;border-top-color:#2b2350;border-bottom:none}
+#bubble .pat{height:5px;border-radius:4px;background:#e7e2f5;margin-top:6px;overflow:hidden}
+#bubble .pat i{display:block;height:100%;background:linear-gradient(90deg,#7ee08e,#ffd76a,#ff7a6a)}
+#sleepBtn{position:fixed;right:12px;bottom:calc(46vh + 26px);z-index:8;padding:10px 16px;border-radius:999px;border:1.5px solid rgba(160,150,255,.5);background:rgba(50,40,100,.85);color:#d8d0ff;font-weight:700;font-size:13px;cursor:pointer}
+</style>
+<canvas id="cv"></canvas>
+<div class="pill" id="pCoins">🪙 <span id="hudCoins">0</span></div>
+<div class="pill" id="pEnergy">⚡ <span id="hudEnergy">0</span></div>
+<div class="pill" id="pDay">📅 Day <span id="hudDay">1</span></div>
+<div class="pill" id="mapBtn">🗺 Map</div>
+<button id="sleepBtn">😴 Sleep</button>
+<div id="bubble"></div>
+<div id="sheet"></div>
+<div id="toast"></div>
+<script>
+'use strict';
+/* ================= DATA ================= */
+const ITEMS={
+  firewood:{n:'Firewood',em:'🪵',sell:6},
+  stick:{n:'Stick',em:'🥢',sell:3},
+  mushroom:{n:'Mushroom',em:'🍄',sell:9},
+  berry:{n:'Berries',em:'🫐',sell:8},
+  herb:{n:'Wild Herb',em:'🌿',sell:7},
+  flower:{n:'Meadow Flower',em:'🌼',sell:10},
+  honey:{n:'Wild Honey',em:'🍯',sell:22},
+  goldshroom:{n:'Goldcap!',em:'✨🍄',sell:45},
+  meal:{n:'Camp Meal',em:'🍲',sell:0},
+  minnow:{n:'Minnow',em:'🐟',sell:12},
+  trout:{n:'Trout',em:'🐠',sell:26},
+  koi:{n:'Golden Koi!',em:'✨🐡',sell:85},
+};
+const GEAR={
+  rod:{n:'Fishing Rod',em:'🎣',cost:150,d:'Unlocks fishing at the river'},
+  net:{n:'Forager Net',em:'🕸',cost:220,d:'+1 item on every forage find'},
+  lantern:{n:'Camp Lantern',em:'🏮',cost:180,d:'+3 max energy each day'},
+  tent2:{n:'Tent Mk.II',em:'⛺',cost:400,d:'+4 charm — visitors pay better'},
+};
+const LOCS={
+  camp:{n:'Pinewood Camp',em:'🏕',d:'Your home base'},
+  forest:{n:'Whisperwood',em:'🌲',d:'Forage: mushrooms, herbs, firewood'},
+  river:{n:'Silverbank River',em:'🏞',d:'Fishing — needs a rod',need:'rod'},
+  valley:{n:'Sunpetal Valley',em:'🌄',d:'Rare forage — unlock for 500c',cost:500},
+  mountain:{n:'Cloudrest Peak',em:'⛰',d:'Locked — Season 2'},
+  sea:{n:'Glasscoast',em:'🌊',d:'Locked — Season 2'},
+};
+const WANTS=[ // visitor orders: items cooked or caught
+  {t:'Chilly night — got firewood?',need:{firewood:1},pay:22},
+  {t:'Craving a hot meal…',need:{meal:1},pay:40},
+  {t:'Berries for my trail mix?',need:{berry:2},pay:30},
+  {t:'Mushroom stew, please!',need:{mushroom:2},pay:34},
+  {t:'Fresh fish dinner?',need:{minnow:1},pay:30},
+  {t:'Heard the trout are biting',need:{trout:1},pay:55},
+  {t:'Honey for my tea?',need:{honey:1},pay:60},
+];
+/* ================= STATE ================= */
+let S;
+try{S=JSON.parse(localStorage.getItem('trailbound_v1'))||null}catch(e){S=null}
+S=S||{coins:80,day:1,energy:10,energyMax:10,charm:1,scene:'camp',
+  inv:{firewood:1},gear:{},unlocked:{camp:true,forest:true,river:true},
+  found:{},caught:{},bestFish:0};
+const QS=new URLSearchParams(location.search);
+if(QS.get('reset'))localStorage.removeItem('trailbound_v1');
+if(QS.get('scene'))S.scene=QS.get('scene');
+if(QS.get('coins'))S.coins=+QS.get('coins');
+const save=()=>localStorage.setItem('trailbound_v1',JSON.stringify(S));
+const addItem=(k,n=1)=>{S.inv[k]=(S.inv[k]||0)+n;save()};
+const takeItem=(k,n=1)=>{if((S.inv[k]||0)<n)return false;S.inv[k]-=n;if(!S.inv[k])delete S.inv[k];save();return true};
+const pay=n=>{S.coins+=n;hud();save()};
+const spend=n=>{if(S.coins<n)return false;S.coins-=n;hud();save();return true};
+const useEnergy=()=>{if(S.energy<=0){toast('😴 Out of energy — Sleep to start a new day');return false}S.energy--;hud();return true};
+/* ================= CANVAS / ISO ================= */
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+const VW=1120,VH=680;let SC,Ox,Oy;
+function resize(){const r=innerWidth/innerHeight;const hudTop=110,sheetH=Math.min(innerHeight*.46,document.getElementById('sheet').offsetHeight||200)+16;
+  const availH=innerHeight-hudTop-sheetH;
+  SC=Math.min(innerWidth/VW,availH/VH)*Math.min(devicePixelRatio,2);
+  Ox=innerWidth/2-VW*SC/2;Oy=hudTop+(availH-VH*SC)/2;
+  cv.width=innerWidth*devicePixelRatio;cv.height=innerHeight*devicePixelRatio;
+  cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px'}
+addEventListener('resize',resize);resize();
+const GW=66,GH=42,OX=VW/2,OY=110,TOPH=84,SIDEH=43; // steeper 3/4 view: top face 132x84 (≈1.55:1)
+const T=(i,j)=>({x:OX+(i-j)*GW,y:OY+(i+j)*GH});
+const toScreen=(x,y)=>({x:x*SC+Ox,y:y*SC+Oy});
+/* ================= ASSETS ================= */
+const IMGS={};
+const ld=(k,src)=>{const i=new Image();i.src=src;IMGS[k]=i;return i};
+ld('shop','assets/gen/shop_0.png');
+ld('witch','assets/gen/witch_1.png');
+ld('knight','assets/gen/knight_0.png');
+ld('slime','assets/gen/p_slime_0.png');
+ld('tree','assets/gen/p_tree_0.png');
+ld('tent','assets/camp/tent.png');ld('tarp','assets/camp/tarp.png');
+ld('firering','assets/camp/firering.png');ld('tripod','assets/camp/tripod.png');
+ld('torch','assets/camp/pot.png');ld('logs','assets/camp/logs.png');ld('stump','assets/camp/stump.png');
+ld('crate','assets/camp/crate.png');ld('sack','assets/camp/sack.png');
+const fire=ld('fire','assets/campfire.png');
+const TILE={};['075','043','020','032'].forEach(n=>TILE[n]=ld('t'+n,`assets/kenney_landscape/PNG/landscapeTiles_${n}.png`));
+// player + extra chars (hero cells: block_row_frame)
+const CH={};
+[['0_0',[0,3]],['1_0',[0]],['4_0',[0]],['2_0',[0]]].forEach(([b,rows])=>{CH[b]=[];for(const r of rows){CH[b][r]=[];for(let f=0;f<5;f++)CH[b][r][f]=ld(`c${b}_${r}_${f}`,`assets/sprites/char_${b}_${r}_${f}.png`)}});
+function put(im,x,y,sc=1,flip=false,alpha=1){if(!im.complete||!im.naturalWidth)return;ctx.save();ctx.globalAlpha=alpha;ctx.translate(x,y);if(flip)ctx.scale(-1,1);ctx.drawImage(im,-im.width*sc/2,-im.height*sc,im.width*sc,im.height*sc);ctx.restore()}
+function shadow(x,y,r=40,a=.22){ctx.fillStyle=`rgba(10,8,25,${a})`;ctx.beginPath();ctx.ellipse(x,y-3,r,r*.3,0,0,7);ctx.fill()}
+/* ================= SCENE DEFS ================= */
+// each scene: cols,rows, ground(c,r)->tile key|null, props[], walkable(c,r)
+const SCENES={
+camp:{cols:9,rows:7,ground:(c,r)=>(r===5&&c>=1&&c<=7)||(c===4&&r>=1&&r<=5)?'020':(c>0&&c<8&&r>0&&r<6?'075':null),
+  props:[['shop',T(1,1),.62],['tree',T(0,2),.55],['tree',T(7,1),.5],['tree',T(0,4),.5],
+    ['tent',T(2,3),.34],['tarp',T(6,3),.30],['firering',T(4,4),.26],['tripod',T(4.7,4.4),.26],
+    ['torch',T(2,5),.30],['torch',T(6,5),.30],['logs',T(1.4,3.6),.26],['stump',T(5,4.7),.24],['crate',T(1.2,1.8),.3],['sack',T(1.8,2),.26]],
+  walkable:(c,r)=>c>=.5&&c<=8&&r>=.5&&r<=6},
+forest:{cols:9,rows:7,ground:(c,r)=>c>=0&&c<9&&r>=0&&r<7?'075':null,
+  props:[['tree',T(1,1),.55],['tree',T(7,1),.55],['tree',T(0,4),.5],['tree',T(8,5),.5],['tree',T(3,0),.45],['tree',T(5,6),.45],
+    ['stump',T(2,3),.24],['logs',T(6,3),.26],['torch',T(0,6),.3]],
+  walkable:(c,r)=>c>=.3&&c<=8.7&&r>=.3&&r<=6.5},
+valley:{cols:9,rows:7,ground:(c,r)=>c>=0&&c<9&&r>=0&&r<7?'043':null,
+  props:[['tree',T(0,2),.5],['tree',T(8,2),.55],['stump',T(4,5),.24],['logs',T(2,5),.26],['torch',T(7,5),.3],['crate',T(1,1),.3]],
+  walkable:(c,r)=>c>=.3&&c<=8.7&&r>=.3&&r<=6.5},
+river:{cols:9,rows:7,ground:(c,r)=>c>=7&&c<9?'032':(c>=0&&c<9&&r>=0&&r<7?'075':null),
+  props:[['tree',T(1,1),.55],['tree',T(4,0),.5],['stump',T(5,3),.24],['logs',T(6,5),.26],['torch',T(3,6),.3],['sack',T(5.5,5.5),.26]],
+  walkable:(c,r)=>c>=.3&&c<=6.7&&r>=.3&&r<=6.5}};
+/* ================= RUNTIME ================= */
+const player={x:T(4,5).x,y:T(4,5).y,wp:null,act:null,face:1,moving:false,f:0};
+let parts=[],nodes=[],visitors=[],fishing=null,bubbleTarget=null;
+const spawnP=(x,y,vx,vy,life,r,col)=>parts.push({x,y,vx,vy,t:0,life,r,col});
+function stepParts(dt){for(const p of parts){p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt}parts=parts.filter(p=>p.t<p.life)}
+/* ---- forage nodes ---- */
+const FOREST_NODES=[{i:2,j:1},{i:6,j:2},{i:3,j:4},{i:7,j:4},{i:1,j:5},{i:5,j:1},{i:4,j:6}];
+const VALLEY_NODES=[{i:2,j:2},{i:6,j:1},{i:4,j:4},{i:7,j:5},{i:1,j:4}];
+const FOREST_TABLE=[['mushroom',.3],['berry',.25],['herb',.2],['firewood',.15],['stick',.07],['goldshroom',.03]];
+const VALLEY_TABLE=[['flower',.35],['honey',.25],['berry',.25],['goldshroom',.05]];
+function spawnNodes(){nodes=[];const isV=S.scene==='valley';const list=isV?VALLEY_NODES:FOREST_NODES;const tbl=isV?VALLEY_TABLE:FOREST_TABLE;
+  for(const n of list){let r=Math.random(),k='mushroom';for(const[kk,p]of tbl){if(r<p){k=kk;break}r-=p}
+    nodes.push({...T(n.i,n.j),item:k,glow:Math.random()*6})}}
+/* ---- visitors (camp) ---- */
+let spawnT=2;
+function spawnVisitor(){if(visitors.length>=2)return;
+  const keys=['knight','slime','1_0','4_0'];
+  const k=keys[Math.floor(Math.random()*keys.length)];
+  const w=WANTS[Math.floor(Math.random()*WANTS.length)];
+  const wp=[T(1,6),T(2,5),T(3,5),T(4,5)].map(p=>[p.x,p.y]);
+  visitors.push({key:k,x:T(0,6).x,y:T(0,6).y,wp,w,state:'walk',pi:0,face:1,pat:1,f:Math.random()*5})}
+/* ---- toast / hud ---- */
+const toastEl=document.getElementById('toast');let toastT;
+function toast(m){toastEl.textContent=m;toastEl.style.opacity=1;clearTimeout(toastT);toastT=setTimeout(()=>toastEl.style.opacity=0,2200)}
+function hud(){document.getElementById('hudCoins').textContent=S.coins;
+  document.getElementById('hudDay').textContent=S.day;
+  document.getElementById('hudEnergy').textContent=S.energy+'/'+S.energyMax}
+/* ================= SHEET PANELS ================= */
+const sheet=document.getElementById('sheet');
+function renderSheet(){
+  const sc=S.scene;
+  if(sc==='camp')renderCamp();
+  else if(sc==='map')renderMap();
+  else if(sc==='forest'||sc==='valley')renderForage();
+  else if(sc==='river')renderRiver();
+  requestAnimationFrame(resize);
+}
+let selA=null,selB=null;
+function renderCamp(){
+  const inv=Object.keys(S.inv);
+  sheet.innerHTML=`<h2>Pinewood Camp</h2><div class="sub">Cook meals for visitors · tap a bubble to serve</div>
+  <div class="chips">${inv.map(k=>`<div class="chip ${selA===k||selB===k?'sel':''}" data-k="${k}">${ITEMS[k].em} ${ITEMS[k].n} <span class="n">×${S.inv[k]}</span></div>`).join('')||'<span style="color:#9a92c8;font-size:13px">Backpack empty — go forage!</span>'}</div>
+  <div class="btns"><button class="btn" id="cookBtn" ${selA&&selB&&selA!==selB?'':'disabled'}>🍲 COOK</button>
+  <button class="btn" id="shopBtn" style="background:linear-gradient(#b7a8ff,#7b64d8);color:#1d1440">🛒 SHOP</button></div>`;
+  sheet.querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{const k=ch.dataset.k;
+    if(!selA)selA=k;else if(!selB&&k!==selA)selB=k;else if(selA===k)selA=null;else if(selB===k)selB=null;else selB=k;renderSheet()});
+  document.getElementById('cookBtn').onclick=()=>{
+    if(takeItem(selA)){if(takeItem(selB)){addItem('meal');toast('🍲 Camp meal cooked!');selA=selB=null;renderSheet()}
+      else{addItem(selA);renderSheet()}}};
+  document.getElementById('shopBtn').onclick=renderShop;
+}
+function renderShop(){
+  sheet.innerHTML=`<h2>🛒 Outfitter</h2><div class="sub">Gear opens new trails</div>
+  ${Object.entries(GEAR).map(([k,g])=>`<div class="card"><div class="em" style="font-size:26px">${g.em}</div>
+    <div class="grow"><div class="t">${g.n}</div><div class="d">${g.d}</div></div>
+    <button class="buy ${S.gear[k]?'owned':''}" data-k="${k}" ${S.gear[k]||S.coins<g.cost?'disabled':''}>${S.gear[k]?'OWNED':g.cost+'c'}</button></div>`).join('')}
+  <div class="sub" style="margin-top:6px">Sell items: tap below</div>
+  <div class="chips">${Object.keys(S.inv).filter(k=>ITEMS[k].sell>0).map(k=>`<div class="chip" data-sell="${k}">${ITEMS[k].em} ${ITEMS[k].n} ×${S.inv[k]} <span class="n">+${ITEMS[k].sell}c</span></div>`).join('')||'<span style="color:#9a92c8;font-size:13px">Nothing to sell</span>'}</div>
+  <div class="btns"><button class="btn" id="backBtn" style="background:#3a3060;color:#cfc8f5">← BACK</button></div>`;
+  sheet.querySelectorAll('.buy').forEach(b=>b.onclick=()=>{const k=b.dataset.k;
+    if(spend(GEAR[k].cost)){S.gear[k]=true;save();
+      if(k==='lantern'){S.energyMax+=3;S.energy+=3}
+      if(k==='tent2')S.charm+=4;
+      toast(`${GEAR[k].em} ${GEAR[k].n} — owned!`);hud();renderShop()}});
+  sheet.querySelectorAll('[data-sell]').forEach(ch=>ch.onclick=()=>{const k=ch.dataset.sell;
+    if(takeItem(k)){pay(ITEMS[k].sell);toast(`+${ITEMS[k].sell}c`);renderShop()}});
+  document.getElementById('backBtn').onclick=renderSheet;
+}
+function renderMap(){
+  sheet.innerHTML=`<h2>🗺 Trail Map</h2><div class="sub">Where to today?</div>`+
+  Object.entries(LOCS).map(([k,l])=>{const open=S.unlocked[k];const cur=S.scene===k;
+    return `<div class="loc ${open?'':'locked'}" data-k="${k}"><div class="em">${l.em}</div>
+    <div class="grow"><div class="t">${l.n}${cur?' ·here':''}</div><div class="d">${l.d}</div></div>
+    ${l.cost&&!open?`<button class="go" data-unlock="${k}" ${S.coins<l.cost?'disabled':''}>🔓 ${l.cost}c</button>`:
+      open?`<button class="go" data-k="${k}" ${cur?'disabled':''}>GO</button>`:''}</div>`}).join('')+
+  `<div class="btns"><button class="btn" id="closeMap" style="background:#3a3060;color:#cfc8f5">CLOSE</button></div>`;
+  sheet.querySelectorAll('[data-unlock]').forEach(b=>b.onclick=e=>{e.stopPropagation();const k=b.dataset.unlock;
+    if(spend(LOCS[k].cost)){S.unlocked[k]=true;save();toast(`🔓 ${LOCS[k].n} unlocked!`);renderMap()}});
+  sheet.querySelectorAll('.loc').forEach(el=>el.onclick=()=>{const k=el.dataset.k;
+    if(!S.unlocked[k])return;goScene(k)});
+  document.getElementById('closeMap').onclick=()=>{S.scene=prevScene;enterScene();renderSheet()};
+}
+let prevScene='camp';
+document.getElementById('mapBtn').onclick=()=>{if(S.scene==='map'){S.scene=prevScene;enterScene()}else{prevScene=S.scene;S.scene='map'}renderSheet()};
+function goScene(k){S.scene=k;save();nodes=[];visitors=[];fishing=null;bubbleTarget=null;document.getElementById('bubble').style.display='none';
+  player.wp=null;player.act=null;
+  const s=T(4,4);player.x=s.x;player.y=s.y;
+  enterScene();renderSheet();toast(`${LOCS[k].em} ${LOCS[k].n}`)}
+function enterScene(){
+  if(S.scene==='forest'||S.scene==='valley')spawnNodes();
+  if(S.scene==='camp'&&!visitors.length)spawnVisitor();
+  buildStatic();
+}
+function renderForage(){
+  const isV=S.scene==='valley';
+  sheet.innerHTML=`<h2>${isV?'🌄 Sunpetal Valley':'🌲 Whisperwood'}</h2><div class="sub">Tap a glowing spot to forage (−1⚡) · tap ground to walk</div>
+  <div class="chips">${Object.keys(S.inv).map(k=>`<div class="chip" style="cursor:default">${ITEMS[k].em} ×${S.inv[k]}</div>`).join('')||'<span style="color:#9a92c8;font-size:13px">Empty backpack</span>'}</div>
+  <div class="btns"><button class="btn" id="toCamp" style="background:linear-gradient(#8ee08e,#46a864);color:#0f2d15">🏕 BACK TO CAMP</button></div>`;
+  document.getElementById('toCamp').onclick=()=>goScene('camp');
+}
+function renderRiver(){
+  sheet.innerHTML=`<h2>🏞 Silverbank River</h2><div class="sub">${S.gear.rod?'Tap the water to cast · HOLD to raise tension, release to lower — keep the bar in the zone!':'You need a Fishing Rod — buy one at the camp shop (150c)'}</div>
+  <div class="chips">${['minnow','trout','koi'].filter(k=>S.caught[k]).map(k=>`<div class="chip" style="cursor:default">${ITEMS[k].em} ×${S.caught[k]}</div>`).join('')||'<span style="color:#9a92c8;font-size:13px">No catches yet</span>'}</div>
+  <div class="btns"><button class="btn" id="toCamp2" style="background:linear-gradient(#8ee08e,#46a864);color:#0f2d15">🏕 BACK TO CAMP</button></div>`;
+  document.getElementById('toCamp2').onclick=()=>goScene('camp');
+}
+/* ================= INPUT ================= */
+let holding=false;
+function toWorld(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left-Ox)/SC,y:(e.clientY-r.top-Oy)/SC}}
+cv.addEventListener('pointerdown',e=>{holding=true;const w=toWorld(e);
+  const scene=SCENES[S.scene];if(!scene)return;
+  // visitor tap?
+  for(const v of visitors){if(v.state==='wait'&&Math.hypot(w.x-v.x,w.y-v.y+60)<70){serveVisitor(v);return}}
+  // forage node tap?
+  for(const n of nodes){if(Math.hypot(w.x-n.x,w.y-n.y+20)<70){player.wp={x:n.x,y:n.y+14};player.act={type:'forage',n};return}}
+  // river tap?
+  if(S.scene==='river'&&S.gear.rod){if(w.x>T(6.6,0).x-40)startCast();return}
+  // walk
+  const c=(w.x-OX)/(2*GW)+(w.y-OY)/(2*GH),r=(w.y-OY)/(2*GH)-(w.x-OX)/(2*GW);
+  if(scene.walkable(c,r))player.wp={x:w.x,y:w.y},player.act=null;
+});
+addEventListener('pointerup',()=>holding=false);
+addEventListener('pointercancel',()=>holding=false);
+/* ---- fishing ---- */
+function startCast(){if(fishing||S.energy<=0){if(S.energy<=0)toast('😴 No energy — Sleep first');return}
+  useEnergy();fishing={phase:'cast',t:0,bx:player.x,by:player.y-40,ten:.5,prog:0};
+  toast('🎣 Cast! Wait for the !…')}
+function fishStep(dt){
+  if(!fishing)return;const f=fishing;f.t+=dt;
+  const tx=T(7.6,3);
+  if(f.phase==='cast'){f.bx+=(tx.x-f.bx)*dt*5;f.by+=(tx.y-f.by)*dt*5;
+    if(Math.hypot(tx.x-f.bx,tx.y-f.by)<8){f.phase='wait';f.t=0;f.wait=1.5+Math.random()*3}}
+  else if(f.phase==='wait'&&f.t>f.wait){f.phase='strike';f.t=0}
+  else if(f.phase==='strike'){if(f.t>.9){f.phase='gone';f.t=0;toast('💨 It got away…');setTimeout(()=>fishing=null,600);return}
+    if(holding){f.phase='reel';f.t=0}}
+  else if(f.phase==='reel'){f.ten+=(holding?1:-1)*dt*.85;f.ten=Math.max(0,Math.min(1,f.ten));
+    if(f.ten>.3&&f.ten<.72)f.prog+=dt*.5;else f.prog-=dt*.3;
+    if(f.prog>=1){const r=Math.random();const fish=r<.55?'minnow':r<.9?'trout':'koi';
+      addItem(fish);S.caught[fish]=(S.caught[fish]||0)+1;save();
+      toast(`${ITEMS[fish].em} Caught a ${ITEMS[fish].n}!`);fishing=null;renderSheet()}
+    else if(f.prog<-.5||f.t>10){toast('💨 Line snapped…');fishing=null}}
+}
+document.getElementById('bubble').onclick=()=>{if(bubbleTarget)serveVisitor(bubbleTarget)};
+function serveVisitor(v){
+  const need=Object.entries(v.w.need)[0];
+  if((S.inv[need[0]]||0)>=need[1]){takeItem(need[0],need[1]);
+    const tip=Math.round(v.w.pay*(1+S.charm*.08));
+    pay(tip);v.state='leave';v.face=-1;
+    for(let i=0;i<14;i++)spawnP(v.x,v.y-70,(Math.random()-.5)*160,-80-Math.random()*120,1,3,'#ffd76a');
+    toast(`🪙 +${tip}c — ${v.key==='slime'?'slime happy!':'visitor happy!'}`);
+    document.getElementById('bubble').style.display='none';bubbleTarget=null;renderSheet()}
+  else toast(`Need ${need[1]}× ${ITEMS[need[0]].em} ${ITEMS[need[0]].n} — you have ${S.inv[need[0]]||0}`);
+}
+document.getElementById('sleepBtn').onclick=()=>{
+  S.day++;S.energy=S.energyMax;visitors=[];nodes=[];
+  if(S.scene==='forest'||S.scene==='valley')spawnNodes();
+  spawnT=1;save();hud();renderSheet();toast(`☀ Day ${S.day} — trails await!`)};
+/* ================= STATIC BAKE ================= */
+const staticCv=document.createElement('canvas');staticCv.width=VW;staticCv.height=VH;
+const sx=staticCv.getContext('2d');
+function buildStatic(){sx.clearRect(0,0,VW,VH);const scene=SCENES[S.scene];if(!scene)return;
+  for(let r=0;r<scene.rows;r++)for(let c=0;c<scene.cols;c++){const t=scene.ground(c,r);if(!t)continue;
+    const im=TILE[t];if(!im.complete||!im.naturalWidth){setTimeout(buildStatic,60);return}
+    const p=T(c+.5,r+.5);sx.drawImage(im,p.x-66,p.y-TOPH/2-SIDEH,132,TOPH+SIDEH)}}
+/* ================= MAIN LOOP ================= */
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(.05,(now-last)/1000);last=now;const NOW=now/1000;
+  ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#0d0b18';ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.setTransform(SC,0,0,SC,Ox,Oy);
+  for(let i=0;i<70;i++){const x=(i*173)%VW,y=(i*97)%VH;
+    ctx.globalAlpha=.25+.55*Math.abs(Math.sin(NOW*.9+i));
+    ctx.fillStyle=['#fff0be','#beebff','#d2beff','#96ffd7'][i%4];
+    ctx.fillRect(x,y,i%5?2:3,i%5?2:3)}
+  ctx.globalAlpha=1;
+  if(S.scene==='map'){ctx.restore?.();requestAnimationFrame(frame);return}
+  const scene=SCENES[S.scene];
+  ctx.drawImage(staticCv,0,0);
+  // water shimmer
+  if(S.scene==='river'){ctx.globalAlpha=.4+.25*Math.sin(NOW*1.7);ctx.fillStyle='#a8ecff';
+    const rp=T(7.6,3);ctx.beginPath();ctx.ellipse(rp.x,rp.y-20,34,9,0,0,7);ctx.fill();ctx.globalAlpha=1}
+  // bobber
+  if(fishing){ctx.fillStyle='#e04848';ctx.beginPath();ctx.arc(fishing.bx,fishing.by-8-Math.sin(NOW*4)*2,5,0,7);ctx.fill();
+    ctx.fillStyle='#fff';ctx.fillRect(fishing.bx-2,fishing.by-15,4,5);
+    if(fishing.phase==='strike'){ctx.fillStyle='#ffd050';ctx.font='bold 28px sans-serif';ctx.fillText('!',fishing.bx-6,fishing.by-32-Math.sin(NOW*8)*4)}
+    if(fishing.phase==='reel'){ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillRect(fishing.bx-40,fishing.by-46,80,10);
+      ctx.fillStyle='rgba(120,255,140,.85)';ctx.fillRect(fishing.bx-40+80*.3,fishing.by-46,80*.42,10);
+      ctx.fillStyle='#ffd76a';ctx.fillRect(fishing.bx-40+80*fishing.ten-2,fishing.by-48,4,14)}}
+  // ambient particles
+  if(S.scene==='camp'&&Math.random()<.5){const FP=T(4,4);spawnP(FP.x+(Math.random()-.5)*26,FP.y-24,(Math.random()-.5)*20,-50-Math.random()*40,1.4,3,'#ffb04a')}
+  if(Math.random()<.04)spawnP(OX+(Math.random()-.5)*500,300+Math.random()*300,10-Math.random()*20,-8,4,2.4,'#ffe898');
+  stepParts(dt);
+  const DRAW=[];
+  // visitors
+  spawnT-=dt;if(S.scene==='camp'&&spawnT<0){spawnVisitor();spawnT=8+Math.random()*8}
+  for(const v of visitors){
+    if(v.state==='walk'||v.state==='leave'){const t=v.state==='walk'?v.wp[v.pi]:[T(-1,6).x,T(-1,6).y];
+      const dx=t[0]-v.x,dy=t[1]-v.y,d=Math.hypot(dx,dy);
+      if(d<6){if(v.state==='leave'){v.dead=true;continue}v.pi++;if(v.pi>=v.wp.length){v.state='wait'} }
+      else{v.x+=dx/d*95*dt;v.y+=dy/d*95*dt;v.face=dx<0?-1:1;v.f+=dt*8}}
+    else{v.pat-=dt/45;if(v.pat<=0){v.state='leave';toast('😠 Visitor left unhappy…');document.getElementById('bubble').style.display='none';bubbleTarget=null}}
+    const bob=v.state==='wait'?Math.sin(NOW*2.4+v.f)*3:Math.abs(Math.sin(v.f))*5;
+    const sq=v.state==='wait'?1+Math.sin(NOW*2.4+v.f)*.03:1;
+    DRAW.push({fy:v.y,fn:()=>{shadow(v.x,v.y,32);ctx.save();ctx.translate(v.x,v.y);ctx.scale(v.face,1);
+      const im=v.key.length>3?IMGS[v.key]:CH[v.key][0][Math.floor(v.f)%5]||IMGS.knight;
+      if(v.key.length>3){if(im.complete)ctx.drawImage(im,-im.width*.55/2,-im.height*.55-bob,im.width*.55,im.height*.55*sq)}
+      else{if(im&&im.complete)ctx.drawImage(im,-34,-68-bob,68,68*sq)}
+      ctx.restore()}});
+    if(v.state==='wait'&&!bubbleTarget){bubbleTarget=v;
+      const b=document.getElementById('bubble');
+      const need=Object.entries(v.w.need)[0];
+      b.innerHTML=`${v.w.t}<div style="font-size:11px;color:#7a72a8;margin-top:3px">wants ${need[1]}× ${ITEMS[need[0]].em} ${ITEMS[need[0]].n} — pays ~${Math.round(v.w.pay*(1+S.charm*.08))}c</div><div class="pat"><i style="width:${v.pat*100}%"></i></div>`;
+      b.style.display='block'}
+  }
+  visitors=visitors.filter(v=>!v.dead);
+  // forage nodes
+  for(const n of nodes){n.glow+=dt;
+    DRAW.push({fy:n.y,fn:()=>{const pulse=.6+.4*Math.sin(n.glow*3);
+      ctx.save();ctx.globalAlpha=.25*pulse;ctx.fillStyle='#ffe898';
+      ctx.beginPath();ctx.arc(n.x,n.y-14,26,0,7);ctx.fill();ctx.restore();
+      ctx.font='46px sans-serif';ctx.globalAlpha=.5+.5*pulse;
+      ctx.fillText(ITEMS[n.item].em,n.x-23,n.y+2-Math.sin(n.glow*2)*5);ctx.globalAlpha=1}})}
+  // props
+  for(const[k,p,sc]of scene.props)DRAW.push({fy:p.y,fn:()=>{const im=IMGS[k];shadow(p.x,p.y,Math.min(80,(im&&im.naturalWidth||100)*sc*.34),.18);if(im)put(im,p.x,p.y,sc)}});
+  // campfire anim
+  if(S.scene==='camp'){const FP=T(4,4);
+    DRAW.push({fy:FP.y+2,fn:()=>{const fr=Math.floor(NOW*8)%4;
+      if(fire.complete)ctx.drawImage(fire,fr*16,0,16,16,FP.x-32,FP.y-54,64,64);
+      const g=ctx.createRadialGradient(FP.x,FP.y-20,4,FP.x,FP.y-20,90);
+      g.addColorStop(0,'rgba(255,190,90,.35)');g.addColorStop(1,'rgba(255,190,90,0)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(FP.x,FP.y-20,90,0,7);ctx.fill()}})}
+  // player (animated hero char)
+  if(S.scene!=='map'){
+    if(player.wp){const dx=player.wp.x-player.x,dy=player.wp.y-player.y,d=Math.hypot(dx,dy);
+      if(d<8){player.x=player.wp.x;player.y=player.wp.y;player.wp=null;player.moving=false;
+        if(player.act){const a=player.act;player.act=null;
+          if(a.type==='forage'){if(useEnergy()){const n=a.n;const bonus=S.gear.net?2:1;
+            addItem(n.item,bonus);S.found[n.item]=(S.found[n.item]||0)+1;save();
+            for(let i=0;i<10;i++)spawnP(n.x,n.y-14,(Math.random()-.5)*120,-60-Math.random()*80,.8,3,'#bff5a0');
+            toast(`${ITEMS[n.item].em} +${bonus} ${ITEMS[n.item].n}`);nodes=nodes.filter(x=>x!==n);renderSheet()}}}}
+      else{player.x+=dx/d*110*dt;player.y+=dy/d*110*dt;player.face=dx<0?-1:1;player.moving=true;player.f+=dt*9}}
+    const bob=player.moving?Math.abs(Math.sin(player.f))*5:Math.sin(NOW*2.4)*3;
+    const fr=player.moving?Math.floor(player.f)%5:0;
+    const row=player.wp&&player.wp.y<player.y-2?3:0;
+    DRAW.push({fy:player.y,fn:()=>{shadow(player.x,player.y,30);ctx.save();ctx.translate(player.x,player.y);ctx.scale(player.face,1);
+      const im=CH['0_0'][row][fr];
+      if(im&&im.complete)ctx.drawImage(im,-36,-72-bob,72,72);ctx.restore()}})}
+  // particles
+  for(const p of parts)DRAW.push({fy:p.y,fn:()=>{ctx.globalAlpha=1-p.t/p.life;ctx.fillStyle=p.col;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill();ctx.globalAlpha=1}});
+  DRAW.sort((a,b)=>a.fy-b.fy);for(const d of DRAW)d.fn();
+  fishStep(dt);
+  // bubble anchor
+  if(bubbleTarget&&bubbleTarget.state==='wait'){const s=toScreen(bubbleTarget.x,bubbleTarget.y-130);
+    const b=document.getElementById('bubble');b.style.left=s.x+'px';b.style.top=s.y+'px'}
+  else if(bubbleTarget&&bubbleTarget.state!=='wait'){bubbleTarget=null;document.getElementById('bubble').style.display='none'}
+  requestAnimationFrame(frame);
+}
+hud();enterScene();renderSheet();requestAnimationFrame(frame);
+</script>
