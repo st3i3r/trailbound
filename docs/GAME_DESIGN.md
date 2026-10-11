@@ -547,6 +547,92 @@ glow overlays · fireflies · water shimmer · bob/walk-cycle tweening.
 still comfortably inside Tier 1, but the earlier "~10%" claim counted
 statics only. Animation roughly doubles the realistic budget.
 
+### 7.13 FINAL audit — system-by-system (nothing ships unlisted)
+
+Method: walk every system/screen a player can reach; each row = assets that
+system touches end-to-end. ⛔ = missed in earlier passes. This section is the
+**single source of truth** — any future asset request must map to a row here
+or get added as one.
+
+#### Per-system asset enumeration
+
+| System | Assets (static + anim) | Missed? |
+|---|---|---|
+| **Fishing** | rod icon+prop, bobber, splash×3f, fish icons ×4 (minnow/trout/koi/catfish), fish-jump 4f, fish-shadow 4f, catch burst, "!" marker, tension UI, dock, ripple rings | ⛔ catfish, fish-shadow |
+| **Foraging** | nodes ×8 ×2 states (full/harvested!), sparkle decal, pickup pop, item icons ×9, cache dig-spot, hollow log | ⛔ harvested states |
+| **Cooking** | tripod+pot, stove, **pot states ×3 (empty/cooking/done)** ⛔, steam anim, recipe cards ×8, meal icons ×8, ingredient icons | ⛔ pot states |
+| **Serving** | **want-bubble sprite + tail** ⛔, meal sprites ×8, serve ding VFX, heart pop, charm star, sit poses (in cast) | ⛔ bubble art |
+| **Shop** | outfitter van, gear cards ×12, in-world gear props (rod rack, lantern, tent t2, bike rack, net), buy UI | |
+| **Map/travel** | top-down map illustration 320px, pins ×6 ×locked/unlocked, path line, "you are here" marker, travel fade | |
+| **Day cycle** | day icon, ZZZ, sleep anim, morning transition, energy bolt+bar | |
+| **Journal** | cover, page frames, **stamps ×8**, recipe cards, guestbook signatures, dex entries | |
+| **Story (was fully missed)** | ⛔ grandfather's journal prop, ⛔ letter pages ×5-8 (story delivery!), ⛔ sepia photo art ×2-3, ⛔ grandfather portrait | ALL missed |
+| **Unlocks/quests** | unlock card, stamp-press anim, burst, daily quest card, streak lantern | |
+| **Onboarding** | ⛔ hand/pointer sprite, ⛔ paw-trail decal (dog arrival), first-time dialog frames | |
+| **Share/viral** | ⛔ postcard frame + template (composite camp → image to chat) | |
+| **Feedback/VFX** | sparkle, unlock burst, level rays, heart, ! / ?, arrow marker, coin-fly, energy glow | |
+| **States/errors** | ⛔ offline illustration, ⛔ error toast frame, empty inventory art, empty camp art | |
+| **Boot/brand** | app icon 512, splash+loading bar, title card, bot avatar/banner | ⛔ bot banner |
+
+#### Scene matrices (terrain+props+life)
+
+- **Camp**: grass ×5, path autotile, rim edges+corners; shelter (tent×3, tarp),
+  fire set (unlit/lit/pit-t2, tripod), light set (lantern×2, string, torch,
+  tent lantern), furniture (blanket×2, table, chair×2, bench, stump, hammock),
+  storage (crate, barrel, sack, backpack, gear rack, basket, cooler),
+  info (notice board, chalkboard, signs×3, map table, guestbook),
+  dog set, comfort set (guitar, books, camera-tripod, binoculars, planter,
+  flag, wind chime, clothesline, woodpile, axe-stump),
+  boundaries (fence s/c/gate, rope, stone wall), clutter batch (64 @32px),
+  critters (squirrel, bird, butterfly), kiosk+van
+- **Forest**: grass, dirt, dense-tree layer; nodes ×8×2, cache, hollow log,
+  ferns, mossy rock, leaf piles, tall grass, deer?, owl? (dusk)
+- **River**: bank grass, shallow+deep water, shore transition, rocks;
+  dock, bridge, cattails, reeds, lilypads, stones, canoe, fishing set,
+  waterfall anim
+- **Valley**: grass, wildflower meadow, rock outcrops, stream; vista rock,
+  viewpoint bench+sign, stream anim, kite?, butterflies
+- **Coast**: sand ×3, shallow+deep sea, shore transition, sea cliff;
+  shells, starfish, driftwood, tide pools, beach grass, kayak, umbrella,
+  beach blanket, buoy, seagull anim, wave loop
+- **Mountain**: rock, gravel, pine, snow cap?, cliff; boulders, summit flag,
+  climbing props, cairns, flag-wave anim, goat?
+- **Map screen**: 320px top-down illustration + pins
+
+#### Character anim matrix (final)
+
+| Char | Static cost | Anims (1 gen each) |
+|---|---|---|
+| player | 1 + 10 rotate | idle, walk×4, gather, cast, reel, carry, sit, sleep, **celebrate** ⛔, **eat** ⛔ = 11 |
+| dog | 1 + 10 rotate | idle, walk×4, sit, dig, bark, sleep, **heart-react** ⛔ = 9 |
+| ranger | 1 | idle, wave, talk = 3 |
+| travelers ×5-6 | 5-6 | idle×5-6, sit-var×3, eat×2 ⛔, walk×8 (hiker+photo) = ~18 |
+| portraits ×8 | 8 | — |
+| critters ×6 | 6 | fly/hop/flutter/jump/gull/graze = ~8 |
+
+#### Non-art production assets (0 gens, still required)
+audio SFX ~35 (ambience ×8, actions ×15, UI ×7, dog ×3, music ×3 loops) ·
+save_version + migrations · zod catalog schemas · CI/CD + Playwright smoke ·
+Sentry · analytics funnel events · remote economy config · i18n extraction ·
+a11y pass · TMA checklist (BotFather, banner, description, rating, safe areas,
+HTTPS) · Stars cosmetic catalog · LEGAL (have)
+
+### 7.14 FINAL totals
+
+| Block | Gens |
+|---|---|
+| Terrain (7 Wang sets + rims + scene tiles) | ~110-140 |
+| Props/accessories (all scenes, ~150 items, batched) | ~120-150 |
+| Characters (statics + rotations + all anims) | ~90-110 |
+| Scene/critter anims | ~25-35 |
+| VFX + UI + icons + states | ~60-80 |
+| Story/launch/meta art | ~30-40 |
+| Iteration buffer (~25% regen rate) | ~110-140 |
+| **COMPLETE GAME** | **≈ 550-700 gens** |
+
+**≈ 30% of the ~2,000/mo pool.** Remaining headroom covers misses,
+A/B art variants, and P3 content (seasons, tent interior, events).
+
 ### Operational notes (from docs)
 - **Map objects auto-delete after 8h** → download PNGs immediately at generation time.
 - Downloads are unauthenticated UUID URLs (`/mcp/characters/{id}/download`, `/mcp/tilesets/{id}/image`) — safe to fetch then archive locally.
