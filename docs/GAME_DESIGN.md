@@ -512,24 +512,40 @@ heart pop · ZZZ · ! / ? marks · smoke/steam (procedural covers particles)
 app icon 512px · title/splash · promo key-art · map pins locked/unlocked ·
 journal cover · empty states ×2
 
-### 7.12 Corrected totals
+### 7.12 Corrected totals + ANIMATION LEDGER (was undercounted)
 
-| Tier | Content | Gens |
+Static sprites ≠ animated game. Every anim = `animate-with-text`/`animate_image`
+at **1 gen @64×64** (4-16 frames). The full ledger:
+
+| Group | Animated things | Gens |
 |---|---|---|
-| P0 | camp scene + core cast | ~55 |
-| P1 | loop content + idles | ~60 |
-| **P1.5 (was missing)** | food, portraits, VFX, node-states, tent tiers, fire/water states, bike set, accessories batches | ~120-180 |
-| P2 | valley/coast/mountain terrains + props, walks, critters, seasonal | ~150-200 |
+| **player** | idle, walk×4, gather, fish_cast, fish_reel, carry, sit, sleep | **9** (was 7) |
+| **dog** | walk×4, sit, dig, bark, sleep, follow-idle | **10** (was 6) |
+| **ranger** | idle, wave, talk | **3** |
+| **travelers×5** | idle×5, sit-variants×3, walk×4 (hiker+photo only) | **16** |
+| **critters** | bird-fly, squirrel-hop, butterfly, frog-jump | **4-8** |
+| **fire** | campfire loop, torch, fire-pit-t2, ember-glow, smoke, steam | **6** |
+| **water** | waterfall, fish-jump, fish-shadow, bobber, ripple-ring, canoe-bob | **6** |
+| **wind/life** | tree sway×3, welcome flag, wind chime, towels, string-light sway, tent flap, hammock | **11** |
+| **VFX** | unlock burst, sparkle, stamp-press, splash, level rays, heart-pop, ZZZ | **7** |
+| **UI/misc** | want-bubble pulse (procedural), sleep transition | **0-2** |
+| **ANIM TOTAL** | | **≈ 70-90 gens** |
+
+Zero-gen (engine-side, real): day/dusk/night tint · rain/fog particles ·
+glow overlays · fireflies · water shimmer · bob/walk-cycle tweening.
+
+| Tier | Static + its anims | Gens |
+|---|---|---|
+| P0 | camp scene + cast (incl. anims) | ~70 |
+| P1 | loop content + idles | ~65 |
+| **P1.5** | food, portraits, VFX, node-states, tiers, fire/water, bike, accessory batches + all their anims | ~160-220 |
+| P2 | valley/coast/mountain + walks + critters + anims | ~170-220 |
 | Launch | icon, splash, promo | ~25 |
-| **COMPLETE** | | **≈ 400-550** |
+| **COMPLETE (static+animated)** | | **≈ 490-600 gens** |
 
-**Zero-gen tricks counted on:** tint for day/dusk/night · particle overlays
-for rain/fog · additive glow derived from lit sprites · `reduce_colors`
-variants for harvested/empty states (maybe) · procedural water shimmer.
-
-**Still ~25% of the ~2,000/mo pool.** The binding constraint is not budget —
-it's sequential throughput + iteration discipline (lock 1 char/1 tile style,
-then batch).
+**Revised verdict:** ~500-600 gens ≈ **25-30% of the ~2,000/mo pool** —
+still comfortably inside Tier 1, but the earlier "~10%" claim counted
+statics only. Animation roughly doubles the realistic budget.
 
 ### Operational notes (from docs)
 - **Map objects auto-delete after 8h** → download PNGs immediately at generation time.
