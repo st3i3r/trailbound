@@ -1,14 +1,46 @@
 {
   "site_id": "whisper_river",
   "camp_core_max_cells": [10, 4],
-  "pads": {"total": 8, "start_open": 3, "spots": [], "neighbours": {}, "tags": {"water": []}},
-  "bank_cells": [],
-  "errand_spots": [],
-  "lookout": null,
+  "camp_core_origin_px": [0, 96],
+  "pads": {
+    "total": 8,
+    "start_open": 3,
+    "spots": {
+      "p1": [1, 0], "p2": [4, 0], "p3": [7, 0],
+      "p4": [0, 2], "p5": [9, 2],
+      "p6": [2, 3], "p7": [5, 3], "p8": [8, 3]
+    },
+    "open": ["p1", "p2", "p4"],
+    "neighbours": {
+      "p1": ["p2", "p4"],
+      "p2": ["p1", "p3", "p7"],
+      "p3": ["p2", "p5"],
+      "p4": ["p1", "p6"],
+      "p5": ["p3", "p8"],
+      "p6": ["p4", "p7"],
+      "p7": ["p2", "p6", "p8"],
+      "p8": ["p5", "p7"]
+    },
+    "tags": {
+      "p3": ["view"],
+      "p5": ["view"],
+      "p6": ["water"],
+      "p7": ["water"],
+      "p8": ["water"]
+    }
+  },
+  "campfire": {"cell": [4, 1], "radius": 2},
+  "bank_cells": [[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3]],
+  "errand_spots": {
+    "forage": [96, 72],
+    "fishing": {"bank_a": [128, 304], "bank_b": [320, 312], "bank_c": [512, 304]},
+    "lookout": [600, 88]
+  },
+  "lookout": [600, 88],
   "crew_plots": [
-    {"id": "crew_structure", "structure": "boathouse", "kind": "structure", "cells": []},
-    {"id": "vol2_plot_a", "kind": "reserved_overgrown", "cells": []},
-    {"id": "vol2_plot_b", "kind": "reserved_overgrown", "cells": []}
+    {"id": "crew_structure", "structure": "boathouse", "kind": "structure", "cells": [], "px": [96, 40]},
+    {"id": "vol2_plot_a", "kind": "reserved_overgrown", "cells": [], "px": [440, 40]},
+    {"id": "vol2_plot_b", "kind": "reserved_overgrown", "cells": [], "px": [560, 40]}
   ],
-  "note": "bank cells along the water (§5.1); crew plots outside the camp core"
+  "note": "River runs along the south bank (row 3). The three bank pads are Water-tagged for W2 (anglers); p3 overlooks the river bend (view, for shutterbugs). Water pads start locked so the angler build-out is earned. Three fishing spots feed the W1 'three kinds' page (carp/trout/catfish pool)."
 }

@@ -81,6 +81,58 @@ func visit_site(site: StringName) -> void:
 		_try_start_next()
 
 
+## §8.2: the morning trail map. Gated by chapter completion; re-rolls
+## the day at the chosen site so the board/weather are the new site's.
+func travel_to(site: StringName) -> bool:
+	if not site_reachable(site):
+		return false
+	visit_site(site)
+	new_day()
+	return true
+
+
+## §12.3: regulars book about every third day at their site until
+## their story ends (visit count reaching story_visits). They take a
+## normal request slot; an elite card is never displaced.
+func _inject_regulars(st: Dictionary) -> void:
+	var d := site_day()
+	for reg: Dictionary in Catalog.data.get("regulars", []):
+		if reg.get("site") != site_id:
+			continue
+		var rid: String = reg["id"]
+		var visits: int = st["counters"]["regular_visits"].get(rid, 0)
+		if visits >= int(reg.get("story_visits", 3)):
+			continue                                   # story told
+		var due := false
+		if reg.get("weekend_only", false):
+			# the Minh family: weekend visitors, and only once a
+			# neighbouring pair can take them (§5.2 family rule)
+			due = d % 7 in [6, 0] and _has_free_pair(st)
+		else:
+			var off := int(reg.get("offset", 3))
+			due = d >= off and (d - off) % int(reg.get("every", 3)) == 0
+		if not due:
+			continue
+		var req := {"id": "reg_" + rid,
+			"archetype": reg["archetype"], "name": reg["name"],
+			"traits": reg.get("traits", []).duplicate(),
+			"loud": reg.get("loud", false),
+			"pads": int(reg.get("pads", 1)),
+			"fee": int(reg["fee"]), "regular": rid,
+			"favourite": reg.get("favourite", "")}
+		var slotted := false
+		# Front-scan: the last two cards may carry the day-6+
+		# conflict pair (§5.2) — displacing them breaks the board.
+		for i in st["board"].size():
+			var card: Dictionary = st["board"][i]
+			if not card.get("elite") and card.get("regular", "") == "":
+				st["board"][i] = req
+				slotted = true
+				break
+		if not slotted:
+			st["board"].append(req)
+
+
 # ------------------------------------------------------------- crew (§8.4)
 
 func _crew_reset() -> void:
@@ -324,6 +376,7 @@ func new_day() -> void:
 		Catalog.data.get("archetypes", []), site_day(), _open_pads(st),
 		rating(), _rng_for("board"), _has_free_pair(st),
 		_favourite_pool())
+	_inject_regulars(st)
 	for r in st["board"]:
 		st["guests"][r["id"]] = r
 
@@ -544,6 +597,8 @@ func chapter_done(site: StringName) -> bool:
 func _is_unlocked(unlock: String) -> bool:
 	if unlock == "":
 		return true
+	if unlock.begins_with("S:"):
+		return _story_done(unlock.get_slice(":", 1))
 	var letter_sites := {"P": &"pinewatch", "W": &"whisper_river",
 		"L": &"lantern_valley"}
 	var site: StringName = letter_sites[unlock.left(1)]
@@ -561,6 +616,17 @@ func site_reachable(site: StringName) -> bool:
 		&"pinewatch": return true
 		&"whisper_river": return chapter_done(&"pinewatch")
 		&"lantern_valley": return chapter_done(&"whisper_river")
+	return false
+
+
+## §12.3: a regular's story ends after story_visits seated stays —
+## it unlocks the story gift (Hùng's Scout Pennant).
+func _story_done(reg_id: String) -> bool:
+	for reg: Dictionary in Catalog.data.get("regulars", []):
+		if reg.get("id") == reg_id:
+			var cnt: Dictionary = site_state(reg.get("site"))["counters"]
+			return int(cnt["regular_visits"].get(reg_id, 0)) \
+				>= int(reg.get("story_visits", 3))
 	return false
 
 

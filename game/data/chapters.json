@@ -173,7 +173,9 @@
     "n": 4,
     "goal": "Lan visits 3 times",
     "gift": 75,
-    "unlocks": [],
+    "unlocks": [
+     "photo_wall"
+    ],
     "check": {
      "metric": "regular_visits:lan",
      "target": 3

@@ -311,6 +311,52 @@ func _ready() -> void:
 			all_named = false
 	check("cards carry favourites", all_named)
 
+	# --- regulars + travel (§8.2, §12.3) ---------------------------------
+	# Hùng is due at Pinewatch every 3rd day from day 3.
+	Game.day = 2
+	Game.new_day()
+	check("Hùng not early", not Game.site_state()["board"].any(
+		func(b): return b.get("regular") == "hung"))
+	Game.day = 3
+	Game.new_day()
+	check("Hùng due day 3", Game.site_state()["board"].any(
+		func(b): return b.get("regular") == "hung" and b["fee"] == 35))
+	# His story told (3 seated stays) retires him and frees the pennant.
+	Game.site_state()["counters"]["regular_visits"]["hung"] = 3
+	Game.new_day()
+	check("story ends the bookings", not Game.site_state()["board"].any(
+		func(b): return b.get("regular") == "hung"))
+	Game.coins = 100
+	check("pennant unlocks on story", Game._is_unlocked("S:hung")
+		and Game.buy_decor("scout_pennant", [Vector2i(3, 1)]))
+
+	# Travel gates on chapter completion; W/L need all 5 pages done.
+	check("W locked before chapter", not Game.travel_to(&"whisper_river"))
+	Game.site_state()["pages_done"] = [1, 2, 3, 4, 5]
+	check("travel to W", Game.travel_to(&"whisper_river")
+		and Game.site_id == &"whisper_river")
+	var wtags: Dictionary = Catalog.data["layouts"]["whisper_river"] \
+		["pads"]["tags"]
+	check("W water bank pads", "water" in wtags["p6"]
+		and "water" in wtags["p7"] and "water" in wtags["p8"])
+	# Old Ba: seat him 3 nights on the river bank → W4 + the Koi Pond.
+	Game.coins = 2000
+	Game.open_pad("p6")
+	var old_ba := {"id": "reg_old_ba", "archetype": "angler",
+		"name": "Old Ba", "traits": ["angler"], "fee": 70,
+		"regular": "old_ba"}
+	for i in 3:
+		Game.site_state()["guests"]["reg_old_ba"] = old_ba
+		Game.site_state()["assignments"] = {"reg_old_ba": ["p6"]}
+		Game.goodnight()
+		Game.day += 1
+	var wcnt: Dictionary = Game.site_state()["counters"]
+	check("Old Ba x3 → W4 + pond", Game.page_done(4)
+		and wcnt["anglers_water"] == 3
+		and Game._is_unlocked("W4")
+		and Game.buy_decor("koi_pond", [Vector2i(2, 1)]),
+		"pages %s" % [Game.site_state()["pages_done"]])
+
 	print("=== %s ===" % ("ALL CHECKS PASS" if failures == 0
 		else "%d FAILURES" % failures))
 	get_tree().quit(failures)
