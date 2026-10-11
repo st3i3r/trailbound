@@ -1005,7 +1005,134 @@ inside assets already in the manifest.
 
 ---
 
-## 8. The 10-day arc — retention design
+## 8. Production-grade audit — full-spectrum check (v3)
+
+Post-pivot re-audit: v2 manager model + Eastward view + Godot/Play + VN layer.
+This section lists what a *shipped* game needs beyond the systems spec — and
+the decisions locked herein.
+
+### 8A. UX — complete screen inventory
+
+splash → title → **trail map** (site select) → site scene →
+**booking board** (tonight's guests, plots, menu) → build/upgrade panel →
+evening service → journal/collections → shop/wardrobe → letters archive →
+achievements/leaderboards → postcard share → settings → offline/update gate.
+
+**Day phase structure (the UX spine):**
+| Phase | Player does | UI |
+|---|---|---|
+| ☀ Morning | read letter+forecast → set tonight's menu → check firewood → dispatch supply run | booking board |
+| 🌤 Day | activities (forage/fish) · decor placement · upkeep tasks | scene + context sheet |
+| 🌆 Dusk | guests arrive → **plot assignment** → serve → reviews pop | scene + want bubbles |
+| 🌙 Night | journal auto-writes → sleep → autosave | journal overlay |
+
+**Interaction spec:** serve = tap guest → want bubble → tap meal → coin+star pop
+(≤3 taps; long-press = auto-match best meal). Plot assignment = drag guest card
+onto plot, adjacency +/− icons preview live. HUD = 4 pills max (coins · ★site ·
+day+weather · journal badge). Haptics: serve-ding, catch, rank-up, stamp.
+
+### 8B. Onboarding — first 60s + first 3 days
+
+- **Cold open:** you arrive at overgrown Site-1, backpack + grandpa's journal,
+  the fire ring is cold. No menu, no tutorial card — the scene IS the tutorial.
+- **Day 0:** ranger greets → "help me fix the fire" (first tap) → first solo
+  guest arrives → serve a gifted meal → sleep → letter #1: *"the trail
+  remembers."* Hook delivered in <3 min.
+- **Progressive unlocks:** day-2 dog · day-3 first upgrade · day-4 forecast+menu
+  · day-5 site-2 milestone visible on the map.
+- **Rule: one new system per session max.** Every mechanic is introduced by a
+  letter or a guest request — never a popup wall.
+
+### 8C. Narrative spec
+
+- **Per-site mini-arc template:** arrival letter → local visitor storyline
+  (3-5 visits) → site-specific reveal → star payoff. Monthly content = this
+  template + new site data.
+- **Grandpa long-arc:** site-1's 10 letters + margin notes across sites;
+  finale = **hidden cove site** (prestige/arc-3 reveal) — decide early so
+  letters foreshadow it correctly.
+- **Dog arc:** collar tag reads "B." — was he grandpa's dog? Resolves at
+  the mountain site (emotional payoff, ~0 cost).
+- **Voice guide:** warm, short sentences, dry humor. Guest lines ≤20 words,
+  letters ≤80 words. Translation-safe — no puns, no idioms.
+- **Narrative = data:** all letters/quests/dialogue in JSON catalogs —
+  shippable without app update.
+
+### 8D. Challenge & balance — cozy ≠ frictionless
+
+- **Challenge sources:** turn-away scarcity · supply shortages (wood,
+  ingredients) · weather windows · picky/elite guests · adjacency puzzles ·
+  demand spikes (events). Friction, never fail states.
+- **Recovery model:** bad night → rating dip → fewer bookings → rebuild via
+  upgrades. No game-over, ever.
+- **Economy targets:** 1-2 meaningful upgrades/day early · rod day-1 ·
+  site-2 ~day 5-7 · meals ≈60-70% of income · consumables ≈10-15% of daily
+  spend (the sink) · coins never accumulate >3 upgrades-worth.
+- **Balance sim required:** day 1-10 economy spreadsheet BEFORE code —
+  current numbers are vibes.
+- **Session target:** 5-15 min/day. Evening phase untimed, but unmet wants
+  decay the night's rating.
+
+### 8E. Multi-site rules (locked)
+
+- **One site per day** — travel = a morning commitment (arrive midday);
+  prevents trivial site-hopping, makes planning real.
+- **Old sites auto-run** — caretaker abstraction: reopened sites earn ~30%
+  income while away, capped ~8h offline accrual. No staff UI; keeps the
+  network alive without sim complexity.
+- **Supply runs** — dispatch the dog = real-time 1-3h timer; rain delays.
+- **Post-chain endgame:** grind each site to 5★ + collections + decoration +
+  prestige (Trail Fame).
+
+### 8F. Mobile/Play UX decisions (locked)
+
+- **Orientation: landscape** — Eastward framing + campsite dioramas are
+  horizontal; UI = side/bottom panels. (Flip to portrait only if playtests
+  say otherwise — cheap now, expensive later.)
+- Android back-stack: modals LIFO, exit-confirm on site scene.
+- Cloud save: last-write-wins + day-count tiebreak, warn on divergence.
+- Fully playable offline; Play Games/leaderboards queue-sync.
+- All assets in AAB — no runtime asset downloads; remote-config for tuning.
+- **Age rating: Everyone/13+** — avoids COPPA Families burden.
+- **Localization: EN + VI at launch** — the signature layer deserves the
+  language; ES/PT later. UI budgets +40% text expansion.
+- Safe areas/notch, foldables tolerance, 44px targets, reduced-motion,
+  colorblind-check palette.
+
+### 8G. Edge cases (handle in code, not vibes)
+
+guest leaves mid-serve · item spoils mid-cook · double-booked plot ·
+save during evening phase (resume at dusk-start) · rain during supply run
+(dog delayed, arrives next visit) · site full + elite guest arrives (the
+good problem — choose!) · all guests served → early-dusk skip · coin can
+never go negative (no debt).
+
+### 8H. Production checklist — launch-grade
+
+- Analytics funnel: open→day1→first_serve→first_upgrade→site2→d3→d7→d30
+- Store listing production: icon · feature graphic · 6 screenshots · 30s
+  trailer · short/long description
+- Play pre-launch report (auto device-matrix) · Crashlytics ≥99.5%
+  crash-free sessions
+- Remote config keys: economy multipliers · spawn tables · event calendar —
+  tune without app updates
+- Content packs: new site = JSON + art + strings → app update or
+  downloadable pack (Play allows non-code content)
+- CI: GH Actions → Gradle AAB → fastlane internal track → closed test
+
+### 8I. Honest remaining gaps
+
+| Gap | Status |
+|---|---|
+| Tutorial funnel analytics (where players drop) | instrument, then tune post-launch |
+| Guest arrival timing variety (staggered, not a wave) | spec in code, not yet tuned |
+| Difficulty modes | intentionally none — cozy |
+| Anti-frustration layer | built-in: no punishments; dog petting always available |
+| Post-launch content cadence owner | open question — who's authoring monthly packs? |
+
+---
+
+## 9. The 10-day arc — retention design
 
 **Core insight:** cozy games don't retain through challenge — they retain through
 *unfinished business* (a journal half-filled, a camp half-built) and *tomorrow
@@ -1013,7 +1140,7 @@ promises* (a letter arriving, rain ending, a rare spawn announced). Session
 length stays 3-5 min; the design goal is making **tomorrow's session feel
 worth having.**
 
-### 8.1 The story IS the retention mechanism
+### 9.1 The story IS the retention mechanism
 
 - The journal has **10 blank pages**. Every morning the ranger delivers one
   of grandpa's letters — story beat + hint about tomorrow's content +
@@ -1025,7 +1152,7 @@ worth having.**
 - **Forgiveness rule:** missed days deliver letters late. Never punish absence
   in a cozy game — that kills the vibe harder than any churn.
 
-### 8.2 The actual 10 days
+### 9.2 The actual 10 days
 
 | Day | What happens | Tomorrow's hook |
 |---|---|---|
@@ -1040,7 +1167,7 @@ worth having.**
 | 9 | **Coast unlock** (1500c) — kayak, shells, new fish | journal ~70% |
 | 10 | **Grandpa's secret spot revealed** + stamp finale | arc-2 hook |
 
-### 8.3 Daily return drivers (habit systems)
+### 9.3 Daily return drivers (habit systems)
 
 - **Breakfast forecast** — weather + rare-spawn hint at day start; different
   day = different optimal plan (rain = fish day, not forage day)
@@ -1055,14 +1182,14 @@ worth having.**
 - **Guestbook** — travelers sign on departure; collecting signatures is
   the relationship metagame
 
-### 8.4 The real reward: the camp grows
+### 9.4 The real reward: the camp grows
 
 The strongest retention lever is **visible progression on the diorama itself**:
 day 1 = bare clearing, old tent, cold pit → day 10 = string lights, tier-2 tent,
 flower beds, doghouse, kids playing by the fire. Every purchase changes the
 scene itself = screenshot-worthy = shareable (postcard feature).
 
-### 8.5 Economy pacing for 10 days
+### 9.5 Economy pacing for 10 days
 
 Gear ladder — one purchase lands every ~1-2 days:
 rod 60 → net 90 → lantern 120 → tent2 200 → bike 300 → stove 400 → decor 50-500∞
@@ -1070,7 +1197,7 @@ rod 60 → net 90 → lantern 120 → tent2 200 → bike 300 → stove 400 → d
 Unlock ladder: forest/river free → valley 500 (d4-5) → coast 1500 (d8-9) →
 mountain tease (arc 2). Income grows via group meals, rare fish, quest bonuses.
 
-### 8.6 What killed retention — and the fix
+### 9.6 What killed retention — and the fix
 
 | Problem | Fix |
 |---|---|
@@ -1081,7 +1208,7 @@ mountain tease (arc 2). Income grows via group meals, rare fish, quest bonuses.
 | No visual payoff | camp upgrades visibly transform the diorama |
 | Story as wallpaper | letters = delivery mechanism; your days become the journal entries |
 
-### 8.7 The 3-month model (post-arc survival)
+### 9.7 The 3-month model (post-arc survival)
 
 Day-10 ends the story — months 1-3 must run on *cadence + collection + social*.
 The proven genre structure (Animal Crossing is the reference):
@@ -1134,7 +1261,7 @@ is ~5-10%. The goal isn't "everyone stays," it's "people who connect get
 (event or arc), which is why the manifest-driven pipeline matters — new
 content = catalog rows + small art batches, not code changes.
 
-## 9. Build order after approval
+## 10. Build order after approval
 
 1. Approve this doc (story + loop + manifest).
 2. **P0 generation pass** (style-locked to example.png) → assets drop into manifest.
@@ -1142,6 +1269,6 @@ content = catalog rows + small art batches, not code changes.
 4. Playtest → adjust economy/pacing → P1 pass.
 5. Only then decide if the real client (Vite+React+TS+PixiJS + server.py rewrite) is warranted.
 
-## 10. Security note
+## 11. Security note
 DONE — token moved to `PIXELLAB_TOKEN` env var in `tools/pixellab_gen.py`
 (see `.env.example`). `.devin/config.json` references the same env var.
