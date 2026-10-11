@@ -1227,6 +1227,19 @@ cloud save status · credits/legal · restore purchases · help/tutorial replay.
 - Left-hand layout toggle (mirror bottom sheet)
 - Reduced-flash: sparkles/bursts capped at 3Hz luminance change
 
+#### Diegetic status layer (from eastward.webp teardown — the zero-chrome goal)
+- **Idle auto-hide:** ALL chrome (pills included) fades after ~3s idle; tap
+  reshows. Watching the campsite = seeing only the campsite. The postcard
+  view is the default state, not a mode.
+- **Status lives ON objects:** firewood-low icon on the woodpile · hungry
+  icon over the dog · ready-meal steam over the pot · mud decal on path —
+  the scene IS the dashboard; the booking board is for *acting*, not reading.
+- **Interaction bubbles beyond "want":** pet (heart — dog, chicken),
+  investigate (?), collect (!), fix (wrench) — proximity-gated: bubbles
+  appear only when you walk near, never always-on markers.
+- **In-world signage is functional:** site sign → dashboard · trail sign →
+  map · notice board → quests. Signs are tappable info, not decor.
+
 #### What we deliberately skip
 screen-reader mode · full colorblind themes · landscape+portrait dual
 layouts (landscape only, §8F) · controller support (mobile-only) ·
