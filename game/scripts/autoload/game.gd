@@ -8,6 +8,7 @@ extends Node
 signal phase_changed(phase: Phase)
 signal crew_stage_ready(structure: StringName)
 signal crew_collected(structure: StringName, keepsake: StringName, finished: bool)
+signal page_completed(site: StringName, page: int, gift: int, unlocks: Array)
 
 enum Phase { BOOT, TITLE, MORNING, PREP, EVENING, NIGHT }
 
@@ -261,7 +262,11 @@ func _fresh_site(site: StringName) -> Dictionary:
 			"radius": int(fire.get("radius", 2))},
 		"seats": 0, "reviews": [], "weather": "clear",
 		"board": [], "guests": {}, "assignments": {},
-		"blogger_bonus": false, "forage_nodes": [], "fish_taken": {}}
+		"blogger_bonus": false, "forage_nodes": [], "fish_taken": {},
+		"pages_done": [],
+		"counters": {"guests_welcomed": 0, "families": 0,
+			"anglers_water": 0, "fish_kinds": [], "oven_recipes": 0,
+			"regular_visits": {}, "events": {}}}
 
 
 ## §21.3: every stream is seeded by save + site + site day + stream
@@ -313,6 +318,8 @@ func new_day() -> void:
 	st["fish_taken"] = {}
 	bought_today = []
 	st["forage_nodes"] = _roll_forage()
+	if site_id == &"pinewatch" and site_day() == 1:
+		journal_event("fire_lit")                # §8.1 P1: day-1 tutorial
 	st["board"] = Seating.board(site_row(),
 		Catalog.data.get("archetypes", []), site_day(), _open_pads(st),
 		rating(), _rng_for("board"), _has_free_pair(st),
@@ -397,6 +404,10 @@ func goodnight() -> Dictionary:
 	var fees := 0
 	var tips := 0
 	var elite5 := false
+	var cnt: Dictionary = st["counters"]
+	var night := {"five_stars": 0, "stargazer_five": 0, "pads_filled": 0}
+	var tags: Dictionary = Catalog.data.get("layouts", {}).get(
+		site_id, {}).get("pads", {}).get("tags", {})
 	for s in seated:
 		var r := Seating.resolve_guest(s["guest"], s["pad_ids"],
 			_world(), int(plan["terms"].get(s["guest"]["id"], -1)))
@@ -406,6 +417,23 @@ func goodnight() -> Dictionary:
 		st["reviews"].append(r["stars"])
 		if s["guest"].get("elite", false) and r["stars"] == 5:
 			elite5 = true                              # §5.6: +1 walk-in tomorrow
+		# journal counters (§8.1)
+		cnt["guests_welcomed"] += 1
+		night["pads_filled"] += s["pad_ids"].size()
+		var arch: String = s["guest"].get("archetype", "")
+		if arch == "family":
+			cnt["families"] += 1
+		elif arch == "angler" and s["pad_ids"].any(
+				func(pid): return "water" in tags.get(pid, [])):
+			cnt["anglers_water"] += 1
+		var regular: String = s["guest"].get("regular", "")
+		if regular != "":
+			cnt["regular_visits"][regular] = int(
+				cnt["regular_visits"].get(regular, 0)) + 1
+		if r["stars"] == 5:
+			night["five_stars"] += 1
+			if "stargazer" in s["guest"].get("traits", []):
+				night["stargazer_five"] = 1
 	while st["reviews"].size() > 15:
 		st["reviews"].pop_front()
 	var walk_ins := Econ.walk_ins(st["seats"], rating_before)
@@ -423,10 +451,117 @@ func goodnight() -> Dictionary:
 	st["guests"] = {}
 	meals.clear()                                    # leftovers to the dog
 	coins += fees + tips + meal_sales
+	var pages := _check_pages(night)
 	set_phase(Phase.NIGHT)
 	return {"results": results, "fees": fees, "tips": tips,
 		"walk_ins": sold.size(), "meal_sales": meal_sales,
-		"income": fees + tips + meal_sales, "rating": rating()}
+		"income": fees + tips + meal_sales, "rating": rating(),
+		"pages": pages.map(func(p): return int(p["n"]))}
+
+
+# ------------------------------------------------------------- journal (§8)
+#
+# Each site's chapter holds five pages; a page's "check" is evaluated
+# against that site's counters plus whatever happened tonight. Pages
+# complete in any order, pay their gift, and register their unlocks.
+
+func _chapter(site := site_id) -> Dictionary:
+	for c in Catalog.data.get("chapters", []):
+		if c.get("id") == site:
+			return c
+	return {}
+
+
+## Evaluate one page check. `night` carries same-night metrics
+## (five_stars, pads_filled, stargazer_five) from Goodnight.
+func _goal_met(check: Dictionary, st: Dictionary,
+		night: Dictionary) -> bool:
+	var cnt: Dictionary = st["counters"]
+	if check.has("event"):
+		return cnt["events"].has(check["event"])
+	if check.has("night"):
+		return int(night.get(check["night"], 0)) >= int(check["target"])
+	var metric: String = check.get("metric", "")
+	var target := int(check.get("target", 1))
+	match metric:
+		"rating":
+			return st["reviews"].size() >= 15 \
+				and rating() >= float(check["target"])
+		"recipes":
+			return recipes_cooked.size() >= target
+		"fish_kinds":
+			return cnt["fish_kinds"].size() >= target
+		_:
+			if metric.begins_with("regular_visits:"):
+				return int(cnt["regular_visits"].get(
+					metric.get_slice(":", 1), 0)) >= target
+			return int(cnt.get(metric, 0)) >= target
+
+
+## External events (tutorial steps, scripted moments) — e.g.
+## journal_event("fire_lit") when the player relights the campfire.
+func journal_event(name: String) -> void:
+	site_state()["counters"]["events"][name] = true
+	_check_pages()
+
+
+func _bump(metric: String, n := 1) -> void:
+	var cnt: Dictionary = site_state()["counters"]
+	cnt[metric] = int(cnt.get(metric, 0)) + n
+
+
+## Complete every met-but-undone page for the current site; returns
+## the pages finished this call so the report/UI can celebrate them.
+func _check_pages(night := {}) -> Array:
+	var st := site_state()
+	var done := []
+	for page in _chapter().get("pages", []):
+		var n := int(page["n"])
+		if n in st["pages_done"]:
+			continue
+		if not _goal_met(page.get("check", {}), st, night):
+			continue
+		st["pages_done"].append(n)
+		coins += int(page.get("gift", 0))
+		page_completed.emit(site_id, n, int(page.get("gift", 0)),
+			page.get("unlocks", []))
+		done.append(page)
+	return done
+
+
+func page_done(page: int, site := site_id) -> bool:
+	return page in site_state(site)["pages_done"]
+
+
+## A chapter finishes when all five pages are stamped — it opens the
+## next site (§8.1).
+func chapter_done(site: StringName) -> bool:
+	return site_state(site)["pages_done"].size() >= 5
+
+
+## Unlock strings: "P3" = Pinewatch page 3, "W0" = Whisper River
+## arrival (chapter 1 done), "W2" = its page 2, "L0" = chapter 2 done.
+func _is_unlocked(unlock: String) -> bool:
+	if unlock == "":
+		return true
+	var letter_sites := {"P": &"pinewatch", "W": &"whisper_river",
+		"L": &"lantern_valley"}
+	var site: StringName = letter_sites[unlock.left(1)]
+	var n := int(unlock.substr(1))
+	if n == 0:                                   # "arrival" unlocks
+		match site:
+			&"pinewatch": return true
+			&"whisper_river": return chapter_done(&"pinewatch")
+			&"lantern_valley": return chapter_done(&"whisper_river")
+	return n in site_state(site)["pages_done"]
+
+
+func site_reachable(site: StringName) -> bool:
+	match site:
+		&"pinewatch": return true
+		&"whisper_river": return chapter_done(&"pinewatch")
+		&"lantern_valley": return chapter_done(&"whisper_river")
+	return false
 
 
 # --- purchases (§6.1: one currency, no debt, refund until Goodnight) ---
@@ -434,7 +569,8 @@ func goodnight() -> Dictionary:
 func buy_decor(item_id: String, cells: Array) -> bool:
 	var row := _row("decor", item_id)
 	var st := site_state()
-	if row.is_empty() or coins < int(row.get("price", 0)):
+	if row.is_empty() or coins < int(row.get("price", 0)) \
+			or not _is_unlocked(row.get("unlock", "")):
 		return false
 	coins -= int(row["price"])
 	if row.get("size") == "campfire":                # Stone Fire Pit
@@ -470,8 +606,9 @@ func upgrade_pad(pad_id: String, shelter: String) -> bool:
 	var raw: Variant = row.get("platform_price") \
 		if shelter == "platform" else row.get("cabin_price")
 	var price := int(raw) if raw != null else 0
+	var need := "P2" if shelter == "platform" else "W0"
 	if not st["pads"].get(pad_id, {}).get("open", false) \
-			or price <= 0 or coins < price:
+			or price <= 0 or coins < price or not _is_unlocked(need):
 		return false
 	coins -= price
 	st["pads"][pad_id]["shelter"] = shelter
@@ -480,7 +617,8 @@ func upgrade_pad(pad_id: String, shelter: String) -> bool:
 
 func buy_gear(item_id: String) -> bool:
 	var row := _row("gear", item_id)
-	if row.is_empty() or item_id in gear or coins < int(row.get("price", 0)):
+	if row.is_empty() or item_id in gear or coins < int(row.get("price", 0)) \
+			or not _is_unlocked(row.get("unlock", "")):
 		return false
 	coins -= int(row["price"])
 	gear.append(item_id)
@@ -493,7 +631,7 @@ func buy_staple(item_id: String) -> bool:
 	var row := _row("ingredients", item_id)
 	if row.get("kind") != "staple" or coins < int(row.get("price", 5)):
 		return false
-	if _unlock_rank(row.get("unlock", "P1")) > _site_rank(site_id):
+	if not _is_unlocked(row.get("unlock", "P1")):
 		return false
 	if pantry_add(item_id, 1) < 1:
 		return false                                   # pantry full
@@ -625,6 +763,10 @@ func fish_catch(spot: String) -> String:
 	if pantry_add(pick, 1) == 0:
 		st["fish_taken"][spot] = taken               # full pantry: no catch
 		return ""
+	var logged: Array = st["counters"]["fish_kinds"]
+	if pick not in logged:
+		logged.append(pick)
+		_check_pages()                               # e.g. W1 "3 kinds"
 	return pick
 
 
@@ -703,6 +845,9 @@ func cook(a: String, b: String) -> Dictionary:
 	meals.append(meal)
 	if r["id"] not in recipes_cooked:
 		recipes_cooked.append(r["id"])
+	if r.get("station") == "oven":
+		_bump("oven_recipes")
+	_check_pages()                                   # e.g. P3 "5 recipes"
 	return {"result": "ok", "recipe": r["id"], "meal": meal,
 		"name": r.get("name", "")}
 

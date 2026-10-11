@@ -170,10 +170,26 @@ func _ready() -> void:
 	check("walk-in buys leftover",
 		rep["walk_ins"] == 1 and rep["meal_sales"] == 25,
 		"got %d/%d" % [rep["walk_ins"], rep["meal_sales"]])
-	check("coins = fee+tip+meal",
-		Game.coins == 40 + int(40 * 0.10 * 3) + 25,
-		"got %d" % Game.coins)
+	# P5 (rating ≥4.0, 15 reviews) also landed tonight — gift +50.
+	check("P5 page lands on rating",
+		rep["pages"].has(5)
+		and Game.coins == 40 + int(40 * 0.10 * 3) + 25 + 50,
+		"got %s %d" % [rep["pages"], Game.coins])
 	check("phase went NIGHT", Game.phase == Game.Phase.NIGHT)
+
+	# --- journal (§8.1) -------------------------------------------------
+	check("P1 auto-lit day 1", Game.page_done(1))
+	check("platform still locked", not Game._is_unlocked("P2"))
+	check("W gated by chapter", not Game._is_unlocked("W0")
+		and not Game.site_reachable(&"whisper_river"))
+	var cnt: Dictionary = Game.site_state()["counters"]
+	cnt["guests_welcomed"] = 20
+	Game.recipes_cooked = ["a", "b", "c", "d", "e"]
+	var coins_before := Game.coins
+	Game._check_pages()
+	check("P2+P3 land together", Game.page_done(2) and Game.page_done(3)
+		and Game.coins == coins_before + 60,
+		"coins %d" % Game.coins)
 
 	# --- purchases -----------------------------------------------------
 	Game.coins = 1000
@@ -201,6 +217,8 @@ func _ready() -> void:
 		and back["campfire"]["radius"] == 3
 		and back["decor"].size() == 1
 		and back["decor"][0]["cells"][0] == Vector2i(5, 1)
+		and back["pages_done"].has(1)
+		and back["counters"]["guests_welcomed"] == 20
 		and Game.coins == 430)
 
 	# --- kitchen: forage → pantry → cook (§7) --------------------------

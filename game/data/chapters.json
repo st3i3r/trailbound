@@ -1,32 +1,194 @@
 [
-  {
-    "id": "pinewatch",
-    "pages": [
-      {"n": 1, "goal": "Relight the fire", "gift": 20, "unlocks": ["outfitter", "stools", "lantern", "planter", "hedge", "tarp", "dog_bed"]},
-      {"n": 2, "goal": "Welcome 20 guests", "gift": 30, "unlocks": ["platform", "bench", "guitar_stump"]},
-      {"n": 3, "goal": "Cook 5 different recipes", "gift": 30, "unlocks": ["fishing_rod", "picnic_table"]},
-      {"n": 4, "goal": "Host a family", "gift": 40, "unlocks": ["swing", "string_lights"]},
-      {"n": 5, "goal": "Reach a 4.0 rating over 15 reviews", "gift": 50, "unlocks": ["stone_fire_pit"]}
-    ]
-  },
-  {
-    "id": "whisper_river",
-    "pages": [
-      {"n": 1, "goal": "Catch 3 kinds of fish", "gift": 30, "unlocks": ["radio"]},
-      {"n": 2, "goal": "Seat 6 anglers on Water pads", "gift": 40, "unlocks": ["silk_lantern"]},
-      {"n": 3, "goal": "Three 5-star parties in one night", "gift": 50, "unlocks": ["binoculars"]},
-      {"n": 4, "goal": "Old Ba visits 3 times", "gift": 60, "unlocks": ["koi_pond"]},
-      {"n": 5, "goal": "Reach a 4.2 rating over 15 reviews", "gift": 75, "unlocks": []}
-    ]
-  },
-  {
-    "id": "lantern_valley",
-    "pages": [
-      {"n": 1, "goal": "A 5-star night for a Stargazer", "gift": 40, "unlocks": []},
-      {"n": 2, "goal": "Cook 3 oven recipes", "gift": 50, "unlocks": []},
-      {"n": 3, "goal": "Fill all 8 pads one night", "gift": 60, "unlocks": []},
-      {"n": 4, "goal": "Lan visits 3 times", "gift": 75, "unlocks": []},
-      {"n": 5, "goal": "Reach a 4.4 rating over 15 reviews", "gift": 100, "unlocks": []}
-    ]
-  }
+ {
+  "id": "pinewatch",
+  "pages": [
+   {
+    "n": 1,
+    "goal": "Relight the fire",
+    "gift": 20,
+    "unlocks": [
+     "outfitter",
+     "stools",
+     "lantern",
+     "planter",
+     "hedge",
+     "tarp",
+     "dog_bed"
+    ],
+    "check": {
+     "event": "fire_lit"
+    }
+   },
+   {
+    "n": 2,
+    "goal": "Welcome 20 guests",
+    "gift": 30,
+    "unlocks": [
+     "platform",
+     "bench",
+     "guitar_stump"
+    ],
+    "check": {
+     "metric": "guests_welcomed",
+     "target": 20
+    }
+   },
+   {
+    "n": 3,
+    "goal": "Cook 5 different recipes",
+    "gift": 30,
+    "unlocks": [
+     "fishing_rod",
+     "picnic_table"
+    ],
+    "check": {
+     "metric": "recipes",
+     "target": 5
+    }
+   },
+   {
+    "n": 4,
+    "goal": "Host a family",
+    "gift": 40,
+    "unlocks": [
+     "swing",
+     "string_lights"
+    ],
+    "check": {
+     "metric": "families",
+     "target": 1
+    }
+   },
+   {
+    "n": 5,
+    "goal": "Reach a 4.0 rating over 15 reviews",
+    "gift": 50,
+    "unlocks": [
+     "stone_fire_pit"
+    ],
+    "check": {
+     "metric": "rating",
+     "target": 4.0
+    }
+   }
+  ]
+ },
+ {
+  "id": "whisper_river",
+  "pages": [
+   {
+    "n": 1,
+    "goal": "Catch 3 kinds of fish",
+    "gift": 30,
+    "unlocks": [
+     "radio"
+    ],
+    "check": {
+     "metric": "fish_kinds",
+     "target": 3
+    }
+   },
+   {
+    "n": 2,
+    "goal": "Seat 6 anglers on Water pads",
+    "gift": 40,
+    "unlocks": [
+     "silk_lantern"
+    ],
+    "check": {
+     "metric": "anglers_water",
+     "target": 6
+    }
+   },
+   {
+    "n": 3,
+    "goal": "Three 5-star parties in one night",
+    "gift": 50,
+    "unlocks": [
+     "binoculars"
+    ],
+    "check": {
+     "night": "five_stars",
+     "target": 3
+    }
+   },
+   {
+    "n": 4,
+    "goal": "Old Ba visits 3 times",
+    "gift": 60,
+    "unlocks": [
+     "koi_pond"
+    ],
+    "check": {
+     "metric": "regular_visits:old_ba",
+     "target": 3
+    }
+   },
+   {
+    "n": 5,
+    "goal": "Reach a 4.2 rating over 15 reviews",
+    "gift": 75,
+    "unlocks": [],
+    "check": {
+     "metric": "rating",
+     "target": 4.2
+    }
+   }
+  ]
+ },
+ {
+  "id": "lantern_valley",
+  "pages": [
+   {
+    "n": 1,
+    "goal": "A 5-star night for a Stargazer",
+    "gift": 40,
+    "unlocks": [],
+    "check": {
+     "night": "stargazer_five",
+     "target": 1
+    }
+   },
+   {
+    "n": 2,
+    "goal": "Cook 3 oven recipes",
+    "gift": 50,
+    "unlocks": [],
+    "check": {
+     "metric": "oven_recipes",
+     "target": 3
+    }
+   },
+   {
+    "n": 3,
+    "goal": "Fill all 8 pads one night",
+    "gift": 60,
+    "unlocks": [],
+    "check": {
+     "night": "pads_filled",
+     "target": 8
+    }
+   },
+   {
+    "n": 4,
+    "goal": "Lan visits 3 times",
+    "gift": 75,
+    "unlocks": [],
+    "check": {
+     "metric": "regular_visits:lan",
+     "target": 3
+    }
+   },
+   {
+    "n": 5,
+    "goal": "Reach a 4.4 rating over 15 reviews",
+    "gift": 100,
+    "unlocks": [],
+    "check": {
+     "metric": "rating",
+     "target": 4.4
+    }
+   }
+  ]
+ }
 ]
