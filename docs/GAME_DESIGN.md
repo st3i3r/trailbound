@@ -274,8 +274,7 @@ UI widgets come from `create-ui-elements` (Pro adds concept+palette guidance): a
 | No tool for trail-map screen | `create-map` pixflux is top-down/sidescroller only → generate the **trail-map screen illustration** (top-down, 320×320 Tier 1) |
 | Can't reuse example.png style directly | `image-to-pixel-art`: convert reference crops → our palette, remove-bg; `consistent-style`: ≤32px→**64 imgs/10 gens**, 43-85px→16 imgs — feed our locked sprites as style refs for batch props |
 | Skeleton anim = only quality path | `animate-with-skeleton` IS Tier 1 and best quality (reusable skeletons, "fixed head" tip keeps chibi faces stable) — reserve for player + ranger closeups; text-anim for the rest |
-| — | `try-on`: outfit transfer → re-dress travelers from one base sprite (variant NPCs nearly free) |
-| — | `create-instant-character`, `extend-map-v2`: **Tier 2 — NOT in $12 plan** |
+| — | `try-on`, `multi-image`, `create-instant-character`, `extend-map-v2`: **all Tier 2 — NOT in $12 plan** |
 | MCP = local package | MCP is **remote HTTP** `https://api.pixellab.ai/mcp` + Bearer token; stdio-only clients bridge via `npx mcp-remote` |
 | Manual fixes need Aseprite | **Pixelorama** = free in-browser editor w/ PixelLab built in → zero-cost touch-ups |
 | Licensing risk | FAQ: no training on our inputs, commercial + Steam use explicitly allowed |
@@ -354,8 +353,8 @@ visibly hike in (hiker, photographer).
 | kid scout | small kid scout, oversized green backpack, cap, freckles | idle_s | 2 |
 | van-lifer | relaxed woman, denim overalls, purple bandana, coffee mug | idle_s | 2 |
 
-Variant trick: `try-on` outfit transfer on one base sprite → near-free extra
-travelers once a body silhouette is approved.
+Variant trick (Tier-1-safe): `edit-image-pro` / `create-sl-image-pro` with the
+approved sprite as reference → outfit/color variants. (`try-on` is Tier 2.)
 
 #### P2 — ambient + upgrades (~30-60 gens)
 walk×4 for hiker/photographer (~14 each) · cyclist traveler · ambient wildlife
@@ -367,6 +366,52 @@ walk×4 for hiker/photographer (~14 each) · cyclist traveler · ambient wildlif
   `client/src/assets/manifest.ts` (`char.*` keys already reserved)
 - Consistency controls: same style-image ref for all calls, `reduce_colors`
   batch at the end, feet-anchored south at bottom-center, 64×64
+
+### 7.10 Production completeness audit (what the manifest was missing)
+
+The §7.x manifest is scene-complete but not production-complete. A shipped
+game needs these too — sorted by who makes them:
+
+**PixelLab-generatable additions (~40-60 gens, add to P1):**
+- **Food sprites** — the cook→serve reward objects: stew pot, skewers, sandwiches,
+  drinks, pie (on-blanket meals like example.png shows) — `consistent-style` batch
+- **Launch art** — app icon (512px, bot avatar + directory), title/splash card,
+  promo key-art for sharing
+- **Portraits** — character busts for journal/dialogue (32-48px heads)
+- **VFX frames** — unlock burst, sparkle, level-up, stamp-press animations
+- **Location pin icons** — map nodes locked/unlocked states
+- **Journal art** — stamp/badge set, recipe card illustrations
+- **Empty states** — "no travelers yet" campfire illustration, empty inventory art
+
+**Non-PixelLab (separate tools/sources):**
+- **Audio** — 🔴 biggest gap. PixelLab does zero audio.
+  - SFX: Kenney/freesound packs (footsteps, splash, coins, UI) + WebAudio
+    procedural (fire crackle = filtered noise — already stubbed)
+  - Music: ambient campfire loop — AI music tool (separate service) or
+    CC0 ambient tracks; budget ~2-3 loops (day/dusk/activity)
+- **Monetization** — Telegram Stars: cosmetic gear + convenience (never
+  energy-predatory; cozy audience punishes it). Decide model before launch.
+- **Backend** — server save (multi-device + anti-cheat validation), remote
+  config for economy tuning, Sentry error reporting, minimal analytics
+  (retention funnel: open→first cook→day-2 return)
+
+**Design/engineering gaps:**
+- **Onboarding** — first-session flow unplanned; design the first 60 seconds
+  (spawn at fire → dog arrives → first forage prompt) before any art spend
+- **Retention systems** — daily quest card, guestbook signatures, streak
+  lantern; cheap text systems, big payoff
+- **Save versioning** — add `save_version` to state now; every schema change
+  needs a migration or players lose progress
+- **Catalog validation** — zod schemas on items/gear/locations JSON; a bad
+  row in prod = broken economy
+- **i18n-ready** — strings extracted day one; Silkscreen is Latin-only → need
+  fallback font for Cyrillic/CJK later
+- **A11y/perf budgets** — 44px min tap targets, colorblind-check palette,
+  reduced-motion toggle, <3s cold start, <100MB RAM on Android WebView
+- **CI/CD** — GH Actions: typecheck+build on push; Playwright smoke on the loop
+- **TMA platform checklist** — BotFather setup, bot description/commands,
+  HTTPS hosting (cloudflared for dev), Telegram header/safe-area testing,
+  content rating
 
 ### Operational notes (from docs)
 - **Map objects auto-delete after 8h** → download PNGs immediately at generation time.
