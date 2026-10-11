@@ -80,6 +80,86 @@
       "source": "pixellab pixen 'high top-down'",
       "notes": "vintage outfitter van, warm paint + cream roof — warmth on the prop is per the Eastward rule (structures/props carry the warm tones, ground stays green)"
     },
+    {
+      "id": "terrain_grass_lush",
+      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "denser under-canopy grass variant"
+    },
+    {
+      "id": "terrain_grass_worn",
+      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "sparse/dry high-traffic grass variant"
+    },
+    {
+      "id": "terrain_dirt",
+      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "bare packed-earth base"
+    },
+    {
+      "id": "terrain_path_dirt",
+      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "worn footpath tile"
+    },
+    {
+      "id": "terrain_forest_floor",
+      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "pine-needle bed under the pines"
+    },
+    {
+      "id": "terrain_path_stone",
+      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "stepping-stone path"
+    },
+    {
+      "id": "terrain_pond_water",
+      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "still pond water (§11 Pinewatch pond errand)"
+    },
+    {
+      "id": "terrain_shore_corner_in",
+      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "inside shore corner, mates with terrain_shore_p_0 edges"
+    },
+    {
+      "id": "terrain_shore_corner_out",
+      "category": "terrain", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "outside shore corner (sandy point)"
+    },
+    {
+      "id": "decal_grass_tuft_a",
+      "category": "clutter", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "seeded scatter layer (§16.4: tufts near trees)"
+    },
+    {
+      "id": "decal_grass_tuft_b",
+      "category": "clutter", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "second tuft silhouette"
+    },
+    {
+      "id": "decal_pine_needles",
+      "category": "clutter", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "needle drift scatter"
+    },
+    {
+      "id": "decal_pebbles",
+      "category": "clutter", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "pebble cluster scatter"
+    },
+    {
+      "id": "decal_fern",
+      "category": "clutter", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "fern clump scatter"
+    },
+    {
+      "id": "decal_wildflower",
+      "category": "clutter", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "tiny flower dots scatter"
+    },
+    {
+      "id": "decal_mushroom",
+      "category": "clutter", "status": "planned", "files": [], "canvas": "32x32", "frames": 1, "batch": 1,
+      "notes": "mushroom pair — forage hint"
+    },
 
     {
       "id": "wardens_hut_ruin",
