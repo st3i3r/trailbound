@@ -1,6 +1,6 @@
 {
   "project": "Trailbound",
-  "palette": "pending — locked in Batch 0 (GDD §28). Per-site ramps: Pinewatch = deep greens + ember-orange accents; Whisper River = river blues + bamboo green; Lantern Valley = golden meadow + dusk violet (§11). Dusk warmth is a §16.3 lighting layer — do NOT bake it into sprites",
+  "palette": "batch-0 first pass: 32-color ramp at cleanup/batch0_palette.json (tools/palette_lock.py --batch 0). Per-site ramps: Pinewatch = deep greens + ember-orange accents; Whisper River = river blues + bamboo green; Lantern Valley = golden meadow + dusk violet (§11). Dusk warmth is a §16.3 lighting layer — do NOT bake it into sprites",
   "sun_angle": "upper left",
   "assets": [
     {
