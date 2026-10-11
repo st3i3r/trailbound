@@ -6,9 +6,8 @@ material; only `sheets/` output gets copied into the game project.
 ## Layout
 
 ```
-gen/          raw PixelLab output (tools/pixellab_gen.py lands here as <prefix>_<n>.png)
-approved/     human-approved originals, by category — NEVER edit in place
-cleanup/      Pixelorama .pxo + cleaned PNGs
+gen/          generated art — current canonical sprites (palette-locked in place)
+cleanup/      palette ramps, Pixelorama .pxo, working files
 sheets/       assembled atlases/sprite sheets ready for game/assets (2 px padding)
 prompts/      prompt library per batch (GDD §28)
 refs/         style refs, palette ramps, Eastward teardown frames
@@ -17,10 +16,9 @@ manifest.json the asset ledger — every asset's status, file, size, frames
 
 ## Naming
 
-`{category}/{id}__{variant}_{WxH}.png` — e.g.
-`approved/decor/lantern__lit_64x64.png`, `sheets/pinewatch_terrain_32x32.png`.
-IDs are stable snake_case and match `game/data/*.json` ids where the asset
-backs a data entry.
+`gen/<id>_<n>.png` for generated files; `sheets/<site>_<kind>_<size>.png`
+for atlases. IDs are stable snake_case and match `game/data/*.json` ids
+where the asset backs a data entry.
 
 ## Rules (GDD §16.2, §16.4, §28)
 
@@ -38,10 +36,11 @@ backs a data entry.
 
 ## Flow
 
-1. `tools/pixellab_gen.py` (or MCP) → `gen/`
-2. Vibe/QA review → copy to `approved/<category>/`
-3. Pixelorama cleanup → `cleanup/` (keep the .pxo)
-4. Assemble sheet → `sheets/` → copy into `game/assets/` + register
+1. `tools/pixellab_gen.py` (or MCP) → `gen/` — assets are approved by
+   default; re-roll or clean only when something's actually wrong
+2. `tools/palette_lock.py --batch N` → remaps gen/ onto the shared ramp
+   in place + refreshes `cleanup/batchN_palette.*`
+3. Assemble sheet → `sheets/` → copy into `game/assets/` + register
    in manifest.json (`status: imported`)
 
-Statuses: `planned` → `generated` → `approved` → `cleaned` → `imported`.
+Statuses: `planned` → `generated` → `imported`.

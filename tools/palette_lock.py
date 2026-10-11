@@ -7,7 +7,8 @@ Usage:
     python tools/palette_lock.py [--batch 0] [--colors 32] [files...]
     --batch N   pull files of that batch from assets_src/manifest.json
     files...    explicit PNG paths (may be combined with --batch)
-Writes cleanup/paletted/<name>.png + cleanup/batch0_palette.{png,json}.
+Remaps each sprite in place (gen/ is the canonical location; originals
+live in git history) + writes cleanup/batch0_palette.{png,json}.
 Stdlib only (tools/png.py).
 """
 import argparse, json, math, os, sys
@@ -157,14 +158,13 @@ def main():
     ramp = sort_ramp(ramp)
     print(f"ramp: {len(ramp)} colors")
 
-    os.makedirs(os.path.join(OUT, "paletted"), exist_ok=True)
+    os.makedirs(OUT, exist_ok=True)
     coverage, far_tot = set(), 0
     for p, w, h, rows in images:
         uniq, used, far = remap(rows, w, ramp)
         coverage |= used
         far_tot += far
-        dst = os.path.join(OUT, "paletted", os.path.basename(p))
-        pngmod.write(dst, w, h, rows)
+        pngmod.write(p, w, h, rows)          # lock in place — gen/ is canonical
         print(f"  {os.path.basename(p):28s} {uniq:4d} uniq -> "
               f"{len(used):2d} ramp colors, {far} far-mapped")
 
@@ -176,7 +176,7 @@ def main():
               open(os.path.join(OUT, "batch0_palette.json"), "w"), indent=2)
     print(f"coverage: {len(coverage)}/{len(ramp)} ramp colors used, "
           f"{far_tot} far-mapped px")
-    print(f"-> {os.path.relpath(OUT, ROOT)}/paletted/ + batch0_palette.*")
+    print(f"-> {os.path.relpath(OUT, ROOT)}/batch0_palette.*")
 
 
 if __name__ == "__main__":
