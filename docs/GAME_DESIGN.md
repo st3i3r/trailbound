@@ -997,6 +997,19 @@ most fold into already-budgeted sprites.**
 shuttlecock, moped, stools, karst bg) — everything else is prompt/detail choices
 inside assets already in the manifest.
 
+**Đá cầu animation spec (trái cầu = separate physics sprite, not baked):**
+- Kids' `play` anim = kick/ready/balance poses WITHOUT the shuttlecock —
+  the trái cầu flies via engine physics so rallies never loop identically
+- Shuttlecock sprite ~8×12px: rubber-washer base + bright feather fringe;
+  2-3 frames = `tucked` (rise, dart-like) · `flared` (descent — feathers
+  open = parachute float, the signature slow đá cầu fall) · squash-on-kick
+- Physics: impulse on kid-contact (kick frame fires when it lands in range),
+  rise = normal gravity, descent = drag-limited slow fall, slight impulse
+  randomness → every rally differs; z-sorts with characters
+- End state: trái cầu drops, kid picks it up — or the dog lunges at it
+  (charm beat, reuses dog `excited` anim)
+- Cost: kids' `play` anim (already in B4) + ~1-2 gens shuttlecock frames
+
 ### 7.19 Micro-detail audit — production vs toy (pixel-level, from eastward crops)
 
 #### THE 10 PRODUCTION TELLS (the gap between toy and shipped)
