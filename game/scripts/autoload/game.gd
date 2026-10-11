@@ -25,6 +25,8 @@ var site_id: StringName = &"pinewatch"
 var sites_visited: Dictionary = {}          # site_id -> first in-game day
 var letters_read: Array = []                # letter ids (§8.2 journal)
 var vignettes_seen: Array = []              # §13.4 unseen plays first
+var dog := {"name": "Bean", "bond": 0, "met": false,
+	"pet_today": false}                       # §9 companion
 var crew: Dictionary = {}                   # §22 save shape, see _crew_reset()
 var coins: int = 0                          # §6.1: one currency, starts at 0
 var seed: int = 0                           # save seed feeding every stream (§21.3)
@@ -434,6 +436,9 @@ func new_day() -> void:
 	st["fish_taken"] = {}
 	bought_today = []
 	st["forage_nodes"] = _roll_forage()
+	dog["pet_today"] = false
+	if dog["met"]:
+		_dog_dig()                               # §9: 1 bonus item/day
 	if site_id == &"pinewatch" and site_day() == 1:
 		journal_event("fire_lit")                # §8.1 P1: day-1 tutorial
 	st["board"] = Seating.board(site_row(),
@@ -569,6 +574,11 @@ func goodnight() -> Dictionary:
 	var meal_sales := 0
 	for m in sold:
 		meal_sales += int(m.get("price", 0))
+	if not dog["met"] and site_id == &"pinewatch" and site_day() == 1:
+		dog["met"] = true                          # §9: night-1 stray
+	if dog["met"]:
+		dog["bond"] += int(_dog_cfg().get("bond_leftover", 1)) \
+			* (leftover.size() - sold.size())
 	st["blogger_bonus"] = elite5
 	var vig := _pick_vignette(st, seated)
 	st["assignments"] = {}
@@ -1074,6 +1084,66 @@ func cook(a: String, b: String) -> Dictionary:
 		"name": r.get("name", "")}
 
 
+# ------------------------------------------------------------- the dog (§9)
+#
+# A stray who turns up on Pinewatch's first night. No needs, no
+# penalties, never lost; its guest effect only ever comes from the
+# Dog Bed decor item, so wandering never touches scoring.
+
+func _dog_cfg() -> Dictionary:
+	return Catalog.data.get("dog", {})
+
+
+## Seeded bonus forage each morning — straight into the pantry; a
+## full pantry means the dog buries it for later (no item).
+func _dog_dig() -> void:
+	var pool := _ingredients_of_kind("forage")
+	if pool.is_empty():
+		return
+	var rng := _rng_for("dog")
+	var pick: Dictionary = pool[rng.randi() % pool.size()]
+	pantry_add(pick["id"], 1)
+
+
+## One pet per day, +bond per dog.json. Returns false once petted.
+func dog_pet() -> bool:
+	if not dog["met"] or dog["pet_today"]:
+		return false
+	dog["pet_today"] = true
+	dog["bond"] += int(_dog_cfg().get("bond_pet", 2))
+	return true
+
+
+func name_dog(n: String) -> void:
+	if n.strip_edges() != "":
+		dog["name"] = n
+
+
+## Bond level 0-4 from the thresholds in dog.json; each level
+## unlocks a cosmetic trick, the last is the đá cầu chase (§9).
+func dog_level() -> int:
+	var lvl := 0
+	var levels: Array = _dog_cfg().get("levels", [])
+	for i in levels.size():
+		if dog["bond"] >= int(levels[i].get("bond", 0)):
+			lvl = i
+	return lvl
+
+
+func dog_trick() -> String:
+	var levels: Array = _dog_cfg().get("levels", [])
+	if levels.is_empty():
+		return ""
+	return String(levels[dog_level()].get("trick", ""))
+
+
+## Is the Dog Bed placed here? (The dog sleeps on it — §9 — but the
+## guest effect already flows through the decor, nothing to score.)
+func dog_bed_placed() -> bool:
+	return site_state()["decor"].any(
+		func(d): return d["id"] == "dog_bed")
+
+
 # ------------------------------------------------------------- Daily (§10)
 #
 # One shared puzzle per calendar day, seeded by hash("daily", date).
@@ -1191,6 +1261,7 @@ func state_dict() -> Dictionary:
 		"letters": letters_read.duplicate(),
 		"journal": {"vignettes_seen": vignettes_seen.duplicate()},
 		"daily": daily_state.duplicate(),
+		"dog": dog.duplicate(),
 		"sites": _sites_to_json()}
 
 
@@ -1246,6 +1317,7 @@ func load_state(state: Dictionary) -> void:
 	vignettes_seen = state.get("journal", {}).get(
 		"vignettes_seen", vignettes_seen)
 	daily_state = state.get("daily", daily_state)
+	dog = state.get("dog", dog)
 	if state.has("sites"):
 		sites = _sites_from_json(state["sites"])
 	var saved: Dictionary = state.get("crew", {})

@@ -1,0 +1,14 @@
+{
+  "default_name": "Bean",
+  "name_vi": "Bơ",
+  "bond_pet": 2,
+  "bond_leftover": 1,
+  "levels": [
+    {"bond": 0, "trick": null, "label": "Stray"},
+    {"bond": 10, "trick": "sit", "label": "Regular"},
+    {"bond": 25, "trick": "paw", "label": "Friend"},
+    {"bond": 50, "trick": "roll", "label": "Companion"},
+    {"bond": 80, "trick": "da_cau", "label": "Best friend"}
+  ],
+  "note": "§9: met on the first Pinewatch night (the stray eats the leftover stew); 1 bonus forage dug up per morning; bond from a daily pet + leftovers the dog eats after walk-ins; last trick chases the đá cầu shuttlecock."
+}
