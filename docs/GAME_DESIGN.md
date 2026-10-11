@@ -997,6 +997,57 @@ most fold into already-budgeted sprites.**
 shuttlecock, moped, stools, karst bg) — everything else is prompt/detail choices
 inside assets already in the manifest.
 
+### 7.19 Micro-detail audit — production vs toy (pixel-level, from eastward crops)
+
+#### THE 10 PRODUCTION TELLS (the gap between toy and shipped)
+
+| # | Tell | Toy does | Production does |
+|---|---|---|---|
+| 1 | **Pixel density** | mixed: 16px tile + 32px char + 24px prop | ONE pixel size everywhere — enforced on import |
+| 2 | **Contact shadows** | props float | soft shadow blob under every object & char |
+| 3 | **Embedded objects** | props pasted on tiles | grass/debris decals overlap prop BASES — planted, not placed |
+| 4 | **Terrain texture depth** | flat fill | 3 layers: base noise + tuft clusters + 1-2px specks (flowers/embers) |
+| 5 | **Wear on large surfaces** | clean repeats | moss/scuff/wear patches breaking up every roof, wall, tent |
+| 6 | **Micro-states** | open OR closed | every interactive object: closed/open/occupied/light-on variants |
+| 7 | **Directional consistency** | shadows/shadows random | ONE sun angle + ONE wind vector — smoke, flags, towels all agree |
+| 8 | **Idle life** | static idle | blink frames, breathing, cloth micro-sway, tail wag |
+| 9 | **Transition frames** | state pops | pot empty→cooking→done has stir-anim between; fire build-up |
+| 10 | **Atlas hygiene** | bleed/fuzz at edges | 2px padding, no mipmaps, palette-lock post-pass |
+
+#### Micro-asset additions (~15-25 gens, nearly all [B]-batchable)
+
+- **contact-shadow blob** ×2 sizes — THE tell; tinted sprite under everything (~1)
+- **embedding decals**: grass-blade edge tufts ×4, worn-path decal (under doors/fire), pebble ring — sit ON prop bases (~3)
+- **speck layer**: flower specks, leaf bits, ember dots — 1-2px scatter sprites (~2)
+- **wear patches**: moss, scuff, damp — overlay decals for tent/roof/crates (~4)
+- **foam edge strip** where water meets shore + shore sparkle (~2)
+- **bird-flight shadow** (shadow only, flies overhead — delightful, ~1)
+- **falling leaf** particle sprite + **dust puff** at feet + dew sparkle (~2)
+- **state variants missed:** occupied tent (glow from inside), cooler open, gate open, letterbox flag-up, awning-open van, serving table with-food (~6)
+- **blink frames** + breathing/sleep-2f added to idle anims (~2)
+- **micro-clutter**: ant trail, spider web corner, mushroom ring, incense smoke wisp (VN layer) (~3)
+
+#### Engine-side techniques (0 gens — the free polish layer)
+
+- **cloud shadows** drifting across ground (big soft overlay)
+- **grass wave** when chars walk through tufts (vertex shader displacement)
+- **reflections**: flipped-faded sprite under waterline objects
+- **mist sheets** at dawn over water/grass
+- **wind vector**: one global wind dir drives flags/towels/smoke/sway sync
+- **footprints** fading decals in sand/mud
+- **number tick-up** on coin gain · haptic-matched pops (juice, not art)
+
+#### Consistency QA gates (run on EVERY batch)
+
+1. Import lint: pixel size uniform, no stray 1px orphans, feet-anchor bottom-center
+2. `reduce_colors` whole batch → shared ramp (palette drift = instant toy look)
+3. Shadow/sun check: every cast shadow agrees on direction
+4. Outline check: selective-outline weight consistent on chars vs props
+
+**Honest note:** tells 1-3 + 8 alone close ~60% of the toy→production gap,
+and all four are cheap. This is where the extra ~20 gens goes before any
+new feature.
+
 ### Operational notes (from docs)
 - **Map objects auto-delete after 8h** → download PNGs immediately at generation time.
 - Downloads are unauthenticated UUID URLs (`/mcp/characters/{id}/download`, `/mcp/tilesets/{id}/image`) — safe to fetch then archive locally.
