@@ -1,0 +1,60 @@
+{
+  "project": "Trailbound",
+  "palette": "pending — locked in Batch 0 (GDD §28)",
+  "sun_angle": "upper left",
+  "assets": [
+    {
+      "id": "campfire_ring",
+      "category": "structures",
+      "status": "generated",
+      "files": ["gen/campfire_0.png"],
+      "canvas": "64x64",
+      "frames": 1,
+      "batch": 0,
+      "source": "pixellab pixen 'high top-down'",
+      "notes": "stone ring only — flame is a separate animated layer (campfire_flame)"
+    },
+    {
+      "id": "campfire_flame",
+      "category": "anims",
+      "status": "generated",
+      "files": ["gen/flame_frames_0.png"],
+      "canvas": "128x32",
+      "frames": "4x32x32 strip",
+      "batch": 0,
+      "source": "pixellab pixen 'side'",
+      "notes": "flicker loop 1-2-4-2; frame 3 doubles as wind-gust variant; sits on campfire_ring + glow layer"
+    },
+    {
+      "id": "player_idle",
+      "category": "characters",
+      "status": "generated",
+      "files": ["gen/player_0.png"],
+      "canvas": "64x64",
+      "frames": 1,
+      "batch": 0,
+      "source": "pixellab pixen 'low top-down'",
+      "notes": "back-three-quarter pose — usable as walk-away; front idle still needed for the style anchor; 4-dir sheet later via create_character"
+    },
+    {
+      "id": "terrain_grass_pinewatch",
+      "category": "terrain",
+      "status": "planned",
+      "files": [],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 0,
+      "notes": "pine-forest floor base tile"
+    },
+    {
+      "id": "terrain_shore_sample",
+      "category": "terrain",
+      "status": "planned",
+      "files": [],
+      "canvas": "32x32",
+      "frames": 1,
+      "batch": 0,
+      "notes": "water edge sample for palette lock"
+    }
+  ]
+}
