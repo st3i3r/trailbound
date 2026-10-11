@@ -24,7 +24,7 @@ def req(method, path, body=None):
                  "Content-Type": "application/json"},
         method=method)
     try:
-        with urllib.request.urlopen(r, timeout=60) as resp:
+        with urllib.request.urlopen(r, timeout=180) as resp:
             return json.loads(resp.read())
     except urllib.error.HTTPError as e:
         print("HTTP", e.code, e.read()[:500])
@@ -74,7 +74,8 @@ def collect_images(resp, prefix):
         print("  saved", p)
     return saved
 
-def gen_image(description, w, h, prefix, style=None, no_bg=True, seed=None):
+def gen_image(description, w, h, prefix, style=None, no_bg=True, seed=None,
+              style_palette=True):
     body = {"description": description,
             "image_size": {"width": w, "height": h},
             "no_background": no_bg}
@@ -83,7 +84,8 @@ def gen_image(description, w, h, prefix, style=None, no_bg=True, seed=None):
         body["style_image"] = {"image": b64img(style),
                                "size": {"width": im.width, "height": im.height},
                                "usage_description": "copy this pixel art style: palette, outlines, shading and level of detail"}
-        body["style_options"] = {"color_palette": True, "outline": True,
+        body["style_options"] = {"color_palette": style_palette,
+                                 "outline": True,
                                  "detail": True, "shading": True}
     if seed is not None:
         body["seed"] = seed
@@ -118,7 +120,10 @@ if __name__ == "__main__":
     ap.add_argument("height", type=int)
     ap.add_argument("prefix", help="output file prefix")
     ap.add_argument("--style", default=ROOT + "/docs/reference/example.png",
-                    help="PNG style reference (default: docs/reference/example.png)")
+                    help="style reference image (default: docs/reference/example.png)")
+    ap.add_argument("--style-no-color", action="store_true",
+                    help="transfer outline/detail/shading only — keep the "
+                         "described palette instead of the ref's")
     ap.add_argument("--no-style", action="store_true",
                     help="generate without a style reference")
     ap.add_argument("--keep-bg", action="store_true",
@@ -134,5 +139,6 @@ if __name__ == "__main__":
     else:
         saved = gen_image(a.description, a.width, a.height, a.prefix,
                           style=None if a.no_style else a.style,
-                          no_bg=not a.keep_bg, seed=a.seed)
+                          no_bg=not a.keep_bg, seed=a.seed,
+                          style_palette=not a.style_no_color)
     sys.exit(0 if saved else 1)

@@ -308,6 +308,162 @@
       "source": "pixellab pixen 'high top-down'"
     },
     {
+      "id": "tree_pine_large",
+      "category": "structures",
+      "status": "generated",
+      "files": [
+        "gen/tree_pine_green_2.png"
+      ],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": 2,
+      "source": "pixellab v2 style-transfer (ref: docs/reference/tree.jpg, palette off)",
+      "notes": "APPROVED PICK \u2014 fullest-canopy green pine, the signature silhouette; alts green_1/3, pixen tree_pine_large_0.png"
+    },
+    {
+      "id": "tree_pine_young",
+      "category": "structures",
+      "status": "generated",
+      "files": [
+        "gen/tree_pine_green_0.png"
+      ],
+      "canvas": "64x64",
+      "frames": 1,
+      "batch": 2,
+      "source": "pixellab v2 style-transfer (ref: docs/reference/tree.jpg, palette off)",
+      "notes": "APPROVED PICK \u2014 narrow conical spruce reads as the young/midground pine"
+    },
+    {
+      "id": "tree_autumn_accent_a",
+      "category": "structures",
+      "status": "generated",
+      "files": [
+        "gen/tree_ref_2.png"
+      ],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": 2,
+      "source": "pixellab v2 style-transfer (ref: docs/reference/tree.jpg)",
+      "notes": "APPROVED PICK \u2014 tiered-bough autumn accent (the eastward1.jpg accent-tree role); alts gen/tree_ref_0/1.png"
+    },
+    {
+      "id": "tree_autumn_accent_b",
+      "category": "structures",
+      "status": "generated",
+      "files": [
+        "gen/tree_ref_3.png"
+      ],
+      "canvas": "96x96",
+      "frames": 1,
+      "batch": 2,
+      "source": "pixellab v2 style-transfer (ref: docs/reference/tree.jpg)",
+      "notes": "APPROVED PICK \u2014 wide-spread autumn accent; second accent silhouette for variety"
+    },
+    {
+      "id": "prop_tent_olive",
+      "category": "props",
+      "status": "generated",
+      "files": [
+        "gen/prop_tent_olive_0.png"
+      ],
+      "canvas": "64x64",
+      "frames": 1,
+      "batch": 2,
+      "source": "pixellab pixen 'high top-down'",
+      "notes": "olive A-frame with pole frame + guy lines \u2014 primary pad tent"
+    },
+    {
+      "id": "prop_tent_rust",
+      "category": "props",
+      "status": "generated",
+      "files": [
+        "gen/prop_tent_rust_0.png"
+      ],
+      "canvas": "64x64",
+      "frames": 1,
+      "batch": 2,
+      "source": "pixellab pixen 'high top-down'",
+      "notes": "rust-orange colorway \u2014 second silhouette-matched tent for pad variety"
+    },
+    {
+      "id": "prop_log_bench",
+      "category": "props",
+      "status": "generated",
+      "files": [
+        "gen/prop_log_bench_0.png"
+      ],
+      "canvas": "64x64",
+      "frames": 1,
+      "batch": 2,
+      "source": "pixellab pixen 'high top-down'",
+      "notes": "split-log campfire bench"
+    },
+    {
+      "id": "prop_stump",
+      "category": "props",
+      "status": "generated",
+      "files": [
+        "gen/prop_stump_0.png"
+      ],
+      "canvas": "64x64",
+      "frames": 1,
+      "batch": 2,
+      "source": "pixellab pixen 'high top-down'",
+      "notes": "mossy-top stump with roots + sprout \u2014 campfire stool"
+    },
+    {
+      "id": "prop_lantern_post",
+      "category": "props",
+      "status": "generated",
+      "files": [
+        "gen/prop_lantern_post_0.png"
+      ],
+      "canvas": "64x64",
+      "frames": 1,
+      "batch": 2,
+      "source": "pixellab pixen 'high top-down'",
+      "notes": "post + cross-arm + hanging paper lantern; top silhouette slightly muddy \u2014 acceptable at 3x, cleanup optional"
+    },
+    {
+      "id": "prop_signpost",
+      "category": "props",
+      "status": "generated",
+      "files": [
+        "gen/prop_signpost_0.png"
+      ],
+      "canvas": "64x64",
+      "frames": 1,
+      "batch": 2,
+      "source": "pixellab pixen 'high top-down'",
+      "notes": "two-way arrow boards + base tuft"
+    },
+    {
+      "id": "prop_supply_crate",
+      "category": "props",
+      "status": "generated",
+      "files": [
+        "gen/prop_supply_crate_0.png"
+      ],
+      "canvas": "64x64",
+      "frames": 1,
+      "batch": 2,
+      "source": "pixellab pixen 'high top-down'",
+      "notes": "tarped crate stack \u2014 reads as one crate, fine for clutter"
+    },
+    {
+      "id": "prop_boulder",
+      "category": "props",
+      "status": "generated",
+      "files": [
+        "gen/prop_boulder_0.png"
+      ],
+      "canvas": "64x64",
+      "frames": 1,
+      "batch": 2,
+      "source": "pixellab pixen 'high top-down'",
+      "notes": "mossy granite + tiny red sprout accent"
+    },
+    {
       "id": "wardens_hut_ruin",
       "category": "structures",
       "status": "planned",
