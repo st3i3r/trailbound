@@ -1263,15 +1263,28 @@ custom font upload — none serve this game's audience.
 differentiators (diegetic storefront, ceremony beats, photo mode, attract
 mode) are all specced. Execution risk sits in motion-feel polish, not scope.
 
-### 8I. Honest remaining gaps
+### 8I. Honest remaining gaps — the final list (post all audits)
 
-| Gap | Status |
-|---|---|
-| Tutorial funnel analytics (where players drop) | instrument, then tune post-launch |
-| Guest arrival timing variety (staggered, not a wave) | spec in code, not yet tuned |
-| Difficulty modes | intentionally none — cozy |
-| Anti-frustration layer | built-in: no punishments; dog petting always available |
-| Post-launch content cadence owner | open question — who's authoring monthly packs? |
+| Gap | Severity | Status |
+|---|---|---|
+| **Audio spec detail** | 🟡 real | "needed ~35 SFX" but no per-interaction list — footsteps-per-material (grass/dirt/wood/sand!), serve ding, chop, cast, splash-size, ambience per site per day-phase, dynamic music switching rules. Spec before code |
+| **Marketing/distribution plan** | 🔴 real | No launch-visibility plan at all: cozy-game communities (r/CozyGamers, cozy TikTok), VN dev-community angle (the signature layer IS a marketing hook — "spot the VN details" posts), Play featuring criteria, pre-registration. A great game no one sees dies |
+| **Content catalog schemas** | 🟡 execution | items/recipes/guests/sites/letters JSON — specced conceptually, unwritten. Phase-0 artifact |
+| **Save schema fields** | 🟡 execution | rule exists (save_version + migrations); fields unwritten. Phase-0 |
+| **Guest movement model** | 🟢 small | waypoint graph vs A* pathing on sites — pick waypoints at scaffold (simpler, sufficient for fixed sites) |
+| **Corrupt-save recovery** | 🟢 small | backup slot + "your journal was damaged, restored to last day" flow — add to save spec |
+| **Analytics event taxonomy** | 🟢 small | funnel listed; full event list authored at integration phase |
+| **Monetization final call** | 🟡 open | cosmetics-only vs +rewarded ads — decide before storefront UI is built |
+| **Monthly content author** | 🟡 open | who writes/builds the monthly pack? (assume: us, ~1-2 days/arc) |
+| **Portrait fallback trigger** | 🟢 open | only flip if playtest data says so — default landscape |
+| **Godot tech spikes** | 🟢 scaffold | Y-sort + embedded decals z-fighting · pixel-snap on fractional DPI · edge-strip tilemap approach — all resolved inside Phase-0 prototype |
+
+**Meta-verdict:** design-side coverage is complete — further audits now
+have diminishing returns. The remaining list is (a) 2 small specs worth
+writing (audio detail, marketing), (b) execution artifacts authored when
+code starts (catalogs, schema), (c) 3 decisions needing an owner. The doc
+is the contract; **the next gap that matters can only be found by building
+the vertical slice.**
 
 ---
 
