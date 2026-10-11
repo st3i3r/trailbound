@@ -731,6 +731,57 @@ mountain tease (arc 2). Income grows via group meals, rare fish, quest bonuses.
 | No visual payoff | camp upgrades visibly transform the diorama |
 | Story as wallpaper | letters = delivery mechanism; your days become the journal entries |
 
+### 8.7 The 3-month model (post-arc survival)
+
+Day-10 ends the story — months 1-3 must run on *cadence + collection + social*.
+The proven genre structure (Animal Crossing is the reference):
+
+**Monthly — one new arc (~100-150 gens each, the sub funds it):**
+- M2: **Snowpass Mountain** — rock/snow terrain, climbing verb, mountain tea,
+  goat critter, letter arc "grandpa's winter"
+- M3: **Ember Desert / Twilight Hollow** — new terrain set + night-exclusive
+  foraging (lantern finally pays off) + arc-3 letters
+- Each arc = 1 Wang transition set + ~30 props + 1-2 visitors + 5 species +
+  gear tier. Fits inside the monthly pool with room to spare.
+
+**Weekly — rotating events (data + a few props, near-zero cost):**
+- Fishing Friday (tournament — biggest catch leaderboard)
+- Market Saturday (**trader van** visits, rotating stock — the reason to
+  check the shop every week; Animal Crossing's Redd/turnip model)
+- Mushroom Sunday / Meteor Monday (night event, lantern-gated)
+- Events are JSON entries + reuse of existing scenes — cheap to author,
+  gives the "what's on this week" check-in
+
+**Seasonal — reskins, not new scenes:**
+autumn leaves / winter snow / spring bloom on existing tilesets + seasonal
+props + limited species. ~30-50 gens per season via variant passes —
+the biggest retention-per-gen lever in the whole plan.
+
+**Evergreen endgame systems (built once):**
+- **Camp rating 1-5★** — charm + decor + quests → better/elite visitors
+  (food blogger at 4★, **grandpa's old friend at 5★** = story payoff)
+- **Collections** — fish dex (~20 species incl. 1 legendary/location),
+  recipe book, stamp album, guestbook signatures, photo spots
+- **Visitor storylines** — each traveler has a 3-visit arc: angler's big
+  fish, photographer's exhibition, the family's weekend tradition,
+  kid scout's badge. Resolves over weeks, not days
+- **Dog bond** — levels unlock tricks + better finds (long-tail habit)
+- **Decorating** — decor catalog grows monthly; camp-as-canvas is the
+  actual endgame expression for this genre
+
+**Social (Telegram-native, no realtime multiplayer needed):**
+- **Async camp visits** — see friends' camps, leave guestbook signatures +
+  small gifts; the strongest TMA-native hook available
+- **Postcards** — composite your camp → share to chat (already in manifest)
+- **Leaderboards** — biggest fish / fastest journal / most signatures
+  (Telegram high-score API is free)
+
+**Honest math:** 3-month survival for indie games is hard — good casual D30
+is ~5-10%. The goal isn't "everyone stays," it's "people who connect get
+3 months of reasons." What that demands: **ship something new every week**
+(event or arc), which is why the manifest-driven pipeline matters — new
+content = catalog rows + small art batches, not code changes.
+
 ## 9. Build order after approval
 
 1. Approve this doc (story + loop + manifest).
