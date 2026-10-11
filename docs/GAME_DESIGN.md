@@ -138,18 +138,133 @@ exactly the 3-month cadence: new site ≈ new arc ≈ one monthly content batch.
 | Forager's Net | 220c (forage ×2) |
 | Camp Lantern | 180c (+3⚡) |
 | Tent Mk.II | 400c (+4 charm, +2⚡) |
-| Valley pass (trail fee) | 500c |
 | Mountain boots → Sea kayak | 800c → 1500c (S2 runway) |
+| Consumables (firewood bundle, bait, ice) | 5-15c — recurring sink |
 
-Target pacing: rod day 1, valley ~day 3–4, one meaningful purchase choice per day.
+Target pacing: rod day 1, site-2 (Whisper River) ~day 5 via 2★ milestone — coins buy
+*builds*, stars buy *expansion* (§3 meta v2).
 
-### 4.3 Charm & travelers
-- Charm = camp comfort score (upgrades + decorations). Drives traveler frequency, tips,
-  and *tier* of visitors (the photographer only stops at charming camps).
-- Max 2–3 travelers waiting; patience drains over ~45s; ignoring them costs nothing but
-  the lost sale.
+### 4.3 Guests — the full lifecycle (management core)
 
-### 4.4 The Journal (retention + collection)
+**Charm** = site comfort score (build mix + decor). Drives booking frequency, tip rate,
+and *tier* of guests (the photographer only books at 3★+ sites).
+
+**Guest types & stay length:**
+| Type | Stay | Needs | Pays |
+|---|---|---|---|
+| Meal-stop hiker | evening | 1 meal | 30-60c |
+| Overnight camper | evening + breakfast | plot + meal + fire | 80-150c |
+| Family (4) | overnight | 2 adjacent plots + play space + group meal | 200-350c |
+| Regular | recurring | remembers your site; expects favorite meal | +50% tip |
+| Elite (blogger, warden's friend) | overnight | 4-5★ site, signature dish | big review / story |
+
+**Plot assignment = the nightly management puzzle.** Guests book specific plots;
+adjacency matters — anglers seated together swap stories (+tips), kids next to the
+fire = happy family, a couple shoved between a scout troop = complaint. Full site →
+**turn-away choice**: lose the sale vs squeeze (crowding = rating hit).
+
+**Satisfaction score per guest** (0-5★) = f(bed quality, food match, fire warmth,
+adjacency, dog pet, weather cover). Site rating = rolling average; individual reviews
+pop as speech bubbles. Negative events exist: rainy night + cheap tent = 2★ review.
+
+**Service requests beyond food:** take their photo · fix a bike · tell a trail story ·
+pet their dog. Small interactions, big charm — served guests linger, chat, leave tips.
+
+**Max visible guests** 4-6; no hard patience failure (cozy) — ignored guests just
+leave, costing the sale and a tiny rating tick.
+
+### 4.4 Demand & the nightly economy
+
+- **Demand curve:** weekend nights busy (5-6 guests), weekdays quiet (2-3), rain
+  halves bookings, events spike. The **forecast** (breakfast letter) tells you
+  tomorrow's demand → you plan firewood, meals, and whether to open new plots.
+- **Menu choice = demand steering.** Setting tonight's menu (stew / fish / pie)
+  attracts matching guests: hikers want stew, van-lifers want fancy. One morning
+  decision shapes the evening.
+- **Supply:** meals need ingredients (forage/fish = the activity layer's job);
+  **fire needs firewood** (chop = 1⚡ or buy bundles); cooler upgrade extends
+  ingredient shelf-life (raw forage spoils next day, cooked meals same evening).
+- **Turn-away:** full camp + extra booking → decline (lost sale) or squeeze (+1 cot,
+  -adjacency for everyone). Scarcity is the decision, not the grind.
+- **Late-game sinks:** seasonal-exclusive decor, consumables (wood, bait, cooler ice),
+  deluxe decor tiers — coins never inflate.
+
+### 4.5 Activity depth upgrades
+
+- **Foraging:** quality tiers (normal/gold glint), weather modifiers (rain = more
+  mushrooms, fewer flowers), **replant** — leave the root (1 free action) and the
+  node regrows in 2 days instead of 4. Node states: sprout → full → harvested.
+- **Fishing:** **bait crafting** (mushroom scrap → bait = activity interlock), spot
+  choice along the bank, dawn/dusk species, weight records + leaderboard.
+- **Cooking:** timed pot (left too long = burnt → compost or sad-meal), recipe
+  quality tiers, **site signature dish** (forest = Trail Stew, coast = chowder —
+  signature on the menu raises that site's charm).
+- **Hosting:** adjacency bonuses, ambiance multipliers (lit lanterns + music +
+  fire = evening "golden hour" tip bonus).
+
+### 4.6 Upkeep & decay — the daily management pulse
+
+Light maintenance so logging in matters beyond collecting:
+- **Firewood depletes** nightly (woodpile visual states: full → low → empty); a cold
+  site = cold guests = rating hit
+- **Mud after rain** (decal overlay; swept away next visit or with a broom upgrade)
+- **Tent pegs loosen** (tap to fix, 30s task); **cooler ice melts**
+- Visiting an old site restocks it — keeps reopened sites on your route
+
+### 4.7 Cross-site supply chain — why multiple sites matter
+
+Sites aren't parallel saves; they're a network:
+- Each site produces its specialty (forest: mushrooms+wood, river: fish, coast:
+  shells+kelp, valley: honey+flowers)
+- **Supply runs:** load the pack mule / send the **dog courier** (bandana bag!),
+  deliver forest mushrooms → coast camp's chowder unlocks; river fish feeds any site
+- Specialty-gated meals make every site depend on your network → reopening old
+  sites = ongoing purpose, not nostalgia
+- v1: one delivery UI + per-site inventory. P2: auto-routes, market trades.
+
+### 4.8 Site specialization
+
+Build mix declares an identity per site: **family campground** (play props, group
+plots) · **angler's lodge** (dock, smoke rack, fish menu) · **stargazer retreat**
+(telescope, dark-sky lights, quiet corner). Specialization shifts the guest pool
+and unlocks themed events. Replay value: your forest camp ≠ my forest camp.
+
+### 4.9 Warden ranks (account progression)
+
+Site stars build **Warden Rank 1-10** — the account-level title:
+- Rank gates decor tiers, elite guests, and site count
+- Rank badge on profile/postcards; leaderboards sort by rank
+- Rank-up = celebration moment (banner + letter from the ranger HQ)
+
+### 4.10 Hazards (light mischief, never fail states)
+
+- **Raccoon** raids uncovered food at night (cooler = defense; funny chase-off anim)
+- **Bear** wanders the mountain site (dog barks it off — the dog earns his keep)
+- Sudden downpour test: uncovered firewood gets wet. Light stakes, great stories.
+
+### 4.11 Guest pets & barter
+
+- Some guests bring dogs — they play with yours while you cook (0-cost joy)
+- **Barter offers:** a guest proposes item-for-item (angler trades a lure for
+  dinner). Charm > coins sometimes — the trail economy isn't only money.
+
+### 4.12 Prestige — Trail Fame (post-arc)
+
+After the chain is complete: **Trail Fame** soft-reset — restart the trail with a
+permanent reputation bonus + legacy journal pages. Standard cozy live-ops loop;
+P3 implementation, designed-in from the schema (per-site state already isolated).
+
+### 4.13 Explicit NO-list (scope traps)
+
+| Tempting | Verdict |
+|---|---|
+| Staff/payroll sim | ❌ dog + ranger cover the fantasy |
+| Free-form build editor v1 | ❌ slots give 80% of the feel; P3 |
+| Hard patience/fail states | ❌ cozy = low pressure; leave = lost sale only |
+| Skill trees / RPG stats | ❌ the journal is the progression |
+| PvP / competitive | ❌ wrong audience entirely |
+
+### 4.14 The Journal (retention + collection)
 Pages auto-fill:
 - **Trail stamps** — one per location visited
 - **Field notes** — species collected (Foragedex ~12, Fishdex ~10)
@@ -157,10 +272,11 @@ Pages auto-fill:
 - **Recipes** — discovered cooking pairs (~6)
 - Completion % is the share-bait stat.
 
-### 4.5 The dog
+### 4.15 The dog
 Adopted on day 2 (scripted). Follows the player on trips; occasionally digs up a bonus
-item (visible sparkle → walk over). Pure charm + a light economic trickle. 4-dir walk +
-sit + happy-bark frames needed.
+item (visible sparkle → walk over). **Courier duty:** delivers supply runs between your
+sites (§4.7). **Defense:** barks off the bear (§4.10). Pure charm + a light economic
+trickle. 4-dir walk + sit + happy-bark + courier-bag frames needed.
 
 ---
 
@@ -182,16 +298,23 @@ thumb-reachable. The current prototype UI is wireframe only.
 
 ---
 
-## 6. Locations (v1 shipped / teasers)
+## 6. The Site Chain (v2 — campsites ARE the locations)
 
-| Location | Status | Palette | Content |
-|---|---|---|---|
-| Pinewood Camp | ✅ hub | green/dusk | hosting, cooking, upgrades |
-| Whisperwood | ✅ forest | deep green | forage nodes ×7 |
-| Silverbank River | ✅ activity | green + blue bank | fishing |
-| Sunpetal Valley | 🔒 500c | golden meadow | forage tier-2 (honey, flowers) + bike teaser |
-| Cloudrest Peak | 🔒 S2 | rock/snow | climbing (needs boots) |
-| Glasscoast | 🔒 S2 | sand/sea | sea fishing (needs kayak) |
+Each site = one managed campsite + its local activity (§4.x). Progress = reopening
+the chain; milestone-gated, never coin-gated.
+
+| # | Site | Status | Palette | Amenity / specialty | Guests |
+|---|---|---|---|---|---|
+| 1 | **Pinewatch Forest** | ✅ start | green/dusk | forage, campfire · mushrooms+wood | hikers, family, scout |
+| 2 | **Whisper River** | 🔒 2★ | green + blue bank | fishing, dock · fish | anglers, photographers |
+| 3 | **Lantern Valley** | 🔒 3★ | golden meadow | trail riding · honey+flowers | cyclists, van-lifers |
+| 4 | **Glasscoast** | 🔒 4★ | sand/sea | kayak, shell hunt · shells+kelp | surfers, families |
+| 5 | **Snowpass Mountain** | 🔒 arc 2 | rock/snow | climbing · herbs | elite, bear |
+
+**Activity access model:** your current site's amenity is free; visiting other
+*reopened* sites uses their amenities (that's why the supply chain works — you walk
+your own network). The old "travel to a location" loop is absorbed: destinations
+are now the sites themselves, each a business to run.
 
 ---
 
@@ -655,6 +778,22 @@ or get added as one.
 | portraits ×8 | 8 | — |
 | critters ×6 | 6 | fly/hop/flutter/jump/gull/graze = ~8 |
 
+#### Management-depth delta (§4.3–4.12 — v2 spec)
+| System | New assets | Gens |
+|---|---|---|
+| Guest lifecycle | overnight tent-occupied variant, breakfast tray, star-review bubble | 3 |
+| Upkeep/decay | woodpile ×2 extra states, mud decal, wet-firewood variant | 4 |
+| Cooking depth | burnt meal variant, bait items ×3, sprout-node state ×8 (batched) | 5 |
+| Hazards | raccoon (sprite + scurry + steal), bear (sprite + wander) | 6 |
+| Pets/courier | guest dogs ×2 palettes, courier bandana-bag accessory | 3 |
+| Supply chain | supply crate, delivery box, loaded-pack variant | 3 |
+| Warden ranks | badges ×10 + rank-up banner (batched) | 3 |
+| Specialization | lodge/retreat/family icons ×3, themed props ×3 batched | 4 |
+| Signature dishes | dish cards ×5 (batched) | 2 |
+| Plot/booking UI | plot markers, booking board, kids' play props (ball, kite) | 4 |
+| Trail Fame | prestige emblem | 1 |
+| **Management delta total** | | **~38** |
+
 #### Non-art production assets (0 gens, still required)
 audio SFX ~35 (ambience ×8, actions ×15, UI ×7, dog ×3, music ×3 loops) ·
 save_version + migrations · zod catalog schemas · CI/CD + Playwright smoke ·
@@ -672,10 +811,11 @@ HTTPS) · Stars cosmetic catalog · LEGAL (have)
 | Scene/critter anims | ~25-35 |
 | VFX + UI + icons + states | ~60-80 |
 | Story/launch/meta art | ~30-40 |
+| Management-depth delta (§4.3-4.12) | ~40-55 |
 | Iteration buffer (~25% regen rate) | ~110-140 |
-| **COMPLETE GAME** | **≈ 550-700 gens** |
+| **COMPLETE GAME** | **≈ 590-755 gens** |
 
-**≈ 30% of the ~2,000/mo pool.** Remaining headroom covers misses,
+**≈ 30-38% of the ~2,000/mo pool.** Remaining headroom covers misses,
 A/B art variants, and P3 content (seasons, tent interior, events).
 
 ### Operational notes (from docs)
