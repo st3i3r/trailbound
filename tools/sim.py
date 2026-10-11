@@ -207,8 +207,11 @@ def weighted(rng, pairs):
 
 
 # ---------------------------------------------------------------- the run
-def run(seed=1, K=1.25, A=0.0, show=False, max_day=120):
-    """One playthrough. K = skill (need coverage multiplier), A = ad share."""
+def run(seed=1, K=1.25, A=0.0, show=False, max_day=120, post_arc=0):
+    """One playthrough. K = skill (need coverage multiplier), A = ad share.
+    post_arc > 0 keeps simulating that many sandbox days past the finale
+    (§33.2/§6.11): the bot stays at the last site, like the Appendix C
+    post-arc probe."""
     coins, day, gear, site = 0, 0, set(), 1
     st = {}
     def new_site(s):
@@ -230,7 +233,7 @@ def run(seed=1, K=1.25, A=0.0, show=False, max_day=120):
     agg = dict(host=0, walk=0, reward=0, ad=0, spend=0, staples=0)
     site_inc = {1: 0.0, 2: 0.0, 3: 0.0}
     order_empty = {}
-    wmax, done = 0, None
+    wmax, done, arc_agg = 0, None, None
     page_day, daily = {}, []
 
     def unlocked(item, s):
@@ -270,7 +273,7 @@ def run(seed=1, K=1.25, A=0.0, show=False, max_day=120):
     if show:
         print('day s k pads stars rating net coins pages | bought')
 
-    while day < max_day:
+    while day < (done + post_arc if done else max_day):
         day += 1
         S = SITES[site]
         t = st[site]
@@ -640,10 +643,11 @@ def run(seed=1, K=1.25, A=0.0, show=False, max_day=120):
                         place_decor(t, pick, pads)
                     else:
                         t['bought_cos'].append(pick)
-        ppd[site].append(len(bought))
+        if done is None or day <= done:      # §6.9 arc metrics stop at the
+            ppd[site].append(len(bought))    # finale; post-finale days are the
+            wmax = max(wmax, coins)          # §6.11 sandbox measured separately
         if not t['order'] and site not in order_empty:
             order_empty[site] = day
-        wmax = max(wmax, coins)
         daily.append(dict(d=day, s=site, k=k, pads=pads, parties=parties_n,
                           stars=[r for r in t['reviews']][-parties_n:],
                           net=round(inc + tips + ad_extra + wi - stp),
@@ -661,25 +665,79 @@ def run(seed=1, K=1.25, A=0.0, show=False, max_day=120):
                 st[site] = new_site(site)
                 unlock_day[site] = day + 1
             else:
-                done = day
-                break
+                if done is None:
+                    done = day
+                    arc_agg = dict(agg)      # §6.9 aggregates freeze at finale
+                if not post_arc or day >= done + post_arc:
+                    break
 
-    tot = agg['host'] + agg['walk'] + agg['reward'] + agg['ad']
+    arc = arc_agg or agg     # post-arc runs report §6.9 metrics arc-scoped
+    tot = arc['host'] + arc['walk'] + arc['reward'] + arc['ad']
+    post_stats = None
+    if post_arc and done:
+        by_day = {e['d']: e for e in daily}
+        post = [e for e in daily if done < e['d'] <= done + post_arc]
+
+        def left_value(s):
+            """Coins still spendable at site s (§6.11 sizing input)."""
+            S, t2 = SITES[s], st[s]
+            padi, plat, cabin = t2['padi'], t2['plat'], t2['cabin']
+            pads_after, total, n = t2['pads'], 0, 0
+            for it in t2['order']:
+                if it == 'pad':
+                    if padi >= len(S['pad_prices']):
+                        continue
+                    total += S['pad_prices'][padi]
+                    padi += 1
+                    pads_after += 1
+                elif it == 'platform':
+                    if plat + cabin >= pads_after:
+                        continue
+                    total += S['platform']
+                    plat += 1
+                elif it == 'cabin':
+                    if plat <= 0 or S['cabin'] is None:
+                        continue
+                    total += S['cabin']
+                    plat -= 1
+                    cabin += 1
+                elif it in GEAR:
+                    if it in gear:
+                        continue
+                    total += GEAR[it][0]
+                else:
+                    total += DECOR[it][0]
+                n += 1
+            return n, total, len(t2['order'])
+
+        last_buy = max((e['d'] for e in daily if e['bought']), default=None)
+        post_stats = dict(
+            window=len(post),
+            net_per_day=(round(statistics.mean(e['net'] for e in post))
+                         if post else 0),
+            last_buy_offset=(last_buy - done) if last_buy else None,
+            balance_at={n: by_day[done + n]['coins']
+                        for n in (0, 10, 20, 30, 60)
+                        if (done + n) in by_day},
+            leftover={s: left_value(s) for s in (1, 2, 3)},
+            leftover_items={s: list(st[s]['order']) for s in (1, 2, 3)})
+
     return dict(seed=seed, u2=unlock_day.get(2), u3=unlock_day.get(3),
                 p_done=(unlock_day[2] - 1) if 2 in unlock_day else None,
                 done=done, daily=daily,
                 ppd={s: (round(statistics.mean(v), 2) if v else 0)
                      for s, v in ppd.items()},
                 zero={s: v.count(0) for s, v in ppd.items()},
-                shares=(round(100 * agg['host'] / tot),
-                        round(100 * agg['walk'] / tot),
-                        round(100 * agg['reward'] / tot)) if tot else (0, 0, 0),
-                stp=round(100 * agg['staples'] / agg['spend']) if agg['spend'] else 0,
+                shares=(round(100 * arc['host'] / tot),
+                        round(100 * arc['walk'] / tot),
+                        round(100 * arc['reward'] / tot)) if tot else (0, 0, 0),
+                stp=round(100 * arc['staples'] / arc['spend']) if arc['spend'] else 0,
                 wmax=round(wmax), pages=dict(sorted(page_day.items())),
-                income=round(tot), spend=round(agg['spend']),
+                income=round(tot), spend=round(arc['spend']),
                 site_inc={s: round(v) for s, v in site_inc.items()},
                 order_empty=order_empty, order_left=len(t['order']),
-                ad_share=round(100 * agg['ad'] / tot) if tot else 0)
+                ad_share=round(100 * arc['ad'] / tot) if tot else 0,
+                post=post_stats)
 
 
 def dup_helps(t, item, pads):
@@ -794,11 +852,41 @@ def guardrails(out, out_runs):
     return ok
 
 
+def post_report(runs, label):
+    """Post-arc sandbox stats across seeds (§6.11 sizing, Appendix C 3.1)."""
+    stats = [r['post'] for r in runs if r['post']]
+    if not stats:
+        return
+    nets = [p['net_per_day'] for p in stats]
+    lastb = [p['last_buy_offset'] for p in stats
+             if p['last_buy_offset'] is not None]
+    lefts = [p['leftover'][1][1] + p['leftover'][2][1] for p in stats]
+    b30 = [p['balance_at'].get(30) for p in stats
+           if p['balance_at'].get(30) is not None]
+    mid = min(runs, key=lambda r: abs((r['done'] or 999)
+                                      - statistics.median(
+                                          r['done'] for r in runs if r['done'])))
+    mp = mid['post']
+    print(f'  post-arc {label}: net/day med {statistics.median(nets):.0f} '
+          f'({min(nets)}–{max(nets)}) | last buy {statistics.median(lastb):+.0f}d | '
+          f'bal +30 med {statistics.median(b30):.0f} | '
+          f'P+W leftover med {statistics.median(lefts):.0f} '
+          f'({min(lefts)}–{max(lefts)})')
+    print(f'    mid seed {mid["seed"]}: bal {mp["balance_at"]} | '
+          f'left P {mp["leftover"][1]} W {mp["leftover"][2]} '
+          f'L {mp["leftover"][3]}')
+    print(f'    leftover items P: {mp["leftover_items"][1]}')
+    print(f'    leftover items W: {mp["leftover_items"][2]}')
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument('--seeds', type=int, default=30,
                     help='save seeds per variant (default 30)')
     ap.add_argument('--variant', help='one variant only')
+    ap.add_argument('--post-arc', type=int, metavar='DAYS', default=0,
+                    help='simulate DAYS of post-finale sandbox and report '
+                         'leftover orders, income drift, balance curve (§6.11)')
     ap.add_argument('--show', action='store_true',
                     help='print the day log of the median-seed run')
     ap.add_argument('--baseline', action='store_true',
@@ -811,9 +899,12 @@ def main():
     for lab, K, A in VARIANTS:
         if a.variant and lab != a.variant:
             continue
-        runs = [run(seed=s, K=K, A=A) for s in range(1, a.seeds + 1)]
+        runs = [run(seed=s, K=K, A=A, post_arc=a.post_arc)
+                for s in range(1, a.seeds + 1)]
         out_runs[(lab, A)] = runs
         out[(lab, A)] = report(runs, f'{lab} K={K} A={A}')
+        if a.post_arc:
+            post_report(runs, f'{lab} K={K} A={A}')
         if a.show or a.variant:
             mid = out[(lab, A)]['mid']
             print(f'  pages: {mid["pages"]}')
