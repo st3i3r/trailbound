@@ -24,6 +24,7 @@
     },
     "tags": {}
   },
+  "campfire": {"cell": [4, 2], "radius": 2},
   "bank_cells": [],
   "errand_spots": {
     "forage": [96, 72],
