@@ -22,6 +22,8 @@ Thumbs.db
 .godot/
 *.keystore
 *.jks
+game/android/
+game/build/
 
 # local agent workspace
 .secwright/

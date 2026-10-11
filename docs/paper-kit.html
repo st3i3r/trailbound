@@ -1,0 +1,94 @@
+<!doctype html><meta charset="utf-8"><title>Trailbound — Phase -1 paper kit</title>
+<style>
+@page { size: A4 landscape; margin: 8mm }
+* { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif }
+body { margin: 0; color: #222 }
+h1 { font-size: 20px } h2 { font-size: 15px; margin: 14px 0 6px }
+h2::before { content: '✂ '; }
+.sheet { page-break-after: always }
+.grid { display: flex; flex-wrap: wrap; gap: 4mm }
+.card, .tile, .pad, .chip { border: 1.5px dashed #888; border-radius: 6px;
+  padding: 6px 8px; page-break-inside: avoid }
+.card { width: 62mm; min-height: 40mm }
+.card h3 { margin: 0 0 4px; font-size: 14px }
+.card .fee { float: right; font-weight: 700 }
+.card .traits { font-size: 11px; color: #444 }
+.tile { width: 40mm; min-height: 26mm; font-size: 11px }
+.tile b { font-size: 12px }
+.tile .p { float: right; font-weight: 700 }
+.chip { width: 30mm; min-height: 12mm; font-size: 10px; text-align: center }
+.chip.need { background: #e8f4e8 } .chip.aversion { background: #fdecec }
+.pad { width: 48mm; height: 48mm; position: relative; font-size: 11px;
+  border-style: solid }
+.pad.locked { background: repeating-linear-gradient(45deg,#eee,#eee 6px,#e2e2e2 6px,#e2e2e2 12px); color:#777 }
+.pad .num { position: absolute; top: 3px; left: 6px; font-size: 18px; font-weight:700 }
+.pad .tags { position: absolute; bottom: 3px; left: 6px; color:#555 }
+.camp { display:flex; gap:4mm; align-items:flex-end; flex-wrap:wrap }
+.fire { width:48mm; height:48mm; border:2px solid #a63; border-radius:6px;
+  background:#f7e6d0; font-size:11px; padding:6px }
+table { border-collapse: collapse; font-size: 11px }
+td, th { border: 1px solid #bbb; padding: 2px 7px; text-align: left }
+.note { font-size: 11px; color: #555; max-width: 240mm }
+.log td { height: 20px }
+.star { font-size: 13px; letter-spacing: 1px }
+</style>
+<div class="sheet">
+<h1>Trailbound — Phase -1 paper kit (Pinewatch Forest)</h1>
+<p class="note">Run <b>10 in-game days</b> per session, 5 sessions. Each day:
+Morning (read the booking board, weather) → Prep (cook, buy, place — use the
+journal-page unlocks; the Outfitter opens day 2) → Evening (drag guest cards
+onto pads; check the star preview by hand) → Night (score stars, pay fees +
+tips, walk-ins, page gifts; buy phase again tomorrow). Record each night on
+the log sheet. Compare with the sim: <code>python tools/sim.py --show</code>.</p>
+<h2>How a night scores (§5.4)</h2>
+<p class="note"><span class="star">stars = clamp(2 + comfort + meal + traits + weather, 1, 5)</span>
+· comfort: bare 0 / Platform +1 / Cabin +2 · meal: favourite +1 / other 0 / none −1
+· +1 per need met, −1 per aversion · rain −1 on uncovered pads (Tarp r1, cabins always dry)
+· tip = fee × 10% × max(0, stars−2) · site rating = mean of last 15 reviews
+· walk-ins = min(Seats, ⌊rating⌋−2), each buys a leftover meal (avg 18c at Pinewatch)</p>
+<h2>Trait → effect map (§5.3)</h2>
+<table><tr><th>Trait</th><th>Condition</th><th>Type</th></tr><tr><td>Chilly</td><td>Warmth in range</td><td>need</td></tr><tr><td>Social</td><td>≥1 occupied neighbour</td><td>need</td></tr><tr><td>Introvert</td><td>Privacy in range, or no neighbour</td><td>need</td></tr><tr><td>Nature Lover</td><td>Nature in range</td><td>need</td></tr><tr><td>Night Owl</td><td>Light in range</td><td>need</td></tr><tr><td>Music Lover</td><td>Music in range</td><td>need</td></tr><tr><td>Light Sleeper</td><td>Music in range, or Loud neighbour</td><td>aversion</td></tr><tr><td>Dog Lover</td><td>Dog in range</td><td>need</td></tr><tr><td>Kids</td><td>Play in range of either pad</td><td>need</td></tr></table>
+<p class="note">Effects: Warmth=campfire (r2, ~3 pads)+Fire Pit · Light=Lantern/String Lights ·
+Nature=Planter/Flower Arch · Cover=Tarp/Cabin · Privacy=Hedge · Dog=Dog Bed ·
+Music=Guitar Stump · Play=Swing · Stars=Telescope · Seats=walk-in capacity.</p>
+<h2>Journal pages → unlocks (§8.1)</h2>
+<table><tr><th>Page</th><th>Goal</th><th>Unlocks</th></tr><tr><td>P1</td><td>Relight the fire (day 1)</td><td>Outfitter + Stools/Lantern/Planter/Hedge/Tarp/Dog Bed + staples</td></tr><tr><td>P2</td><td>Welcome 20 guests</td><td>Platform · Bench · Guitar Stump</td></tr><tr><td>P3</td><td>Cook 5 different recipes</td><td>Fishing Rod · Picnic Table</td></tr><tr><td>P4</td><td>Host a family</td><td>Swing · String Lights</td></tr><tr><td>P5</td><td>Reach a 4.0 rating (15 reviews)</td><td>Stone Fire Pit</td></tr></table>
+<p class="note">Pads open in this order: start 2, then 120 · 200 · 300 · 420 · 580 · 750 · staples 5c each
+per meal served · refund in full until Goodnight.</p>
+</div>
+<div class="sheet">
+<h2>Camp sheet — Pinewatch (cut around; pads are the 64px cells)</h2>
+<div class="camp"><div class="fire"><b>Campfire</b><br>Warmth r2 reaches
+~3 pads (shown on pads 1–3). Stone Fire Pit → r3 (+3 more).</div><div class="pad"><span class="num">1</span><span class="tags">campfire Warmth r2</span></div><div class="pad"><span class="num">2</span><span class="tags">campfire Warmth r2</span></div><div class="pad locked"><span class="num">3</span><span class="tags">campfire Warmth r2</span></div><div class="pad locked"><span class="num">4</span><span class="tags">overgrown — pay to open</span></div><div class="pad locked"><span class="num">5</span><span class="tags">overgrown — pay to open</span></div><div class="pad locked"><span class="num">6</span><span class="tags">overgrown — pay to open</span></div><div class="pad locked"><span class="num">7</span><span class="tags">overgrown — pay to open</span></div><div class="pad locked"><span class="num">8</span><span class="tags">overgrown — pay to open</span></div></div>
+<p class="note">Neighbour rule for this kit: pads in a row — each pad's
+neighbours are the pads immediately left/right (2–3 per pad, §5.1).
+An item "reaches" a pad when any pad cell is within Chebyshev r1 of the item
+cell — on paper, count the item's r as "~2 pads (r1) / ~4 pads (r2)" and
+place its effect chit under the pads you choose.</p>
+</div>
+<div class="sheet">
+<h2>Guest cards (deck: ×3 Hiker, ×2 Scout, ×4 Couple, ×2 Family — redraw as needed)</h2>
+<div class="grid"><div class="card"><span class="fee">40c</span><h3>Hiker</h3><div class="traits">Chilly · Nature Lover</div><div class="traits"><i>1 pad · fee incl. dinner</i></div><div class="traits">attach trait chips: ____ ____ ____</div></div><div class="card"><span class="fee">30c</span><h3>Scout</h3><div class="traits">Social · Dog Lover</div><div class="traits"><i>1 pad · fee incl. dinner</i></div><div class="traits">attach trait chips: ____ ____ ____</div></div><div class="card"><span class="fee">55c</span><h3>Couple</h3><div class="traits">Introvert · Light Sleeper</div><div class="traits"><i>1 pad · fee incl. dinner</i></div><div class="traits">attach trait chips: ____ ____ ____</div></div><div class="card"><span class="fee">110c</span><h3>Family</h3><div class="traits">Kids + 1</div><div class="traits"><i>needs 2 neighbouring pads · fee incl. dinner</i></div><div class="traits">attach trait chips: ____ ____ ____</div></div><div class="card"><span class="fee">150c</span><h3>Food Blogger</h3><div class="traits">3 traits, ≥1 aversion — only when rating ≥4.5</div><div class="traits"><i>1 pad · fee incl. dinner</i></div><div class="traits">attach trait chips: ____ ____ ____</div></div><div class="card"><span class="fee">35c</span><h3>Hùng (scout regular)</h3><div style="color:#06c">🎗 regular</div><div class="traits">Social · Dog Lover — visits ~every 3rd day, pays +20%</div><div class="traits"><i>1 pad · fee incl. dinner</i></div><div class="traits">attach trait chips: ____ ____ ____</div></div><div class="card"><span class="fee">130c</span><h3>Minh family</h3><div style="color:#06c">🎗 regular</div><div class="traits">Kids + 1 — weekend visitors, &quot;usually your first family&quot;</div><div class="traits"><i>needs 2 neighbouring pads · fee incl. dinner</i></div><div class="traits">attach trait chips: ____ ____ ____</div></div></div>
+<h2>Trait chips (cut out; draw per the day's rules: day 1–4 → 1 trait, then 2)</h2>
+<div class="grid"><div class="chip need"><b>Chilly</b><br>Warmth in range<br><i>need</i></div><div class="chip need"><b>Social</b><br>≥1 occupied neighbour<br><i>need</i></div><div class="chip need"><b>Introvert</b><br>Privacy in range, or no neighbour<br><i>need</i></div><div class="chip need"><b>Nature Lover</b><br>Nature in range<br><i>need</i></div><div class="chip need"><b>Night Owl</b><br>Light in range<br><i>need</i></div><div class="chip need"><b>Music Lover</b><br>Music in range<br><i>need</i></div><div class="chip aversion"><b>Light Sleeper</b><br>Music in range, or Loud neighbour<br><i>aversion</i></div><div class="chip need"><b>Dog Lover</b><br>Dog in range<br><i>need</i></div><div class="chip need"><b>Kids</b><br>Play in range of either pad<br><i>need</i></div><div class="chip need"><b>Chilly</b><br>Warmth in range<br><i>need</i></div><div class="chip need"><b>Social</b><br>≥1 occupied neighbour<br><i>need</i></div><div class="chip need"><b>Introvert</b><br>Privacy in range, or no neighbour<br><i>need</i></div><div class="chip need"><b>Nature Lover</b><br>Nature in range<br><i>need</i></div><div class="chip need"><b>Night Owl</b><br>Light in range<br><i>need</i></div><div class="chip need"><b>Music Lover</b><br>Music in range<br><i>need</i></div><div class="chip aversion"><b>Light Sleeper</b><br>Music in range, or Loud neighbour<br><i>aversion</i></div><div class="chip need"><b>Dog Lover</b><br>Dog in range<br><i>need</i></div><div class="chip need"><b>Kids</b><br>Play in range of either pad<br><i>need</i></div></div>
+</div>
+<div class="sheet">
+<h2>Decor & upgrade tiles</h2>
+<div class="grid"><div class="tile"><span class="p">25c</span><b>Stools</b><br>Seats · 1 seat · 1×1<br><i>from P1</i></div><div class="tile"><span class="p">40c</span><b>Bench</b><br>Seats · 1 seat · 1×1<br><i>from P2</i></div><div class="tile"><span class="p">140c</span><b>Picnic Table</b><br>Seats · 2 seats · 2×1<br><i>from P3</i></div><div class="tile"><span class="p">50c</span><b>Lantern</b><br>Light · r1 · 1×1<br><i>from P1</i></div><div class="tile"><span class="p">190c</span><b>String Lights</b><br>Light · r2 · 2×1<br><i>from P4</i></div><div class="tile"><span class="p">45c</span><b>Planter</b><br>Nature · r1 · 1×1<br><i>from P1</i></div><div class="tile"><span class="p">250c</span><b>Flower Arch</b><br>Nature · r2 · 2×1<br><i>from L</i></div><div class="tile"><span class="p">75c</span><b>Tarp</b><br>Cover · r1 · 1×1<br><i>from P1</i></div><div class="tile"><span class="p">60c</span><b>Hedge</b><br>Privacy · r1 · 1×1<br><i>from P1</i></div><div class="tile"><span class="p">55c</span><b>Dog Bed</b><br>Dog · r2 · 1×1<br><i>from P1</i></div><div class="tile"><span class="p">110c</span><b>Guitar Stump</b><br>Music · r2 · 1×1<br><i>from P2</i></div><div class="tile"><span class="p">150c</span><b>Swing</b><br>Play · r2 · 2×1<br><i>from P4</i></div><div class="tile"><span class="p">275c</span><b>Telescope</b><br>Stars · r1 · 1×1<br><i>from L</i></div><div class="tile"><span class="p">100c</span><b>Platform</b><br>comfort +1 on a pad<br><i>from P2</i></div><div class="tile"><span class="p">300c</span><b>Stone Fire Pit</b><br>campfire Warmth r2→r3<br><i>from P5</i></div><div class="tile"><span class="p">150c</span><b>Fishing Rod</b><br>fishing at the pond<br><i>from P3</i></div></div>
+<h2>Board strip</h2>
+<p class="note">Each morning line up <b>open pads + 1</b> cards (+1 more on in-game
+weekends, days 6–7 of 7). Day 1 is scripted: two single-trait travellers.
+From day 6 every board must contain one conflicting pair
+(Social×Introvert, Loud×Light Sleeper, Night Owl×Stargazer). Families appear
+~1 night in 3 once ≥4 pads open; their card stays disabled with no free
+pad pair. Cards left in the tray at Goodnight leave politely — no penalty.</p>
+</div>
+<div class="sheet">
+<h2>Night log (one row per day)</h2>
+<table class="log"><tr><th>Day</th><th>Weather</th><th>Guests seated / stars</th>
+<th>Fees + tips</th><th>Walk-ins</th><th>Coins end</th><th>Pages / buys</th></tr>
+<tr><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>2</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>3</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>4</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>5</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>6</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>7</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>8</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>9</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>10</td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>
+<p class="note">Session questions (Phase -1 exit): did a night ever present a
+real trade-off (a guest you could not satisfy)? Did the board's conflicting
+pair change your layout? Which item did you save for and was it worth it?</p>
+</div>
