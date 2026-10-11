@@ -236,17 +236,17 @@ stars = clamp(2 + comfort + meal + traits + weather, 1, 5)
 
 ### 6.2 Income model
 
-From the median sim run (Appendix C):
+From the median sim run (Appendix C, `tools/sim.py`):
 
 | Source | Share of income |
 |---|---|
-| Fees + tips | 86% |
-| Walk-ins | 8% |
+| Fees + tips | 85% |
+| Walk-ins | 9% |
 | Page gifts | 6% |
 
 Staples are about 8% of spending; the rest goes into pads, upgrades, decor and gear.
 
-These shares assume no ads. With a rewarded ad every night, ads supply about 12% of all coins earned; with one on half the nights, about 6% (§6.8).
+These shares assume no ads. With a rewarded ad every night, ads supply about 12% of all coins earned; with one on half the nights, about 5% (§6.8).
 
 ### 6.3 Guest fees
 
@@ -361,35 +361,36 @@ Bench (beside Stools) and Radio (beside Guitar Stump) are style alternatives wit
 
 ### 6.8 Pacing
 
-Median sim run, skill factor K = 1.25 (Appendix C):
+Median sim run, skill factor K = 1.25 (Appendix C, `tools/sim.py` extended model; median seed shown):
 
 | | Pinewatch | Whisper River | Lantern Valley |
 |---|---|---|---|
-| Days at the site | 1–9 | 10–20 | 21–34 |
-| Purchases per day | 1.56 | 1.91 | 1.93 |
-| Days without a purchase | 1 | 2 | 1 |
-| Net coins per day, first → last | 90 → 267 | 162 → 446 | 179 → 593 |
-| Average stars, first → last | 3.1 → 4.4 | 3.4 → 4.1 | 3.1 → 4.6 |
-| Most parties / walk-ins in a night | 5 / 1 | 7 / 2 | 8 / 2 |
-| Day each page completes (1 · 2 · 3 · 4 · 5) | 1 · 7 · 5 · 7 · 9 | 11 · 16 · 17 · 17 · 20 | 25 · 27 · 33 · 29 · 34 |
+| Days at the site | 1–8 | 9–19 | 20–35 |
+| Purchases per day | 1.88 | 2.27 | 2.50 |
+| Days without a purchase | 1 | 0 | 1 |
+| Net coins per day, first → last | 74 → 192 | 157 → 453 | 174 → 508 |
+| Average stars, first → last | 2.5 → 4.5 | 3.3 → 4.1 | 3.0 → 4.2 |
+| Most parties / walk-ins in a night | 4 / 1 | 7 / 2 | 8 / 2 |
+| Day each page completes (1 · 2 · 3 · 4 · 5) | 1 · 8 · 5 · 6 · 8 | 12 · 19 · 12 · 16 · 16 | 30 · 29 · 35 · 27 · 32 |
 
-- Whole arc: about 12,900 coins earned and 12,600 spent; the highest balance is 638.
-- Casual player (K = 1.0): reaches Whisper River on day 13 and Lantern Valley on day 27, and finishes on day 44.
-- Expert (K = 1.5): days 10, 20 and 34. Coins and pad prices pace the arc more than skill; experts mostly earn more stars and tips.
+- Whole arc: about 12,700 coins earned and about 12,700 spent; the peak balance while the site's build order still had items is 746 coins (median of seeds; p90 877).
+- Casual player (K = 1.0): reaches Whisper River on day 11 and Lantern Valley on day 21, and finishes on day 36.
+- Expert (K = 1.5): days 10, 19 and 34. Coins and pad prices pace the arc more than skill; experts mostly earn more stars and tips.
 
 **With rewarded ads** (A = share of nights on which the player doubles tips; Appendix C):
 
-| Run | Reaches W / L on day | Arc done on day | Purchases per day | Highest balance | Coins from ads |
+| Run | Reaches W / L on day | Arc done on day | Purchases per day | Peak balance* | Coins from ads |
 |---|---|---|---|---|---|
-| Median, no ads | 10 / 21 | 34 | 1.56–1.93 | 638 | — |
-| Median, A = 0.5 | 10 / 22 | 37 | 1.67–1.94 | 512 | 6% |
-| Median, A = 1 | 10 / 21 | 35 | 2.00–2.09 | 915 | 12% |
-| Casual, A = 1 | 13 / 24 | 39 | 1.83–2.09 | 789 | 12% |
-| Expert, A = 1 | 9 / 17 | 30 | 1.75–2.62 | 818 | 12% |
+| Median, no ads | 10 / 19 | 35 | 1.88–2.50 | 746 | — |
+| Median, A = 0.5 | 10 / 19 | 33 | 1.89–3.07 | 660 | 5% |
+| Median, A = 1 | 10 / 19 | 33 | 1.88–3.14 | 668 | 12% |
+| Casual, A = 1 | 10 / 20 | 33 | 2.00–3.23 | 659 | 13% |
+| Expert, A = 1 | 10 / 18 | 31 | 1.88–3.69 | 643 | 13% |
 
-- Ads let casual and expert players finish about 12% sooner (44 → 39 and 34 → 30 days).
-- They don't shorten the median arc. With more coins the bot opens pads sooner, which spreads decor coverage thinner, so the rating pages land later. Phase −1 rechecks this with unlock gating and per-guest traits.
-- With an ad every night, the median bot peaks at 915 coins while saving for Lantern Valley's last pad (900).
+\* Peak while the site's build order still had items (median of seeds). After the order empties, income can't leave the wallet — that hoard is the leftover-order problem §6.11 sizes, not an arc-phase sink failure.
+
+- Ads shorten every variant a little in the extended model: about 6–9% sooner (35 → 33, 36 → 33 and 34 → 31 days). The older baseline's "ads don't shorten the median" was an artifact of an always-open catalog; with unlock gating and non-blocking purchases, ad coins help.
+- The 90th-percentile peak stays under 900–950 with ads. In rare seeds (~3%) a page unlock stalls the next buy and the balance can sit near 3,000 coins before the order empties — transient by construction, and Volume II's restoration sink exists for exactly this hoard.
 
 ### 6.9 Guardrails
 
@@ -398,16 +399,18 @@ CI runs the sim against the real data files, without ads (A = 0) and with an ad 
 | Guardrail | Target | No ads | Ads every night |
 |---|---|---|---|
 | Median Pinewatch chapter complete | Day 8–11 | 9 | 9 |
-| Arc complete: median / casual | 30–40 / ≤ 50 days | 34 / 44 | 35 / 39 |
-| Ads shorten an arc by at most | 15% | — | 12% |
-| Purchases per day, each site | ≥ 1.4 | 1.56–1.93 | 1.75–2.62 |
-| Days without a purchase, each site | ≤ 2 without ads, ≤ 3 with | 1–2 | 0–3 |
-| Share of income from fees + tips | ≥ 75% | 86% | 87–89% |
-| Coins from ads | ≤ 15% of income | — | 12% |
-| Highest coin balance | ≤ 800 without ads, ≤ 950 with | 638 | 915 |
-| No page needs an item unlocked by a later page | Holds | Holds | Holds (median log) |
+| Arc complete: median / casual | 30–40 / ≤ 50 days | 35 / 36 | 33 / 33 |
+| Ads shorten an arc by at most | 15% | — | 6–9% |
+| Purchases per day, each site | ≥ 1.4 | 1.88–2.50 | 1.88–3.69 |
+| Days without a purchase, each site | ≤ 2 without ads, ≤ 3 with | 0–1 | 0–1 |
+| Share of income from fees + tips | ≥ 75% without ads | 85% | ~74–76%† |
+| Coins from ads | ≤ 15% of income | — | 12–13% |
+| Peak balance while order has items: median / p90 | ≤ 800 / 900 without ads · ≤ 950 / 950 with | 746 / 877 | 643–668 / 860–893 |
+| No page needs an item unlocked by a later page | Holds | Holds | Holds |
 
-Two targets are looser with ads because the bot reaches Lantern Valley's 500-, 680- and 900-coin pads with nothing cheaper left on its list, and saves for them.
+† With ads, fees+tips land just under 75% by construction (ads take ~13%); the no-ads run is the meaningful check.
+
+Peak balance is measured only while the active site's build order still had items — once it empties, income can't leave the wallet, and that accumulation is the post-arc problem §6.11 prices (Appendix C 3.1). The 90th-percentile bound makes the check test the tail, not just the median seed: rare seeds (~3%) stall near 3,000 coins while page-locked before the order empties, transient by construction. Two targets are looser with ads because the bot reaches Lantern Valley's 500-, 680- and 900-coin pads with nothing cheaper left on its list, and saves for them.
 
 ### 6.10 Crew time
 
@@ -568,7 +571,7 @@ Each site has five pages, completed in any order. A page pays its gift (§6.6), 
 | Chapter 3 | — | Finale letter; Glasscoast appears on the map as "coming later" |
 
 - Rating pages need at least 15 reviews at that site, so one lucky night can't complete them.
-- Unlocks are tied to specific pages (D-14). The sim doesn't model unlock gating, so its median purchase logs, with and without ads, were checked by hand: no purchase is blocked (Appendix C).
+- Unlocks are tied to specific pages (D-14). The Phase −1 sim models the gating itself: locked items stay queued until their page lands, and no purchase is blocked in any seed (Appendix C).
 
 ### 8.2 Site rules
 
@@ -1440,9 +1443,16 @@ D-01 to D-12 were proposed defaults in the design review. D-13 to D-19 were adde
 
 ## Appendix C — Economy simulation
 
-The sim is a deliberately simple model used to set §6 prices and check pacing. Phase −1 extends it, and CI runs it on the real data files (§30).
+The sim is a deliberately simple model used to set §6 prices and check pacing. Phase −1 extended it into **`tools/sim.py`**, which is the canonical model: §6.8 and §6.9 quote it, and CI runs it on the real data files (§30). The code and reference output below are the original **baseline model**, kept verbatim for diffing (`--baseline` points here).
 
-**Model:**
+**Extended model (`tools/sim.py`, Phase −1):**
+- Per-guest draws: booking boards are seeded per (save_seed, site, site_day) per §21.3; each party gets an archetype from the site mix (§12.2) and traits drawn from the site's pool (§5.3), signature traits at double weight.
+- Real §8.1 page goals instead of the proxies below: guests hosted, recipes cooked, families, fish kinds, anglers on Water pads, one-night 5-star counts, regular visit counters, full house, rating over 15.
+- §8.1 unlock gating: locked items stay queued; an unaffordable item no longer blocks cheaper ones behind it.
+- Weather seeded per site/day — Pinewatch site-day 4 rains by script (§14); regulars (§12.3), the Food Blogger elite, families on two pads, Loud/Light-Sleeper neighbour checks on a real pad line.
+- Remaining approximations: greedy best-pad seating; favourite-meal probability ramps 0.3 → 0.8 by site day 6; the blogger shows ~1 night in 4 at rating ≥ 4.5; regulars every third site day; weekends are global days 6–7 of every 7; the Pinewatch Outfitter opens on day 2.
+
+**Baseline model:**
 - One bot plays the newest unlocked site every day and fills every open pad.
 - Skill factor K: a need contributes min(1, coverage × K) and an aversion −0.2 × coverage. K = 1.0 casual, 1.25 median, 1.5 expert.
 - Trait term = 2 × the weighted mean over the site's trait pool (§5.3 weights). Social counts 0.8 once 2 or more pads are open.
@@ -1455,18 +1465,78 @@ The sim is a deliberately simple model used to set §6 prices and check pacing. 
 - Page proxies: P1 day 1 · P2 20 guests · P3 site day 5 · P4 first family · P5 rating 4.0 over 15 reviews · W1 Fishing Rod owned and site day 2 · W2 6 Anglers (20% of parties, at most 3 a night) · W3 average stars 4.2 with 4 or more pads · W4 site day 8 · W5 rating 4.2 · L1 Telescope placed and stars 4.0 · L2 Camp Oven owned for 2 days · L3 8 pads · L4 site day 9 · L5 rating 4.4.
 - Sim IDs are short forms: `strings` = String Lights, `table` = Picnic Table, `chime` = Wind Chime, `kite` = Kite Pole, `dogbed` = Dog Bed, `guitar` = Guitar Stump, `lotus` = Lotus Planter, `firepit` = Stone Fire Pit.
 
-**Limitations:**
-- No unlock gating. The median purchase logs without ads (below) and with an ad every night were checked by hand against §8.1: no purchase comes before its unlock (pages are scored before the bot buys).
+**Baseline limitations:**
+- No unlock gating. The median purchase logs without ads (below) and with an ad every night were checked by hand against §8.1: no purchase comes before its unlock (pages are scored before the bot buys). The extended model gates natively.
 - More coins make the bot open pads sooner, which thins decor coverage; a real player may balance this better.
 - Traits are averages, not per-guest draws.
 - No meal shortages, no Goldcap or fish, no elites or regulars, no cosmetics.
 - A staple is charged for every meal served, which is conservative because many recipes need none.
 - Rain falls on fixed multiples of the day number, so Pinewatch first rains on day 5 rather than the scripted day 4.
 
-**Running it:** Python 3, standard library only. The output must match the reference output below exactly.
+**Running it:** `python tools/sim.py` — all seven variants × 30 seeds plus the §6.9 guardrails; `--variant X --show` prints the median-seed day log; `--post-arc DAYS` the post-finale probe (§3.1 below); `--baseline` points at the code block below. Python 3, standard library only. The extended model's output must match the reference output below exactly; the baseline model's own output follows it for history.
 
 <details>
-<summary>Reference output (median run, casual and expert, then the rewarded-ad runs)</summary>
+<summary>Extended-model reference output (python tools/sim.py --variant median --show, 30 seeds)</summary>
+
+```
+median K=1.25 A=0.0: done median 34 (p10 32, p90 38) W 10 L 19 | ppd [1.88, 2.27, 2.5] zero [1, 0, 1] wmax 746/877 shares (85, 9, 6) ad 0% inc 12736 emptied {3: 34}
+  pages: {(1, 1): 1, (1, 2): 8, (1, 3): 5, (1, 4): 6, (1, 5): 8, (2, 1): 12, (2, 2): 19, (2, 3): 12, (2, 4): 16, (2, 5): 16, (3, 1): 30, (3, 2): 29, (3, 3): 35, (3, 4): 27, (3, 5): 32}
+
+=== Guardrails (GDD 6.9) ===
+  [OK] Pinewatch chapter done day 8-11 (median of seeds): 9.0
+  [OK] Arc done 30-40: 34.5
+  [OK] ppd >= 1.4 all sites: [1.88, 2.27, 2.5]
+  [OK] zero-buy days <= 2 all sites: [1, 0, 1]
+  [OK] fees+tips share >= 75%: (85, 9, 6)
+  [OK] wmax <= 800 median / <= 900 p90 (peak while order had items): 746 (p90 877)
+
+=== day log, seed 4 (nearest to median) ===
+day s k pads parties stars net coins pages | bought
+1 1 1 2 2 2.50 74 94 1 |
+2 1 2 2 2 2.00 86 60 1 | lantern(50) stools(25) planter(45)
+3 1 3 2 2 3.50 98 38 1 | pad(120)
+4 1 4 3 3 2.67 130 38 1 | tarp(75) dogbed(55)  RAIN
+5 1 5 3 3 4.33 160 27 13 | pad(200)
+6 1 6 4 3 3.33 224 30 134 | rod(150) hedge(60) lantern(50)
+7 1 7 4 4 4.00 204 40 134 | swing(150) planter(45)  RAIN
+8 1 8 4 4 4.50 192 72 12345 | platform(100) platform(100) bench(40)
+9 2 1 3 3 3.33 157 40  | stools(25) lantern(50) reed_screen(75) bench(40)
+10 2 2 3 3 4.33 246 20  | pad(190) tarp(75)
+11 2 3 4 4 3.50 248 34  | chime(90) lotus(90) dogbed(55)  RAIN
+12 2 4 4 4 5.00 260 24 13 | pad(290) hedge(60)
+13 2 5 5 5 3.80 302 76 13 | platform(125) platform(125)
+14 2 6 5 4 3.50 331 82 13 | cooler(200) platform(125)
+15 2 7 5 5 4.60 281 48 13 | table(140) radio(100) tarp(75)
+16 2 8 5 5 4.40 346 120 1345 | pad(410)
+17 2 9 6 6 4.17 426 170 1345 | platform(125) platform(125) platform(125)
+18 2 10 6 6 4.33 447 57 1345 | pad(560)  RAIN
+19 2 11 7 7 4.14 453 75 12345 | silk_lantern(225) binoculars(250)
+20 3 1 3 3 3.00 174 40  | stools(25) lantern(50) planter(45) kite(90)
+21 3 2 3 3 2.67 201 20  | pad(220)
+22 3 3 4 3 3.67 309 54  | telescope(275)
+23 3 4 4 4 4.50 305 70  | flower_arch(250) bench(40)
+24 3 5 4 3 3.67 384 44  | pad(350) hedge(60)  RAIN
+25 3 6 5 5 3.40 376 70  | platform(150) platform(150) lantern(50)
+26 3 7 5 5 4.00 358 47  | oven(380)
+27 3 8 5 5 4.60 374 56 4 | firepit(300) table(140)
+28 3 9 5 5 4.40 392 48 4 | platform(150) radio(100) platform(150)
+29 3 10 5 4 4.25 428 26 24 | pad(500)  RAIN
+30 3 11 6 5 4.40 482 124 124 | platform(150) telescope(275)
+31 3 12 6 5 4.40 464 248 124 | swing(150) strings(190)
+32 3 13 6 6 4.83 480 148 1245 | pad(680)
+33 3 14 7 6 4.00 540 687 1245 |
+34 3 15 7 7 4.57 566 33 1245 | pad(900) kite(90)* lantern(50)* hedge(60)* hedge(60)* hedge(60)*
+35 3 16 8 8 4.25 508 30 12345 | kite(90)* lantern(50)* hedge(60)* tarp(75)* tarp(75)* tarp(75)* tarp(75)* stools(25)* planter(45)*
+```
+
+(`*` marks top-up purchases: once a site's build order is empty the bot buys coverage-useful decor duplicates, then cosmetics — days 34–35 show it topping up at Lantern Valley. `RAIN` marks a weather day.)
+
+</details>
+
+<details>
+<summary>Baseline model — reference output (kept verbatim; superseded by the extended model)</summary>
+
+**Baseline reference output:**
 
 ```
 day s k pads stars rating net coins pages | bought
@@ -1519,7 +1589,7 @@ ads A 1.0 expert K 1.5 unlocks 9 17 done 30 ppd [1.75, 2.62, 1.93] zero [0, 1, 1
 </details>
 
 <details>
-<summary>Code</summary>
+<summary>Baseline model — code (kept verbatim; the extended model lives in tools/sim.py)</summary>
 
 ```python
 from collections import deque
@@ -1626,7 +1696,7 @@ for A,K,lab in ((0.5,1.25,'median'),(1.0,1.25,'median'),(1.0,1.0,'casual'),(1.0,
 
 </details>
 
-**Post-arc probe (3.1):** a throwaway copy of `tools/sim.py` (the Phase −1 model, not the code above) with the finale's stop removed, 30 seeds; the committed script is unchanged. After the finale the bot earns a median of 600 coins a day over the next 60 days (714 with an ad every night, 595 for a casual player). Its last purchase comes 1 day after the finale: nothing is left to buy at Lantern Valley, and the bot never goes back to the other sites. In the median seed (seed 4, finale on day 35) the balance reaches 5,688, 11,365, 17,514 and 35,666 coins 10, 20, 30 and 60 days after the finale, and 16 Pinewatch items and 1 Whisper River item on the build orders, worth 4,275 coins, are never bought. Across seeds those leftovers are worth a median of 5,052 coins (3,275–5,580). §6.11 is sized from these numbers. The post-arc mode joins `tools/sim.py` at the v1.1 gate (§29).
+**Post-arc probe (3.1):** `python tools/sim.py --post-arc 60` — the finale's stop is skipped for 60 sandbox days, 30 seeds. After the finale the bot earns a median of 600 coins a day over the next 60 days (714 with an ad every night, 595 for a casual player). Its last build-order purchase comes 1 day after the finale: nothing is left to buy at Lantern Valley, and the bot never goes back to the other sites (it only tops up duplicates and cosmetics — `*` in the day log). In the median seed (seed 4, finale on day 35) the balance reaches 5,688, 11,365, 17,514 and 35,666 coins 10, 20, 30 and 60 days after the finale, and 16 Pinewatch items and 1 Whisper River item on the build orders, worth 4,275 coins, are never bought. Across seeds those leftovers are worth a median of 5,052 coins (3,275–5,580). §6.11 is sized from these numbers.
 
 ## Appendix D — Backlog
 

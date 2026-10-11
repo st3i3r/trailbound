@@ -24,8 +24,10 @@ See GDD §20 and §24.
 ## Layout
 
 ```
-game/         Godot project (lands in Phase 0 — the production app)
-tools/        pixellab_gen.py (PixelLab REST); the sim, content lint and Daily solver join later
+game/         Godot 4.7 project (Phase 0 scaffold — autoloads, data/, export preset)
+tools/        sim.py (Phase -1 economy sim, --post-arc mode), paper_kit.py,
+              pixellab_gen.py (PixelLab REST), slice_sheet.py + png.py (sheet tools);
+              content lint and Daily solver join later
 assets_src/   source art from the tools, before import — never shipped
 docs/         GDD, dev workflow, reference/ (style targets)
 LEGAL/        PRIVACY.md, TERMS.md drafts (needed for the Play listing)
@@ -36,11 +38,15 @@ removed in the v3.0 hard break (GDD D-22); they live in git history.
 
 ## Develop
 
-Godot project: not yet scaffolded — `game/` lands in Phase 0
-(`docs/DEV_WORKFLOW.md` §4).
+Godot project: `game/` is the Phase 0 scaffold — `godot --headless --path game`
+imports clean and a debug AAB export is proven (see `docs/DEV_WORKFLOW.md` §4
+for the toolchain paths and the Gradle-template gotchas).
 
-Economy sim: Python 3, standard library only — the code and its reference
-output live in GDD Appendix C.
+Economy sim: `python tools/sim.py` runs all variants and the §6.9 guardrails
+(`--variant median --show` prints a day log, `--post-arc 60` the post-finale
+probe). Python 3, standard library only; the older reference model stays
+embedded in GDD Appendix C. Headless crew-clock checks:
+`godot --headless --path game tests/test_crew.tscn`.
 
 ## Asset pipeline
 

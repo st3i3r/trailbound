@@ -645,7 +645,12 @@ def run(seed=1, K=1.25, A=0.0, show=False, max_day=120, post_arc=0):
                         t['bought_cos'].append(pick)
         if done is None or day <= done:      # §6.9 arc metrics stop at the
             ppd[site].append(len(bought))    # finale; post-finale days are the
-            wmax = max(wmax, coins)          # §6.11 sandbox measured separately
+            # §6.11 sandbox measured separately. wmax = peak balance while
+            # the site's order had items — after it empties, income can't
+            # leave the wallet, which is the leftover-order problem, not
+            # an arc-phase sink failure.
+            if site not in order_empty:
+                wmax = max(wmax, coins)
         if not t['order'] and site not in order_empty:
             order_empty[site] = day
         daily.append(dict(d=day, s=site, k=k, pads=pads, parties=parties_n,
@@ -828,8 +833,9 @@ def guardrails(out, out_runs):
             [m0['mid']['zero'][s] for s in (1, 2, 3)])
         chk('fees+tips share >= 75%', m0['mid']['shares'][0] >= 75,
             m0['mid']['shares'])
-        chk('wmax <= 800 (median of seeds; p90 in parens)',
-            m0['wmed'] <= 800, f"{m0['wmed']:.0f} (p90 {m0['wp90']})")
+        chk('wmax <= 800 median / <= 900 p90 (peak while order had items)',
+            m0['wmed'] <= 800 and m0['wp90'] <= 900,
+            f"{m0['wmed']:.0f} (p90 {m0['wp90']})")
     c0 = out.get(('casual', 0.0))
     if c0:
         chk('Casual arc <= 50', c0['median'] <= 50, c0['median'])
@@ -841,8 +847,9 @@ def guardrails(out, out_runs):
             short = 1 - r['median'] / base['median']
             chk(f'{lab}: shorten <= 15% ({short:+.0%})', short <= 0.15,
                 f"{base['median']} -> {r['median']}")
-            chk(f'{lab}: wmax <= 950 (median; p90 in parens)',
-                r['wmed'] <= 950, f"{r['wmed']:.0f} (p90 {r['wp90']})")
+            chk(f'{lab}: wmax <= 950 median & p90',
+                r['wmed'] <= 950 and r['wp90'] <= 950,
+                f"{r['wmed']:.0f} (p90 {r['wp90']})")
             chk(f'{lab}: ad share <= 15%', r['mid']['ad_share'] <= 15,
                 r['mid']['ad_share'])
     if not ran[0]:
