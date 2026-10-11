@@ -1,3 +1,14 @@
-[
-  {"site_id": "pinewatch", "pads": 8, "start_open": 2, "tags": {}, "note": "cells, neighbours, bank cells, errand spots, lookout — Phase 0 layout work (GDD 21.2)"}
-]
+{
+  "site_id": "pinewatch",
+  "camp_core_max_cells": [10, 4],
+  "pads": {"total": 8, "start_open": 2, "spots": [], "neighbours": {}, "tags": {}},
+  "bank_cells": [],
+  "errand_spots": [],
+  "lookout": null,
+  "crew_plots": [
+    {"id": "crew_structure", "structure": "wardens_hut", "kind": "structure", "cells": []},
+    {"id": "vol2_plot_a", "kind": "reserved_overgrown", "cells": []},
+    {"id": "vol2_plot_b", "kind": "reserved_overgrown", "cells": []}
+  ],
+  "note": "pad spots, neighbour lists, tags, errand/lookout cells — Phase 0/1 layout work (§5.1, §21.2); crew plots sit outside the 10x4 camp core"
+}

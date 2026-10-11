@@ -1,1 +1,5 @@
-[]
+[
+  {"id": "porch_light", "label": "Porch light", "trigger": "crew_restored:wardens_hut", "tier": "S", "art": null},
+  {"id": "boat_on_the_river", "label": "Boat on the river", "trigger": "crew_restored:boathouse", "tier": "S", "art": null},
+  {"id": "lanterns_over_the_valley", "label": "Lanterns over the valley", "trigger": "crew_restored:lantern_workshop", "tier": "S", "art": null}
+]

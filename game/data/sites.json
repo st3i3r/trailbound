@@ -5,14 +5,41 @@
     "chapter": 1,
     "start_pads": 2,
     "max_pads": 8,
-    "pad_prices": [120, 200, 300, 420, 580, 750],
+    "pad_prices": [
+      120,
+      200,
+      300,
+      420,
+      580,
+      750
+    ],
     "platform_price": 100,
     "cabin_price": null,
     "rain_chance": 0.2,
     "meal_price": 18,
-    "page_gifts": [20, 30, 30, 40, 50],
-    "trait_pool": {"chilly": 3, "social": 2, "introvert": 2, "nature_lover": 2, "dog_lover": 2, "night_owl": 2, "music_lover": 1, "light_sleeper": 2},
-    "archetype_mix": {"hiker": 35, "scout": 20, "couple": 45}
+    "page_gifts": [
+      20,
+      30,
+      30,
+      40,
+      50
+    ],
+    "trait_pool": {
+      "chilly": 3,
+      "social": 2,
+      "introvert": 2,
+      "nature_lover": 2,
+      "dog_lover": 2,
+      "night_owl": 2,
+      "music_lover": 1,
+      "light_sleeper": 2
+    },
+    "archetype_mix": {
+      "hiker": 35,
+      "scout": 20,
+      "couple": 45
+    },
+    "crew_structure": "wardens_hut"
   },
   {
     "id": "whisper_river",
@@ -20,14 +47,45 @@
     "chapter": 2,
     "start_pads": 3,
     "max_pads": 8,
-    "pad_prices": [190, 290, 410, 560, 750],
+    "pad_prices": [
+      190,
+      290,
+      410,
+      560,
+      750
+    ],
     "platform_price": 125,
     "cabin_price": 275,
     "rain_chance": 0.25,
     "meal_price": 25,
-    "page_gifts": [30, 40, 50, 60, 75],
-    "trait_pool": {"chilly": 2, "social": 1, "introvert": 2, "nature_lover": 1, "dog_lover": 1, "night_owl": 2, "music_lover": 2, "light_sleeper": 2, "angler": 3, "shutterbug": 2},
-    "archetype_mix": {"hiker": 25, "scout": 25, "couple": 10, "van_lifer": 10, "angler": 20, "photographer": 10}
+    "page_gifts": [
+      30,
+      40,
+      50,
+      60,
+      75
+    ],
+    "trait_pool": {
+      "chilly": 2,
+      "social": 1,
+      "introvert": 2,
+      "nature_lover": 1,
+      "dog_lover": 1,
+      "night_owl": 2,
+      "music_lover": 2,
+      "light_sleeper": 2,
+      "angler": 3,
+      "shutterbug": 2
+    },
+    "archetype_mix": {
+      "hiker": 25,
+      "scout": 25,
+      "couple": 10,
+      "van_lifer": 10,
+      "angler": 20,
+      "photographer": 10
+    },
+    "crew_structure": "boathouse"
   },
   {
     "id": "lantern_valley",
@@ -35,13 +93,44 @@
     "chapter": 3,
     "start_pads": 3,
     "max_pads": 8,
-    "pad_prices": [220, 350, 500, 680, 900],
+    "pad_prices": [
+      220,
+      350,
+      500,
+      680,
+      900
+    ],
     "platform_price": 150,
     "cabin_price": 325,
     "rain_chance": 0.1667,
     "meal_price": 30,
-    "page_gifts": [40, 50, 60, 75, 100],
-    "trait_pool": {"chilly": 2, "social": 1, "introvert": 1, "nature_lover": 2, "dog_wary": 1, "night_owl": 1, "music_lover": 1, "light_sleeper": 1, "stargazer": 2, "shutterbug": 2},
-    "archetype_mix": {"hiker": 20, "scout": 20, "couple": 15, "van_lifer": 10, "photographer": 10, "cyclist": 25}
+    "page_gifts": [
+      40,
+      50,
+      60,
+      75,
+      100
+    ],
+    "trait_pool": {
+      "chilly": 2,
+      "social": 1,
+      "introvert": 1,
+      "nature_lover": 2,
+      "dog_wary": 1,
+      "night_owl": 1,
+      "music_lover": 1,
+      "light_sleeper": 1,
+      "stargazer": 2,
+      "shutterbug": 2
+    },
+    "archetype_mix": {
+      "hiker": 20,
+      "scout": 20,
+      "couple": 15,
+      "van_lifer": 10,
+      "photographer": 10,
+      "cyclist": 25
+    },
+    "crew_structure": "lantern_workshop"
   }
 ]

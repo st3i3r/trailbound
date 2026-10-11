@@ -27,6 +27,18 @@ func load_all() -> PackedStringArray:
 			errors.append("%s: invalid JSON" % file)
 			continue
 		data[stem] = parsed
+	data["layouts"] = {}
+	for file in DirAccess.get_files_at(DATA_DIR + "layouts/"):
+		if not file.ends_with(".json"):
+			continue
+		var parsed: Variant = JSON.parse_string(
+			FileAccess.get_file_as_string(DATA_DIR + "layouts/" + file))
+		if parsed is Dictionary and parsed.has("site_id"):
+			data["layouts"][parsed["site_id"]] = parsed
+		elif parsed == null:
+			errors.append("layouts/%s: invalid JSON" % file)
+		else:
+			errors.append("layouts/%s: missing site_id" % file)
 	return errors
 
 

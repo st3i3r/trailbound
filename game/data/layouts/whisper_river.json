@@ -1,0 +1,14 @@
+{
+  "site_id": "whisper_river",
+  "camp_core_max_cells": [10, 4],
+  "pads": {"total": 8, "start_open": 3, "spots": [], "neighbours": {}, "tags": {"water": []}},
+  "bank_cells": [],
+  "errand_spots": [],
+  "lookout": null,
+  "crew_plots": [
+    {"id": "crew_structure", "structure": "boathouse", "kind": "structure", "cells": []},
+    {"id": "vol2_plot_a", "kind": "reserved_overgrown", "cells": []},
+    {"id": "vol2_plot_b", "kind": "reserved_overgrown", "cells": []}
+  ],
+  "note": "bank cells along the water (§5.1); crew plots outside the camp core"
+}
