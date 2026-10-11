@@ -2,14 +2,14 @@
 
 | | |
 |---|---|
-| Version | 3.0 — draft for approval |
+| Version | 3.1 — draft for approval |
 | Date | 2026-10-11 |
 | Platform | Android (Google Play), landscape, phones and tablets |
 | Engine | Godot 4 (typed GDScript), 2D, Compatibility renderer |
 | Languages | English, Vietnamese |
 | Supersedes | The 2.x design and the café-era plans, removed from the repo (D-22) |
 
-This document is the single source of truth for v1. Earlier designs and the café-era plans were removed in a hard break (D-22) and live only in git history.
+This document is the single source of truth for v1 and the plan after launch (§33). Earlier designs and the café-era plans were removed in a hard break (D-22) and live only in git history.
 
 **Conventions**
 
@@ -26,7 +26,7 @@ This document is the single source of truth for v1. Earlier designs and the caf�
 - Content: 11 Sites · 12 Cast · 13 Narrative · 14 Onboarding · 15 Vietnamese signature
 - Presentation: 16 Art direction · 17 UI and UX · 18 Audio · 19 Localization
 - Technology: 20 Stack · 21 Architecture and data · 22 Save system · 23 Performance budgets · 24 Monetization · 25 Analytics and KPIs · 26 Privacy, compliance and store
-- Production: 27 Scope · 28 Assets and pipeline · 29 Roadmap and gates · 30 Testing · 31 Launch · 32 Risks
+- Production: 27 Scope · 28 Assets and pipeline · 29 Roadmap and gates · 30 Testing · 31 Launch · 32 Risks · 33 After launch
 - Appendices: A Decision log · B Open questions · C Economy simulation · D Backlog · E Glossary · F Changelog
 
 ---
@@ -41,8 +41,8 @@ This document is the single source of truth for v1. Earlier designs and the caf�
 | Audience | 13+; cozy and light-puzzle players on phones |
 | Comparables | Good Pizza, Great Pizza (service loop) · Mini Motorways (placement under constraints) · Unpacking (calm, tactile) · Eastward (look) |
 | Session | One in-game day takes about 4–6 minutes; safe to stop at any phase |
-| Length | Main arc of about 34 in-game days for a median player (about 2.5–3.5 hours), then sandbox play and the Trail Daily |
-| Business model | Free to play and ad-supported: an opt-in rewarded ad on the Night summary, an occasional interstitial between days, and a one-time Remove Ads purchase (§24). All three sites are free. No energy, premium currency, timers or paywalled content |
+| Length | Main arc of about 34 in-game days for a median player (about 2.5–3.5 hours), then sandbox play and the Trail Daily. Volume II adds about 30 more days in v1.1 (§33) |
+| Business model | Free to play and ad-supported: opt-in rewarded ads (Double tips on the Night summary, and a crew speed-up), an occasional interstitial between days, and a one-time Remove Ads purchase (§24). All three sites are free. No energy, premium currency or paywalled content; the only timers are the optional crew builds (§8.4) |
 | Look | Eastward-style 3/4 top-down pixel art; mood from 2D lighting |
 | Signature | A quiet Vietnamese layer in food, props, nature and sound (§15) |
 | Team | One full-time developer, AI-assisted art with manual cleanup, licensed or CC0 audio. Re-plan after Phase 1 (§29) |
@@ -55,7 +55,7 @@ Your grandfather was the Grand Trail's last warden. He kept a chain of rest stop
 
 So you rebuild, one site at a time. Relight the fire, host travelers, earn and reshape the camp until the site earns its stars, then follow the trail to the next one. Each site is a chapter: a forest camp, a river camp with a dock, a valley meadow under the stars. Travelers return, the trail wakes up, and the journal fills in.
 
-v1 ships three sites: Pinewatch Forest, Whisper River and Lantern Valley. Grandpa's margin notes foreshadow Glasscoast and a hidden cove (Appendix D).
+v1 ships three sites: Pinewatch Forest, Whisper River and Lantern Valley. At each one, Ranger Mai's volunteer crew restores one of grandpa's old structures, and every finished stage turns up a keepsake from his life (§8.4). Grandpa's margin notes foreshadow Glasscoast and a hidden cove (Appendix D).
 
 | Design need | What the story provides |
 |---|---|
@@ -63,6 +63,7 @@ v1 ships three sites: Pinewatch Forest, Whisper River and Lantern Valley. Grandp
 | A goal beyond money | Finish the journal: pages, guests, field notes, recipes |
 | Emotional hook | Restoration and hospitality — cozy, not conquest |
 | Pacing | A letter from grandpa on most mornings |
+| A reason to come back tomorrow | The crew's restorations, which finish in real time (§8.4) |
 | Content runway | The margins tease the coast and the cove |
 
 **Tone:** warm, quiet, gently funny. Modern characters (hoodies, thermoses, film cameras) and no magic. The companion is a stray dog who adopts you on the first night — not a familiar, just a good dog who sometimes digs up mushrooms.
@@ -75,7 +76,7 @@ v1 ships three sites: Pinewatch Forest, Whisper River and Lantern Valley. Grandp
 |---|---|---|
 | 1. Every evening is a small, fair puzzle | Deterministic scoring, a full preview before committing, conflicts designed into every board | Hidden stats, random rolls, placement timers, a Charm stat |
 | 2. The camp is the reward | Every coin becomes something visible that changes tomorrow's puzzle | Stat sticks, consumable boosts, premium currency |
-| 3. No pressure, still thinking | No fail state, debt or clock; the player advances the day | Energy, streak penalties, upkeep and decay, FOMO, ads that interrupt a phase |
+| 3. No pressure, still thinking | No fail state, debt or deadline; the player advances the day. The only real-time element is the optional crew (§8.4): it never blocks the arc and never expires | Energy, timers on the arc's critical path, streak penalties, upkeep and decay, FOMO, ads that interrupt a phase |
 | 4. Alive in ten seconds, remembered forever | An inhabited cold open; nights replay your camp; everything becomes a journal entry | Menu-first starts, popup tutorials, invisible progress |
 
 ## 4. Core loop
@@ -85,9 +86,10 @@ v1 ships three sites: Pinewatch Forest, Whisper River and Lantern Valley. Grandp
 | Moment | Seconds | Drag a guest onto a pad and watch the stars change | Instant, readable feedback |
 | Day | 4–6 min | Prep the camp, seat the guests, watch the night | Coins, reviews, a vignette |
 | Chapter | About 9–14 days | Complete a site's five journal pages | The next site, a story beat |
-| Arc | About 34 days | Three chapters | The finished journal; sandbox and Trail Daily |
+| Arc | About 34 days | Three chapters | The finished journal; sandbox and Trail Daily; Volume II from v1.1 (§33) |
+| Crew (beside the loop) | Hours of real time | Collect a finished stage, which starts the next | A keepsake; in the end a restored structure (§8.4) |
 
-A day has four phases. The player ends each phase with one button; nothing runs on a clock.
+A day has four phases. The player ends each phase with one button; nothing in a day runs on a clock. Only the crew works in real time, beside the day (§8.4).
 
 | Phase | Player does | Typical time | Ends with |
 |---|---|---|---|
@@ -99,7 +101,7 @@ A day has four phases. The player ends each phase with one button; nothing runs 
 - Lighting follows the phase, not a clock (§16.3).
 - Day 1 starts in Prep; there is no Morning on day 1 (§14).
 - Quitting at any point resumes the same phase (§22).
-- Ads appear only on the Night summary (an opt-in rewarded ad) and between Sleep and the next Morning (§24).
+- Ads appear only when the player taps a rewarded offer (Double tips on the Night summary, or a crew speed-up) and between Sleep and the next Morning (§24).
 
 ## 5. Hosting
 
@@ -110,7 +112,7 @@ A day has four phases. The player ends each phase with one button; nothing runs 
 - A pad fills 1 cell. Tent, platform and cabin art may overhang upward.
 - Decor fills 1 cell, except four 2×1 items: Picnic Table, String Lights, Flower Arch and Swing.
 - The camp core (pads, campfire and decor cells) is at most 10×4 cells, so the whole puzzle fits above the booking tray in a 640-px-wide view. Validate in Phase 1.
-- Each site layout defines its pad spots, a hand-authored neighbour list (2–3 neighbours per pad), pad tags (Water, View), errand spots and a lookout. Whisper River also marks bank cells along the water.
+- Each site layout defines its pad spots, a hand-authored neighbour list (2–3 neighbours per pad), pad tags (Water, View), errand spots, a lookout and the crew plots outside the camp core (§8.4). Whisper River also marks bank cells along the water.
 - An item affects a pad when any pad cell is within the item's radius of any item cell (Chebyshev distance; r1 means the 8 surrounding cells).
 - Layout rule, enforced by a lint: an r1 item can reach about 2 pads, an r2 item about 4.
 - Every site has a built-in campfire: Warmth r2, reaching about 3 pads. The Stone Fire Pit upgrade raises it to r3.
@@ -228,8 +230,9 @@ stars = clamp(2 + comfort + meal + traits + weather, 1, 5)
 - No debt, upkeep, decay or price changes.
 - Anything bought today can be returned for a full refund until Goodnight. Build mode (place, move, store, return) works in Prep and in the Evening. Items bought on earlier days can be moved or stored for free but not sold.
 - Pads, upgrades and decor belong to their site. Gear, staples and catalog unlocks are global.
-- Coins come only from guest fees and tips, walk-ins buying leftovers, page gifts, and the optional rewarded ad that doubles a night's tips (§6.4). There is no raw selling.
+- Coins come only from guest fees and tips, walk-ins buying leftovers, page gifts, and the optional rewarded ad that doubles a night's tips (§6.4). There is no raw selling. Volume II (v1.1) adds a Gathering bonus (§6.11).
 - Cosmetics have no effect and are left out of the sim.
+- The crew (§8.4) costs and pays no coins in v1, so the sim leaves it out. Coins never buy crew time; only rewarded ads speed it up (§6.10).
 
 ### 6.2 Income model
 
@@ -406,6 +409,68 @@ CI runs the sim against the real data files, without ads (A = 0) and with an ad 
 
 Two targets are looser with ads because the bot reaches Lantern Valley's 500-, 680- and 900-coin pads with nothing cheaper left on its list, and saves for them.
 
+### 6.10 Crew time
+
+The crew (§8.4) is the game's only real-time system. Its times live here with the other numbers, and in Remote Config with these defaults built in (§24).
+
+| Structure | Site | Stage 1 | Stage 2 | Stage 3 | Total |
+|---|---|---|---|---|---|
+| Warden's Hut | Pinewatch | 10 min | 4 h | 8 h | 12 h 10 min |
+| Boathouse | Whisper River | 1 h | 4 h | 8 h | 13 h |
+| Lantern Workshop | Lantern Valley | 2 h | 6 h | 12 h | 20 h |
+
+**Speed-up** (a rewarded ad, §24):
+- Each ad removes one chunk of the current stage: chunk = max(15 min, stage time ÷ 6). The button shows it ("▶ −40 min").
+- At most 3 speed-ups per stage and 6 per calendar day. Finish is free once 5 minutes or less remain.
+- Three speed-ups halve any stage of 90 minutes or more, so ads shorten waits but never remove them. Coins never buy time.
+
+| Stage time | Chunk | Left after 3 speed-ups |
+|---|---|---|
+| 10 min | 15 min | Done after 1 |
+| 1 h | 15 min | 15 min |
+| 2 h | 20 min | 1 h |
+| 4 h | 40 min | 2 h |
+| 6 h | 1 h | 3 h |
+| 8 h | 1 h 20 min | 4 h |
+| 12 h | 2 h | 6 h |
+
+**Pacing check:** a player who plays once a day for about 20 minutes collects about one stage a day, so the crew's 9 stages take about 9 real days. That is about as long as the arc takes at that rate (34 in-game days of 4–6 minutes, about 8.5 real days). Phase 3 playtests and closed-test data replace this estimate (Q12).
+
+### 6.11 Volume II (v1.1, draft)
+
+Volume II (§33.3) gives coins a job after the finale. These numbers are a draft, checked at the v1.1 gate by a post-arc mode in `tools/sim.py` (Appendix C).
+
+**Restorations** (two per site, three stages each; the player pays for a stage, then that site's crew team works on it):
+
+| Restoration | Site | Stage costs | Effect when restored |
+|---|---|---|---|
+| Fire Tower | P | 300 · 500 · 700 | View tag on about 3 pads (set in the layout); Photographers join the Pinewatch mix at 10%, taken from Couples |
+| Pond Dock | P | 300 · 500 · 700 | Water tag on about 2 pads; Anglers join the Pinewatch mix at 10%, taken from Hikers |
+| Bamboo Treehouse | W | 400 · 600 · 800 | A 9th pad with no neighbours: View tag, Cabin comfort, always covered |
+| Bathhouse | W | 400 · 600 · 800 | Warmth r2 |
+| Observatory | L | 500 · 700 · 900 | Stars r3 (about 4 pads) |
+| Long Table | L | 500 · 700 · 900 | Seats +2; the walk-in limit from the rating rises by 1 (§5.6) |
+
+- Every restoration stage takes 1 h · 4 h · 8 h of crew time, with speed-up chunks of 15 min · 40 min · 1 h 20 min (§6.10).
+- In Volume II the crew splits into three teams, one per site, each working on one stage at a time.
+- Totals: Pinewatch 3,000, Whisper River 3,600, Lantern Valley 4,200; 10,800 in all.
+- Pinewatch fees for its new archetypes, by the §6.3 formula: Photographer 60, Angler 50.
+- Volume II page gifts: 60 per page at Pinewatch, 80 at Whisper River and 100 at Lantern Valley.
+- Gathering bonus: +25% of the Gathering's fees when its brief is met (§33.3).
+- Verify: the Treehouse's 9th pad fits the 640-px view (§5.1).
+
+**Sizing:** 10,800 coins of restorations, plus about 5,000 of Pinewatch and Whisper River items a median player hasn't bought yet, is about 15,800 coins: about 26 in-game days at the post-arc rate of about 600 a day (Appendix C). The target is 25–40 days. A player who plays about 20 minutes a day can start about three stages a day, one per team, so coins and the crew keep about the same pace. Players with longer sessions wait on the crew and play pages 8–10 meanwhile (§33.3).
+
+**Guardrails** (checked at the v1.1 gate, assuming 4 in-game days per real day):
+
+| Guardrail | Target |
+|---|---|
+| Median Volume II complete | 25–40 in-game days after the finale |
+| A purchase or a stage start, each site | At least every 2 in-game days |
+| Highest coin balance until Volume II is done | ≤ 2,500 |
+| Coins from ads | ≤ 15% of income |
+| No Volume II page needs an unlock from a later page | Holds |
+
 ## 7. Errands and cooking
 
 ### 7.1 Forage
@@ -507,7 +572,7 @@ Each site has five pages, completed in any order. A page pays its gift (§6.6), 
 
 ### 8.2 Site rules
 
-- One site per day, chosen on the trail map in the Morning. Other sites wait: no offline income and no decay.
+- One site per day, chosen on the trail map in the Morning. Other sites wait: no offline income and no decay. The crew works in real time whichever site the player is at (§8.4).
 - Completed sites stay open as sandboxes. Bookings, rating and walk-ins carry on.
 - Letters arrive in order, at most one per morning. Each has a trigger: the Nth morning at a site, or an event such as a family's first booking or a finished chapter. Event letters go first; unread letters wait in the journal.
 
@@ -519,10 +584,33 @@ Each site has five pages, completed in any order. A page pays its gift (§6.6), 
 | Guestbook | 13 (9 archetypes + 4 regulars) | A first stay; a regular's finished story |
 | Field Notes | 22 (5 forage finds, 5 fish including the Golden Koi, 12 birds) | A first find, catch or sighting |
 | Recipes | 13 | A first cook |
+| Keepsakes | 9 (3 per site) | Collecting a crew stage (§8.4) |
 | Letters | 25 | Reading |
 | Days log | One line per day | Each night: site, weather, guests, best review, coins |
 
-The cover shows completion as a percentage of the 63 collectible entries (Chapters, Guestbook, Field Notes, Recipes).
+The cover shows completion as a percentage of the 72 collectible entries (Chapters, Guestbook, Field Notes, Recipes, Keepsakes).
+
+### 8.4 The crew and grandpa's structures
+
+On day 2, Ranger Mai's van drops off a small volunteer crew. At each site they restore one of grandpa's old structures in three stages that take real time (§6.10), and every stage turns up a keepsake from his life. This is the game's only real-time system, and it runs beside the day: it never blocks a page, a chapter or a site, costs nothing in v1 and never expires (D-23).
+
+| Structure | Site | Keepsakes, one per stage | When restored |
+|---|---|---|---|
+| Warden's Hut | Pinewatch | Grandpa's thermos (brambles cleared) · the old trail register (roof fixed) · a photo of him on the porch (porch rebuilt) | "Porch light" vignette [S] |
+| Boathouse | Whisper River | An oar carved with two sets of initials · his river chart · the boat he shared with Old Ba, afloat again | "Boat on the river" vignette [S] |
+| Lantern Workshop | Lantern Valley | Bamboo frames and rice paper · his pattern book · his last unfinished lantern, which you finish | "Lanterns over the valley" vignette [S] |
+
+**Rules:**
+- One crew works on one stage at a time, in site order. The hut's first stage starts by itself on day 2; the Boathouse and the Workshop start by themselves once the player has reached their site and the crew is free.
+- Stages run in real time, including while the app is closed and whichever site the player is at.
+- A finished stage shows a bubble on the structure and on the site's trail-map marker; nothing pops up. Collecting it (tap either) plays a 2–4 s ceremony (§17.3), adds the keepsake to the journal (§8.3) and starts the next stage.
+- A keepsake is a journal entry: an illustration and a note of at most 80 words (§13.1). In v1 the crew gives no coins, stars, tags or unlocks, so it never touches the economy or the puzzle.
+- Nothing waits on the crew and nothing expires; a finished stage stays ready until collected.
+- The crew sheet (§17.2) shows the stage, the time left, Collect, the speed-up offer and Finish. It opens from the structure or its trail-map marker in the Morning and Prep; never in the Evening or the Night.
+- Speed-ups are rewarded ads (§6.10, §24), offered from day 4 and never in the Evening, the Trail Daily or onboarding.
+- Clock: progress counts in UTC, and each check adds max(0, now − last seen). Setting the device clock back never undoes work; setting it forward finishes stages early, an accepted risk while keepsakes are the only reward (§32).
+- The structures stand on crew plots outside the camp core (§5.1), so they never take pad or decor space. Each layout also reserves 2 overgrown plots for Volume II's restorations (§6.11); in v1 they are scenery.
+- Keepsake notes are side stories about grandpa; the main reveals stay in the letters (§13.1). The Workshop's last keepsake may foreshadow the cove once its story is settled (Q8).
 
 ## 9. The dog
 
@@ -540,7 +628,7 @@ The cover shows completion as a percentage of the 63 collectible entries (Chapte
 - Score = total stars, out of 25. No coins, so it never touches the economy.
 - One scored attempt per day; unlimited practice afterwards.
 - Share text: "Trailbound Daily #N — x/25" followed by one row of stars per guest. N counts days since launch.
-- Seed = hash("daily", local device date). No leaderboard (v1.1) and no streaks.
+- Seed = hash("daily", local device date). No leaderboard or Trail Passport until v1.1 (§33.5), and no streaks.
 - A CI solver checks the next 400 dailies. A seed is rerolled deterministically if its best score is below 22, or if a naive placement scores within 2 of the best.
 - A compact layout that reuses Pinewatch art.
 - No ads inside the Daily (§24).
@@ -557,6 +645,7 @@ The cover shows completion as a percentage of the 63 collectible entries (Chapte
 | New archetypes | Hiker, Scout, Couple, Family | Van-lifer, Angler, Photographer | Cyclist |
 | New traits | 9 base traits, including Kids | Angler, Shutterbug | Stargazer, Dog-wary |
 | Signature features | Campfire circle under the pines | Bamboo bridge, lotus pads, dock | Terraced hills behind, a banyan, a telescope deck |
+| Crew structure (§8.4) | Warden's Hut | Boathouse | Lantern Workshop |
 | Regulars | Hùng, the Minh family | Old Ba | Lan |
 | Rain | About 1 day in 5 | About 1 in 4 | About 1 in 6 |
 | Rating page | 4.0 | 4.2 | 4.4 |
@@ -571,7 +660,7 @@ Glasscoast and the hidden cove are only foreshadowed in v1 (Appendix D).
 |---|---|---|
 | You | The new warden | Hoodie, fixed look, never named, no dialogue choices |
 | Grandpa | Letters, journal margins, one photo | Never appears in person |
-| Ranger Mai | Tutorial guide; drives the Outfitter van from site to site | Short lines; never blocks play |
+| Ranger Mai | Tutorial guide; drives the Outfitter van from site to site and brings the volunteer crew (§8.4) | Short lines; never blocks play |
 | The dog | Companion (§9) | Named by the player |
 
 ### 12.2 Guest archetypes
@@ -617,9 +706,10 @@ Single-pad archetype mix by site:
 ### 13.1 Structure
 
 - About 25 letters: 10 at Pinewatch, 7 at Whisper River, 7 at Lantern Valley and a finale.
+- 9 keepsake notes, one per crew stage (§8.4): side stories about grandpa, never the main reveals, which stay in the letters.
 - Ranger Mai's short notes announce unlocks and explain mechanics in context. They also fill mornings after a site's letters run out.
 - Each site's arc: arrival → the regular's story → a reveal about grandpa → the rating payoff. Whisper River and Lantern Valley letters are written to this shape in Phase 4.
-- The finale, "The trail continues": grandpa's last margin note points to Glasscoast and a hidden cove. The cove's story must be settled before the Pinewatch letters are written, so they can foreshadow it (Q8).
+- The finale, "The trail continues": grandpa's last margin note points to Glasscoast and a hidden cove. The cove's story must be settled before the Pinewatch letters are written, so they can foreshadow it (Q8). Ranger Mai then hands the player a blank second volume; until v1.1 it reads "coming soon", with no date (§33.2).
 
 ### 13.2 Voice
 
@@ -658,9 +748,13 @@ Single-pad archetype mix by site:
 | Old Ba's fish story | Old Ba is staying | [S] |
 | Lan's long exposure | Lan is staying (no flash) | [S] |
 | Marshmallow roast | A Chilly guest + S'mores served | [S] |
+| Porch light | The Warden's Hut is restored (once) | [S] |
+| Boat on the river | The Boathouse is restored (once) | [S] |
+| Lanterns over the valley | The Lantern Workshop is restored (once) | [S] |
 
 - One vignette per night, 6–12 s, skippable after 3 s. It replays your actual camp and guests.
 - Unseen vignettes play first. Among the eligible ones, the trigger with the most matching guests wins.
+- A restoration vignette plays on the first night the player spends at that site after the structure is restored, ahead of any other unseen vignette.
 
 ## 14. Onboarding
 
@@ -682,14 +776,16 @@ Single-pad archetype mix by site:
 
 | Day | New idea |
 |---|---|
-| 2 | A booking board with 3 requests for 2 pads, so someone is turned away; Ranger Mai opens the Outfitter |
+| 2 | A booking board with 3 requests for 2 pads, so someone is turned away; Ranger Mai opens the Outfitter, and her van drops off a volunteer crew who start clearing grandpa's hut (§8.4) |
 | 3 | The Ranger suggests opening a third pad; neighbours start to matter (Social, Introvert) |
 | 4 | Scripted rain; the Tarp |
 | 5 | Guests now have two traits |
 | 6 | The first guaranteed conflict; the Trail Daily unlocks |
 | 7 onward | New items arrive through pages |
 
-**Ads in onboarding:** none on days 1 and 2. Where the law requires it, the privacy consent form shows once, at the start of Morning 2, after the cold open and the first night. Rewarded offers start on night 3 and interstitials on day 5 (§24).
+**The crew in onboarding:** the crew needs nothing from the player on day 2. When the 10-minute first stage is done, a bubble appears on the hut; collecting it shows grandpa's thermos, starts the 4-hour roof and asks once about the crew notification (§17.6).
+
+**Ads in onboarding:** none on days 1 and 2. Where the law requires it, the privacy consent form shows once, at the start of Morning 2, after the cold open and the first night. Rewarded offers start on night 3 (the crew speed-up on day 4) and interstitials on day 5 (§24).
 
 Settings → "Ranger's tips" replays any tip.
 
@@ -709,7 +805,7 @@ Settings → "Ranger's tips" replays any tip.
 | Animation | The Minh kids play đá cầu |
 | Sound | A rooster at dawn, free-range chickens (Chicken Coop), cicadas at dusk |
 | Names | A few Vietnamese guest names in an international pool |
-| Later | Lunar New Year and Mid-Autumn lantern events (Appendix D) |
+| Later | Lunar New Year and Mid-Autumn festival weeks: star lanterns, rice cakes, mooncakes (v1.2, §33.4) |
 
 **Đá cầu animation:**
 - The kids' play animation has kick, ready and balance poses without the shuttlecock.
@@ -805,8 +901,9 @@ Eastward's richness comes from detail assets placed with judgment. Three layers:
 | Pantry and cooking | Ingredients, pair picker, recipe book, Cook ×N |
 | Outfitter | The catalog in tabs: decor, pads and upgrades, gear, staples, cosmetics; the Remove Ads offer at the end (§24) |
 | Night summary | Reviews with breakdowns, tips, walk-ins, coin tally, page progress, tomorrow's forecast; the opt-in "Double tips" ad (§24) |
-| Journal | Chapters, Guestbook, Field Notes, Recipes, Letters, Days log |
-| Trail map | Site choice and locked sites; the Glasscoast teaser after the finale |
+| Journal | Chapters, Guestbook, Field Notes, Recipes, Keepsakes, Letters, Days log |
+| Trail map | Site choice and locked sites; crew status and ready bubbles on each site (§8.4); the Glasscoast teaser after the finale |
+| Crew sheet | The current stage and time left, Collect, the speed-up offer and Finish (§8.4, §24); opened from the structure or its trail-map marker in the Morning and Prep |
 | Remove Ads | The one-time Remove Ads offer and restore, opened from Settings or the Outfitter (§24) |
 | Trail Daily | The daily puzzle, result and share |
 | Settings | §17.4 |
@@ -814,14 +911,14 @@ Eastward's richness comes from detail assets placed with judgment. Three layers:
 ### 17.3 Feel
 
 - Smoke and mist wipes between scenes; squash on press; guests walk in rather than pop in.
-- Short ceremonies (2–4 s) for a page stamp, a completed chapter, a site unlock and an all-5★ night.
+- Short ceremonies (2–4 s) for a page stamp, a completed chapter, a site unlock, an all-5★ night and a collected crew stage.
 - Coins tick up, and haptics match the pops.
 - Reopening the app returns to the live camp, never a menu or an ad.
 - [C] An attract mode on the title screen.
 
 ### 17.4 Settings
 
-Music, ambience and SFX volume · haptics · Daily reminder (on/off and time) · language · text size (normal, large) · reduced motion · reduced flashing (at most 3 Hz) · Assist mode · left-handed layout · Remove Ads and restore purchases · privacy options (ad consent, where required) · Ranger's tips · credits and licences · privacy policy.
+Music, ambience and SFX volume · haptics · Daily reminder (on/off and time) · crew notification (on/off) · language · text size (normal, large) · reduced motion · reduced flashing (at most 3 Hz) · Assist mode · left-handed layout · Remove Ads and restore purchases · privacy options (ad consent, where required) · Ranger's tips · credits and licences · privacy policy.
 
 **Assist mode:** a wider fishing window (§7.2), highlighted forage nodes, and a suggested cook plan for tonight's favourites. It never solves the seating.
 
@@ -835,9 +932,11 @@ Music, ambience and SFX volume · haptics · Daily reminder (on/off and time) ·
 ### 17.6 Platform UX
 
 - Back closes the most recently opened sheet. On the Camp screen it asks before quitting.
-- The only notification is the Daily reminder [S], requested after the first completed Daily.
+- Two local notifications, both opt-in (D-17, D-25). The Daily reminder [S] is requested after the first completed Daily. The crew notification [S] is requested once when the hut's roof starts (§14), after a one-line in-game explanation, and never in the same session as the consent form.
+- The crew notification says what is ready to collect, never "hurry" or "don't miss". At most one a calendar day; none between 21:00 and 09:00 local time (it waits until 09:00); merged with the Daily reminder when the two fall within 2 hours of each other.
+- Both are scheduled on the device with inexact timing: no exact-alarm permission and no push service. Verify: the scheduling plugin, delivery after a reboot, and any permissions it adds.
 - In-app review prompt [S]: after the first night where every guest gave 5★, not before day 7, at most once every 90 days, and never in the same break as an interstitial.
-- Ads follow §24: an opt-in rewarded ad on the Night summary and an occasional interstitial between Sleep and the next Morning. Never during a phase, the Trail Daily or onboarding, or right after a purchase.
+- Ads follow §24: opt-in rewarded ads (Double tips on the Night summary, the crew speed-up) and an occasional interstitial between Sleep and the next Morning. No ad starts on its own during a phase, and none appear in the Evening, the Trail Daily or onboarding, or right after a purchase.
 
 ### 17.7 Edge cases
 
@@ -852,10 +951,12 @@ Music, ambience and SFX volume · haptics · Daily reminder (on/off and time) ·
 | Oven pair at the campfire | Hint; ingredients kept |
 | Purchase would go below 0 | Blocked; coins never go negative |
 | Rain on a Cabin | No penalty (Cabins are covered) |
-| Device date changed | Affects only the Trail Daily |
+| Device date or time changed | The Trail Daily follows the new date. Crew: forward finishes stages sooner; back never undoes progress (§8.4) |
+| Crew stage finishes while the app is closed | A bubble on the structure and its trail-map marker; no popup. The crew notification, if the player opted in (§17.6) |
+| Speed-up cap reached | The offer hides; the sheet says when it returns (the next stage, or tomorrow) |
 | Purchase pending | Shown as pending and granted when it clears (§24) |
-| No ad loaded, or offline | The rewarded offer is hidden and the interstitial skipped; play is unaffected |
-| Rewarded ad closed early | No reward; the offer stays until Sleep |
+| No ad loaded, or offline | Rewarded offers are hidden and the interstitial skipped; play is unaffected |
+| Rewarded ad closed early | No reward. Double tips stays until Sleep; the speed-up stays in the crew sheet |
 | App backgrounded during an ad | Resume returns to the same screen; a rewarded ad that finished still pays |
 | Ad consent declined | Ads follow the consent result (limited ads or none); the game is unaffected |
 | Corrupt save | Load the backup; otherwise offer a fresh start and keep the corrupt file |
@@ -912,7 +1013,7 @@ The camp core and HUD must work inside the 640×360 frame; the extra area shows 
 
 | Autoload | Responsibility |
 |---|---|
-| Game | Phase state machine (Boot → Title → Morning → Prep → Evening → Night) and day and site flow |
+| Game | Phase state machine (Boot → Title → Morning → Prep → Evening → Night), day and site flow, and the crew clock (§8.4) |
 | Catalog | Loads and validates the JSON data; serves items, traits, recipes and pages |
 | Econ | Pure functions: stars, tips, rating, walk-ins, meal allocation. No scene access |
 | Save | Load, save, backup, migrations (§22) |
@@ -926,22 +1027,24 @@ The camp core and HUD must work inside the 640×360 frame; the extra area shows 
 | File | Contents |
 |---|---|
 | `sites.json` | Sites, multipliers, rain rates, forage and fish tables, trait pools, archetype mix |
-| `layouts/*.json` | Per site: cells, pad spots, neighbour lists, tags, bank cells, errand spots, lookout |
+| `layouts/*.json` | Per site: cells, pad spots, neighbour lists, tags, bank cells, errand spots, lookout, crew plots |
 | `decor.json`, `gear.json`, `upgrades.json` | §6.7 |
 | `archetypes.json`, `traits.json` | §5.3, §12.2 |
 | `recipes.json`, `ingredients.json`, `fish.json`, `birds.json` | §7 |
 | `chapters.json` | Pages, goals, gifts, unlocks |
+| `crew.json` | Crew structures and stages: times, speed-up chunks, keepsakes, art states (§6.10, §8.4) |
 | `letters.json`, `vignettes.json`, `reviews.json` | §13 and review comments |
 | `strings/*.csv` | UI and narrative text per language |
 
 - IDs are stable snake_case strings. Saves store IDs, never indexes.
-- CI validation: every reference resolves, recipe pairs are unique, every unlock is reachable, no page needs an item from a later page, layouts pass the §5.1 lint, and every string exists in both languages.
+- CI validation: every reference resolves, recipe pairs are unique, every unlock is reachable, no page needs an item from a later page, layouts pass the §5.1 lint, every crew structure has a plot in its site's layout, and every string exists in both languages.
 
 ### 21.3 Determinism
 
 - Each save has a 64-bit seed.
 - Each day's content (board, rain, forage, bites, walk-in choices) draws from an RNG seeded with hash(save seed, site, site day), so reloading never rerolls anything.
 - The Trail Daily uses hash("daily", local date).
+- The crew runs on the device clock (UTC) and never feeds an RNG, so it can't change a board, the weather or a Daily.
 
 ### 21.4 Repo layout
 
@@ -960,8 +1063,8 @@ assets_src/                  source art (not imported)
 
 - One save slot: `user://save.json` plus `user://save.bak`. Writes go to a temporary file that is then renamed.
 - A `save_version` field with migrations; every migration has a fixture test.
-- Saves happen at the start of each Morning, after purchases (debounced 2 s), at the end of the Night and when the app pauses. Resume restores the exact phase, including the Evening seating.
-- Contents: seed, day, current site, phase, coins, per-site state (pads, upgrades, decor, reviews, pages, site day, regulars), pantry, today's meals, known recipes and tried pairs, journal, letters read, dog (name, bond), Daily (last date, score), the cached Remove Ads entitlement and ad pacing (the day and time of the last interstitial, and whether tonight's rewarded offer was used). Settings live in a separate file.
+- Saves happen at the start of each Morning, after purchases (debounced 2 s), when a crew stage is collected or sped up, at the end of the Night and when the app pauses. Resume restores the exact phase, including the Evening seating.
+- Contents: seed, day, current site, phase, coins, per-site state (pads, upgrades, decor, reviews, pages, site day, regulars), pantry, today's meals, known recipes and tried pairs, journal, letters read, dog (name, bond), Daily (last date, score), crew (structure, stage, seconds left, the last-seen UTC time, speed-ups used on this stage and today), the cached Remove Ads entitlement and ad pacing (the day and time of the last interstitial, and whether tonight's rewarded offer was used). Settings live in a separate file.
 - Android Auto Backup covers device moves (export option `user_data_backup/allow`). Play Games Saved Games arrives in v1.1.
 - Budget: under 100 KB; loads in under 100 ms.
 
@@ -984,23 +1087,25 @@ assets_src/                  source art (not imported)
 
 ## 24. Monetization
 
-Free to play and ad-supported (D-03, D-20). All three sites and every item are free. Revenue comes from opt-in rewarded ads, an occasional interstitial between days and a one-time Remove Ads purchase. Player-paced days make this fit: the day boundary is a natural break that never cuts into a puzzle, and the tips offer comes right after the player sees the night's result.
+Free to play and ad-supported (D-03, D-20). All three sites and every item are free. Revenue comes from opt-in rewarded ads, an occasional interstitial between days and a one-time Remove Ads purchase. Player-paced days make this fit: the day boundary is a natural break that never cuts into a puzzle, and the tips offer comes right after the player sees the night's result. The crew speed-up adds a second opt-in offer, outside the puzzle (§8.4).
 
 ### 24.1 Placements
 
 | Placement | Format | Where and when | Rule |
 |---|---|---|---|
 | Double tips | Rewarded, opt-in | Night summary, from night 3; once per in-game day | Doubles that night's tips; the button shows the exact coins. Sim-checked (§6.8, §6.9) |
+| Crew speed-up | Rewarded, opt-in | Crew sheet (§17.2) in the Morning or Prep, from day 4; never in the Evening, the Trail Daily or onboarding | Removes one chunk of the current stage, shown on the button (§6.10); at most 3 per stage and 6 per calendar day; Finish is free with 5 minutes or less left. Coins never buy time |
 | Ranger's crate [C] | Rewarded, opt-in | Morning, once per in-game day | Ingredients for tonight's favourite meals. Ships only once the sim models its effect on meals |
 | Between days | Interstitial | After Sleep and the autosave, before the next Morning; from day 5 | At most one every 2 in-game days, at least 4 minutes apart; skipped if a rewarded ad played in the last 3 minutes |
 
 - No banners and no app-open ads [W].
-- No ad during a phase, in the Trail Daily, on app open or resume, before night 3, or right after a purchase.
+- No ad starts on its own during a phase. Rewarded ads play only when tapped, and never in the Evening, the Trail Daily or onboarding. No ad on app open or resume, before night 3, or right after a purchase.
 - Nothing requires an ad. With no ad loaded or no connection, the rewarded offer is hidden and the interstitial skipped.
-- A rewarded ad pays only when it completes. Closed early, the offer stays until Sleep.
+- A rewarded ad pays only when it completes. Closed early, Double tips stays until Sleep and the speed-up stays in the crew sheet.
 - Ads preload in the background during the Night; the game never waits for one.
-- Start days, caps and a 5% ads-off holdout live in Remote Config, with the defaults above built in.
+- Start days, caps, crew times and chunks (§6.10), and a 5% ads-off holdout live in Remote Config, with the defaults above built in.
 - AdMob settings: maximum ad content rating G; sensitive categories such as gambling and dating blocked.
+- Crew timers only delay a keepsake: they never expire, never shrink a reward and can't be bought with coins or money (D-24). Review them against the Digital Fairness Act when it is published (§26).
 
 ### 24.2 Remove Ads
 
@@ -1033,7 +1138,7 @@ Events go through the Analytics adapter and never include names, free text or co
 
 | Event | Key fields |
 |---|---|
-| `app_open` | Cold or warm start |
+| `app_open` | Cold or warm start; whether a notification opened it, and which (Daily or crew) |
 | `tutorial_step` | Step ID |
 | `day_start`, `day_end` | Day, site, guests, average stars, coins |
 | `purchase_item` | Item ID, site, price |
@@ -1047,7 +1152,8 @@ Events go through the Analytics adapter and never include names, free text or co
 | `daily_start`, `daily_complete` | Daily number, score |
 | `letter_open` | Letter ID |
 | `settings_change` | Setting, value |
-| `notification_opt_in` | Accepted or declined |
+| `notification_opt_in` | Type (Daily or crew); accepted or declined |
+| `crew_stage_start`, `crew_stage_collect` | Structure, stage; on collect, minutes waited and speed-ups used |
 
 | KPI | Target |
 |---|---|
@@ -1062,6 +1168,9 @@ Events go through the Analytics adapter and never include names, free text or co
 | Retention cost of ads | D7 retention within 5% (relative) of the ads-off holdout |
 | Crash-free sessions | At least 99.5% |
 | Median in-game day | 4–6 minutes |
+| Crew engagement | At least 70% of players who reach day 4 have collected the hut's first stage |
+| Speed-ups per crew stage | Watch: an average above 2 means the waits are too long (Q12) |
+| Crew notification opt-in | Baseline set in the first month |
 
 Firebase is the vendor (D-21), with consent from UMP (§24.3); both await confirmation (Q6).
 
@@ -1069,8 +1178,9 @@ Firebase is the vendor (D-21), with consent from UMP (§24.3); both await confir
 
 - Privacy policy in `LEGAL/PRIVACY.md`, hosted on a developer website and linked from the store listing and Settings. The same site serves `app-ads.txt` for AdMob.
 - The data safety form follows Google's published guidance for the AdMob and Firebase SDKs actually shipped (device and advertising IDs, app interactions, diagnostics, approximate location from the IP address) and covers the Remove Ads purchase. Play Console declares that the app contains ads.
-- Permissions: POST_NOTIFICATIONS for the Daily reminder, requested in context. INTERNET, ACCESS_NETWORK_STATE and AD_ID come from the ad SDK. No location, contacts or storage permissions.
+- Permissions: POST_NOTIFICATIONS for the Daily reminder and the crew notification, requested in context (§17.6); no exact-alarm permission. INTERNET, ACCESS_NETWORK_STATE and AD_ID come from the ad SDK. No location, contacts or storage permissions.
 - Content rating through the IARC questionnaire, which declares the ads; expected Everyone / PEGI 3. Target audience 13+; not designed for children, outside the Families program, and no child-directed marketing.
+- EU Digital Fairness Act: the Commission planned its proposal for the second half of 2026 (Verify its status). It targets dark patterns such as artificial urgency. Review the crew (§8.4), the speed-up (§6.10) and the ad rules (§24) against it when it is published.
 - Target API 36 now (required for new apps and updates since 2026-08-31). Plan for API 37 after 2027-08-31.
 - 16 KB memory page support. Verify: whether the requirement applies and whether the 4.7.2 export template complies.
 - Personal developer accounts created after 2023-11-13 must run a closed test with at least 12 testers for 14 continuous days before production access; pre-registration waits for it too. Organization accounts are exempt. Create the account and recruit testers early (§29).
@@ -1078,13 +1188,13 @@ Firebase is the vendor (D-21), with consent from UMP (§24.3); both await confir
 
 ## 27. Scope
 
-**Must:** the four-phase day; 3 sites with 5 pages each; bookings, traits, stars and preview; pads, upgrades and decor; foraging, fishing and 13 recipes; the dog; the journal; about 25 letters; the six [M] vignettes; onboarding; settings and accessibility (§17.4, §17.5); English and Vietnamese; save and resume; ads with consent (Double tips, the between-days interstitial, UMP) and the Remove Ads purchase; analytics and crash reporting; the whole game playable offline.
+**Must:** the four-phase day; 3 sites with 5 pages each; bookings, traits, stars and preview; pads, upgrades and decor; foraging, fishing and 13 recipes; the dog; the journal; the crew with three structures and 9 keepsakes (§8.4); about 25 letters; the six [M] vignettes; onboarding; settings and accessibility (§17.4, §17.5); English and Vietnamese; save and resume; ads with consent (Double tips, the crew speed-up, the between-days interstitial, UMP) and the Remove Ads purchase; analytics and crash reporting; the whole game playable offline.
 
-**Should:** the Trail Daily and its reminder; spotting; Hùng's story; the other six vignettes; cosmetics; the in-app review prompt.
+**Should:** the Trail Daily and its reminder; the crew notification; spotting; Hùng's story; the nine [S] vignettes (six guest scenes and three restorations); cosmetics; the in-app review prompt.
 
 **Could:** a title-screen attract mode; a vignette log in the journal; a shareable camp image; the Ranger's crate rewarded ad.
 
-**Won't in v1:** Play Games (achievements, leaderboards, Saved Games) until v1.1; photo mode; new sites; seasonal events; iOS; more languages; multiplayer or visits; banner and app-open ads; energy, premium currency or paywalled content; raw selling; upkeep, decay, hazards, ranks or prestige.
+**Won't in v1:** Volume II, the Trail Passport and Play Games (achievements, leaderboards, Saved Games) until v1.1; seasons, festivals and Camp Postcards until v1.2 (§33); photo mode; new sites; iOS; more languages; real-time multiplayer or live visits; banner and app-open ads; energy, premium currency or paywalled content; timers on the arc's critical path; raw selling; upkeep, decay, hazards, ranks or prestige.
 
 ## 28. Assets and pipeline
 
@@ -1101,10 +1211,12 @@ Firebase is the vendor (D-21), with consent from UMP (§24.3); both await confir
 | Items (ingredients, fish, meals, gear icons) | About 45 |
 | UI icons + kit | About 30 + kit |
 | Journal and map art | About 10 |
+| Crew: structures (3 × 4 states), a scaffold, 6 overgrown Volume II plots, 2 volunteers | About 22 |
+| Keepsake illustrations | 9 |
 | VFX | About 10 |
-| **Total** | **About 300 + 64 clutter** |
+| **Total** | **About 330 + 64 clutter** |
 
-Manual cleanup is estimated at 75–150 hours (about 100). Phase 2 re-estimates it from measured times.
+Manual cleanup is estimated at 80–165 hours (about 110). Phase 2 re-estimates it from measured times.
 
 **Pipeline:**
 - Generation: PixelLab through the MCP server configured in `.devin/config.json` (token in the `PIXELLAB_TOKEN` environment variable), and scripted batches with `tools/pixellab_gen.py`.
@@ -1122,24 +1234,25 @@ Manual cleanup is estimated at 75–150 hours (about 100). Phase 2 re-estimates 
 | 0 Scaffold | 1–2 | Godot project, display settings, autoloads, data loading and validation, save v1, debug menu, Android export to the internal track; spikes for the renderer, lights, Vietnamese font, and the AdMob and Firebase plugins | The AAB installs from the internal track; 20 lights run at 60 fps on Device B; a Vietnamese pangram renders; a test ad and a test analytics event come through on Device A |
 | 1 Greybox | 2–3 | Pinewatch days 1–5 in greybox: Morning → Prep (forage, cook, build) → Evening seating with preview → Night | At least 3 of 5 testers want to continue; median day 4–6 min; testers can explain their stars |
 | 2 Style lock | 1–2 | Batch 0 → approval → one production Pinewatch dusk screen; every asset timed | Look approved on device; art hours re-estimated |
-| 3 Pinewatch complete | 6–8 | All Pinewatch content, onboarding, letters 1–10, the dog, journal, settings, English and Vietnamese, audio | 5 testers finish the chapter; median completion on day 8–11 |
-| 4 River, Valley, Daily | 6–8 | Sites 2 and 3, regulars, finale, Trail Daily | Arc completable; guardrails hold on real data; Daily deterministic and solver-checked |
-| 5 Platform | 3–4 | Ad placements and pacing, UMP consent and privacy options, Remove Ads (purchase and restore), Firebase Analytics, Crashlytics and Remote Config, Daily reminder, privacy policy and data safety | Ads verified with test units, including no fill; consent verified with the EEA debug geography; Remove Ads purchase, pending and refund verified with license testers; §23 budgets met with ads on |
-| 6 Store | 3–4 | Closed test (12 testers × 14 days), listing in English and Vietnamese, pre-launch report, staged rollout | Closed test complete; crash-free at least 99.5%; listing approved |
+| 3 Pinewatch complete | 7–9 | All Pinewatch content, onboarding, letters 1–10, the dog, journal, settings, English and Vietnamese, audio; the crew and the Warden's Hut | 5 testers finish the chapter; median completion on day 8–11; at least 4 of 5 testers come back for the hut's roof |
+| 4 River, Valley, Daily | 6–8 | Sites 2 and 3, regulars, finale, Trail Daily, the Boathouse and the Lantern Workshop | Arc completable; guardrails hold on real data; Daily deterministic and solver-checked |
+| 5 Platform | 3–5 | Ad placements and pacing (Double tips, the crew speed-up, the interstitial), UMP consent and privacy options, Remove Ads (purchase and restore), Firebase Analytics, Crashlytics and Remote Config, the Daily reminder and the crew notification, privacy policy and data safety | Ads verified with test units, including no fill; consent verified with the EEA debug geography; Remove Ads purchase, pending and refund verified with license testers; notifications respect quiet hours and the daily cap; §23 budgets met with ads on |
+| 6 Store | 3–4 | Closed test (12 testers × 14 days), listing in English and Vietnamese, pre-launch report, staged rollout; Volume II work starts while the closed test runs | Closed test complete; crash-free at least 99.5%; listing approved |
+| 7 Volume II (v1.1) | 4–6 | Volume II (§33.3), the Trail Passport, Play Games; a post-arc mode in the sim | §6.11 guardrails hold; ships 4–6 weeks after the 100% rollout |
 
-- Total: 23–32 weeks plus about 15% contingency, roughly 6–8.5 months for one full-time developer.
+- Total to launch (Phases −1 to 6): 24–34 weeks plus about 15% contingency, roughly 6.5–9 months for one full-time developer. The crew adds about 1–2 weeks (Phases 3 and 5). Phase 7 overlaps Phase 6 and the rollout.
 - **Do now:** create the Play developer account and start recruiting testers, including Vietnamese players. The closed test can run with any build; starting it during Phase 4 takes it off the critical path. Create the AdMob account and the Firebase project too: AdMob's payment and tax setup takes time.
 
 ## 30. Testing
 
 | Layer | Coverage |
 |---|---|
-| Unit (GUT) | Econ (every star term, families, tips, the rating window, walk-ins, meal allocation), recipes (unique pairs, the oven rule), all 15 page conditions, save migrations (one fixture per version) |
+| Unit (GUT) | Econ (every star term, families, tips, the rating window, walk-ins, meal allocation), recipes (unique pairs, the oven rule), all 15 page conditions, the crew clock (clock moved forward and back, app killed mid-stage, speed-up caps per stage and per day), save migrations (one fixture per version) |
 | Simulation | The Appendix C model on the real data files, with and without ads; CI fails if a §6.9 guardrail breaks |
 | Content lint | References, duplicate pairs, unreachable unlocks, page order, layout rules, missing strings, text length |
 | Daily solver | The next 400 dailies (§10) |
 | Golden days | Recorded inputs replay to identical saves |
-| Device passes | Devices A, B and C: kill and resume in every phase, airplane mode, low storage, language switch, large text, the back button; ads on and off, no fill, consent declined, Remove Ads bought and refunded |
+| Device passes | Devices A, B and C: kill and resume in every phase, airplane mode, low storage, language switch, large text, the back button; ads on and off, no fill, consent declined, Remove Ads bought and refunded; the crew across reboots and clock changes; notification timing, quiet hours and the daily cap |
 | Store checks | The Play pre-launch report on every closed-test build |
 | Playtests | Phases −1, 1, 3 and 6, including Vietnamese players |
 
@@ -1150,7 +1263,8 @@ Manual cleanup is estimated at 75–150 hours (about 100). Phase 2 re-estimates 
 - The Daily share text is the organic loop.
 - Staged rollout at 10%, then 50%, then 100%, watching Android vitals, ad metrics and the ads-off holdout.
 - Before production ads: link the AdMob app to the published listing and publish `app-ads.txt`.
-- v1.1 brings Play Games (achievements, leaderboards, Saved Games); content updates follow Appendix D.
+- The finale says a second volume is coming, without a date (§13.1).
+- v1.1 brings Volume II, the Trail Passport and Play Games (achievements, leaderboards, Saved Games) 4–6 weeks after the 100% rollout; later updates follow §33.2.
 
 ## 32. Risks
 
@@ -1169,17 +1283,114 @@ Manual cleanup is estimated at 75–150 hours (about 100). Phase 2 re-estimates 
 | Play or AdMob policy issues, or review delays | Medium | Medium | Account and testers early; target API 36; closed test started in Phase 4; ad placements per AdMob policy; a 13+ audience and no child-directed marketing |
 | Solo-developer scope | High | High | MoSCoW scope; phase gates; cut Should items first |
 | Save loss | Low | High | Atomic writes, a backup, migrations, Auto Backup |
+| Players finish the arc before v1.1 ships | High | High | Volume II work starts in Phase 6 and ships 4–6 weeks after the 100% rollout; the finale promises a second volume; sandbox and the Trail Daily hold finishers meanwhile (§33) |
+| Crew timers feel like pressure or a paywall | Medium | Medium | Keepsakes only in v1; nothing blocks the arc or expires; coins never buy time; capped speed-ups; calm notification copy (§8.4, §17.6); speed-ups per stage watched (§25) |
+| Clock changes skip crew stages | Medium | Low | Back never undoes; forward is accepted while keepsakes are the only reward; revisit before Volume II's restorations, which have real effects (§6.11) |
+| EU rules on game design tighten (Digital Fairness Act) | Medium | Medium | Timers only delay keepsakes and never expire; no event currency, countdowns or limited-time offers (§33.6); review when the proposal is published (§26) |
+
+## 33. After launch
+
+### 33.1 Why a second act
+
+- Ad revenue grows with in-game days played. The crew brings players back on more calendar days, but only new content gives them more days to play.
+- After the finale, coins pile up at about 600 a day and the last useful purchase comes a day later (Appendix C). Sandbox play and the Trail Daily keep some finishers, but nothing asks for their coins.
+- Finishers are the most engaged players, and they play almost half of all days.
+
+Illustrative cohort of 1,000 installs:
+
+| Segment | Players | In-game days each | Days played |
+|---|---|---|---|
+| Leave on days 1–2 | 150 | 1.5 | 225 |
+| Leave during Pinewatch | 500 | 5 | 2,500 |
+| Leave during Whisper River | 140 | 14 | 1,960 |
+| Leave during Lantern Valley | 60 | 27 | 1,620 |
+| Finish, plus about 5 sandbox days | 150 | 39 | 5,850 |
+| **Total** | **1,000** | | **12,155** |
+
+- Finishers play about 48% of all days.
+- If finishers play Volume II through, it adds about 30 days each in place of about 5 sandbox days: about +31% days played.
+- Seasons add about 20 more days per finisher: about +56% in total.
+- For comparison, raising Pinewatch completion from 35% to 40% (§25) adds about 9%.
+- The shares are assumptions; soft-launch and rollout data replace them.
+
+### 33.2 Release plan
+
+| Version | When | Adds |
+|---|---|---|
+| 1.0 | Launch | Volume I (the three-site arc), the crew and its three structures, the Trail Daily |
+| 1.1 | 4–6 weeks after the 100% rollout; work starts in Phase 6 (§29) | Volume II (§33.3), the Trail Passport (§33.5), Play Games (achievements, leaderboards, Saved Games) |
+| 1.2 | Timed for the next festival after v1.1: Mid-Autumn 2027 or Lunar New Year 2028 (Verify against the launch date) | Seasons of the Trail and the first festival week (§33.4); Camp Postcards [C] (§33.5) |
+| 1.3+ | Later | Glasscoast, the hidden cove, Snowpass and the "B." reveal (Appendix D) |
+
+- The finale says a second volume is coming, without a date (§13.1). No in-game text promises a date.
+- Every update ships its content inside the app (§13.2) and follows the live-ops rules (§33.6).
+
+### 33.3 Volume II: "Your book" (v1.1, draft)
+
+Volume I was grandpa's book; Volume II is the player's own. It opens at every site the morning after the finale. Each site gets five new pages, completed in any order, and two more of grandpa's old places to restore (numbers in §6.11).
+
+| Page | Pinewatch | Whisper River | Lantern Valley |
+|---|---|---|---|
+| 6 | Restore the Fire Tower | Restore the Bamboo Treehouse | Restore the Observatory |
+| 7 | Restore the Pond Dock | Restore the Bathhouse | Restore the Long Table |
+| 8 | Meet 3 Gathering briefs | Meet 3 Gathering briefs | Meet 3 Gathering briefs |
+| 9 | A perfect night: 6 or more parties, all 5★ | All 9 pads occupied, every party 4★ or better (needs the Treehouse) | A rainy night with 8 occupied pads, every party 4★ or better |
+| 10 | Reach a 4.5 rating | Reach a 4.6 rating | Reach a 4.7 rating |
+
+- The crew paces pages 6 and 7: the player pays for each stage and that site's crew team builds it (§6.11). Pages 8–10 never wait on the crew, so there is always something to play while a stage runs.
+- Volume II stays off Volume I's critical path: Glasscoast (v1.3+) unlocks from the Volume I finale, never from Volume II.
+- Finishing all 15 pages brings a last keepsake from grandpa, found in the final restoration, and a Volume II stamp on the journal cover (Q15).
+
+**Gatherings:**
+- From Volume II, the booking board may offer one Gathering a night: 3–5 parties booked together with one brief.
+- A Gathering replaces cards on the board; a night never has more parties than before.
+- The Evening preview checks the brief live, like stars. Meeting it pays the Gathering bonus (§6.11) and counts for page 8. The first time each brief is met, its guests leave a cosmetic gift.
+- About 24 templates, 8 per site. Each brief is a deterministic rule over the seating, so a CI solver checks that every brief offered can be met.
+
+| Gathering | Site | Brief |
+|---|---|---|
+| Scout troop | P | 4 Scouts, all within reach of the campfire |
+| Wedding party | W | 3 Couples and a Family, nobody below 4★ |
+| Photo club | L | 3 Photographers on View pads under clear skies |
+
+### 33.4 Seasons of the Trail (v1.2, draft)
+
+- Seasons follow the device date: spring, summer, autumn and winter, northern hemisphere (Q14).
+- Each season shifts one trait weight per site by ±1 (§5.3) and the rain rate by at most ±50% (§5.7), changes the ambience, and adds a seasonal ingredient and recipe, 4 Field Notes, 3–4 decor variants that copy an existing item's price and effect, and a seasonal regular with a 3-visit story.
+- Festival weeks for Lunar New Year and Mid-Autumn: a Star Lantern decor variant, a Rice Cake or Mooncake recipe (generic names, §15) and a festival vignette.
+- No FOMO: every season and festival returns each year, with no event currency and no countdown, so nothing is lost for good. The Daily reminder mentions a new season or festival.
+- Data lives in `seasons.json`, with festival dates precomputed for 2027–2032. Verify: the dates against the Vietnamese lunar calendar (UTC+7).
+- The sim runs each season's modifiers, and the §6.9 and §6.11 guardrails must hold in every season.
+
+### 33.5 Social
+
+- **Trail Passport (v1.1):** a stamp for each completed Trail Daily; every 7 stamps unlock a cosmetic. It never resets, so a missed day costs nothing (no streaks, §10).
+- **Play Games (v1.1):** achievements mapped to journal pages, leaderboards for Trail Daily stars, and Saved Games (§22). Verify: Play Games leaderboard resets don't follow the player's local date.
+- **Camp Postcards [C] (v1.2):** a short text code (layout, seed, version and a checksum; about 40–50 characters, Verify) that shares one night at the player's camp. A friend plays that night as a sandbox: no coins, no backend and no free text.
+
+### 33.6 Live-ops rules
+
+- Content ships inside app updates. Remote Config tunes values, caps and feature flags only; there is no remote narrative (§13.2).
+- Seasonal content returns every year. No event currency, countdowns or limited-time offers.
+- Real time never blocks Volume I (D-23); in Volume II it paces only the restoration pages (§33.3).
+- Every update re-runs the sim and its guardrails (§6.9, §6.11) before release.
+
+| v1.1 KPI | Target |
+|---|---|
+| Finishers who open Volume II | At least 80% |
+| Finishers still playing 14 days after the finale | At least 40% |
+| Rewarded opt-in among Volume II players | At least 40% |
 
 ---
 
 ## Appendix A — Decision log
 
-D-01 to D-12 were proposed defaults in the design review. D-13 to D-19 were added while writing 3.0, and D-20 to D-22 after the decisions of 2026-10-11. The status column says which are decided.
+D-01 to D-12 were proposed defaults in the design review. D-13 to D-19 were added while writing 3.0, D-20 to D-22 after the decisions of 2026-10-11, and D-23 to D-28 in 3.1. The status column says which are decided.
 
 | ID | Decision | Status |
 |---|---|---|
 | D-01 | The core loop is the nightly hosting puzzle: guests assigned to pads, decor working by radius. Foraging, fishing and cooking are short errands that feed it | Default, awaiting confirmation |
-| D-02 | Days advance when the player chooses (Path B). No real-time timers, offline accrual or streaks | Decided 2026-10-11 on recommendation (Q1): it suits ad pacing, keeps the puzzle deterministic and fits the cozy pillars |
+| D-02 | Days advance when the player chooses (Path B). No timers on the arc's critical path, no offline accrual and no streaks; the only real-time element is the optional crew (D-23) | Decided 2026-10-11 on recommendation (Q1): it suits ad pacing, keeps the puzzle deterministic and fits the cozy pillars. Amended the same day by D-23 |
 | D-03 | Free to play and ad-supported (§24): all three sites free; revenue from opt-in rewarded ads, an occasional interstitial between days and a one-time Remove Ads purchase (price: Q3). No energy, premium currency or paywalled content | Decided 2026-10-11; replaces the Full Trail unlock |
 | D-04 | Landscape, confirmed by the Phase 1 thumb test (Q5) | Default, awaiting confirmation |
 | D-05 | Godot 4 with GDScript, Android first, no backend. The whole game plays offline; ads and analytics need a connection. Version pinned by D-13 | Default, awaiting confirmation (updated for ads) |
@@ -1194,18 +1405,24 @@ D-01 to D-12 were proposed defaults in the design review. D-13 to D-19 were adde
 | D-14 | Catalog unlocks are tied to specific pages; checked against the sim's purchase log | New in 3.0, awaiting confirmation |
 | D-15 | Add Caramel Custard, a third oven recipe, so L2 ("Bake all 3 oven recipes") works | New in 3.0, awaiting confirmation |
 | D-16 | Same-day purchases are refundable until Goodnight, and Build mode also works in the Evening | New in 3.0, awaiting confirmation |
-| D-17 | The only notification is the Daily reminder, requested after the first completed Daily | New in 3.0, awaiting confirmation |
+| D-17 | Two opt-in local notifications: the Daily reminder, requested after the first completed Daily, and the crew notification (D-25) | New in 3.0, awaiting confirmation; the crew notification is decided (D-25) |
 | D-18 | String Lights are 2×1; Lotus Planter and Reed Screen may sit on bank cells (this justifies their prices) | New in 3.0, awaiting confirmation |
 | D-19 | The Binoculars enable spotting (birds plus a bonus forage node) | New in 3.0, awaiting confirmation |
 | D-20 | Ad design (§24): a Double tips rewarded ad on the Night summary from night 3, once per in-game day; at most one interstitial every 2 in-game days and 4 minutes, only between Sleep and Morning, from day 5; no banners or app-open ads; Remove Ads removes interstitials | New, default awaiting confirmation |
 | D-21 | Ads and services stack: AdMob through the Poing Studios plugin with Google UMP; Firebase Analytics, Crashlytics and Remote Config through a thin custom Android plugin; minSdk 24 | New, default awaiting confirmation (Q6) |
 | D-22 | Hard break: the legacy prototypes, the café-era plans and code, the 2.x design, unused art packs and old scripts are removed from the repo and live only in git history | Done 2026-10-11 |
+| D-23 | Hybrid timers: the arc stays player-paced, and a volunteer crew restores one of grandpa's structures per site in real time (§8.4, §6.10). In v1 it gives keepsakes only, never blocks the arc, costs nothing and never expires. Volume II's restorations use the same crew with real effects (§6.11) | Decided 2026-10-11 |
+| D-24 | Crew speed-up: a rewarded ad removes one chunk, max(15 min, stage time ÷ 6); at most 3 per stage and 6 per calendar day; Finish is free once 5 minutes or less remain; coins never buy time (§6.10, §24) | Decided 2026-10-11; values tuned in playtests (Q12) |
+| D-25 | Crew notification: opt-in, asked once when the hut's roof starts; at most one a calendar day; none between 21:00 and 09:00; merged with the Daily reminder within 2 hours; no urgent copy (§17.6) | Decided 2026-10-11 |
+| D-26 | Volume II (§6.11, §33.3) ships in v1.1, 4–6 weeks after the 100% rollout, not in v1 | Decided 2026-10-11 |
+| D-27 | Live-ops rules (§33.6): content ships in app updates; Remote Config tunes values only; seasonal content returns every year; no event currency, countdowns or limited-time offers | New in 3.1, awaiting confirmation |
+| D-28 | Release plan (§33.2): v1.1 Volume II, the Trail Passport and Play Games; v1.2 Seasons with the first festival week, and Camp Postcards [C]; v1.3 and later Glasscoast and the cove | New in 3.1, awaiting confirmation |
 
 ## Appendix B — Open questions
 
 | # | Question | Needed by | Default or answer |
 |---|---|---|---|
-| Q1 | Confirm Path B (player-paced days, no real-time systems) | Phase −1 | **Resolved 2026-10-11:** yes, on recommendation (D-02) |
+| Q1 | Confirm Path B (player-paced days, no real-time systems) | Phase −1 | **Resolved 2026-10-11:** yes, on recommendation (D-02); amended the same day: the optional crew runs in real time (D-23) |
 | Q2 | Keep the Vietnamese identity subtle, or make it the headline? | Phase 2 | **Resolved 2026-10-11:** subtle (D-07) |
 | Q3 | Remove Ads price | Phase 5 | $2.99, test $3.99 |
 | Q4 | Team size and weekly hours | Phase 0 | **Resolved 2026-10-11:** one full-time developer |
@@ -1216,6 +1433,10 @@ D-01 to D-12 were proposed defaults in the design review. D-13 to D-19 were adde
 | Q9 | Repo housekeeping | — | **Resolved 2026-10-11:** hard break, old content removed (D-22) |
 | Q10 | Crash reporting vendor | — | **Merged into Q6:** Crashlytics |
 | Q11 | Which bidding partners to add to AdMob mediation after launch? | First month after launch | AdMob only until volume justifies mediation |
+| Q12 | Crew stage times and speed-up chunks (§6.10) | Phase 3 playtest | The §6.10 defaults, tuned from the roof gate (§29) and speed-ups per stage (§25) |
+| Q13 | A regional soft launch before the global rollout? | Phase 6 | Staged rollout only (§31). Alternative: 4–6 weeks in 2–3 English-speaking markets to measure retention and ad revenue first |
+| Q14 | Which hemisphere's seasons (§33.4)? | v1.2 | Northern |
+| Q15 | Volume II's last keepsake and its Glasscoast hooks | v1.1 | None; decide together with Q8 |
 
 ## Appendix C — Economy simulation
 
@@ -1405,10 +1626,14 @@ for A,K,lab in ((0.5,1.25,'median'),(1.0,1.25,'median'),(1.0,1.0,'casual'),(1.0,
 
 </details>
 
+**Post-arc probe (3.1):** a throwaway copy of `tools/sim.py` (the Phase −1 model, not the code above) with the finale's stop removed, 30 seeds; the committed script is unchanged. After the finale the bot earns a median of 600 coins a day over the next 60 days (714 with an ad every night, 595 for a casual player). Its last purchase comes 1 day after the finale: nothing is left to buy at Lantern Valley, and the bot never goes back to the other sites. In the median seed (seed 4, finale on day 35) the balance reaches 5,688, 11,365, 17,514 and 35,666 coins 10, 20, 30 and 60 days after the finale, and 16 Pinewatch items and 1 Whisper River item on the build orders, worth 4,275 coins, are never bought. Across seeds those leftovers are worth a median of 5,052 coins (3,275–5,580). §6.11 is sized from these numbers. The post-arc mode joins `tools/sim.py` at the v1.1 gate (§29).
+
 ## Appendix D — Backlog
 
-- **v1.1:** Play Games achievements, leaderboards and Saved Games; photo mode; a shareable camp image.
-- **Content:** Glasscoast; the hidden cove; Snowpass and the "B." collar-tag reveal; Lunar New Year and Mid-Autumn events.
+- **v1.1:** Volume II; the Trail Passport; Play Games achievements, leaderboards and Saved Games (§33.2).
+- **v1.2:** Seasons of the Trail with Lunar New Year and Mid-Autumn festival weeks (§33.4); Camp Postcards [C] (§33.5).
+- **Content (v1.3 and later):** Glasscoast; the hidden cove; Snowpass and the "B." collar-tag reveal.
+- **Later:** photo mode; a shareable camp image, if it doesn't make v1 (§27).
 - **Platforms and languages:** iOS; Spanish; Brazilian Portuguese.
 - **Parked 2.x ideas** (each needs a design reason to return): auto-running sites, supply runs, warden ranks, upkeep, hazards, prestige.
 
@@ -1421,8 +1646,11 @@ for A,K,lab in ((0.5,1.25,'median'),(1.0,1.25,'median'),(1.0,1.0,'casual'),(1.0,
 | Booking board | The morning list of tonight's requests |
 | Cell | A 64×64 px placement square |
 | Chapter | One site's five journal pages |
+| Crew | Ranger Mai's volunteers, who restore grandpa's structures in real time (§8.4) |
 | Elite | The Food Blogger, who appears only at highly rated sites |
+| Gathering | A Volume II booking of 3–5 parties with one brief (§33.3) |
 | Interstitial | A full-screen ad, shown only between Sleep and the next Morning (§24) |
+| Keepsake | A journal entry found in a finished crew stage (§8.4) |
 | Loud | A guest that triggers Light Sleepers on neighbouring pads |
 | Lookout | The spot at each site used for spotting |
 | Need | A trait condition worth 1★ when met |
@@ -1432,18 +1660,23 @@ for A,K,lab in ((0.5,1.25,'median'),(1.0,1.25,'median'),(1.0,1.0,'casual'),(1.0,
 | Reach | Which pads an item affects (r1 or r2) |
 | Regular | A named guest with a short story |
 | Remove Ads | The one-time purchase that turns off interstitials |
-| Rewarded ad | An opt-in ad that doubles a night's tips (§24) |
+| Restoration | One of grandpa's structures, rebuilt by the crew in three stages (§8.4); Volume II adds two per site (§6.11) |
+| Rewarded ad | An opt-in ad: Double tips on the Night summary, or a crew speed-up (§24) |
 | Seats | Walk-in capacity from seat decor |
 | Site day | The Nth day spent at a particular site |
+| Speed-up | A rewarded ad that removes one chunk of a crew stage (§6.10) |
 | Staple | An ingredient bought at the Outfitter (Bread, Tea, Marshmallow, Noodles, Coffee, Sweet Milk) |
 | Trail Daily | The shared daily puzzle |
+| Trail Passport | The v1.1 stamp card for completed Dailies (§33.5) |
 | Vignette | The short scene that plays each night |
+| Volume II | Five more journal pages per site after the finale, from v1.1 (§33.3) |
 | Walk-in | A passer-by who buys a leftover meal |
 
 ## Appendix F — Changelog
 
 | Version | Date | Changes |
 |---|---|---|
+| 3.1 | 2026-10-11 | Hybrid timers: a volunteer crew restores one of grandpa's structures per site in real time, for keepsakes (§8.4, §6.10), with a capped rewarded speed-up (§24) and an opt-in crew notification (§17.6). D-02 and D-17 amended; D-23 to D-28 added. New §33 After launch: Volume II in v1.1 (§6.11, §33.3), sized from a post-arc sim probe (Appendix C); Seasons in v1.2; the Trail Passport, Camp Postcards and live-ops rules. Pillar 3, the journal (72 entries), scope, assets, roadmap, KPIs, risks and backlog updated |
 | 3.0 | 2026-10-11 | Rewritten around the evening hosting puzzle. One economy table, sim-checked pacing, and production sections (stack, save, budgets, monetization, compliance, roadmap). Same day: ads-first monetization replaces the Full Trail unlock (all sites free; rewarded ads, a capped interstitial, Remove Ads; the sim gains an ads switch), and a hard break removes earlier designs and legacy code from the repo |
 | 2.x | — | Activity-loop design. Removed in the 3.0 hard break; see git history |
 

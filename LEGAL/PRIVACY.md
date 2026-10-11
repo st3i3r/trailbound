@@ -55,7 +55,7 @@ TODO: counsel to confirm these bases and how Firebase consent mode follows the c
 - **US state privacy laws:** the same Privacy options entry lets you opt out of the use of your data for targeted advertising where those laws apply.
 - **Advertising ID:** you can reset or delete it in your Android settings.
 - **Remove Ads:** the one-time purchase turns off the full-screen ads between days. Rewarded ads stay available and are always optional.
-- **Notifications:** the game asks before sending the Daily reminder. You can turn it off in Settings or in Android settings.
+- **Notifications:** the game asks before sending the Daily reminder or the crew notification (when a restoration stage is ready). You can turn either off in Settings or in Android settings.
 
 TODO: decide whether Settings also offers an analytics opt-out.
 

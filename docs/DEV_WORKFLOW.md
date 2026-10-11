@@ -128,10 +128,11 @@ Weeks and full deliverables: GDD §29.
 | **0. Scaffold** | `game/` Godot project: display settings (640×360, `canvas_items`, integer scaling), TileMapLayer+Y-sort test, autoloads, save system (`save_version`), catalog loader (JSON+validation), **debug menu**, Android export (Gradle build) to the internal track; spikes: renderer/2D lights, Vietnamese font, AdMob plugin (pin a release), custom Firebase plugin | F5 boots a scene; debug menu works; save round-trips; the AAB installs from the internal track; 20 lights at 60 fps on Device B; a Vietnamese pangram renders; a test ad and a test analytics event come through on Device A |
 | **1. Greybox** | Pinewatch days 1–5, placeholder art: Morning → Prep (forage, cook, build) → Evening seating with star preview → Night | **≥3 of 5 testers want to continue; median day 4–6 min; testers can explain their stars** — the make-or-break gate before art spend |
 | **2. Style lock** | Batch 0 (GDD §28) → approve → one production Pinewatch dusk screen; time every asset | look approved on the real phone; art hours re-estimated |
-| **3. Pinewatch complete** | all Pinewatch content, onboarding, letters 1–10, the dog, journal, settings, EN+VI, audio | 5 testers finish the chapter; median completion on day 8–11 |
-| **4. River, Valley, Daily** | sites 2–3, regulars, finale, Trail Daily | arc completable; guardrails hold on real data; Daily deterministic + solver-checked |
-| **5. Platform** | ad placements + pacing, UMP consent + privacy options, Remove Ads (Play Billing) + restore, Firebase Analytics/Crashlytics/Remote Config, Daily reminder notification, privacy policy + data safety | ads verified with test units incl. no fill; consent verified with the EEA debug geography; Remove Ads purchase incl. pending + refund verified with license testers; GDD §23 budgets met with ads on |
-| **6. Store** | listing assets (EN+VI), AAB signing, closed test (12 testers × 14 days), pre-launch report, staged rollout | closed test complete; crash-free ≥ 99.5%; production access granted |
+| **3. Pinewatch complete** | all Pinewatch content, onboarding, letters 1–10, the dog, journal, settings, EN+VI, audio; the crew + Warden's Hut (GDD §8.4) | 5 testers finish the chapter; median completion on day 8–11; ≥4 of 5 testers come back for the hut's roof |
+| **4. River, Valley, Daily** | sites 2–3, regulars, finale, Trail Daily, Boathouse + Lantern Workshop | arc completable; guardrails hold on real data; Daily deterministic + solver-checked |
+| **5. Platform** | ad placements + pacing (Double tips, crew speed-up, interstitial), UMP consent + privacy options, Remove Ads (Play Billing) + restore, Firebase Analytics/Crashlytics/Remote Config, Daily reminder + crew notification, privacy policy + data safety | ads verified with test units incl. no fill; consent verified with the EEA debug geography; Remove Ads purchase incl. pending + refund verified with license testers; notifications respect quiet hours + the daily cap; GDD §23 budgets met with ads on |
+| **6. Store** | listing assets (EN+VI), AAB signing, closed test (12 testers × 14 days), pre-launch report, staged rollout; Volume II work starts during the closed test | closed test complete; crash-free ≥ 99.5%; production access granted |
+| **7. Volume II (v1.1)** | Volume II (GDD §33.3), Trail Passport, Play Games; post-arc mode in `tools/sim.py` | GDD §6.11 guardrails hold; ships 4–6 weeks after the 100% rollout |
 
 **Gate discipline:** phase 1 is the risk kill — if the greybox loop isn't fun,
 no art is generated. Art never leads gameplay.
@@ -147,7 +148,8 @@ no art is generated. Art never leads gameplay.
 - **Per-release device pass:** Device A (touch/UX) + Device B (60fps gate) +
   Device C (tablet layout) + back-button stack + offline + kill-and-resume in
   every phase + ads: with and without Remove Ads, no fill, airplane mode,
-  consent declined, backgrounded mid-ad (GDD §17.7, §30)
+  consent declined, backgrounded mid-ad + the crew across reboots and clock
+  changes + notification quiet hours and daily cap (GDD §17.7, §30)
 - **Play pre-launch report** before every track promotion — free automated
   device matrix
 - **Human playtests:** closed test group — recruit VN players deliberately;
