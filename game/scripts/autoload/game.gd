@@ -471,9 +471,7 @@ func _world() -> Dictionary:
 	for gid in st["assignments"]:
 		for pid in st["assignments"][gid]:
 			occ[pid] = gid
-	var kinds := {}
-	for t in Catalog.data.get("traits", []):
-		kinds[t["id"]] = t.get("kind", "need")
+	var kinds := _trait_kinds()
 	return {"layout": Catalog.data.get("layouts", {}).get(site_id, {}),
 		"campfire": st["campfire"], "decor": st["decor"],
 		"pads": st["pads"], "occupants": occ,
@@ -1176,20 +1174,47 @@ func daily_n(date_str: String) -> int:
 ## the same cards, kit and meals.
 func daily(date_str := "") -> Dictionary:
 	var d := _daily_date(date_str)
-	var rng := RandomNumberGenerator.new()
-	rng.seed = absi(int(("daily|" + d).hash()))
-	var skip := ["seats", "warmth_upgrade", "none"]
-	var kit_pool: Array = Catalog.data.get("decor", []).filter(
-		func(x): return String(x.get("unlock", "")).begins_with("P") \
-			and x.get("effect") not in skip)
-	var pz := Seating.daily_puzzle(site_row(&"pinewatch"),
-		Catalog.data.get("archetypes", []), kit_pool,
-		_favourite_pool(&"pinewatch"), rng)
+	var pz := _daily_gen(d, _daily_tries(d))
 	pz["date"] = d
 	pz["n"] = daily_n(d)
 	pz["attempted"] = daily_state["date"] == d \
 		and daily_state["score"] >= 0
 	return pz
+
+
+## Deterministic reroll chain (§10): attempt k>0 uses seed
+## "daily|date|rk". The CI solver (tests/daily_check) bakes the
+## accepted try count into data/daily_seeds.json; dates beyond the
+## table fall back to the raw seed.
+func _daily_seed(d: String, tries: int) -> int:
+	var s := "daily|" + d
+	if tries > 0:
+		s += "|r%d" % tries
+	return absi(int(s.hash()))
+
+
+func _daily_tries(d: String) -> int:
+	return int(Catalog.data.get("daily_seeds", {}).get(
+		"seeds", {}).get(d, 0))
+
+
+func _daily_gen(d: String, tries: int) -> Dictionary:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = _daily_seed(d, tries)
+	var skip := ["seats", "warmth_upgrade", "none"]
+	var kit_pool: Array = Catalog.data.get("decor", []).filter(
+		func(x): return String(x.get("unlock", "")).begins_with("P") \
+			and x.get("effect") not in skip)
+	return Seating.daily_puzzle(site_row(&"pinewatch"),
+		Catalog.data.get("archetypes", []), kit_pool,
+		_favourite_pool(&"pinewatch"), rng)
+
+
+func _trait_kinds() -> Dictionary:
+	var kinds := {}
+	for t in Catalog.data.get("traits", []):
+		kinds[t["id"]] = t.get("kind", "need")
+	return kinds
 
 
 ## Score an attempt. assignments: {guest_id: [pad_ids]};
@@ -1218,9 +1243,7 @@ func daily_score(puzzle: Dictionary, assignments: Dictionary,
 			occupants[pid] = gid
 		seated.append({"guest": guests[gid],
 			"pad_ids": assignments[gid]})
-	var kinds := {}
-	for t in Catalog.data.get("traits", []):
-		kinds[t["id"]] = t.get("kind", "need")
+	var kinds := _trait_kinds()
 	var world := Seating.daily_world(puzzle, decor_items, occupants,
 		guests, kinds, Catalog.data.get("reviews", {}))
 	var plan := Seating.allocate_meals(puzzle["meals"], seated)

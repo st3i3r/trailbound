@@ -465,3 +465,227 @@ static func daily_world(puzzle: Dictionary, decor_items: Array,
 		"pads": {}, "occupants": occupants, "guests": guests,
 		"decor": decor_items, "weather": "clear",
 		"trait_kinds": trait_kinds, "comments": comments, "day": 0}
+
+
+# ------------------------------------------------------------- solver (§10)
+#
+# Exact enumeration: 6 guest subsets × 5! pad assignments × 6P4
+# decor placements. eval_guest is memoized on its exact read-set —
+# (guest, pad, effect-signature, occupied, loud) — so the oracle IS
+# the game scorer, no port drift. Meal terms are per-subset via the
+# real allocate_meals (order-canonical: request order).
+#
+# A puzzle passes when best ≥ 22 AND naive ≤ best − 3 — "within 2
+# of the best" rerolls, so the gap must clear 2 (§10).
+
+static func _permutations(items: Array, k: int) -> Array:
+	var out := []
+	if k == 0:
+		return [[]]
+	for i in items.size():
+		var rest := items.duplicate()
+		var x = rest.pop_at(i)
+		for tail in _permutations(rest, k - 1):
+			out.append([x] + tail)
+	return out
+
+
+## First-fit player: requests in order → pads in order, kit in
+## order → spots in order. The gate's baseline (§10).
+static func daily_naive(puzzle: Dictionary,
+		trait_kinds: Dictionary) -> int:
+	var plan := _naive_plan(puzzle)
+	return _plan_score(puzzle, plan[0], plan[1], plan[2],
+		trait_kinds, {})
+
+
+## Canonical naive configuration, also used by daily_solve to skip
+## re-deriving it.
+static func _naive_plan(puzzle: Dictionary) -> Array:
+	var reqs: Array = puzzle["requests"]
+	var pad_ids: Array = puzzle["pads"].keys()
+	var spots: Array = puzzle["decor_spots"]
+	var seated: Array = reqs.slice(0, 5)
+	var occupants := {}
+	for i in seated.size():
+		occupants[pad_ids[i]] = seated[i]["id"]
+	var items := []
+	for i in mini(puzzle["kit"].size(), spots.size()):
+		var k: Dictionary = puzzle["kit"][i]
+		var s: Array = spots[i]
+		items.append({"id": k["id"], "cells": [Vector2i(s[0], s[1])],
+			"effect": k.get("effect", ""), "reach": k.get("reach", 1)})
+	return [seated, occupants, items]
+
+
+## Score one (seated, occupants, decor_items) configuration exactly
+## as the game would: same eval_guest, same allocate_meals, same
+## stars formula. Returns total stars.
+static func _plan_score(puzzle: Dictionary, seated: Array,
+		occupants: Dictionary, decor_items: Array,
+		trait_kinds: Dictionary, eval_cache: Dictionary) -> int:
+	var guests := {}
+	for r in puzzle["requests"]:
+		guests[r["id"]] = r
+	var world := daily_world(puzzle, decor_items, occupants,
+		guests, trait_kinds, {})
+	var terms: Dictionary = allocate_meals(puzzle["meals"],
+		seated.map(func(r): return {"guest": r, "pad_ids": []}))["terms"]
+	var total := 0
+	for pid in occupants:
+		var g: Dictionary = guests[occupants[pid]]
+		var key := "%s|%s|%s" % [g["id"], pid, _ctx_key(pid, world)]
+		var ev: Dictionary = eval_cache.get(key, {})
+		if ev.is_empty():
+			ev = eval_guest(g, [pid], world)
+			eval_cache[key] = ev
+		total += Econ.stars(0, int(terms.get(g["id"], 0)),
+			ev["needs_met"], ev["aversions"], 0)
+	return total
+
+
+## The full read-set of eval_guest for a single-pad guest: which
+## effects cover the pad, whether a neighbour is occupied, whether
+## one is loud. Tags are implied by the pad id.
+static func _ctx_key(pad_id: String, world: Dictionary) -> String:
+	var layout: Dictionary = world["layout"]
+	var spots: Dictionary = layout["pads"]["spots"]
+	var cell := Vector2i(spots[pad_id][0], spots[pad_id][1])
+	var occupied := ""
+	var loud := ""
+	for nb: String in layout["pads"]["neighbours"].get(pad_id, []):
+		var who: String = world["occupants"].get(nb, "")
+		if who != "":
+			occupied = "o"
+			if world["guests"].get(who, {}).get("loud", false):
+				loud = "l"
+	var eff := effects_at(cell, world).keys()
+	eff.sort()
+	return "%s%s%s" % ["".join(eff), occupied, loud]
+
+
+## Exhaustive solve. Returns {"best", "naive", "gap", "accept",
+## "play": the winning configuration for inspection}.
+static func daily_solve(puzzle: Dictionary,
+		trait_kinds: Dictionary) -> Dictionary:
+	var reqs: Array = puzzle["requests"]
+	var pad_ids: Array = puzzle["pads"].keys()
+	var spots: Array = puzzle["decor_spots"]
+	var kit: Array = puzzle["kit"]
+
+	var decor_plans := []
+	for sp in _permutations(range(spots.size()), kit.size()):
+		var items := []
+		for i in kit.size():
+			var k: Dictionary = kit[i]
+			var s: Array = spots[sp[i]]
+			items.append({"id": k["id"],
+				"cells": [Vector2i(s[0], s[1])],
+				"effect": k.get("effect", ""),
+				"reach": k.get("reach", 1)})
+		decor_plans.append(items)
+
+	var subsets := []
+	var terms_list := []
+	var guests := {}
+	var loud := {}
+	var nbs := {}
+	var gidx := {}
+	var pidx := {}
+	for i in reqs.size():
+		guests[reqs[i]["id"]] = reqs[i]
+		loud[reqs[i]["id"]] = reqs[i].get("loud", false)
+		gidx[reqs[i]["id"]] = i
+	for i in pad_ids.size():
+		nbs[pad_ids[i]] = puzzle["pads"][pad_ids[i]]["neighbours"]
+		pidx[pad_ids[i]] = i
+	for drop in reqs.size():
+		var seated := reqs.slice(0, drop) + reqs.slice(drop + 1)
+		subsets.append(seated)
+		terms_list.append(allocate_meals(puzzle["meals"],
+			seated.map(func(r): return {"guest": r,
+				"pad_ids": []}))["terms"])
+	var pad_perms := _permutations(pad_ids, pad_ids.size())
+	var world := daily_world(puzzle, [], {}, guests,
+		trait_kinds, {})
+
+	# Configurations: every (subset, assignment) once — neighbour
+	# state per pad collapses to 1 quiet / 2 loud (all pads filled).
+	# Per guest the (guest,pad,state) contribution key is arithmetic:
+	# gidx*10 + pidx*2 + (state-1), and keys/terms are plan-invariant.
+	var configs := []
+	for si in subsets.size():
+		var seated: Array = subsets[si]
+		var terms: Dictionary = terms_list[si]
+		for perm in pad_perms:
+			var occupants := {}
+			var keys := []
+			var tv := []
+			var pl := []
+			for i in seated.size():
+				occupants[perm[i]] = seated[i]["id"]
+			for i in seated.size():
+				var pid: String = perm[i]
+				var gid: String = seated[i]["id"]
+				var s := 1
+				for nb: String in nbs[pid]:
+					var who: String = occupants.get(nb, "")
+					if who != "" and loud.get(who, false):
+						s = 2
+						break
+				keys.append(gidx[gid] * 10 + pidx[pid] * 2 + s - 1)
+				tv.append(int(terms.get(gid, 0)))
+				pl.append(pid)
+			configs.append({"si": si, "occ": occupants,
+				"k": keys, "t": tv, "p": pl})
+
+	# Per decor plan: evaluate (guest, pad, state) for every state
+	# the board can actually produce, storing needs−aversions as an
+	# int — the enumeration then runs on table lookups only.
+	var best := -1
+	var best_play := {}
+	for items in decor_plans:
+		world["decor"] = items
+		var contrib := {}
+		for pid in pad_ids:
+			for g in reqs:
+				var gid: String = g["id"]
+				for s in [1, 2]:
+					var standin := ""
+					for r2 in reqs:
+						if r2.get("loud", false) == (s == 2) \
+								and r2["id"] != gid:
+							standin = r2["id"]
+							break
+					if standin == "":
+						continue               # unreachable state
+					var occ := {}
+					occ[nbs[pid][0]] = standin
+					world["occupants"] = occ
+					var ev := eval_guest(g, [pid], world)
+					contrib[gidx[gid] * 10 + pidx[pid] * 2 + s - 1] = \
+						ev["needs_met"] - ev["aversions"]
+		for cfg in configs:
+			var total := 0
+			var keys: Array = cfg["k"]
+			var tv: Array = cfg["t"]
+			for j in 5:
+				var c = contrib.get(keys[j])
+				if c == null:                # defensive: evaluate
+					world["occupants"] = cfg["occ"]
+					var ev2 := eval_guest(
+						guests[cfg["occ"][cfg["p"][j]]],
+						[cfg["p"][j]], world)
+					c = ev2["needs_met"] - ev2["aversions"]
+				total += clampi(2 + tv[j] + int(c), 1, 5)
+			if total > best:
+				best = total
+				best_play = {"drop": cfg["si"],
+					"occupants": cfg["occ"].duplicate(),
+					"decor": items.map(
+						func(d): return {"id": d["id"],
+							"cells": d["cells"]})}
+	var naive := daily_naive(puzzle, trait_kinds)
+	return {"best": best, "naive": naive, "gap": best - naive,
+		"accept": best >= 22 and naive <= best - 3,
+		"play": best_play}

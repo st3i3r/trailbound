@@ -645,7 +645,7 @@ On day 2, Ranger Mai's van drops off a small volunteer crew. At each site they r
 - One scored attempt per day; unlimited practice afterwards.
 - Share text: "Trailbound Daily #N — x/25" followed by one row of stars per guest. N counts days since launch.
 - Seed = hash("daily", local device date). No leaderboard or Trail Passport until v1.1 (§33.5), and no streaks.
-- A CI solver checks the next 400 dailies. A seed is rerolled deterministically if its best score is below 22, or if a naive placement scores within 2 of the best.
+- A CI solver checks the next 400 dailies. A seed is rerolled deterministically if its best score is below 22, or if a naive placement scores within 2 of the best. Implementation: the solver enumerates the full decision space (6 guest subsets × 5! pad assignments × 6P4 decor placements) using the game's own scoring functions — no separate evaluator. Reroll k>0 uses seed hash("daily|" + date + "|r" + k); accepted try counts are baked to `data/daily_seeds.json` (`tests/daily_check.tscn`, shardable via `--from/--days`), so the device does an O(1) lookup and dates beyond the table fall back to the raw seed. The naive baseline is the first-fit player: requests in order onto pads in order, kit in order onto spots in order.
 - A compact layout that reuses Pinewatch art.
 - No ads inside the Daily (§24).
 

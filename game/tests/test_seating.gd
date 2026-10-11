@@ -474,6 +474,42 @@ func _ready() -> void:
 		Game.daily_state["score"] == scored
 		and Game.daily(today)["attempted"])
 
+	# --- daily solver (§10 CI gate) --------------------------------------
+	var pzs := Game.daily("2025-03-15")
+	var sol: Dictionary = Seating.daily_solve(pzs, Game._trait_kinds())
+	check("best within bounds", sol["best"] <= 25 and sol["best"] > 0,
+		"got %d" % sol["best"])
+	check("naive never beats best", sol["naive"] <= sol["best"],
+		"got %d vs %d" % [sol["naive"], sol["best"]])
+	check("accept implies gates", not sol["accept"] or
+		(sol["best"] >= 22 and sol["gap"] >= 3))
+	# The winning play must reproduce `best` through the real scoring
+	# path — solver vs game parity, the whole point of the design.
+	var occ_inv := {}
+	for pid in sol["play"]["occupants"]:
+		occ_inv[sol["play"]["occupants"][pid]] = pid
+	var asg3 := {}
+	for rq in pzs["requests"]:
+		if occ_inv.has(rq["id"]):
+			asg3[rq["id"]] = [occ_inv[rq["id"]]]
+	var plc3 := {}
+	for d in sol["play"]["decor"]:
+		plc3[d["id"]] = d["cells"]
+	check("solver best achievable", Game.daily_score(
+		pzs, asg3, plc3)["score"] == sol["best"],
+		"got %d vs %d" % [Game.daily_score(
+			pzs, asg3, plc3)["score"], sol["best"]])
+	# Reroll chain: try k>0 is a different deterministic puzzle.
+	var pzr := Game._daily_gen("2025-03-15", 1)
+	check("reroll differs", pzr["requests"].map(
+		func(r): return r["archetype"]) != pzs["requests"].map(
+			func(r): return r["archetype"])
+		or pzr["kit"] != pzs["kit"] or pzr["meals"] != pzs["meals"])
+	check("reroll deterministic",
+		Game._daily_gen("2025-03-15", 1) == pzr)
+	check("seeds table drives tries",
+		Game._daily_tries("2099-01-01") == 0)
+
 	# --- the dog (§9) ----------------------------------------------------
 	Game.dog = {"name": "Bean", "bond": 0, "met": false,
 		"pet_today": false}
