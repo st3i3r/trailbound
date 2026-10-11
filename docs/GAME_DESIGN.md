@@ -1,7 +1,7 @@
 # TRAILBOUND — Game Design & Asset Bible
 
-> Working title. A cozy camping/travel game for Telegram Mini Apps (mobile-first, works on
-> desktop Telegram + web). **Visual target: `reference/eastward.jpg`** — fixed 3/4 tilted
+> Working title. A cozy camping/travel game for **Android on Google Play** (mobile-first;
+> iOS/web possible later via the same engine). **Visual target: `reference/eastward.jpg`** — fixed 3/4 tilted
 > top-down (flat ground, object fronts), painterly soft-dithered pixel art, bright
 > daylight lush palette. `reference/example.png` = secondary ref for prop density and
 > ember-light dusk mood (delivered by our day/night tint, not the base style).
@@ -54,7 +54,7 @@ that slowly becomes home.*
    of the journal. There is no "right" spend.
 4. **Gear is progression.** One purchase = one new thing to do. Never a stat stick.
 5. **The journal remembers.** Everything collected is a page filled — visible, shareable
-   progress (Telegram-native bragging rights).
+   progress (native share-sheet bragging rights).
 
 ---
 
@@ -444,27 +444,53 @@ UI widgets come from `create-ui-elements` (Pro adds concept+palette guidance): a
 | **No audio in plan** | WebAudio procedural (fire crackle = filtered noise, blips) + free SFX (freesound/Kenney audio) — zero art budget needed |
 | **No pixel font chosen** | Silkscreen/VT323/Micro5 (Google Fonts, OFL) — load early, it's half the "pixel game" feel |
 | **Sprite packing** | Manifest loader + simple bin-pack script → one atlas PNG, fewer requests on mobile |
-| **Telegram SDK not wired** | `@twa-dev/sdk` — initData, haptics (catch fish → bump), viewport lock, theme sync; prototype still works standalone |
-| **localStorage only** | Fine for demo; real save → tiny backend endpoint keyed by Telegram user id |
+| **Platform SDKs (Android)** | Play Games Services plugin (achievements/leaderboards/cloud save) + Play Billing + FCM — Godot plugins exist; wire at P1 |
+| **localStorage only** | Fine for demo; real save → Play Games cloud save (user:// fallback) |
 | **Depth sort edge cases** | Painter-sort by (i+j) w/ entity Y-fine-tiebreak — already in compositor; add `z_offset` field for tall props |
 
-### 7.8 Locked stack (approved)
+### 7.8 Locked stack v3 — GOOGLE PLAY / ANDROID (re-approved, supersedes all)
+
+Target platform is **native Android on Google Play** — NOT Telegram Mini App.
+Researched alternatives: Unity (heavier, seat costs, slower iteration — only if
+ad-mediation depth is needed later) · Defold (strong casual-2D, thin ecosystem) ·
+Flutter+Flame (great UI, weak game tooling) · Capacitor webview wrap (Play policy
+risk + WebView perf) — all rejected.
 
 ```
-client/  = Vite + TypeScript + PixiJS v8 + @twa-dev/sdk
-render   = PixiJS Container tree + Y-sort depth adapter (3/4 tilted top-down)
-           (game logic/entities engine-agnostic → Canvas-2D fallback stays possible)
-assets   = manifest-driven (sprite path swap = art upgrade, zero code change)
-sprites  = PixiJS Assets atlas packing, ScaleMode 'nearest'
-effects  = additive glow sprites + scene tint filter (fire glow, dusk/day)
-audio    = WebAudio procedural SFX + free packs
-save     = localStorage (demo) → tiny backend keyed by Telegram user id (later)
-font     = Silkscreen or VT323 (OFL)
-perf gate= first check on Telegram Android WebView (weakest link)
+engine    = Godot 4.5+ (GDScript) — real 2D renderer, MIT license, ~35-50MB AAB
+            also exports iOS + web-demo later. C# Android export is experimental
+            → GDScript only.
+scene     = 1 scene per campsite (5 site scenes) + overlay UI scenes
+render    = y_sort_enabled (native Y-sort — no painter-sort code)
+terrain   = TileMapLayer (flat ground + edge strips)
+anims     = AnimatedSprite2D + AnimationPlayer (all batch-4/5 frame anims)
+ui        = Control nodes + themes — pixel font + parchment panels, responsive,
+            RTL/i18n via TranslationServer (.po)
+assets    = SAME manifest-driven PNG sprites/atlases — engine-agnostic, budget unchanged
+effects   = CanvasItem shaders (day/dusk tint, glow) + GPUParticles2D
+            (fireflies, embers, rain) — the 0-gen layer preserved
+audio     = AudioStreamPlayer buses: ambience / sfx / music
+save      = user:// JSON + save_version → Play Games cloud save
+platform  = Play Games Services (achievements, leaderboards, cloud save)
+            · Google Play Billing (cosmetic IAP — replaces Stars plan)
+            · FCM push notifications (daily letter / guests-waiting — the
+              retention channel TMA lacked)
+            · optional AdMob rewarded ads (cozy-mobile norm, non-intrusive)
+ops       = AAB via Android build template + Gradle · fastlane → internal/closed
+            track · Crashlytics (or Sentry) · Firebase Analytics + Remote Config
+            (economy tuning without redeploy)
+policy    = Play requires: AAB · targetSdk latest · 16KB page-size native libs
+            (Godot 4.4+ templates comply) · IARC rating · data-safety form ·
+            privacy policy (LEGAL/ ✓) · NEW DEV ACCOUNTS: closed test
+            ~20 testers × 14 days before production — plan launch lead-time
+font      = Silkscreen (OFL) + CJK/Cyrillic fallback stack
+perf gate = integer pixel-scaling viewport; 60fps on low-end Android
+            (Snapdragon 4xx / 3GB RAM floor) — no WebView ceiling anymore
 ```
 
-PixiJS earns its place at client/ scaffold time — not in the prototype — for filters,
-atlas packing, and particle headroom. Phaser/KAPLAY rejected: we own the game logic.
+`client/` (Vite/PixiJS) scaffold = **superseded** — kept as reference only; Godot
+can emit a web demo build later if wanted. `prototype/` remains the playable
+sandbox. ALL design/manifest/economy content is unchanged — sprites are PNGs.
 
 ### 7.9 Cast generation sheet (prompts + per-char cost)
 
@@ -523,7 +549,7 @@ Kid anims: `run` ×4 + `play` — they never walk calmly anyway.
 
 **Player skins** — v1 ships ONE protagonist (the campsite keeper = you).
 Variants later: palette-swap recolors ≈ 0 gens; alternate body sprites
-~15-17 gens each → natural Stars cosmetic item.
+~15-17 gens each → natural Play Billing cosmetic item.
 
 Variant trick (Tier-1-safe): `edit-image-pro` / `create-sl-image-pro` with the
 approved sprite as reference → outfit/color variants. (`try-on` is Tier 2.)
@@ -561,7 +587,7 @@ game needs these too — sorted by who makes them:
     procedural (fire crackle = filtered noise — already stubbed)
   - Music: ambient campfire loop — AI music tool (separate service) or
     CC0 ambient tracks; budget ~2-3 loops (day/dusk/activity)
-- **Monetization** — Telegram Stars: cosmetic gear + convenience (never
+- **Monetization** — Google Play Billing cosmetics + optional rewarded ads (never
   energy-predatory; cozy audience punishes it). Decide model before launch.
 - **Backend** — server save (multi-device + anti-cheat validation), remote
   config for economy tuning, Sentry error reporting, minimal analytics
@@ -579,11 +605,11 @@ game needs these too — sorted by who makes them:
 - **i18n-ready** — strings extracted day one; Silkscreen is Latin-only → need
   fallback font for Cyrillic/CJK later
 - **A11y/perf budgets** — 44px min tap targets, colorblind-check palette,
-  reduced-motion toggle, <3s cold start, <100MB RAM on Android WebView
-- **CI/CD** — GH Actions: typecheck+build on push; Playwright smoke on the loop
-- **TMA platform checklist** — BotFather setup, bot description/commands,
-  HTTPS hosting (cloudflared for dev), Telegram header/safe-area testing,
-  content rating
+  reduced-motion toggle, <3s cold start, 60fps on Snapdragon 4xx-class devices
+- **CI/CD** — GH Actions → Gradle AAB build → fastlane to Play internal track
+- **Play platform checklist** — dev account + $25 fee, AAB + 16KB libs, IARC
+  rating, data-safety form, store listing (icon/feature graphic/screenshots),
+  closed test ~20 testers × 14 days before production access
 
 ### 7.11 COMPLETE coverage matrix — every tile, state, object
 
@@ -802,9 +828,10 @@ or get added as one.
 #### Non-art production assets (0 gens, still required)
 audio SFX ~35 (ambience ×8, actions ×15, UI ×7, dog ×3, music ×3 loops) ·
 save_version + migrations · zod catalog schemas · CI/CD + Playwright smoke ·
-Sentry · analytics funnel events · remote economy config · i18n extraction ·
-a11y pass · TMA checklist (BotFather, banner, description, rating, safe areas,
-HTTPS) · Stars cosmetic catalog · LEGAL (have)
+Sentry/Crashlytics · analytics funnel events · remote economy config · i18n extraction ·
+a11y pass · **Play Store checklist** (AAB, 16KB libs, IARC rating, data-safety form,
+closed-test 20×14d, store listing assets: icon+feature graphic+screenshots) ·
+Billing cosmetic catalog · LEGAL (have)
 
 ### 7.14 FINAL totals
 
@@ -1037,12 +1064,14 @@ the biggest retention-per-gen lever in the whole plan.
 - **Decorating** — decor catalog grows monthly; camp-as-canvas is the
   actual endgame expression for this genre
 
-**Social (Telegram-native, no realtime multiplayer needed):**
-- **Async camp visits** — see friends' camps, leave guestbook signatures +
-  small gifts; the strongest TMA-native hook available
-- **Postcards** — composite your camp → share to chat (already in manifest)
-- **Leaderboards** — biggest fish / fastest journal / most signatures
-  (Telegram high-score API is free)
+**Social (Play-native, no realtime multiplayer needed):**
+- **Play Games leaderboards + achievements** — biggest fish / fastest journal /
+  most signatures — official, free, no backend needed
+- **Postcards** — composite your camp → native share sheet (WhatsApp/IG/etc.)
+- **Async camp visits** (later, backend) — see friends' camps, guestbook
+  signatures + small gifts
+- **FCM notifications** — daily letter / guests waiting / supply run arrived —
+  the retention channel Telegram lacked
 
 **Honest math:** 3-month survival for indie games is hard — good casual D30
 is ~5-10%. The goal isn't "everyone stays," it's "people who connect get
