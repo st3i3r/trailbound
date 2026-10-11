@@ -53,7 +53,7 @@ func _ready() -> void:
 	var again := Seating.board(Game.site_row(),
 		Catalog.data["archetypes"], Game.site_day(),
 		Game._open_pads(st), Game.rating(), Game._rng_for("board"),
-		Game._has_free_pair(st))
+		Game._has_free_pair(st), Game._favourite_pool())
 	check("board reseeds identically", again == st["board"])
 
 	# Weekend boards carry one extra request (§5.2).
@@ -202,6 +202,91 @@ func _ready() -> void:
 		and back["decor"].size() == 1
 		and back["decor"][0]["cells"][0] == Vector2i(5, 1)
 		and Game.coins == 430)
+
+	# --- kitchen: forage → pantry → cook (§7) --------------------------
+	Game.pantry = {}
+	Game.meals = []
+	var nodes: Array = Game.site_state()["forage_nodes"]
+	check("6 seeded forage nodes", nodes.size() == 6
+		and nodes.all(func(n): return n["items"].size() == 2))
+	var first_items: Array = nodes[0]["items"].duplicate()
+	var got := Game.gather("f0")
+	check("gather moves items to pantry",
+		got.size() == 2 and Game.pantry_count() == 2
+		and got == first_items, "got %s" % [got])
+	# Pantry capacity: fill to the brim, node keeps its leftovers.
+	for i in 18:
+		Game.pantry_add("berries", 1)
+	var left := Game.gather("f1")
+	check("full pantry keeps node items", left.is_empty()
+		and Game.pantry_count() == 20)
+
+	Game.pantry = {"mushroom": 2, "herb": 1, "bread": 1,
+		"sweet_milk": 1, "honey": 1, "tea": 1}
+	var c := Game.cook("mushroom", "herb")
+	check("known pair cooks", c["result"] == "ok"
+		and c["recipe"] == "trail_stew"
+		and Game.meals[0]["price"] == 20
+		and Game.pantry.get("mushroom", 0) == 1)
+	c = Game.cook("bread", "tea")
+	check("unknown pair → Camp Mash", c["result"] == "ok"
+		and c["recipe"] == "camp_mash"
+		and Game.meals[1]["price"] == 5)
+	c = Game.cook("sweet_milk", "honey")
+	check("oven pair hints, keeps ingredients",
+		c["result"] == "oven_hint"
+		and Game.pantry.get("sweet_milk", 0) == 1
+		and Game.meals.size() == 2)
+	Game.gear.append("oven")
+	c = Game.cook("sweet_milk", "honey")
+	check("oven unlocked cooks custard", c["recipe"] == "caramel_custard"
+		and Game.meals.size() == 3)
+	Game.gear.erase("oven")
+	c = Game.cook("mushroom", "mushroom")
+	check("same-ingredient pair needs 2",
+		c["result"] == "missing" or c["recipe"] == "mushroom_skewers",
+		"got %s" % c)
+	Game.pantry = {"rice": 1, "herb": 1}
+	c = Game.cook("rice", "herb")
+	check("gỏi cuốn cooks", c["result"] == "ok"
+		and c["recipe"] == "goi_cuon"
+		and Game.meals.back()["price"] == 25, "got %s" % c)
+	Game.pantry = {}
+	Game.meals = []
+	Game.gear = []
+
+	# Staples + gear purchases + fishing (§7.2).
+	Game.coins = 30
+	check("buy tea (P1 staple)", Game.buy_staple("tea")
+		and Game.coins == 25 and Game.pantry.get("tea") == 1)
+	check("noodles gated at Pinewatch", not Game.buy_staple("noodles"))
+	check("no rod, no fish", Game.fish_catch("pond") == "")
+	Game.coins = 200
+	check("buy fishing rod", Game.buy_gear("fishing_rod")
+		and Game.coins == 50)
+	Game.pantry = {}
+	var catches := []
+	for i in 5:
+		catches.append(Game.fish_catch("pond"))
+	check("3 catches per spot", catches.slice(0, 3).all(
+			func(f): return f in ["perch", "carp"])
+		and catches[3] == "" and catches[4] == "",
+		"got %s" % [catches])
+	Game.site_state()["weather"] = "rain"
+	check("rain adds a 4th", Game.fish_catch("pond") != "")
+	Game.site_state()["weather"] = "clear"
+	Game.gear = []
+	Game.pantry = {}
+
+	# Every board card carries a cookable favourite (§5.2).
+	var pool := Game._favourite_pool()
+	check("favourite pool non-empty", pool.size() >= 7,
+		"got %d" % pool.size())
+	var all_named := true
+	for req in Game.site_state()["board"]:
+		if req.get("favourite", "") not in pool:
+			all_named = false
+	check("cards carry favourites", all_named)
 
 	print("=== %s ===" % ("ALL CHECKS PASS" if failures == 0
 		else "%d FAILURES" % failures))

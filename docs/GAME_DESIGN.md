@@ -283,12 +283,15 @@ Walk-ins pay these prices. Booked guests' meals are included in their fee.
 | Meal | Price | Meal | Price |
 |---|---|---|---|
 | Camp Mash | 5 | Iced Coffee | 25 |
-| Herb Tea | 10 | Grilled Fish | 30 |
-| Berry Tea | 15 | Berry Pie | 30 |
-| Campfire S'mores | 15 | Caramel Custard | 30 |
-| Trail Sandwich | 15 | Noodle Soup | 35 |
-| Trail Stew | 20 | Honey Cakes | 35 |
-| Mushroom Skewers | 20 | Goldcap Skillet | 45 |
+| Herb Tea | 10 | Gỏi Cuốn | 25 |
+| Berry Tea | 15 | Grilled Fish | 30 |
+| Campfire S'mores | 15 | Berry Pie | 30 |
+| Trail Sandwich | 15 | Caramel Custard | 30 |
+| Trail Stew | 20 | Mì Quảng | 30 |
+| Mushroom Skewers | 20 | Noodle Soup | 35 |
+| Cơm Nắm | 20 | Honey Cakes | 35 |
+| Chè | 20 | Cá Kho | 35 |
+| | | Goldcap Skillet | 45 |
 
 The sim assumes an average walk-in meal of 18 at Pinewatch, 25 at Whisper River and 30 at Lantern Valley.
 
@@ -355,7 +358,7 @@ Bench (beside Stools) and Radio (beside Guitar Stump) are style alternatives wit
 | Binoculars | 250 | W3 | Spotting (§7.3) |
 | Camp Oven | 380 | L arrival | Baked recipes (§7.5) |
 
-**Staples** (5 each, bought at the Outfitter into the pantry): Bread, Tea and Marshmallow from P1; Noodles from W arrival; Coffee and Sweet Milk from L arrival.
+**Staples** (5 each, bought at the Outfitter into the pantry): Bread, Tea and Marshmallow from P1; Rice from P2; Noodles from W arrival; Coffee and Sweet Milk from L arrival.
 
 **Cosmetics** [S] (no effect; 1×1 and from P1 unless noted): Woodpile 20 · Clothesline 30 · Bird Feeder 35 · Pennant String 40 · Chicken Coop 60 · Hammock 120 (2×1) · Koi Pond 120 (2×1, from W4) · Moped 150. Free story gifts: Scout Pennant (Hùng, §12.3) and Photo Wall (Lan, L4).
 
@@ -535,11 +538,16 @@ The Golden Koi appears only in Old Ba's story (W4). It is caught and released, a
 | Grilled Fish | Any fish + Herb | Campfire | Fishing Rod | |
 | Noodle Soup | Noodles + any fish | Campfire | Fishing Rod | Phở-style bowl |
 | Iced Coffee | Coffee + Sweet Milk | Campfire | — | Phin filter |
+| Cơm Nắm | Rice + Mushroom | Campfire | — | Charred rice balls |
+| Gỏi Cuốn | Rice + Herb | Campfire | — | Fresh spring rolls |
+| Mì Quảng | Noodles + Mushroom | Campfire | — | Turmeric noodles |
+| Chè | Sweet Milk + Berries | Campfire | — | Sweet bean-style soup |
+| Cá Kho | Any fish + Honey | Campfire | Fishing Rod | Clay-pot fish |
 | Berry Pie | Berries + Bread | Oven | Camp Oven | |
 | Honey Cakes | Honey + Bread | Oven | Camp Oven | |
 | Caramel Custard | Sweet Milk + Honey | Oven | Camp Oven | Bánh flan |
 
-Pinewatch offers 7 recipes without the Fishing Rod, so P3 ("Cook 5 different recipes") never depends on it.
+Pinewatch offers 9 recipes without the Fishing Rod, so P3 ("Cook 5 different recipes") never depends on it.
 
 ## 8. Progression
 
@@ -586,7 +594,7 @@ Each site has five pages, completed in any order. A page pays its gift (§6.6), 
 | Chapters | 15 pages | Completing pages |
 | Guestbook | 13 (9 archetypes + 4 regulars) | A first stay; a regular's finished story |
 | Field Notes | 22 (5 forage finds, 5 fish including the Golden Koi, 12 birds) | A first find, catch or sighting |
-| Recipes | 13 | A first cook |
+| Recipes | 18 | A first cook |
 | Keepsakes | 9 (3 per site) | Collecting a crew stage (§8.4) |
 | Letters | 25 | Reading |
 | Days log | One line per day | Each night: site, weather, guests, best review, coins |

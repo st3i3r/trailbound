@@ -20,6 +20,7 @@ func default_state() -> Dictionary:
 		"save_version": SAVE_VERSION, "seed": 0, "day": 0,
 		"site": "pinewatch", "phase": 0, "coins": 0,
 		"sites": {}, "pantry": {}, "meals": [], "recipes": [],
+		"gear": [], "pairs_tried": {},
 		"journal": {}, "letters": [],
 		"dog": {"name": "", "bond": 0},
 		"daily": {"date": "", "score": -1},

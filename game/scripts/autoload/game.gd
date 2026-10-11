@@ -27,6 +27,10 @@ var seed: int = 0                           # save seed feeding every stream (§
 var sites: Dictionary = {}                  # site_id -> site state, see _fresh_site()
 var meals: Array = []                       # cooked today; never carried over (§5.5)
 var bought_today: Array = []                # refundable until Goodnight (§6.1)
+var pantry := {}                            # ingredient id -> count (§7.4, global)
+var gear: Array = []                        # owned gear ids (global, §6.7)
+var recipes_cooked: Array = []              # recipe ids cooked ≥once — the book
+var pairs_tried := {}                       # "a+b" -> recipe id | "camp_mash" | "oven_hint"
 var _next_structure := 0
 var _tick_accum := 0.0
 
@@ -257,7 +261,7 @@ func _fresh_site(site: StringName) -> Dictionary:
 			"radius": int(fire.get("radius", 2))},
 		"seats": 0, "reviews": [], "weather": "clear",
 		"board": [], "guests": {}, "assignments": {},
-		"blogger_bonus": false}
+		"blogger_bonus": false, "forage_nodes": [], "fish_taken": {}}
 
 
 ## §21.3: every stream is seeded by save + site + site day + stream
@@ -300,15 +304,19 @@ func rating(site := site_id) -> float:
 
 
 ## Morning: forecast + booking board, both deterministic per §5.2/§5.7.
+## Errand tables (forage nodes, catches) seed off the same morning.
 func new_day() -> void:
 	var st := site_state()
 	st["weather"] = _roll_weather()
 	st["assignments"] = {}
 	st["guests"] = {}
+	st["fish_taken"] = {}
 	bought_today = []
+	st["forage_nodes"] = _roll_forage()
 	st["board"] = Seating.board(site_row(),
 		Catalog.data.get("archetypes", []), site_day(), _open_pads(st),
-		rating(), _rng_for("board"), _has_free_pair(st))
+		rating(), _rng_for("board"), _has_free_pair(st),
+		_favourite_pool())
 	for r in st["board"]:
 		st["guests"][r["id"]] = r
 
@@ -470,6 +478,235 @@ func upgrade_pad(pad_id: String, shelter: String) -> bool:
 	return true
 
 
+func buy_gear(item_id: String) -> bool:
+	var row := _row("gear", item_id)
+	if row.is_empty() or item_id in gear or coins < int(row.get("price", 0)):
+		return false
+	coins -= int(row["price"])
+	gear.append(item_id)
+	return true
+
+
+## Staples are global, 5 coins each, gated by the site's staples
+## unlock rank (P1 < W0 < L0 — §6.7).
+func buy_staple(item_id: String) -> bool:
+	var row := _row("ingredients", item_id)
+	if row.get("kind") != "staple" or coins < int(row.get("price", 5)):
+		return false
+	if _unlock_rank(row.get("unlock", "P1")) > _site_rank(site_id):
+		return false
+	if pantry_add(item_id, 1) < 1:
+		return false                                   # pantry full
+	coins -= int(row.get("price", 5))
+	return true
+
+
+# ------------------------------------------------------------- kitchen (§7)
+
+const PANTRY_BASE := 20
+const PANTRY_COOLER := 30
+const SITE_RANKS := {"pinewatch": 0, "whisper_river": 1,
+	"lantern_valley": 2}
+
+
+func _site_rank(site := site_id) -> int:
+	return SITE_RANKS.get(site, 0)
+
+
+func _unlock_rank(unlock: String) -> int:
+	if unlock.begins_with("P"):
+		return 0
+	if unlock.begins_with("W"):
+		return 1
+	return 2
+
+
+func pantry_count() -> int:
+	var n := 0
+	for k in pantry:
+		n += int(pantry[k])
+	return n
+
+
+func pantry_capacity() -> int:
+	return PANTRY_COOLER if "cooler" in gear else PANTRY_BASE
+
+
+## Returns how many actually fit (§7.4: nodes keep what's left over).
+func pantry_add(item_id: String, n := 1) -> int:
+	var room := pantry_capacity() - pantry_count()
+	var take := mini(n, room)
+	if take > 0:
+		pantry[item_id] = int(pantry.get(item_id, 0)) + take
+	return take
+
+
+func _ingredients_of_kind(kind: String, site := site_id) -> Array:
+	var out := []
+	for i in Catalog.data.get("ingredients", []):
+		if i.get("kind") == kind and site in i.get("sites", []):
+			out.append(i)
+	return out
+
+
+## §7.1: six seeded nodes a day, two items each, positions and
+## contents rolled fresh each morning; Goldcap about one day in three.
+func _roll_forage() -> Array:
+	var pool := _ingredients_of_kind("forage")
+	var rng := _rng_for("forage")
+	var fpx: Array = Catalog.data.get("layouts", {}).get(
+		site_id, {}).get("errand_spots", {}).get("forage", [96, 72])
+	var nodes := []
+	var goldcap_day := rng.randf() < 1.0 / 3.0 \
+		and pool.any(func(i): return i.get("rare", false))
+	var goldcap_slot := rng.randi() % 6
+	for i in 6:
+		var items := []
+		for j in 2:
+			items.append(_pick_weighted(pool, rng,
+				func(i2): return i2.get("rare", false)))
+		if goldcap_day and i == goldcap_slot:
+			items[0] = "goldcap"
+		nodes.append({"id": "f%d" % i, "items": items,
+			"px": [fpx[0] + rng.randi_range(-72, 72),
+				fpx[1] + rng.randi_range(-28, 28)]})
+	return nodes
+
+
+func _pick_weighted(pool: Array, rng: RandomNumberGenerator,
+		skip: Callable = Callable()) -> String:
+	var usable := pool
+	if skip.is_valid():
+		usable = pool.filter(func(i): return not skip.call(i))
+	var total := 0.0
+	for i in usable:
+		total += float(i.get("weight", 1))
+	var roll := rng.randf() * total
+	for i in usable:
+		roll -= float(i.get("weight", 1))
+		if roll <= 0.0:
+			return i["id"]
+	return usable.back()["id"] if not usable.is_empty() else ""
+
+
+## §7.1: gather a node — items land in the pantry until it's full;
+## the node keeps whatever didn't fit.
+func gather(node_id: String) -> Array:
+	var st := site_state()
+	var got := []
+	for node in st["forage_nodes"]:
+		if node["id"] != node_id:
+			continue
+		var left := []
+		for item in node["items"]:
+			if pantry_add(item, 1) > 0:
+				got.append(item)
+			else:
+				left.append(item)
+		node["items"] = left
+	return got
+
+
+## §7.2: 3 catches per spot per day, +1 in rain; needs the rod.
+func fish_catch(spot: String) -> String:
+	if "fishing_rod" not in gear:
+		return ""
+	var st := site_state()
+	var limit := 3 + (1 if st["weather"] == "rain" else 0)
+	var taken := int(st["fish_taken"].get(spot, 0))
+	if taken >= limit:
+		return ""
+	var rng := _rng_for("fish_" + spot)
+	var kinds := _ingredients_of_kind("fish")
+	var pick := ""
+	for i in taken + 1:
+		pick = kinds[rng.randi() % kinds.size()]["id"] if kinds else ""
+	st["fish_taken"][spot] = taken + 1
+	if pantry_add(pick, 1) == 0:
+		st["fish_taken"][spot] = taken               # full pantry: no catch
+		return ""
+	return pick
+
+
+## Recipes a guest could plausibly crave at this site (§5.2 card):
+## every ingredient obtainable here, oven recipes only once Lantern
+## Valley makes them possible.
+func _favourite_pool(site := site_id) -> Array:
+	var rank := _site_rank(site)
+	var fish := _ingredients_of_kind("fish", site)
+	var out := []
+	for r in Catalog.data.get("recipes", []):
+		if r.get("fallback", false):
+			continue
+		if r.get("station") == "oven" and rank < 2:
+			continue
+		var ok := true
+		for ing in r.get("pair", []):
+			if ing == "any_fish":
+				ok = ok and not fish.is_empty()
+			else:
+				var row := _row("ingredients", ing)
+				if row.get("kind") == "staple":
+					ok = ok and _unlock_rank(
+						row.get("unlock", "P1")) <= rank
+				else:
+					ok = ok and site in row.get("sites", [])
+			if not ok:
+				break
+		if ok:
+			out.append(r["id"])
+	return out
+
+
+func _slot(want: String, have_id: String) -> bool:
+	return want == have_id or (want == "any_fish" \
+		and _row("ingredients", have_id).get("kind") == "fish")
+
+
+func _match_recipe(a: String, b: String) -> Dictionary:
+	for r in Catalog.data.get("recipes", []):
+		var pair: Array = r.get("pair", [])
+		if pair.size() != 2:
+			continue
+		if (_slot(pair[0], a) and _slot(pair[1], b)) \
+				or (_slot(pair[0], b) and _slot(pair[1], a)):
+			return r
+	return {}
+
+
+## §7.5: pick two ingredients, cook one portion. A known pair → that
+## meal; an oven pair at the campfire → hint, ingredients kept; an
+## unknown pair → Camp Mash.
+func cook(a: String, b: String) -> Dictionary:
+	var need := {}
+	for x in [a, b]:
+		need[x] = int(need.get(x, 0)) + 1
+	for x in need:
+		if int(pantry.get(x, 0)) < need[x]:
+			return {"result": "missing", "missing": x}
+	var key := "+".join([a, b] if a < b else [b, a])
+	var r := _match_recipe(a, b)
+	if r.is_empty():
+		r = _row("recipes", "camp_mash")
+		pairs_tried[key] = "camp_mash"
+	elif r.get("station") == "oven" and "oven" not in gear:
+		pairs_tried[key] = "oven_hint"
+		return {"result": "oven_hint",
+			"hint": "%s needs the Camp Oven" % r.get("name", "?")}
+	else:
+		pairs_tried[key] = r["id"]
+	for x in need:
+		pantry[x] -= need[x]
+		if pantry[x] <= 0:
+			pantry.erase(x)
+	var meal := {"id": r["id"], "price": int(r.get("price", 5))}
+	meals.append(meal)
+	if r["id"] not in recipes_cooked:
+		recipes_cooked.append(r["id"])
+	return {"result": "ok", "recipe": r["id"], "meal": meal,
+		"name": r.get("name", "")}
+
+
 # ------------------------------------------------------------- save (§22)
 
 func state_dict() -> Dictionary:
@@ -477,6 +714,9 @@ func state_dict() -> Dictionary:
 	return {"day": day, "site": String(site_id), "phase": phase,
 		"sites_visited": sites_visited, "crew": crew.duplicate(true),
 		"coins": coins, "seed": seed, "meals": meals.duplicate(true),
+		"pantry": pantry.duplicate(), "gear": gear.duplicate(),
+		"recipes": recipes_cooked.duplicate(),
+		"pairs_tried": pairs_tried.duplicate(),
 		"sites": _sites_to_json()}
 
 
@@ -524,6 +764,10 @@ func load_state(state: Dictionary) -> void:
 	coins = int(state.get("coins", coins))
 	seed = int(state.get("seed", seed))
 	meals = state.get("meals", meals)
+	pantry = state.get("pantry", pantry)
+	gear = state.get("gear", gear)
+	recipes_cooked = state.get("recipes", recipes_cooked)
+	pairs_tried = state.get("pairs_tried", pairs_tried)
 	if state.has("sites"):
 		sites = _sites_from_json(state["sites"])
 	var saved: Dictionary = state.get("crew", {})

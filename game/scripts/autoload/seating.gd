@@ -232,12 +232,14 @@ static func _draw_traits(arch: Dictionary, pool: Dictionary, count: int,
 
 
 static func _request(arch: Dictionary, site_id: String, traits: Array,
-		index: int) -> Dictionary:
+		index: int, rng: RandomNumberGenerator,
+		favourites: Array) -> Dictionary:
 	return {"id": "req%d" % index, "archetype": arch.get("id", ""),
 		"name": arch.get("name", ""), "traits": traits,
 		"loud": arch.get("loud", false), "pads": int(arch.get("pads", 1)),
 		"fee": int(arch.get("fees", {}).get(site_id, 0)),
-		"favourite": ""}
+		"favourite": favourites[rng.randi() % favourites.size()] \
+			if not favourites.is_empty() else ""}
 
 
 static func _has_conflict(board: Array) -> bool:
@@ -262,7 +264,8 @@ static func _has_conflict(board: Array) -> bool:
 ## seeded by save + site + site day (§21.3) so reloads never reroll.
 static func board(site: Dictionary, archetypes: Array, site_day: int,
 		open_pads: Array, rating: float,
-		rng: RandomNumberGenerator, has_free_pair := false) -> Array:
+		rng: RandomNumberGenerator, has_free_pair := false,
+		favourites: Array = []) -> Array:
 	var site_id: String = site.get("id", "")
 	var reqs := []
 	if site_day == 1:
@@ -271,7 +274,7 @@ static func board(site: Dictionary, archetypes: Array, site_day: int,
 			var arch := _pick_archetype(
 				{spec["archetype"]: 1}, archetypes, site_id, rng)
 			reqs.append(_request(arch, site_id,
-				spec["traits"].duplicate(), i))
+				spec["traits"].duplicate(), i, rng, favourites))
 			i += 1
 		return reqs
 
@@ -308,7 +311,7 @@ static func board(site: Dictionary, archetypes: Array, site_day: int,
 			traits = _draw_traits(arch, pool, trait_count, rng)
 		if arch.get("loud", false):
 			loud_count += 1
-		reqs.append(_request(arch, site_id, traits, i))
+		reqs.append(_request(arch, site_id, traits, i, rng, favourites))
 
 	# From day 6 every board holds at least one conflicting pair (§5.2).
 	if site_day >= 6 and reqs.size() >= 2 and not _has_conflict(reqs):
@@ -335,7 +338,8 @@ static func board(site: Dictionary, archetypes: Array, site_day: int,
 						has_aversion = true
 				if not has_aversion and "light_sleeper" not in traits:
 					traits[0] = "light_sleeper"
-				var req := _request(arch, site_id, traits, reqs.size())
+				var req := _request(arch, site_id, traits, reqs.size(),
+					rng, favourites)
 				req["elite"] = true
 				reqs[reqs.size() - 1] = req
 				break

@@ -1,1 +1,21 @@
-[]
+[
+  {"id": "camp_mash", "name": "Camp Mash", "pair": [], "station": "campfire", "price": 5, "fallback": true},
+  {"id": "trail_stew", "name": "Trail Stew", "pair": ["mushroom", "herb"], "station": "campfire", "price": 20, "taught": true},
+  {"id": "mushroom_skewers", "name": "Mushroom Skewers", "pair": ["mushroom", "mushroom"], "station": "campfire", "price": 20},
+  {"id": "herb_tea", "name": "Herb Tea", "pair": ["herb", "tea"], "station": "campfire", "price": 10},
+  {"id": "berry_tea", "name": "Berry Tea", "pair": ["berries", "tea"], "station": "campfire", "price": 15},
+  {"id": "smores", "name": "Campfire S'mores", "pair": ["marshmallow", "bread"], "station": "campfire", "price": 15},
+  {"id": "trail_sandwich", "name": "Trail Sandwich", "pair": ["bread", "herb"], "station": "campfire", "price": 15},
+  {"id": "goldcap_skillet", "name": "Goldcap Skillet", "pair": ["goldcap", "herb"], "station": "campfire", "price": 45},
+  {"id": "grilled_fish", "name": "Grilled Fish", "pair": ["any_fish", "herb"], "station": "campfire", "price": 30, "needs": "fishing_rod"},
+  {"id": "noodle_soup", "name": "Noodle Soup", "pair": ["noodles", "any_fish"], "station": "campfire", "price": 35, "needs": "fishing_rod"},
+  {"id": "iced_coffee", "name": "Iced Coffee", "pair": ["coffee", "sweet_milk"], "station": "campfire", "price": 25},
+  {"id": "com_nam", "name": "Cơm Nắm (Rice Balls)", "pair": ["rice", "mushroom"], "station": "campfire", "price": 20},
+  {"id": "goi_cuon", "name": "Gỏi Cuốn (Spring Rolls)", "pair": ["rice", "herb"], "station": "campfire", "price": 25},
+  {"id": "che", "name": "Chè (Sweet Soup)", "pair": ["sweet_milk", "berries"], "station": "campfire", "price": 20},
+  {"id": "ca_kho", "name": "Cá Kho (Clay-Pot Fish)", "pair": ["any_fish", "honey"], "station": "campfire", "price": 35, "needs": "fishing_rod"},
+  {"id": "mi_quang", "name": "Mì Quảng (Turmeric Noodles)", "pair": ["noodles", "mushroom"], "station": "campfire", "price": 30},
+  {"id": "berry_pie", "name": "Berry Pie", "pair": ["berries", "bread"], "station": "oven", "price": 30},
+  {"id": "honey_cakes", "name": "Honey Cakes", "pair": ["honey", "bread"], "station": "oven", "price": 35},
+  {"id": "caramel_custard", "name": "Caramel Custard", "pair": ["sweet_milk", "honey"], "station": "oven", "price": 30}
+]
