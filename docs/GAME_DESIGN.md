@@ -942,6 +942,36 @@ want-bubble pulse · wet-sheen · mirroring E→W
 | Iteration buffer ~25% | ~110-140 |
 | **COMPLETE** | **≈ 545-695** |
 
+### 7.17 Density strategy — procedural hand-craft (closing the Eastward gap)
+
+Eastward's "expensive" feel = detail assets + *placement judgment*. AI covers the
+assets; placement is rules + a small human pass. ~0 extra gens.
+
+**Layer 1 — AI detail library (batched, cheap):**
+- `consistent-style` @32px: clutter families — weeds, petals, leaf litter,
+  pebbles, scuffs, pinecones, sprouts, footprints — 64 items per ~10 gens
+- `edit-image-pro` variants: weathered/blooming/mossy versions of base props
+- `inpaint` on hero props: moss on this rock, patch on that sign
+- `create_map_object(background_image=site_screenshot)` → props arrive
+  pre-style-matched to the actual scene
+
+**Layer 2 — scatter rules engine (engineering, not gens):**
+- Noise-driven clutter placement per site (seeded → deterministic, saveable)
+- Rules, not random: tufts cluster near trees · wear decals near doors/paths ·
+  petals near planters · scuffs near the fire ring · shells above the waterline
+- Per-site density budget (≈1 detail / 2 tiles — the Eastward ratio)
+- Scatter pass runs at site-build time; players never see it "happen"
+
+**Layer 3 — hero vignettes (human, Pixelorama, free):**
+- 3-4 hand-tuned spots per site: the fire circle, the dock bend, the gate corner —
+  the places players screenshot → manual prop/detail polish in Pixelorama
+  (free editor, PixelLab integrated — cleanup + variants without burning gens)
+- Everything else stays procedural — human time only where cameras linger
+
+**Reality check:** this gets ~80% of the hand-crafted look. The remaining ~20%
+is a pixel artist's full-scene judgment — acceptable gap at our scale; the
+day/night tint + glow layer covers a lot of the residual difference.
+
 ### Operational notes (from docs)
 - **Map objects auto-delete after 8h** → download PNGs immediately at generation time.
 - Downloads are unauthenticated UUID URLs (`/mcp/characters/{id}/download`, `/mcp/tilesets/{id}/image`) — safe to fetch then archive locally.
