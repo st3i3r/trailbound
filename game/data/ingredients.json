@@ -12,6 +12,7 @@
 
   {"id": "bread", "name": "Bread", "kind": "staple", "price": 5, "unlock": "P1"},
   {"id": "rice", "name": "Rice", "kind": "staple", "price": 5, "unlock": "P2"},
+  {"id": "eggs", "name": "Eggs", "kind": "staple", "price": 5, "unlock": "P3"},
   {"id": "tea", "name": "Tea", "kind": "staple", "price": 5, "unlock": "P1"},
   {"id": "marshmallow", "name": "Marshmallow", "kind": "staple", "price": 5, "unlock": "P1"},
   {"id": "noodles", "name": "Noodles", "kind": "staple", "price": 5, "unlock": "W0"},

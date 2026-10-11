@@ -291,7 +291,9 @@ Walk-ins pay these prices. Booked guests' meals are included in their fee.
 | Mushroom Skewers | 20 | Noodle Soup | 35 |
 | Cơm Nắm | 20 | Honey Cakes | 35 |
 | Chè | 20 | Cá Kho | 35 |
-| | | Goldcap Skillet | 45 |
+| Sinh Tố | 25 | Goldcap Skillet | 45 |
+| Trà Mật Ong | 25 | | |
+| Cà Phê Trứng | 30 | | |
 
 The sim assumes an average walk-in meal of 18 at Pinewatch, 25 at Whisper River and 30 at Lantern Valley.
 
@@ -358,7 +360,7 @@ Bench (beside Stools) and Radio (beside Guitar Stump) are style alternatives wit
 | Binoculars | 250 | W3 | Spotting (§7.3) |
 | Camp Oven | 380 | L arrival | Baked recipes (§7.5) |
 
-**Staples** (5 each, bought at the Outfitter into the pantry): Bread, Tea and Marshmallow from P1; Rice from P2; Noodles from W arrival; Coffee and Sweet Milk from L arrival.
+**Staples** (5 each, bought at the Outfitter into the pantry): Bread, Tea and Marshmallow from P1; Rice from P2; Eggs from P3; Noodles from W arrival; Coffee and Sweet Milk from L arrival.
 
 **Cosmetics** [S] (no effect; 1×1 and from P1 unless noted): Woodpile 20 · Clothesline 30 · Bird Feeder 35 · Pennant String 40 · Chicken Coop 60 · Hammock 120 (2×1) · Koi Pond 120 (2×1, from W4) · Moped 150. Free story gifts: Scout Pennant (Hùng, §12.3) and Photo Wall (Lan, L4).
 
@@ -541,8 +543,11 @@ The Golden Koi appears only in Old Ba's story (W4). It is caught and released, a
 | Cơm Nắm | Rice + Mushroom | Campfire | — | Charred rice balls |
 | Gỏi Cuốn | Rice + Herb | Campfire | — | Fresh spring rolls |
 | Mì Quảng | Noodles + Mushroom | Campfire | — | Turmeric noodles |
-| Chè | Sweet Milk + Berries | Campfire | — | Sweet bean-style soup |
+| Chè | Rice + Sweet Milk | Campfire | — | Sweet sticky-rice soup |
 | Cá Kho | Any fish + Honey | Campfire | Fishing Rod | Clay-pot fish |
+| Sinh Tố | Berries + Sweet Milk | Campfire | — | Fruit smoothie |
+| Cà Phê Trứng | Coffee + Eggs | Campfire | — | Whipped egg coffee |
+| Trà Mật Ong | Honey + Tea | Campfire | — | Warm honey tea |
 | Berry Pie | Berries + Bread | Oven | Camp Oven | |
 | Honey Cakes | Honey + Bread | Oven | Camp Oven | |
 | Caramel Custard | Sweet Milk + Honey | Oven | Camp Oven | Bánh flan |
@@ -594,7 +599,7 @@ Each site has five pages, completed in any order. A page pays its gift (§6.6), 
 | Chapters | 15 pages | Completing pages |
 | Guestbook | 13 (9 archetypes + 4 regulars) | A first stay; a regular's finished story |
 | Field Notes | 22 (5 forage finds, 5 fish including the Golden Koi, 12 birds) | A first find, catch or sighting |
-| Recipes | 18 | A first cook |
+| Recipes | 21 | A first cook |
 | Keepsakes | 9 (3 per site) | Collecting a crew stage (§8.4) |
 | Letters | 25 | Reading |
 | Days log | One line per day | Each night: site, weather, guests, best review, coins |

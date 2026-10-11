@@ -251,6 +251,11 @@ func _ready() -> void:
 	check("gỏi cuốn cooks", c["result"] == "ok"
 		and c["recipe"] == "goi_cuon"
 		and Game.meals.back()["price"] == 25, "got %s" % c)
+	Game.pantry = {"coffee": 1, "eggs": 1}
+	c = Game.cook("eggs", "coffee")
+	check("cà phê trứng cooks", c["result"] == "ok"
+		and c["recipe"] == "ca_phe_trung"
+		and Game.meals.back()["price"] == 30, "got %s" % c)
 	Game.pantry = {}
 	Game.meals = []
 	Game.gear = []
