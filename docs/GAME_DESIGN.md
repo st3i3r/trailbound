@@ -413,6 +413,124 @@ game needs these too — sorted by who makes them:
   HTTPS hosting (cloudflared for dev), Telegram header/safe-area testing,
   content rating
 
+### 7.11 COMPLETE coverage matrix — every tile, state, object
+
+Honest answer to "does 200 gens cover everything": **no — ~200 covers P0+P1.
+A real complete game ≈ 400-550 gens** (still ~25% of monthly pool). The full
+enumeration:
+
+#### A. ALL terrain tiles (per scene needs)
+
+| Material | Tiles needed | Scenes |
+|---|---|---|
+| grass | plain, tuft, flowers, worn, sparkle | all |
+| dirt/earth | bare patch, tilled, mud | camp, forest, valley |
+| **dirt path autotile** | 18-config set (straights, corners, T, cross, ends) | all |
+| sand | plain, rippled, shell-dotted | coast |
+| rock | boulder field, gravel, smooth | valley, mountain, river |
+| stone path | laid stones | camp (upgrade look) |
+| wood planks | dock, bridge, treehouse floor | river, camp |
+| shallow water | wadeable edge | river, coast |
+| deep water | pond, river main, sea | river, coast |
+| waterfall | anim 4f | river |
+| snow | only if seasons ship — P2 defer | mountain |
+
+**Transitions (Wang 16-tile sets, 10-15 gens each):**
+grass→water · grass→path · grass→sand · sand→water · grass→rock ·
+dirt→water (muddy bank) · rock→water (sea cliff)
+→ **7 sets ≈ 70-105 gens** (this is what real terrain costs — not loose tiles)
+
+**Island rim:** cliff edge N/E/S/W + 4 corners + terrain-height plateau edge
+(part of tiles_pro generation, counted above)
+
+#### B. Scenes × tile mix
+
+| Scene | Terrain | Unique props |
+|---|---|---|
+| Camp | grass, path, rim | all camp accessories below |
+| Forest | grass, dirt, dense trees | forage nodes×8 (+empty/harvested state each!), hollow log, ferns, leaf piles, cache dig-spot |
+| River | grass bank, water×2, planks | dock, bridge, bobber, cattails, fish-jump anim, canoe |
+| Valley | grass, flowers, rock | wildflowers, vista rock, viewpoint bench, stream |
+| Coast | sand, shallow, deep, rock | shells, starfish, driftwood, tide pool, beach grass, kayak, seagull |
+| Mountain | rock, gravel, pine | boulders, summit flag, climbing props, goat? |
+
+#### C. States — what costs ZERO gens vs what needs sprites
+
+| State | Cost |
+|---|---|
+| day/dusk/night | **0 gens** — scene tint filter (locked in stack) |
+| rain | **0 gens** — particle overlay + wet-sheen tint; +3 puddle decals optional |
+| fog/wind | **0 gens** — mist overlay + existing sway anims |
+| unlit vs lit fire/lantern/torch | sprite each (unlit state is a real asset!) + **0-gen** glow overlay (additive) |
+| forage node full vs harvested | **2× node sprites** — this was missed: 8 nodes × 2 states |
+| tent tiers t1/t2/t3 | 3 sprites (progression!) |
+| fire pit tier upgrade | +1 sprite |
+
+#### D. Fire & light objects (complete)
+campfire unlit · campfire lit 4-8f · tripod+pot · lantern post unlit/lit ·
+string lights · torch · fire pit t2 · embers prop · hanging tent lantern
+(+0-gen glow overlays, fireflies procedural)
+
+#### E. Water objects (complete)
+waterfall anim · dock · bridge · swim ring · kayak/canoe · reeds/cattails ·
+lilypads · fish silhouettes · bobber · splash frames · ripple decals ·
+fish-jump anim (+0-gen shimmer shader)
+
+#### F. Camping accessories (the REAL checklist)
+**Sleep:** tent×3 tiers, tarp, hammock, bedroll, sleeping bag, dog bed
+**Cook/eat:** fire ring, tripod, stove, cooler, kettle, mugs, thermos,
+camp table, chairs×2, log bench, stump seats, picnic blankets×2
+**Storage:** crates, barrel, sack, backpack prop, gear rack, basket
+**Light:** lantern post, string lights, torch, tent lantern
+**Info:** notice board, chalkboard, trail signs×3, map table, guestbook stand
+**Comfort:** guitar, books, camera tripod, binoculars, planter, welcome flag,
+wind chime, clothesline+ towels
+**Dog:** doghouse, bowl, bone, leash post
+**Fishing:** rod, rod rack, tackle box, bait bucket, creel basket, net
+**Bike:** bicycle, rack, repair stand, pump, trail markers
+**Chores:** woodpile, axe-in-stump, log rounds
+**Boundaries:** fence straight/corner/gate, rope fence, stone wall
+**Shop:** outfitter van, ranger kiosk (have shop_0)
+**Clutter:** mushrooms, flowers, tufts, pinecones, leaves, small rocks,
+stepping stones, pebbles — `consistent-style` @32px = **64/10gens**
+
+#### G. Character states beyond walk (was missing)
+player: +sit, +sleep (bedroll) · dog: +bark/excited, +sleep ·
+ranger: +talk · travelers: sit-on-blanket variants ·
+portraits ×8 (32-48px heads) for journal/dialogue
+
+#### H. Items/icons — complete inventory
+ingredients ×9 (+honey, acorn, catfish) · **MEALS ×8** (stew, berry pie,
+skewers, sandwich, tea, grilled fish, s'mores, soup) · gear icons ×12 ·
+stamps ×8 · coin/energy/charm/day icons
+
+#### I. VFX frames
+unlock burst · sparkle · level-up rays · stamp-press · splash ·
+heart pop · ZZZ · ! / ? marks · smoke/steam (procedural covers particles)
+
+#### J. Launch & meta art
+app icon 512px · title/splash · promo key-art · map pins locked/unlocked ·
+journal cover · empty states ×2
+
+### 7.12 Corrected totals
+
+| Tier | Content | Gens |
+|---|---|---|
+| P0 | camp scene + core cast | ~55 |
+| P1 | loop content + idles | ~60 |
+| **P1.5 (was missing)** | food, portraits, VFX, node-states, tent tiers, fire/water states, bike set, accessories batches | ~120-180 |
+| P2 | valley/coast/mountain terrains + props, walks, critters, seasonal | ~150-200 |
+| Launch | icon, splash, promo | ~25 |
+| **COMPLETE** | | **≈ 400-550** |
+
+**Zero-gen tricks counted on:** tint for day/dusk/night · particle overlays
+for rain/fog · additive glow derived from lit sprites · `reduce_colors`
+variants for harvested/empty states (maybe) · procedural water shimmer.
+
+**Still ~25% of the ~2,000/mo pool.** The binding constraint is not budget —
+it's sequential throughput + iteration discipline (lock 1 char/1 tile style,
+then batch).
+
 ### Operational notes (from docs)
 - **Map objects auto-delete after 8h** → download PNGs immediately at generation time.
 - Downloads are unauthenticated UUID URLs (`/mcp/characters/{id}/download`, `/mcp/tilesets/{id}/image`) — safe to fetch then archive locally.
@@ -430,5 +548,5 @@ game needs these too — sorted by who makes them:
 5. Only then decide if the real client (Vite+React+TS+PixiJS + server.py rewrite) is warranted.
 
 ## 9. Security note
-The PixelLab token is currently hardcoded in `prototype/pixellab_gen.py`. Move to
-`PIXELLAB_TOKEN` env var before any commit.
+DONE — token moved to `PIXELLAB_TOKEN` env var in `tools/pixellab_gen.py`
+(see `.env.example`). `.devin/config.json` references the same env var.
