@@ -1,9 +1,11 @@
 # Batch 0 — style lock prompts (GDD §28)
 
-Shared tail for every prompt:
-> cozy pixel art, single consistent sun angle from upper left, soft
-> contact shadow, warm amber + moss green Pinewatch palette, crisp
-> outlines, one pixel density
+Shared tail for every prompt (Eastward-style sunlit daylight — ref:
+docs/reference/eastward.jpg + eastward1.jpg):
+> cozy pixel art, Eastward-style painterly soft-dithered shading,
+> sunlit yellow-green ground with warm browns on wood and stone,
+> ember orange accents only, single sun angle from upper left, soft
+> contact shadow, crisp outlines, one pixel density
 
 | Asset | Tool | Size | Prompt (before shared tail) |
 |---|---|---|---|

@@ -1,6 +1,6 @@
 {
   "project": "Trailbound",
-  "palette": "pending — locked in Batch 0 (GDD §28)",
+  "palette": "pending — locked in Batch 0 (GDD §28). Per-site ramps: Pinewatch = deep greens + ember-orange accents; Whisper River = river blues + bamboo green; Lantern Valley = golden meadow + dusk violet (§11). Dusk warmth is a §16.3 lighting layer — do NOT bake it into sprites",
   "sun_angle": "upper left",
   "assets": [
     {
@@ -29,32 +29,56 @@
       "id": "player_idle",
       "category": "characters",
       "status": "generated",
+      "files": ["gen/player_front_0.png"],
+      "canvas": "64x64",
+      "frames": 1,
+      "batch": 0,
+      "source": "pixellab pixen 'low top-down'",
+      "notes": "front-facing idle — the character style anchor; 4-dir sheet later via create_character"
+    },
+    {
+      "id": "player_walk_away",
+      "category": "characters",
+      "status": "generated",
       "files": ["gen/player_0.png"],
       "canvas": "64x64",
       "frames": 1,
       "batch": 0,
       "source": "pixellab pixen 'low top-down'",
-      "notes": "back-three-quarter pose — usable as walk-away; front idle still needed for the style anchor; 4-dir sheet later via create_character"
+      "notes": "back-three-quarter pose — kept as the walk-away (north) pose for the 4-dir sheet"
     },
     {
       "id": "terrain_grass_pinewatch",
       "category": "terrain",
-      "status": "planned",
-      "files": [],
+      "status": "generated",
+      "files": ["gen/terrain_grass_p1_0.png", "gen/terrain_grass_p_0.png"],
       "canvas": "32x32",
       "frames": 1,
       "batch": 0,
-      "notes": "pine-forest floor base tile"
+      "source": "pixellab pixen 'high top-down'",
+      "notes": "p1 (current candidate): sunlit yellow-green base, ember litter accents — matches eastward1.jpg ground; mild litter cluster right-center to thin in cleanup. p0 superseded: dark moss + dense amber"
     },
     {
       "id": "terrain_shore_sample",
       "category": "terrain",
-      "status": "planned",
-      "files": [],
+      "status": "generated",
+      "files": ["gen/terrain_shore_p_0.png"],
       "canvas": "32x32",
       "frames": 1,
       "batch": 0,
-      "notes": "water edge sample for palette lock"
+      "source": "pixellab pixen 'high top-down'",
+      "notes": "sandy bank → foam → blue water, horizontal transition for vertical tiling; sand tone is material-true warm tan"
+    },
+    {
+      "id": "prop_outfitter_van",
+      "category": "props",
+      "status": "generated",
+      "files": ["gen/prop_van_p_0.png"],
+      "canvas": "64x64",
+      "frames": 1,
+      "batch": 0,
+      "source": "pixellab pixen 'high top-down'",
+      "notes": "vintage outfitter van, warm paint + cream roof — warmth on the prop is per the Eastward rule (structures/props carry the warm tones, ground stays green)"
     },
 
     {
