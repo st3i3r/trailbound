@@ -803,9 +803,9 @@ or get added as one.
 | Char | Static cost | Anims (1 gen each) |
 |---|---|---|
 | player | 1 + 10 rotate | idle, walk×4, gather, cast, reel, carry, sit, sleep, **celebrate** ⛔, **eat** ⛔ = 11 |
-| dog | 1 + 10 rotate | idle, walk×4, sit, dig, bark, sleep, **heart-react** ⛔ = 9 |
+| dog | 1 + 10 rotate | idle, walk×4, sit, dig, bark, sleep, **heart-react** ⛔, **lunge** ⛔ (đá cầu chase) = 10 |
 | ranger | 1 | idle, wave, talk = 3 |
-| travelers ×10 (incl. family) | 10 | idle×10, sit-var×4, eat×2, walk×8 (hiker+photo), **kid run×8 + play×2** = ~36 |
+| travelers ×10 (incl. family) | 10 | idle×10, sit-var×4, eat×2, walk×8 (hiker+photo), **kid run×8 + play×2 + bend/pickup×2** ⛔ = ~38 |
 | portraits ×8 | 8 | — |
 | critters ×6 | 6 | fly/hop/flutter/jump/gull/graze = ~8 |
 
@@ -893,9 +893,10 @@ Every asset we generate, deduplicated, in the order batches should run.
 
 #### BATCH 4 — characters ~90-110 gens (static + rotations + anims)
 - **player** — sprite + 8-rot + anims ×11 (idle, walk×4, gather, cast, reel, carry, sit, sleep, celebrate, eat)
-- **dog** — quadruped sprite + 8-rot + anims ×10 (idle, walk×4, sit, dig, bark, sleep, heart-react) + courier-bag variant
+- **dog** — quadruped sprite + 8-rot + anims ×10 (idle, walk×4, sit, dig, bark, sleep, heart-react, lunge) + courier-bag variant
 - **ranger** — sprite + idle, wave, talk
-- **travelers ×10** (hiker, photographer, old angler, kid scout, van-lifer, dad, mom, boy, girl, cyclist) — sprites + idles; sit-variants ×4, eat ×2, walks for arrivals, kid run×4 + play
+- **travelers ×10** (hiker, photographer, old angler, kid scout, van-lifer, dad, mom, boy, girl, cyclist) — sprites + idles; sit-variants ×4, eat ×2, walks for arrivals, kid run×4 + play + bend/pickup×2;
+shuttlecock frames ×3 (tucked/flared/squash) — counted in VN batch
 - **portraits ×8** (32-48px busts for journal/dialogue)
 - **guest dogs ×2** (palette variants)
 - **hazards:** raccoon `[A scurry,steal]` · bear `[A wander]` (mountain)
