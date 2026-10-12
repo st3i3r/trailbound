@@ -61,7 +61,7 @@ Cast, food, fauna and keepsakes are site-neutral: no site module.
 | Terrain | `create_topdown_tileset` pro, 32 px, `high top-down` | calm low-detail ground wash, large soft tonal patches, no flowers, no tufts, no speckles, no repeating motif (detail comes from `tb_dither` + decals); pond/lake shores get a stone-ring edge band + 2–3 frame shimmer overlay, not a flat fill (T4) |
 | Hero prop / structure | Batch tool ≤170 (4 slots, 128–160 style refs); Pro Flash custom for non-square | hand-painted miniature density, contemporary 2026 camping equipment (style_lock prop era spec: dome tents, coolers, chairs, stoves — never patched canvas / rusted surplus), clean surfaces with light wear (scuffs, dirt splash), one strong silhouette with one accent detail, base embedded, top and front faces both visible |
 | Small item (L6) | Batch tool ≤42 (64 slots, 32 px refs) or ≤85 (16 slots, 64 px refs) | small and simple, readable at 1×, two or three tones plus outline, one clear silhouette, no fine noise |
-| Foliage / tree | Batch tool ≤170 | leaf masses as clumps (not single dots), lit top-left rim, cool shaded underside, visible trunk and root flare; **canopy and trunk as separate sprites** (T2); **variants re-shaded on the same silhouette — new light structure, never a hue swap** (T1) |
+| Foliage / tree | Batch tool ≤170 | leaf masses as clumps (not single dots), lit top-left rim, cool shaded underside, visible trunk and root flare; gen canopy and trunk as two separate cut-outs (T2); colour variants are `tb_variant` ramp-swaps, never re-gen'd (T1) |
 | Character | `create_character_pro_flash` 48×48, `low top-down`, template `mannequin`, 8 directions, `style_options.detail=false` | full body about 3.5 heads tall filling about 90% of the canvas height, readable face with simple eyes, distinctive silhouette with one signature colour, clothing folds in two or three tones, relaxed standing pose facing south |
 | Child | same, 48×48 | child about two-thirds adult height, figure fills about 60% of the canvas height |
 | Persona | Character class + | an ordinary person on a weekend nature trip, everyday clothes (not hiking gear unless stated) |
@@ -118,23 +118,22 @@ settled the fix: techniques T1–T5 in `style_lock.md`.  The world stays
 painted; this batch adds the layered family on top.  **H4's dome-tent
 re-author folds in here** — superseded by A-R4.
 
-**A-R1 · tree family, canopy+trunk pairs (batch ≤170, ≈40)**
-Masters: `tree_pine_highland` · `tree_broadleaf_round` ·
-`tree_maple_copper` · `tree_feathery_droop` — each ships as canopy
-sprite + shared trunk sprite (T2), then **2 re-shaded canopy variants**
-(deep-summer, dry-gold) on the same silhouette description (T1) —
-≈4 masters + 8 variants.  Replaces the trees baked into the backdrop.
+**A-R1 · tree family (batch ≤170, ≈20)**
+4 canopy masters (`tree_pine_highland` · `tree_broadleaf_round` ·
+`tree_maple_copper` · `tree_feathery_droop`) + 4 trunk cut-outs —
+two separate gens per tree, composited by `tb_post` (T2).  Colour
+variants (deep-summer, dry-gold) are **`tb_variant` ramp-swaps — 0
+gens** (T1): the model would redraw a different silhouette every
+time; the ramp-swap preserves it exactly.
 
-**A-R2 · bush + undergrowth family (batch ≤85, ≈15)**
+**A-R2 · bush + undergrowth family (batch ≤85, ≈10)**
 `bush_round_m` · `bush_white_flower_v` · `fern_bank` ·
-`grass_tussock` · `reed_shore` — master + 1 re-shaded variant where a
-second palette earns its slot.
+`grass_tussock` · `reed_shore` — masters only; variants derived.
 
-**A-R3 · pond edge + water (batch ≤85 + Pro Flash, ≈15)**
+**A-R3 · pond edge + water (batch ≤85, ≈10)**
 `shore_ring_{n,ne,e,se,s,sw,w,nw}` mossy stone-ring shore edges in the
-Pinewatch palette (T4) · `water_shimmer_{f1,f2}` — two low-frequency
-shimmer overlays at tile size; animation is a runtime frame swap, not
-an animated gen.
+Pinewatch palette (T4).  `water_shimmer_{f1,f2}` = noise pass on the
+water tile via `tb_dither` — 0 gens; runtime frame swap.
 
 **A-R4 · modern camp props (batch ≤170, ≈30) — replaces the canvas set**
 `dome_tent_{sage,amber,slate}` — one dome silhouette, three colours ·
@@ -262,13 +261,13 @@ Walks: `animate_character` template, south / north / east (west mirrored)
 | E decor | ≈30 | |
 | F cut-in | ≈27 | |
 | G animation | ≈220 | Walks: 39 walkers × 3 dirs = 117; ~85 custom anims × 1 (each sprite needs its own copy); prop loops ≈14 |
-| A-R refresh | ≈95 | Net of H4's folded-in tent re-author (gross ≈110) |
+| A-R refresh | ≈65 | Masters only — foliage variants + water shimmer are deterministic pipeline derivatives (tb_variant/tb_dither), 0 gens; net of H4's folded-in tent re-author |
 | H states | ≈66 | H4 dome-tent re-author moved to A-R4 |
 | I events | ≈55 | |
-| **Total** | **≈1,100** (+20% contingency ≈1,320) | vs ~475 in the old manifest — characters and animation were under-priced |
+| **Total** | **≈1,070** (+20% contingency ≈1,285) | vs ~475 in the old manifest — characters and animation were under-priced |
 
 Balance 1,633 now; the allowance refills to 2,000 on 2026-11-11 and
-each cycle after. Fits this cycle with ≈330 left after contingency.
+each cycle after. Fits this cycle with ≈350 left after contingency.
 Levers if needed: one seed per persona, portraits for 4 characters
 instead of 7, west mirrored (already assumed).
 

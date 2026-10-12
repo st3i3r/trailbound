@@ -142,13 +142,17 @@ from studying Immunity's `resurrected_rpg` + `fm32x32` sheets — the
 closest Eastward-adjacent top-down craft we have found.  Study-only:
 nothing ships from the packs; the techniques do.
 
-| # | Technique | Rule |
-|---|---|---|
-| T1 | **Foliage variants are re-shaded, never hue-swapped** | Each palette variant of a tree/bush gets its own highlight structure and dither pass — compare `resurrected_rpg/Plants.png`: the autumn crown is not the summer crown shifted. Prompts describe variants as *a new shading pass on the same silhouette* ("same silhouette and trunk, re-shaded in {palette}, new light structure"), never "recoloured". One gen per variant. |
-| T2 | **Trees ship in three layers** | canopy sprite · trunk sprite · baked ground shadow — the `fm32x32/Trees_seperated.png` compositor. Canopy alone takes colour variants + future sway animation; trunk is shared across variants; shadow comes from `tb_post`, never the prompt. Batch A-refresh gens trees as canopy+trunk pairs. |
-| T3 | **Prop grounding is systematic** | Every placed prop gets a ground blend — contact shadow (`tb_post`) plus 1–3 grass-tuft/leaf-gap decals at its base rim (`resurrected_rpg/Props.png`: every statue/stone sits in tufts). Extends the ground recipe's "decals clustered at prop bases" from suggestion to rule — a grounding decal family is gen'd once per site palette and stamped by the layout pass. |
-| T4 | **Water gets a ring, not a flat fill** | Pond/lake shores draw a stone-ring edge band (`fm32x32/WaterTiles-6frames.png`: ringed shore tiles + animated surface). Ours simplifies to: edge-ring sprites per shore direction + a 2–3 frame low-frequency shimmer overlay on the water plane. Fixes the flat pond read. |
-| T5 | **Cinematic ≠ world** | Licensed vista/sky art (`SOURCES.md` — CraftPix skies/nature/city/winter, vnitti CC-BY) is for cards, ceremonies, letterbox and title only — never inside the site scene, where it would clash with the painterly grade. |
+**How these ship:** the gen model only understands visual descriptors —
+process words ("re-shade", "in layers", "never hue-swap") are ignored.
+Gens produce **subjects**; techniques run in the pipeline:
+
+| # | Technique | Rule | Mechanism |
+|---|---|---|---|
+| T1 | **Foliage variants are re-shaded, never hue-swapped** | Each palette variant gets its own highlight structure and dither (`resurrected_rpg/Plants.png` — autumn ≠ summer shifted) | **Derived, not gen'd** — `tools/tb_variant.py` (new, ~1 day): segment the foliage colour family in the master, remap its light/mid/shade ramp to the variant ramp (same machinery `tb_grade.py` palette-snaps with). Silhouette preserved *by construction*; 0 gens. Re-genning a variant would return a different silhouette AND a different shading — worse on both axes |
+| T2 | **Trees ship in three layers** | canopy · trunk · baked shadow (`fm32x32/Trees_seperated.png`) | Gen canopy and trunk as **two separate cut-out gens** (one canvas can't hold instructions), composite + shadow via `tb_post`. Variants land on the canopy only (T1) |
+| T3 | **Prop grounding is systematic** | Every placed prop gets a ground blend at its base rim (`resurrected_rpg/Props.png`: every statue/stone sits in tufts) — extends "decals at prop bases" from suggestion to rule | Layout pass stamps 1–3 tuft decals per prop; tuft family gen'd once per site palette; contact shadow from `tb_post` |
+| T4 | **Water gets a ring, not a flat fill** | Stone-ring edge band + low-frequency shimmer (`fm32x32/WaterTiles-6frames.png`) | Ring = real subject gen; shimmer f1/f2 = `tb_dither`-style noise pass on the water tile (0 gens); runtime frame swap |
+| T5 | **Cinematic ≠ world** | Licensed vista/sky art never enters the site scene — it would clash with the painterly grade | Cards/ceremonies/letterbox/title pull from the `SOURCES.md` shelf |
 
 ## UI recipe (SOTA, decided 2026-10-12 — cozy HUD discipline)
 
