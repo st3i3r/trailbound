@@ -923,6 +923,457 @@
    14
   ]
  },
+ "decals/decal_berries_red.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   6,
+   31,
+   31
+  ]
+ },
+ "decals/decal_bird_nest.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   5,
+   31,
+   31
+  ]
+ },
+ "decals/decal_branch_bare.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   3,
+   1,
+   29,
+   31
+  ]
+ },
+ "decals/decal_dandelion.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   4,
+   31,
+   31
+  ]
+ },
+ "decals/decal_dirt_mound.png": {
+  "anchor_x": 16,
+  "anchor_y": 20,
+  "anchor": "center",
+  "content": [
+   1,
+   9,
+   31,
+   31
+  ]
+ },
+ "decals/decal_duckweed.png": {
+  "anchor_x": 16,
+  "anchor_y": 19,
+  "anchor": "center",
+  "content": [
+   1,
+   7,
+   31,
+   31
+  ]
+ },
+ "decals/decal_fern_autumn.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   2,
+   1,
+   29,
+   31
+  ]
+ },
+ "decals/decal_fern_frond.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   5,
+   31,
+   31
+  ]
+ },
+ "decals/decal_fern_leaf.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   4,
+   31,
+   31
+  ]
+ },
+ "decals/decal_flowers_purple.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   1,
+   1,
+   31,
+   31
+  ]
+ },
+ "decals/decal_flowers_white.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   4,
+   31,
+   31
+  ]
+ },
+ "decals/decal_flowers_white_b.png": {
+  "anchor_x": 16,
+  "anchor_y": 20,
+  "anchor": "center",
+  "content": [
+   1,
+   10,
+   31,
+   31
+  ]
+ },
+ "decals/decal_ivy.png": {
+  "anchor_x": 16,
+  "anchor_y": 19,
+  "anchor": "center",
+  "content": [
+   1,
+   7,
+   31,
+   31
+  ]
+ },
+ "decals/decal_leaf_pile.png": {
+  "anchor_x": 16,
+  "anchor_y": 17,
+  "anchor": "center",
+  "content": [
+   1,
+   3,
+   31,
+   31
+  ]
+ },
+ "decals/decal_leaf_single.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   4,
+   31,
+   31
+  ]
+ },
+ "decals/decal_lily_pad.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   3,
+   1,
+   29,
+   31
+  ]
+ },
+ "decals/decal_log_piece.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   1,
+   1,
+   31,
+   31
+  ]
+ },
+ "decals/decal_mushroom_brown.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   4,
+   31,
+   31
+  ]
+ },
+ "decals/decal_mushroom_orange.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   5,
+   31,
+   31
+  ]
+ },
+ "decals/decal_mushroom_yellow.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   5,
+   31,
+   31
+  ]
+ },
+ "decals/decal_nest_dark.png": {
+  "anchor_x": 16,
+  "anchor_y": 20,
+  "anchor": "center",
+  "content": [
+   1,
+   8,
+   31,
+   31
+  ]
+ },
+ "decals/decal_pebbles.png": {
+  "anchor_x": 16,
+  "anchor_y": 19,
+  "anchor": "center",
+  "content": [
+   1,
+   7,
+   31,
+   31
+  ]
+ },
+ "decals/decal_pebbles_moss.png": {
+  "anchor_x": 16,
+  "anchor_y": 20,
+  "anchor": "center",
+  "content": [
+   1,
+   9,
+   31,
+   31
+  ]
+ },
+ "decals/decal_pinecones.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   1,
+   1,
+   31,
+   31
+  ]
+ },
+ "decals/decal_planks.png": {
+  "anchor_x": 16,
+  "anchor_y": 20,
+  "anchor": "center",
+  "content": [
+   1,
+   10,
+   31,
+   31
+  ]
+ },
+ "decals/decal_plantain.png": {
+  "anchor_x": 16,
+  "anchor_y": 17,
+  "anchor": "center",
+  "content": [
+   1,
+   3,
+   31,
+   31
+  ]
+ },
+ "decals/decal_root_knot.png": {
+  "anchor_x": 16,
+  "anchor_y": 19,
+  "anchor": "center",
+  "content": [
+   1,
+   7,
+   31,
+   31
+  ]
+ },
+ "decals/decal_seeds.png": {
+  "anchor_x": 16,
+  "anchor_y": 19,
+  "anchor": "center",
+  "content": [
+   1,
+   7,
+   31,
+   31
+  ]
+ },
+ "decals/decal_soil_mound.png": {
+  "anchor_x": 16,
+  "anchor_y": 21,
+  "anchor": "center",
+  "content": [
+   1,
+   11,
+   31,
+   31
+  ]
+ },
+ "decals/decal_soil_patch.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   5,
+   31,
+   31
+  ]
+ },
+ "decals/decal_sprout.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   2,
+   1,
+   30,
+   31
+  ]
+ },
+ "decals/decal_stick_mossy.png": {
+  "anchor_x": 16,
+  "anchor_y": 19,
+  "anchor": "center",
+  "content": [
+   1,
+   7,
+   31,
+   31
+  ]
+ },
+ "decals/decal_stone_moss.png": {
+  "anchor_x": 16,
+  "anchor_y": 20,
+  "anchor": "center",
+  "content": [
+   1,
+   9,
+   31,
+   31
+  ]
+ },
+ "decals/decal_strawberry.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   5,
+   31,
+   31
+  ]
+ },
+ "decals/decal_twig.png": {
+  "anchor_x": 16,
+  "anchor_y": 20,
+  "anchor": "center",
+  "content": [
+   1,
+   8,
+   31,
+   31
+  ]
+ },
+ "decals/tuft_grass_a.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   2,
+   1,
+   29,
+   31
+  ]
+ },
+ "decals/tuft_grass_b.png": {
+  "anchor_x": 16,
+  "anchor_y": 20,
+  "anchor": "center",
+  "content": [
+   1,
+   10,
+   31,
+   31
+  ]
+ },
+ "decals/tuft_grass_c.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   4,
+   31,
+   31
+  ]
+ },
+ "decals/tuft_grass_dry.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   4,
+   31,
+   31
+  ]
+ },
+ "decals/tuft_leaf_litter.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   4,
+   31,
+   31
+  ]
+ },
+ "decals/tuft_moss_patch.png": {
+  "anchor_x": 16,
+  "anchor_y": 18,
+  "anchor": "center",
+  "content": [
+   1,
+   6,
+   31,
+   31
+  ]
+ },
  "font/F1_0.png": {
   "anchor_x": 64,
   "anchor_y": 80,
@@ -1618,35 +2069,35 @@
  },
  "props_large/cabin.png": {
   "anchor_x": 60,
-  "anchor_y": 125,
+  "anchor_y": 128,
   "anchor": "bottom-center",
   "content": [
    1,
    2,
    118,
-   125
+   128
   ]
  },
  "props_large/cottage_shed.png": {
   "anchor_x": 64,
-  "anchor_y": 122,
+  "anchor_y": 125,
   "anchor": "bottom-center",
   "content": [
    4,
    13,
    125,
-   122
+   125
   ]
  },
  "props_large/flamboyant_tree.png": {
   "anchor_x": 64,
-  "anchor_y": 126,
+  "anchor_y": 128,
   "anchor": "bottom-center",
   "content": [
    1,
    2,
    127,
-   126
+   128
   ]
  },
  "props_large/hammock.png": {
@@ -1662,13 +2113,13 @@
  },
  "props_large/outfitter_van.png": {
   "anchor_x": 62,
-  "anchor_y": 97,
+  "anchor_y": 98,
   "anchor": "bottom-center",
   "content": [
    0,
    2,
    124,
-   97
+   98
   ]
  },
  "props_large/pennant_string.png": {
@@ -1735,6 +2186,50 @@
    3,
    126,
    125
+  ]
+ },
+ "props_large/tree_broadleaf.png": {
+  "anchor_x": 64,
+  "anchor_y": 126,
+  "anchor": "bottom-center",
+  "content": [
+   12,
+   0,
+   115,
+   126
+  ]
+ },
+ "props_large/tree_cherry.png": {
+  "anchor_x": 64,
+  "anchor_y": 126,
+  "anchor": "bottom-center",
+  "content": [
+   10,
+   0,
+   117,
+   126
+  ]
+ },
+ "props_large/tree_feathery.png": {
+  "anchor_x": 64,
+  "anchor_y": 126,
+  "anchor": "bottom-center",
+  "content": [
+   19,
+   0,
+   108,
+   126
+  ]
+ },
+ "props_large/tree_maple.png": {
+  "anchor_x": 64,
+  "anchor_y": 126,
+  "anchor": "bottom-center",
+  "content": [
+   13,
+   0,
+   114,
+   126
   ]
  },
  "props_medium/M1_5.png": {
@@ -1880,6 +2375,50 @@
    58
   ]
  },
+ "props_medium/bush_clover.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   20,
+   63,
+   63
+  ]
+ },
+ "props_medium/bush_round_m.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   12,
+   63,
+   63
+  ]
+ },
+ "props_medium/bush_white_flower_v.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   9,
+   63,
+   63
+  ]
+ },
+ "props_medium/camp_table_fold.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   17,
+   63,
+   63
+  ]
+ },
  "props_medium/chicken_coop.png": {
   "anchor_x": 32,
   "anchor_y": 61,
@@ -1889,6 +2428,50 @@
    3,
    62,
    61
+  ]
+ },
+ "props_medium/cooler_box.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   1,
+   63,
+   63
+  ]
+ },
+ "props_medium/debris_brambles.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   11,
+   63,
+   63
+  ]
+ },
+ "props_medium/debris_branch_pile.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   21,
+   63,
+   63
+  ]
+ },
+ "props_medium/debris_log_mossy.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   31,
+   63,
+   63
   ]
  },
  "props_medium/dirt_patch.png": {
@@ -1902,6 +2485,39 @@
    55
   ]
  },
+ "props_medium/dome_tent_amber.png": {
+  "anchor_x": 48,
+  "anchor_y": 79,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   6,
+   95,
+   79
+  ]
+ },
+ "props_medium/dome_tent_sage.png": {
+  "anchor_x": 48,
+  "anchor_y": 79,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   6,
+   95,
+   79
+  ]
+ },
+ "props_medium/dome_tent_slate.png": {
+  "anchor_x": 48,
+  "anchor_y": 79,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   5,
+   95,
+   79
+  ]
+ },
  "props_medium/drying_tarp.png": {
   "anchor_x": 32,
   "anchor_y": 59,
@@ -1911,6 +2527,17 @@
    5,
    62,
    59
+  ]
+ },
+ "props_medium/fern_bank.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   7,
+   63,
+   63
   ]
  },
  "props_medium/fire_ring_lit_static.png": {
@@ -1937,13 +2564,13 @@
  },
  "props_medium/fire_ring_unlit_v2.png": {
   "anchor_x": 24,
-  "anchor_y": 39,
+  "anchor_y": 40,
   "anchor": "bottom-center",
   "content": [
    1,
    1,
    46,
-   39
+   40
   ]
  },
  "props_medium/flower_box.png": {
@@ -1955,6 +2582,17 @@
    5,
    58,
    56
+  ]
+ },
+ "props_medium/folding_chair_pair.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   7,
+   1,
+   56,
+   63
   ]
  },
  "props_medium/lantern_post.png": {
@@ -2012,6 +2650,17 @@
    54
   ]
  },
+ "props_medium/pine_sapling.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   8,
+   1,
+   55,
+   63
+  ]
+ },
  "props_medium/prop_boulder_0.png": {
   "anchor_x": 32,
   "anchor_y": 59,
@@ -2034,6 +2683,17 @@
    63
   ]
  },
+ "props_medium/propane_stove.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   2,
+   1,
+   62,
+   63
+  ]
+ },
  "props_medium/radio_stump.png": {
   "anchor_x": 32,
   "anchor_y": 55,
@@ -2045,6 +2705,17 @@
    55
   ]
  },
+ "props_medium/reed_shore.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   7,
+   1,
+   56,
+   63
+  ]
+ },
  "props_medium/stool_pair.png": {
   "anchor_x": 32,
   "anchor_y": 51,
@@ -2054,6 +2725,39 @@
    24,
    54,
    51
+  ]
+ },
+ "props_medium/stump_burnt.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   8,
+   1,
+   55,
+   63
+  ]
+ },
+ "props_medium/stump_dead.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   13,
+   1,
+   51,
+   63
+  ]
+ },
+ "props_medium/stump_mushroom.png": {
+  "anchor_x": 32,
+  "anchor_y": 63,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   4,
+   63,
+   63
   ]
  },
  "props_medium/tea_table.png": {
@@ -2705,6 +3409,39 @@
    30
   ]
  },
+ "props_small/dry_bag.png": {
+  "anchor_x": 24,
+  "anchor_y": 47,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   1,
+   47,
+   47
+  ]
+ },
+ "props_small/duffel_bag.png": {
+  "anchor_x": 24,
+  "anchor_y": 47,
+  "anchor": "bottom-center",
+  "content": [
+   2,
+   1,
+   45,
+   47
+  ]
+ },
+ "props_small/grass_tussock.png": {
+  "anchor_x": 24,
+  "anchor_y": 47,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   1,
+   47,
+   47
+  ]
+ },
  "props_small/lantern_post_small.png": {
   "anchor_x": 16,
   "anchor_y": 31,
@@ -2727,6 +3464,17 @@
    31
   ]
  },
+ "props_small/mushrooms_orange.png": {
+  "anchor_x": 20,
+  "anchor_y": 39,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   2,
+   39,
+   39
+  ]
+ },
  "props_small/non_la_hat.png": {
   "anchor_x": 16,
   "anchor_y": 25,
@@ -2738,15 +3486,37 @@
    25
   ]
  },
+ "props_small/rock_mossy_s.png": {
+  "anchor_x": 24,
+  "anchor_y": 47,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   8,
+   47,
+   47
+  ]
+ },
+ "props_small/root_gnarled.png": {
+  "anchor_x": 24,
+  "anchor_y": 47,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   6,
+   47,
+   47
+  ]
+ },
  "props_small/signpost.png": {
   "anchor_x": 25,
-  "anchor_y": 63,
+  "anchor_y": 64,
   "anchor": "bottom-center",
   "content": [
    4,
    0,
    46,
-   63
+   64
   ]
  },
  "props_small/silk_lantern_red.png": {
@@ -2760,15 +3530,26 @@
    31
   ]
  },
+ "props_small/solar_lantern.png": {
+  "anchor_x": 24,
+  "anchor_y": 47,
+  "anchor": "bottom-center",
+  "content": [
+   14,
+   1,
+   33,
+   47
+  ]
+ },
  "props_small/spirit_house.png": {
   "anchor_x": 20,
-  "anchor_y": 63,
+  "anchor_y": 64,
   "anchor": "bottom-center",
   "content": [
    5,
    1,
    36,
-   63
+   64
   ]
  },
  "props_small/stool_plastic_blue.png": {
@@ -2791,6 +3572,105 @@
    5,
    28,
    29
+  ]
+ },
+ "terrain/shore_cape_tip.png": {
+  "anchor_x": 32,
+  "anchor_y": 32,
+  "anchor": "center",
+  "content": [
+   13,
+   1,
+   51,
+   63
+  ]
+ },
+ "terrain/shore_corner_L.png": {
+  "anchor_x": 32,
+  "anchor_y": 32,
+  "anchor": "center",
+  "content": [
+   1,
+   2,
+   63,
+   63
+  ]
+ },
+ "terrain/shore_corner_a.png": {
+  "anchor_x": 32,
+  "anchor_y": 32,
+  "anchor": "center",
+  "content": [
+   1,
+   1,
+   63,
+   63
+  ]
+ },
+ "terrain/shore_corner_b.png": {
+  "anchor_x": 32,
+  "anchor_y": 32,
+  "anchor": "center",
+  "content": [
+   1,
+   2,
+   63,
+   63
+  ]
+ },
+ "terrain/shore_edge_bank.png": {
+  "anchor_x": 32,
+  "anchor_y": 32,
+  "anchor": "center",
+  "content": [
+   1,
+   1,
+   62,
+   63
+  ]
+ },
+ "terrain/shore_edge_grass_n.png": {
+  "anchor_x": 32,
+  "anchor_y": 48,
+  "anchor": "center",
+  "content": [
+   1,
+   33,
+   63,
+   63
+  ]
+ },
+ "terrain/shore_edge_vert.png": {
+  "anchor_x": 32,
+  "anchor_y": 32,
+  "anchor": "center",
+  "content": [
+   15,
+   1,
+   49,
+   63
+  ]
+ },
+ "terrain/shore_islet.png": {
+  "anchor_x": 32,
+  "anchor_y": 34,
+  "anchor": "center",
+  "content": [
+   1,
+   4,
+   63,
+   63
+  ]
+ },
+ "terrain/shore_steps_water.png": {
+  "anchor_x": 32,
+  "anchor_y": 40,
+  "anchor": "center",
+  "content": [
+   1,
+   17,
+   63,
+   63
   ]
  },
  "terrain/terrain_grass_forest_pro_0.png": {
@@ -2826,59 +3706,400 @@
    128
   ]
  },
- "ui/U1_0.png": {
-  "anchor_x": 128,
-  "anchor_y": 121,
+ "terrain/variant_forest_LLLL_0.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
   "anchor": "center",
   "content": [
-   23,
+   0,
+   0,
    32,
-   234,
-   210
+   32
   ]
  },
- "ui/U2_0.png": {
-  "anchor_x": 95,
-  "anchor_y": 49,
+ "terrain/variant_forest_LLLL_1.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
   "anchor": "center",
   "content": [
-   30,
+   0,
+   0,
    32,
-   161,
-   66
+   32
   ]
  },
- "ui/U3_0.png": {
-  "anchor_x": 128,
-  "anchor_y": 137,
+ "terrain/variant_forest_LLLL_2.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
   "anchor": "center",
   "content": [
-   16,
+   0,
+   0,
    32,
-   241,
-   242
+   32
   ]
  },
- "ui/U4_0.png": {
-  "anchor_x": 124,
-  "anchor_y": 87,
+ "terrain/variant_forest_LLLL_3.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
   "anchor": "center",
   "content": [
-   11,
-   19,
-   237,
-   155
+   0,
+   0,
+   32,
+   32
   ]
  },
- "ui/U5_0.png": {
-  "anchor_x": 132,
-  "anchor_y": 100,
+ "terrain/variant_forest_LLLL_4.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
   "anchor": "center",
   "content": [
-   16,
-   20,
-   249,
-   180
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_forest_LLLL_5.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_forest_UUUU_0.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_forest_UUUU_1.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_forest_UUUU_2.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_forest_UUUU_3.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_forest_UUUU_4.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_forest_UUUU_5.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_stone_LLLL_0.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_stone_LLLL_1.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_stone_LLLL_2.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_stone_LLLL_3.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_stone_LLLL_4.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_stone_LLLL_5.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_stone_UUUU_0.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_stone_UUUU_1.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_stone_UUUU_2.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_stone_UUUU_3.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_stone_UUUU_4.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_stone_UUUU_5.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_water_LLLL_0.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_water_LLLL_1.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_water_LLLL_2.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_water_LLLL_3.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_water_LLLL_4.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_water_LLLL_5.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_water_UUUU_0.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_water_UUUU_1.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_water_UUUU_2.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_water_UUUU_3.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_water_UUUU_4.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
+  ]
+ },
+ "terrain/variant_water_UUUU_5.png": {
+  "anchor_x": 16,
+  "anchor_y": 16,
+  "anchor": "center",
+  "content": [
+   0,
+   0,
+   32,
+   32
   ]
  }
 }

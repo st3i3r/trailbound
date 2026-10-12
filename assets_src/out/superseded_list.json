@@ -135,6 +135,14 @@
   "tree_ref_3.png": {
    "superseded_by": "flamboyant_tree (L1)",
    "moved_to": "gen/_superseded/tree_ref_3.png"
+  },
+  "tent_green.png": {
+   "superseded_by": "dome_tent_sage (A-R4)",
+   "moved_to": "game/assets/pinewatch/_superseded/tent_green.png"
+  },
+  "tent_red.png": {
+   "superseded_by": "dome_tent_amber (A-R4)",
+   "moved_to": "game/assets/pinewatch/_superseded/tent_red.png"
   }
  },
  "kept_no_replacement": {

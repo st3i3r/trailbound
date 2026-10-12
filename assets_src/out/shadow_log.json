@@ -233,24 +233,9 @@
   ],
   "shadow_px": 560
  },
- "props_large/cabin.png": {
-  "ellipse": [
-   19,
-   119,
-   84,
-   9
-  ],
-  "shadow_px": 569
- },
- "props_large/flamboyant_tree.png": {
-  "ellipse": [
-   21,
-   120,
-   90,
-   9
-  ],
-  "shadow_px": 552
- },
+ "props_large/cabin.png": "has_soft_shadow",
+ "props_large/cottage_shed.png": "has_soft_shadow",
+ "props_large/flamboyant_tree.png": "has_soft_shadow",
  "props_large/hammock.png": {
   "ellipse": [
    27,
@@ -260,15 +245,7 @@
   ],
   "shadow_px": 536
  },
- "props_large/outfitter_van.png": {
-  "ellipse": [
-   19,
-   91,
-   89,
-   9
-  ],
-  "shadow_px": 474
- },
+ "props_large/outfitter_van.png": "has_soft_shadow",
  "props_large/pennant_string.png": "skipped (line prop)",
  "props_large/picnic_table.png": {
   "ellipse": [
@@ -306,6 +283,42 @@
    9
   ],
   "shadow_px": 613
+ },
+ "props_large/tree_broadleaf.png": {
+  "ellipse": [
+   28,
+   120,
+   74,
+   9
+  ],
+  "shadow_px": 454
+ },
+ "props_large/tree_cherry.png": {
+  "ellipse": [
+   27,
+   120,
+   77,
+   9
+  ],
+  "shadow_px": 480
+ },
+ "props_large/tree_feathery.png": {
+  "ellipse": [
+   33,
+   120,
+   64,
+   9
+  ],
+  "shadow_px": 396
+ },
+ "props_large/tree_maple.png": {
+  "ellipse": [
+   29,
+   120,
+   72,
+   9
+  ],
+  "shadow_px": 440
  },
  "props_medium/M1_5.png": {
   "ellipse": [
@@ -424,6 +437,34 @@
   ],
   "shadow_px": 101
  },
+ "props_medium/bush_clover.png": "has_soft_shadow",
+ "props_medium/bush_round_m.png": {
+  "ellipse": [
+   12,
+   57,
+   44,
+   9
+  ],
+  "shadow_px": 236
+ },
+ "props_medium/bush_white_flower_v.png": {
+  "ellipse": [
+   12,
+   57,
+   44,
+   9
+  ],
+  "shadow_px": 236
+ },
+ "props_medium/camp_table_fold.png": {
+  "ellipse": [
+   12,
+   57,
+   44,
+   9
+  ],
+  "shadow_px": 236
+ },
  "props_medium/chicken_coop.png": {
   "ellipse": [
    13,
@@ -432,6 +473,42 @@
    9
   ],
   "shadow_px": 285
+ },
+ "props_medium/cooler_box.png": {
+  "ellipse": [
+   12,
+   57,
+   44,
+   9
+  ],
+  "shadow_px": 236
+ },
+ "props_medium/debris_brambles.png": {
+  "ellipse": [
+   12,
+   57,
+   44,
+   9
+  ],
+  "shadow_px": 236
+ },
+ "props_medium/debris_branch_pile.png": {
+  "ellipse": [
+   12,
+   57,
+   44,
+   9
+  ],
+  "shadow_px": 236
+ },
+ "props_medium/debris_log_mossy.png": {
+  "ellipse": [
+   12,
+   57,
+   44,
+   9
+  ],
+  "shadow_px": 236
  },
  "props_medium/dirt_patch.png": {
   "ellipse": [
@@ -442,6 +519,9 @@
   ],
   "shadow_px": 292
  },
+ "props_medium/dome_tent_amber.png": "has_soft_shadow",
+ "props_medium/dome_tent_sage.png": "has_soft_shadow",
+ "props_medium/dome_tent_slate.png": "has_soft_shadow",
  "props_medium/drying_tarp.png": {
   "ellipse": [
    12,
@@ -450,6 +530,15 @@
    9
   ],
   "shadow_px": 292
+ },
+ "props_medium/fern_bank.png": {
+  "ellipse": [
+   12,
+   57,
+   44,
+   9
+  ],
+  "shadow_px": 236
  },
  "props_medium/fire_ring_lit_static.png": {
   "ellipse": [
@@ -469,6 +558,7 @@
   ],
   "shadow_px": 171
  },
+ "props_medium/fire_ring_unlit_v2.png": "has_soft_shadow",
  "props_medium/flower_box.png": {
   "ellipse": [
    15,
@@ -477,6 +567,15 @@
    7
   ],
   "shadow_px": 192
+ },
+ "props_medium/folding_chair_pair.png": {
+  "ellipse": [
+   16,
+   58,
+   35,
+   7
+  ],
+  "shadow_px": 158
  },
  "props_medium/lantern_post.png": {
   "ellipse": [
@@ -523,6 +622,42 @@
   ],
   "shadow_px": 192
  },
+ "props_medium/pine_sapling.png": {
+  "ellipse": [
+   17,
+   58,
+   33,
+   7
+  ],
+  "shadow_px": 148
+ },
+ "props_medium/prop_boulder_0.png": {
+  "ellipse": [
+   15,
+   54,
+   38,
+   7
+  ],
+  "shadow_px": 196
+ },
+ "props_medium/prop_supply_crate_0.png": {
+  "ellipse": [
+   12,
+   57,
+   43,
+   9
+  ],
+  "shadow_px": 231
+ },
+ "props_medium/propane_stove.png": {
+  "ellipse": [
+   12,
+   57,
+   43,
+   9
+  ],
+  "shadow_px": 228
+ },
  "props_medium/radio_stump.png": {
   "ellipse": [
    18,
@@ -532,6 +667,7 @@
   ],
   "shadow_px": 155
  },
+ "props_medium/reed_shore.png": "has_soft_shadow",
  "props_medium/stool_pair.png": {
   "ellipse": [
    18,
@@ -540,6 +676,33 @@
    7
   ],
   "shadow_px": 160
+ },
+ "props_medium/stump_burnt.png": {
+  "ellipse": [
+   17,
+   58,
+   33,
+   7
+  ],
+  "shadow_px": 148
+ },
+ "props_medium/stump_dead.png": {
+  "ellipse": [
+   20,
+   59,
+   27,
+   5
+  ],
+  "shadow_px": 96
+ },
+ "props_medium/stump_mushroom.png": {
+  "ellipse": [
+   12,
+   57,
+   44,
+   9
+  ],
+  "shadow_px": 236
  },
  "props_medium/tea_table.png": {
   "ellipse": [
@@ -550,24 +713,8 @@
   ],
   "shadow_px": 188
  },
- "props_medium/tent_green.png": {
-  "ellipse": [
-   17,
-   58,
-   64,
-   9
-  ],
-  "shadow_px": 282
- },
- "props_medium/tent_red.png": {
-  "ellipse": [
-   18,
-   58,
-   65,
-   9
-  ],
-  "shadow_px": 288
- },
+ "props_medium/tent_green.png": "has_soft_shadow",
+ "props_medium/tent_red.png": "has_soft_shadow",
  "props_medium/tripod_cauldron.png": {
   "ellipse": [
    17,
@@ -1072,6 +1219,25 @@
   ],
   "shadow_px": 72
  },
+ "props_small/dry_bag.png": {
+  "ellipse": [
+   9,
+   42,
+   33,
+   7
+  ],
+  "shadow_px": 148
+ },
+ "props_small/duffel_bag.png": {
+  "ellipse": [
+   10,
+   42,
+   30,
+   7
+  ],
+  "shadow_px": 134
+ },
+ "props_small/grass_tussock.png": "has_soft_shadow",
  "props_small/lantern_post_small.png": {
   "ellipse": [
    12,
@@ -1090,6 +1256,15 @@
   ],
   "shadow_px": 32
  },
+ "props_small/mushrooms_orange.png": {
+  "ellipse": [
+   8,
+   35,
+   27,
+   5
+  ],
+  "shadow_px": 96
+ },
  "props_small/non_la_hat.png": {
   "ellipse": [
    9,
@@ -1099,6 +1274,25 @@
   ],
   "shadow_px": 32
  },
+ "props_small/rock_mossy_s.png": {
+  "ellipse": [
+   9,
+   42,
+   33,
+   7
+  ],
+  "shadow_px": 148
+ },
+ "props_small/root_gnarled.png": {
+  "ellipse": [
+   9,
+   42,
+   33,
+   7
+  ],
+  "shadow_px": 148
+ },
+ "props_small/signpost.png": "has_soft_shadow",
  "props_small/silk_lantern_red.png": {
   "ellipse": [
    13,
@@ -1108,14 +1302,23 @@
   ],
   "shadow_px": 28
  },
+ "props_small/solar_lantern.png": {
+  "ellipse": [
+   19,
+   44,
+   13,
+   3
+  ],
+  "shadow_px": 27
+ },
  "props_small/spirit_house.png": {
   "ellipse": [
    11,
-   59,
+   60,
    22,
    5
   ],
-  "shadow_px": 77
+  "shadow_px": 60
  },
  "props_small/stool_plastic_blue.png": {
   "ellipse": [
@@ -1134,24 +1337,5 @@
    3
   ],
   "shadow_px": 32
- },
- "props_large/cottage_shed.png": "inherited (copy of shipped cabin incl. shadow)",
- "props_medium/fire_ring_unlit_v2.png": {
-  "ellipse": [
-   9,
-   34,
-   32,
-   7
-  ],
-  "shadow_px": 144
- },
- "props_small/signpost.png": {
-  "ellipse": [
-   12,
-   58,
-   30,
-   7
-  ],
-  "shadow_px": 136
  }
 }

@@ -87,20 +87,30 @@ const PROPS := [
     ["props_small",  "stool_plastic_red", 186, 214],
     # ------- camp kitchen (centre): fire, tripod, bench, stump, lantern
     ["props_medium", "lantern_post",      356, 218, -3.0],
-    ["props_medium", "tent_green",        212, 232],
+    ["props_medium", "dome_tent_sage",    212, 232],
     ["props_medium", "tripod_cauldron",   302, 238],
     ["props_medium", "dirt_patch",        326, 250],
     ["props_medium", "radio_stump",       370, 258],
     ["props_medium", "log_bench",         256, 262],
+    # A-R4 gear cluster by the sage dome: cooler + chair at its mouth
+    ["props_medium", "cooler_box",        238, 244],
+    ["props_medium", "folding_chair_pair", 188, 248, -4.0],
     # ---------- rest corner (E): hammock by the pine, picnic set below
     ["props_large",  "hammock",           566, 150],
     ["props_large",  "picnic_table",      516, 250],
     ["props_medium", "picnic_basket",     498, 266],
     ["props_medium", "tea_table",         472, 276],
-    ["props_medium", "tent_red",          192, 300, -2.5],
+    ["props_medium", "dome_tent_amber",   192, 300, -2.5],
+    # A-R4 gear cluster by the amber dome: table + bags + lantern
+    ["props_medium", "camp_table_fold",   232, 312],
+    ["props_small",  "dry_bag",           168, 314],
+    ["props_small",  "solar_lantern",     246, 322],
     # spare unlit fire pit near the rest corner (storytelling; the A1b
     # flame loop stays on the shipped ring at the kitchen fire)
     ["props_medium", "fire_ring_unlit_v2", 565, 294],
+    ["props_medium", "propane_stove",     330, 266],
+    # A-R1 T2 composite: feathery canopy drooping over the pond west edge
+    ["props_large",  "tree_feathery",     108, 272],
     # ------- work edge (NE/E): coop, herbs, broom, planter, spirit house
     # cottage_shed = shipped cabin reused as a small second structure in
     # the row-3 treeline gap, back-left of the coop/spirit_house pair
@@ -126,16 +136,22 @@ const BOARD_RECT := Rect2(204, 160, 40, 52)  # its tap zone in stage px
 # reads as a patch of something (tuft / flowers / dry grass / pebbles /
 # mushrooms), not confetti
 const DECAL_FAMILIES := {
-    "tuft":   ["XS_0", "XS_1", "XS_4", "XS_24", "XS_36", "XS_52"],
-    "flower": ["XS_10", "XS_11", "XS_22", "XS_56"],
-    "dry":    ["XS_2", "XS_6", "XS_8"],
-    "pebble": ["XS_29", "XS_41", "XS_51"],
-    "shroom": ["XS_13", "XS_16", "XS_43", "XS_44", "XS_61"],
+    "tuft":   ["tuft_grass_a", "tuft_grass_b", "tuft_grass_c",
+               "decal_fern_frond", "decal_fern_leaf", "decal_plantain"],
+    "flower": ["decal_flowers_white", "decal_flowers_purple",
+               "decal_flowers_white_b", "decal_dandelion"],
+    "dry":    ["tuft_grass_dry", "decal_twig", "decal_stick_mossy"],
+    "pebble": ["decal_pebbles", "decal_pebbles_moss", "decal_stone_moss"],
+    "shroom": ["decal_mushroom_brown", "decal_mushroom_orange",
+               "decal_mushroom_yellow"],
     # leaf litter for the (intentionally near-flat) B5 forest floor:
-    # needle scatter + pile, pine twig, fallen yellow/red leaves, pinecone
-    "litter": ["XS_19", "XS_20", "XS_21", "XS_22", "XS_23", "XS_17"],
+    # litter tuft + pile + single leaf + pinecones + bare branch + nest
+    "litter": ["tuft_leaf_litter", "decal_leaf_pile", "decal_leaf_single",
+               "decal_pinecones", "decal_branch_bare", "decal_bird_nest"],
+    # damp moss/soil for shoreline + tree feet
+    "moss":   ["tuft_moss_patch", "decal_soil_patch", "decal_soil_mound"],
 }
-const TENTS := ["tent_green", "tent_red"]
+const TENTS := ["dome_tent_sage", "dome_tent_amber", "dome_tent_slate"]
 
 # ------------------------------------------------------------- grade pass
 const WARM_MUL := Color("fbf4e4")            # sunny filmic multiply —
@@ -155,8 +171,8 @@ const TREE_NEAR := Color(0.51, 0.55, 0.62)   # v2 ground so they don't
 # Open-field interior stays EMPTY; the tint map carries macro variation.
 # [centre x, centre y, family, count, radius x, radius y, terrain want]
 const DECAL_CLUSTERS := [
-    [212.0, 247.0, "tuft",   2, 16.0, 8.0, 0],   # tent_green base
-    [192.0, 316.0, "dry",    2, 16.0, 8.0, 0],   # tent_red base
+    [212.0, 247.0, "tuft",   2, 16.0, 8.0, 0],   # dome_tent_sage base
+    [192.0, 316.0, "dry",    2, 16.0, 8.0, 0],   # dome_tent_amber base
     [256.0, 272.0, "pebble", 2, 12.0, 6.0, 0],   # log_bench feet
     [540.0, 174.0, "tuft",   1, 10.0, 6.0, 0],   # chicken_coop base
     [118.0, 192.0, "pebble", 1, 10.0, 6.0, 0],   # van wheel line
