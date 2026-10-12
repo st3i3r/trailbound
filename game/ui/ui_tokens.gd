@@ -23,14 +23,15 @@ const INK := Color("3e2814")               # dark ink on parchment pills
 const SHADOW := Color("1c2413")            # 1px text drop shadow
 const GOLD := Color("ffcf7d")              # elite / rating accent
 const GREEN := Color("b8d7a8")             # ok / camp green
-const RED := Color("e0886c")               # aversion / penalty terms
-const DIM := Color("a59a72")               # muted text
+const RED := Color("f0a48e")               # aversion / penalty terms
+const DIM := Color("c2b78d")               # muted text
 # On-PAPER variants — the accents above are tuned for dark chrome and
 # wash out on parchment; these deep variants carry the same meaning.
-const MUTE := Color("8f7a52")              # muted text on paper
-const PLUS := Color("5e8f4a")              # positive terms on paper
-const MINUS := Color("b8513d")             # negative terms on paper
-const GOLD_DEEP := Color("b3811f")         # accent / coin text on paper
+# (All WCAG-4.5-verified vs their surfaces — UI-018 lint contrast.)
+const MUTE := Color("7a6742")              # muted text on paper
+const PLUS := Color("4a7534")              # positive terms on paper
+const MINUS := Color("a8442f")             # negative terms on paper
+const GOLD_DEEP := Color("8a6113")         # accent / coin text on paper
 const DIMMER := Color(0.09, 0.06, 0.02, 0.4)
                                            # panel scrim, paper-dark ~40%
 

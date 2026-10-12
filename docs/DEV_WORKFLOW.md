@@ -138,14 +138,32 @@ godot.cmd --headless --path game res://scenes/pinewatch_test.tscn --smoke
 handled in `pinewatch_test.gd`; `--shot=PATH` writes elsewhere — use it
 for wide-viewport checks like the 20:9 `--resolution 2400x1080` run,
 which should show the map centred on the dark clear colour, not grey).
-`--smoke` is the headless UI assertion pass (Back → quit-confirm →
-close, fire-proximity bubble) — run it after touching `game/ui/`.
+`--smoke` is the headless UI assertion pass (Back → quit-confirm,
+fire bubble, tray select/seat/unseat, night sheet → Sleep → Morning →
+booking board → Head Out) — run it after touching `game/ui/`.
 `--dev-ui` opts the scene into dev labels (off by default so `--shot`
 stays clean). `--bare` strips HUD + markers + pad/tray overlays — pure
 world art; the title vista is captured with
 `--bare --shot=res://assets/pinewatch/ui/title_vista.png`. Compare
 against `assets_src/cleanup/pinewatch_comp_v3.png` — the scene's layout
 authority is `tools/scene_comp_v2.py`.
+
+UI gallery (the §5.4 storybook — UI-018): every chrome component in
+labeled sections, golden-shot ready, plus the automated lints.
+
+```bat
+godot.cmd --path game res://scenes/ui_gallery.tscn --shot=golden/ui_gallery.png
+godot.cmd --path game res://scenes/ui_gallery.tscn --lint
+```
+
+`--lint` exits non-zero on failures and prints `LINT name:…` lines:
+touch targets ≥40px both axes (mouse_FILTER_STOP controls), every
+icons.json semantic name resolving, every literal `tr()` key (+ concat
+prefixes) present in strings.csv with both EN+VI filled, WCAG-4.5
+contrast of each text token on its declared surface, and an advisory
+VI-width drift list (>1.7× EN — containers to eyeball, not failures).
+Golden diffs: re-shoot to the same path and compare; the canonical
+goldens live under `assets_src/cleanup/golden/` once a set is blessed.
 
 App shell (the real boot path — `run/main_scene` is `title.tscn`):
 
