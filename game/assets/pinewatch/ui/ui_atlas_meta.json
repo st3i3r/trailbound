@@ -290,68 +290,39 @@
   }
  },
  "btn_green": {
-  "x": 233,
-  "y": 373,
-  "w": 85,
-  "h": 34,
-  "src": {
-   "file": "U2_0.png",
-   "rect": [
-    30,
-    32,
-    85,
-    34
-   ]
-  },
   "nine_slice": {
-   "l": 9,
-   "r": 9,
-   "t": 4,
-   "b": 5
+   "l": 6,
+   "r": 6,
+   "t": 6,
+   "b": 6
+  },
+  "src": {
+   "file": "btn_green.png",
+   "derived": "tb_glass_kit v2"
   }
  },
  "btn_gold": {
-  "x": 320,
-  "y": 373,
-  "w": 85,
-  "h": 34,
-  "src": {
-   "file": "U2_0.png",
-   "rect": [
-    30,
-    32,
-    85,
-    34
-   ],
-   "derived": "recolor_gold"
-  },
   "nine_slice": {
-   "l": 3,
-   "r": 4,
-   "t": 1,
-   "b": 5
+   "l": 6,
+   "r": 6,
+   "t": 6,
+   "b": 6
+  },
+  "src": {
+   "file": "btn_gold.png",
+   "derived": "tb_glass_kit v2"
   }
  },
  "btn_disabled": {
-  "x": 2,
-  "y": 416,
-  "w": 85,
-  "h": 34,
-  "src": {
-   "file": "U2_0.png",
-   "rect": [
-    30,
-    32,
-    85,
-    34
-   ],
-   "derived": "recolor_cream"
-  },
   "nine_slice": {
-   "l": 9,
-   "r": 9,
-   "t": 4,
-   "b": 2
+   "l": 6,
+   "r": 6,
+   "t": 6,
+   "b": 6
+  },
+  "src": {
+   "file": "btn_disabled.png",
+   "derived": "tb_glass_kit v2"
   }
  },
  "btn_round_gold": {
@@ -522,5 +493,89 @@
   "w": 452,
   "h": 514,
   "pad": 2
+ },
+ "glass_panel": {
+  "nine_slice": {
+   "l": 8,
+   "r": 8,
+   "t": 8,
+   "b": 8
+  },
+  "src": {
+   "file": "glass_panel.png",
+   "derived": "tb_glass_kit v2"
+  }
+ },
+ "glass_band": {
+  "nine_slice": {
+   "l": 8,
+   "r": 8,
+   "t": 16,
+   "b": 8
+  },
+  "src": {
+   "file": "glass_band.png",
+   "derived": "tb_glass_kit v2"
+  }
+ },
+ "glass_chip": {
+  "nine_slice": {
+   "l": 6,
+   "r": 6,
+   "t": 6,
+   "b": 6
+  },
+  "src": {
+   "file": "glass_chip.png",
+   "derived": "tb_glass_kit v2"
+  }
+ },
+ "glass_pill": {
+  "nine_slice": {
+   "l": 10,
+   "r": 10,
+   "t": 9,
+   "b": 9
+  },
+  "src": {
+   "file": "glass_pill.png",
+   "derived": "tb_glass_kit v2"
+  }
+ },
+ "btn_pill": {
+  "nine_slice": {
+   "l": 6,
+   "r": 6,
+   "t": 6,
+   "b": 6
+  },
+  "src": {
+   "file": "btn_pill.png",
+   "derived": "tb_glass_kit v2"
+  }
+ },
+ "sel_glow": {
+  "nine_slice": {
+   "l": 8,
+   "r": 8,
+   "t": 8,
+   "b": 8
+  },
+  "src": {
+   "file": "sel_glow.png",
+   "derived": "tb_glass_kit v2"
+  }
+ },
+ "seal_lacquer": {
+  "nine_slice": {
+   "l": 5,
+   "r": 5,
+   "t": 5,
+   "b": 5
+  },
+  "src": {
+   "file": "seal_lacquer.png",
+   "derived": "tb_glass_kit v2"
+  }
  }
 }

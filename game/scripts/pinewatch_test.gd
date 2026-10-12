@@ -767,9 +767,9 @@ func _quit_dialog() -> Control:
     p.size = Vector2(188, 96)
     p.position = (vp - p.size) / 2.0
     p.add_theme_stylebox_override("panel",
-        UIKit.nine("panel_window_flat"))
+        UIKit.nine("glass_panel"))
     var l := UIKit.label_for(tr("quit_title"), UITokens.TypeRole.HEAD,
-        UITokens.INK)
+        UITokens.PAPER)
     l.set_anchors_preset(Control.PRESET_TOP_WIDE)
     l.offset_top = 18
     l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -1005,7 +1005,7 @@ func _fill_bubble(control: Control, detail: Array) -> void:
     var p := Panel.new()
     p.mouse_filter = Control.MOUSE_FILTER_IGNORE
     p.add_theme_stylebox_override("panel",
-        UIKit.state_nine("slot_dark", {}, 0.92))
+        UIKit.state_nine("glass_chip", {}, 0.92))
     p.position = Vector2(40 - w / 2.0, 0)        # centred on the anchor
     p.size = Vector2(w, 22)
     control.add_child(p)
@@ -1246,12 +1246,12 @@ func _advance_phase() -> void:
 ## object.  A "!" marker floats over the signpost until Head out.
 func _start_morning() -> void:
     evening_open = false
-    # "!" chip over the notice board — slot_dark (bubble_prompt's
+    # "!" chip over the notice board — glass_chip (bubble_prompt's
     # 18px tail inset eats the whole 22px chip); gold glyph on dark
     var bub := Panel.new()
     bub.mouse_filter = Control.MOUSE_FILTER_IGNORE
     bub.add_theme_stylebox_override("panel",
-        UIKit.state_nine("slot_dark"))
+        UIKit.state_nine("glass_chip"))
     bub.size = Vector2(22, 22)
     var bang := UIKit.label_for("!", UITokens.TypeRole.DISPLAY,
         UITokens.GOLD)

@@ -46,9 +46,8 @@ func _ready() -> void:
 	strip.name = "BreakdownStrip"
 	strip.visible = false
 	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# slot_dark — same clean frame the cards use; hud_banner_flat's
-	# rope sags through the mid-line at this height and strikes text
-	var sb := UIKit.state_nine("slot_dark")
+	# glass_chip — same clean frame the cards use (lacquer kit)
+	var sb := UIKit.state_nine("glass_chip")
 	sb.modulate_color = Color(1, 1, 1, 0.92)
 	strip.add_theme_stylebox_override("panel", sb)
 	strip_box = HBoxContainer.new()
@@ -119,7 +118,7 @@ func _card(req: Dictionary, sprite: Dictionary) -> Panel:
 	c.custom_minimum_size = Vector2(CARD_W, CARD_H)
 	c.size = Vector2(CARD_W, CARD_H)
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	c.add_theme_stylebox_override("panel", UIKit.state_nine("slot_dark"))
+	c.add_theme_stylebox_override("panel", UIKit.state_nine("glass_chip"))
 	# head-and-shoulders portrait: an integer 36px crop near the top of
 	# the bottom-anchored figure — reads as a portrait, keeps 1x pixels
 	var src: Texture2D = sprite.get("tex")
@@ -198,11 +197,9 @@ func _card(req: Dictionary, sprite: Dictionary) -> Panel:
 	ring.name = "Sel"
 	ring.set_anchors_preset(Control.PRESET_FULL_RECT)
 	ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var rs := StyleBoxFlat.new()
-	rs.bg_color = Color(0, 0, 0, 0)
-	rs.set_border_width_all(1)
-	rs.border_color = UITokens.GOLD
-	ring.add_theme_stylebox_override("panel", rs)
+	# sel_glow — the lacquer kit's notched selection ring
+	ring.add_theme_stylebox_override("panel",
+		UIKit.state_nine("sel_glow"))
 	ring.visible = false
 	c.add_child(ring)
 	return c

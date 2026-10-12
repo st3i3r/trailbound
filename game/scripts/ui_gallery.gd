@@ -63,7 +63,7 @@ func _section(parent: Control, title: String) -> VBoxContainer:
 
 
 func _chip(parent: Control, w: float, h: float,
-		piece := "slot_dark") -> Panel:
+		piece := "glass_chip") -> Panel:
 	var p := Panel.new()
 	p.custom_minimum_size = Vector2(w, h)
 	p.size = p.custom_minimum_size
@@ -87,8 +87,8 @@ func _sec_type(root: Control) -> void:
 			role)
 		l.position = Vector2(8, 4 + i * 15)
 		dark.add_child(l)
-	# paper surface card
-	var paper := _chip(row, 196, 80, "hud_banner_flat")
+	# cream surface card — survives for spoken-word bubbles (D-UI-1)
+	var paper := _chip(row, 196, 80, "bubble_speech_flat")
 	for i in UITokens.TypeRole.size():
 		var role: UITokens.TypeRole = i
 		var l := UIKit.label_for(
@@ -110,13 +110,14 @@ func _sec_type(root: Control) -> void:
 
 
 func _sec_panels(root: Control) -> void:
-	var box := _section(root, "Nine-slice pieces")
+	var box := _section(root, "Lacquer glass kit (UI-019)")
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", UITokens.SP2)
 	box.add_child(row)
-	for piece in ["panel_window_flat", "hud_banner_flat",
-			"slot_dark", "bubble_prompt", "card_guest"]:
-		var p := _chip(row, 110, 40, piece)
+	for piece in ["glass_panel", "glass_band", "glass_chip",
+			"glass_pill", "sel_glow", "seal_lacquer",
+			"bubble_speech_flat"]:
+		var p := _chip(row, 84, 40, piece)
 		var l := UIKit.label_for(piece, UITokens.TypeRole.CAPTION,
 			UITokens.PAPER)
 		l.position = Vector2(6, 4)
@@ -182,7 +183,7 @@ func _sec_chips(root: Control) -> void:
 			signs[i][1])
 		l.position = Vector2(8 + i * 32, 14)
 		dark.add_child(l)
-	var paper := _chip(row, 140, 40, "hud_banner_flat")
+	var paper := _chip(row, 140, 40, "bubble_speech_flat")
 	var psigns := [["+1", UITokens.PLUS], ["−1", UITokens.MINUS],
 		["·", UITokens.MUTE], ["★=3", UITokens.GOLD_DEEP]]
 	for i in psigns.size():
@@ -295,16 +296,20 @@ func _gd_files(dir: String) -> Array:
 ## exists to catch; declaring surfaces keeps that flag meaningful.)
 func _lint_contrast() -> int:
 	var bad := []
-	var L_DARK := 0.06
-	var L_PAPER := 0.86
-	var usage := {   # token -> surface luminance it is allowed on
-		"PAPER": L_DARK, "GOLD": L_DARK, "GREEN": L_DARK,
-		"RED": L_DARK, "DIM": L_DARK,
-		"INK": L_PAPER, "MUTE": L_PAPER, "PLUS": L_PAPER,
-		"MINUS": L_PAPER, "GOLD_DEEP": L_PAPER}
+	# measured surfaces: glass_panel fill, bubble_speech cream —
+	# the lint checks the real art, not approximations
+	var L_GLASS := _lum(Color("141d1a"))
+	var L_CREAM := _lum(Color("eed6ac"))
+	var usage := {   # token -> the measured surface it is allowed on
+		"PAPER": L_GLASS, "GOLD": L_GLASS, "GREEN": L_GLASS,
+		"RED": L_GLASS, "DIM": L_GLASS, "BLUE": L_GLASS,
+		"GLOW": L_GLASS,
+		"INK": L_CREAM, "MUTE": L_CREAM, "PLUS": L_CREAM,
+		"MINUS": L_CREAM, "GOLD_DEEP": L_CREAM}
 	var cols := {"PAPER": UITokens.PAPER, "INK": UITokens.INK,
 		"GOLD": UITokens.GOLD, "GREEN": UITokens.GREEN,
-		"RED": UITokens.RED, "DIM": UITokens.DIM,
+		"RED": UITokens.RED, "DIM": UITokens.DIM, "BLUE": UITokens.BLUE,
+		"GLOW": UITokens.GLOW,
 		"MUTE": UITokens.MUTE, "PLUS": UITokens.PLUS,
 		"MINUS": UITokens.MINUS, "GOLD_DEEP": UITokens.GOLD_DEEP}
 	for n in usage:

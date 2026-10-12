@@ -47,14 +47,12 @@ func _ready() -> void:
 func _build(day: int, forecast: String) -> void:
 	custom_minimum_size = Vector2(W, H)
 	size = Vector2(W, H)
-	add_theme_stylebox_override("panel", UIKit.nine("panel_window_flat"))
-	# title: inside the paper, centred under the frame's hanging emblem
-	# (INK — the emblem hangs into the parchment, so PAPER text would
-	# be invisible on the dark frame band where it used to sit)
+	add_theme_stylebox_override("panel", UIKit.nine("glass_band"))
+	# title: inside the lacquer band (eggshell on the dark band)
 	var title := UIKit.label_for(tr("night_title") % day,
-		UITokens.TypeRole.HEAD, UITokens.INK)
+		UITokens.TypeRole.HEAD, UITokens.PAPER)
 	title.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	title.offset_top = 56
+	title.offset_top = 4
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 	_build_reviews()
@@ -67,10 +65,10 @@ func _build(day: int, forecast: String) -> void:
 func _build_reviews() -> void:
 	var scroll := ScrollContainer.new()
 	scroll.name = "Reviews"
-	# content margin: the frame's rope corners reach ~34px in; all
-	# interior content shares the 36px column so nothing grazes art
-	scroll.position = Vector2(36, 80)
-	scroll.size = Vector2(W - 72, 110)
+	# content column: the 1px glass frame frees the parchment's 36px
+	# margins — 14px clears the corner notches with room to spare
+	scroll.position = Vector2(14, 26)
+	scroll.size = Vector2(W - 28, 170)
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(scroll)
@@ -81,7 +79,7 @@ func _build_reviews() -> void:
 	var results: Array = _rep.get("results", [])
 	if results.is_empty():
 		var none := UIKit.label_for(tr("night_none"),
-			UITokens.TypeRole.BODY, UITokens.MUTE)
+			UITokens.TypeRole.BODY, UITokens.DIM)
 		list.add_child(none)
 		return
 	var best_id: String = _rep.get("best", {}).get("id", "")
@@ -96,7 +94,7 @@ func _review_block(r: Dictionary, is_best: bool) -> Control:
 	var top := HBoxContainer.new()
 	top.add_theme_constant_override("separation", 4)
 	var name_l := UIKit.label_for(String(_names.get(r["id"],
-		r["id"])), UITokens.TypeRole.HEAD, UITokens.INK)
+		r["id"])), UITokens.TypeRole.HEAD, UITokens.PAPER)
 	top.add_child(name_l)
 	if is_best:
 		var b := TextureRect.new()
@@ -113,7 +111,7 @@ func _review_block(r: Dictionary, is_best: bool) -> Control:
 		top.add_child(s)
 	var pay := UIKit.label_for("+%dc" % (int(r.get("fee", 0))
 		+ int(round(r.get("tip", 0.0)))),
-		UITokens.TypeRole.HEAD, UITokens.PLUS)
+		UITokens.TypeRole.HEAD, UITokens.GREEN)
 	top.add_child(pay)
 	box.add_child(top)
 	# line 2: the breakdown — every signed term with its icon
@@ -135,7 +133,7 @@ func _review_block(r: Dictionary, is_best: bool) -> Control:
 	box.add_child(chips)
 	# line 3: the review quote
 	var c := UIKit.label_for("“%s”" % String(r.get("comment", "")),
-		UITokens.TypeRole.BODY, UITokens.MUTE)
+		UITokens.TypeRole.BODY, UITokens.DIM)
 	box.add_child(c)
 	return box
 
@@ -150,11 +148,11 @@ func _term(icon: Texture2D, sign: String) -> Control:
 	if sign == "·":
 		t.modulate = Color(1, 1, 1, 0.6)
 	row.add_child(t)
-	var color := UITokens.MUTE
+	var color := UITokens.DIM
 	if sign.begins_with("+"):
-		color = UITokens.PLUS
+		color = UITokens.GREEN
 	elif sign.begins_with("−"):
-		color = UITokens.MINUS
+		color = UITokens.RED
 	var l := UIKit.label_for(sign, UITokens.TypeRole.BODY, color)
 	row.add_child(l)
 	return row
@@ -177,18 +175,18 @@ func _build_totals(forecast: String) -> void:
 	var parts := "%s +%dc   %s +%dc" % [tr("night_fees"), fees,
 		tr("night_tips"), tips]
 	box.add_child(UIKit.label_for(parts, UITokens.TypeRole.BODY,
-		UITokens.INK))
+		UITokens.PAPER))
 	if walks > 0:
 		box.add_child(UIKit.label_for(
 			tr("night_walkins") % [walks, sales],
-			UITokens.TypeRole.BODY, UITokens.INK))
+			UITokens.TypeRole.BODY, UITokens.PAPER))
 	if gather > 0:
 		box.add_child(UIKit.label_for(
 			tr("night_gathering") % gather,
-			UITokens.TypeRole.BODY, UITokens.INK))
+			UITokens.TypeRole.BODY, UITokens.PAPER))
 	for p in _rep.get("pages", []):
 		var pl := UIKit.label_for(tr("night_page") % int(p),
-			UITokens.TypeRole.BODY, UITokens.GOLD_DEEP)
+			UITokens.TypeRole.BODY, UITokens.GOLD)
 		box.add_child(pl)
 	# forecast row: weather left, money pushed right — no floating numbers
 	var last := HBoxContainer.new()
@@ -201,19 +199,19 @@ func _build_totals(forecast: String) -> void:
 	last.add_child(UIKit.label_for(
 		"%s: %s" % [tr("night_tomorrow"),
 		tr("weather_" + forecast)],
-		UITokens.TypeRole.BODY, UITokens.INK))
+		UITokens.TypeRole.BODY, UITokens.PAPER))
 	var push := Control.new()
 	push.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	last.add_child(push)
 	last.add_child(UIKit.label_for("+%dc" % income,
-		UITokens.TypeRole.HEAD, UITokens.PLUS))
+		UITokens.TypeRole.HEAD, UITokens.GREEN))
 	var cico := TextureRect.new()
 	cico.texture = UIKit.icon("coin")
 	cico.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	cico.stretch_mode = TextureRect.STRETCH_KEEP
 	last.add_child(cico)
 	_coins_l = UIKit.label_for("%dc" % Game.coins,
-		UITokens.TypeRole.HEAD, UITokens.GOLD_DEEP)
+		UITokens.TypeRole.HEAD, UITokens.GOLD)
 	last.add_child(_coins_l)
 	box.add_child(last)
 

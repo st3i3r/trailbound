@@ -42,19 +42,19 @@ func _build(weather: String, open_pads: int,
 		sprite_cb: Callable) -> void:
 	custom_minimum_size = Vector2(W, H)
 	size = Vector2(W, H)
-	add_theme_stylebox_override("panel", UIKit.nine("panel_window_flat"))
+	add_theme_stylebox_override("panel", UIKit.nine("glass_band"))
 
 	var title := UIKit.label_for(tr("board_title"),
-		UITokens.TypeRole.HEAD, UITokens.INK)
+		UITokens.TypeRole.HEAD, UITokens.PAPER)
 	title.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	title.offset_top = 56
+	title.offset_top = 4
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 
 	# forecast row — the morning forecast IS tonight's weather (§5.7)
 	var frow := HBoxContainer.new()
-	frow.position = Vector2(36, 82)
-	frow.size = Vector2(W - 72, 16)
+	frow.position = Vector2(14, 24)
+	frow.size = Vector2(W - 28, 16)
 	frow.add_theme_constant_override("separation", 6)
 	var wico := TextureRect.new()
 	wico.texture = UIKit.weather_icon(weather)
@@ -63,13 +63,13 @@ func _build(weather: String, open_pads: int,
 	frow.add_child(wico)
 	frow.add_child(UIKit.label_for(
 		tr("board_forecast") % tr("weather_" + weather),
-		UITokens.TypeRole.BODY, UITokens.INK))
+		UITokens.TypeRole.BODY, UITokens.PAPER))
 	add_child(frow)
 
 	# request cards
 	var scroll := ScrollContainer.new()
-	scroll.position = Vector2(36, 104)
-	scroll.size = Vector2(W - 72, 124)
+	scroll.position = Vector2(14, 44)
+	scroll.size = Vector2(W - 28, 190)
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(scroll)
@@ -82,15 +82,15 @@ func _build(weather: String, open_pads: int,
 
 	# demand line (§5.6): requests vs open pads, overflow waits outside
 	var demand := VBoxContainer.new()
-	demand.position = Vector2(36, 234)
-	demand.size = Vector2(W - 72, 44)
+	demand.position = Vector2(14, 238)
+	demand.size = Vector2(W - 28, 44)
 	demand.add_theme_constant_override("separation", 2)
 	demand.add_child(UIKit.label_for(
 		tr("board_demand") % [_board.size(), open_pads],
-		UITokens.TypeRole.BODY, UITokens.INK))
+		UITokens.TypeRole.BODY, UITokens.PAPER))
 	if _board.size() > open_pads:
 		demand.add_child(UIKit.label_for(tr("board_wait"),
-			UITokens.TypeRole.BODY, UITokens.MUTE))
+			UITokens.TypeRole.BODY, UITokens.DIM))
 	add_child(demand)
 
 
@@ -99,10 +99,10 @@ func _build(weather: String, open_pads: int,
 ## icons, favourite marker, regular ribbon.
 func _card(req: Dictionary, sprite_cb: Callable) -> Panel:
 	var c := Panel.new()
-	c.custom_minimum_size = Vector2(W - 76, CARD_H)
+	c.custom_minimum_size = Vector2(W - 32, CARD_H)
 	c.size = c.custom_minimum_size
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	c.add_theme_stylebox_override("panel", UIKit.state_nine("slot_dark"))
+	c.add_theme_stylebox_override("panel", UIKit.state_nine("glass_chip"))
 	var sprite: Dictionary = sprite_cb.call(req)
 	var src: Texture2D = sprite.get("tex")
 	if src:
@@ -121,7 +121,7 @@ func _card(req: Dictionary, sprite_cb: Callable) -> Panel:
 		n += " ×%d" % int(req["pads"])
 	var name_l := UIKit.label_for(n, UITokens.TypeRole.CAPTION)
 	name_l.position = Vector2(44, 4)
-	name_l.size = Vector2(W - 76 - 46, 10)
+	name_l.size = Vector2(W - 32 - 46, 10)
 	c.add_child(name_l)
 	var coin := TextureRect.new()
 	coin.texture = UIKit.icon("coin")
@@ -150,10 +150,10 @@ func _card(req: Dictionary, sprite_cb: Callable) -> Panel:
 	fav.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	fav.stretch_mode = TextureRect.STRETCH_KEEP
 	fav.modulate = UITokens.DIM
-	fav.position = Vector2(W - 76 - 40, 4)
+	fav.position = Vector2(W - 32 - 40, 4)
 	c.add_child(fav)
 	var q := UIKit.label_for("?", UITokens.TypeRole.BODY, UITokens.DIM)
-	q.position = Vector2(W - 76 - 26, 6)
+	q.position = Vector2(W - 32 - 26, 6)
 	c.add_child(q)
 	# regulars arrive on ribboned cards (§5.2) — gold star badge
 	if req.get("regular", false):
@@ -162,6 +162,6 @@ func _card(req: Dictionary, sprite_cb: Callable) -> Panel:
 		rib.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		rib.stretch_mode = TextureRect.STRETCH_KEEP
 		rib.modulate = UITokens.GOLD
-		rib.position = Vector2(W - 76 - 40, 22)
+		rib.position = Vector2(W - 32 - 40, 22)
 		c.add_child(rib)
 	return c

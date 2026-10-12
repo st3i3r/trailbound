@@ -158,17 +158,16 @@ static func _place(c: Control, where: Variant,
 static func pill(parent: Control, where: Variant, icon: String,
                  text: String,
                  h_flag := Control.SIZE_SHRINK_BEGIN) -> Label:
-    ## Banner pill: optional 16px icon at left (semantic registry name
-    ## or raw "I1_n"), heading text, capsule ends.  Grows to fit the
-    ## text so callers can pass a minimum, not a guess.  Returns the
-    ## inner Label; the Panel parent carries the icon in its "icon"
-    ## meta for later swaps (e.g. the weather glyph).
+    ## Glass capsule pill (D-UI-1): optional 16px icon at left, heading
+    ## text, round ends.  Grows to fit the text so callers can pass a
+    ## minimum, not a guess.  Returns the inner Label; the Panel parent
+    ## carries the icon in its "icon" meta for later swaps.
     _ensure()
     var tw := _f_body.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT,
         -1.0, type_size(UITokens.TypeRole.HEAD)).x
-    # the banner's rope curl eats ~20px at the right end — keep text
-    # out of the decorative zone, not just inside the nine-slice inset
-    var need := (22.0 if icon != "" else 6.0) + tw + 20.0
+    # the capsule's rounded end eats ~10px at the right — keep text
+    # off the curve, not just inside the nine-slice inset
+    var need := (22.0 if icon != "" else 8.0) + tw + 12.0
     if where is Vector2 and need > where.x:
         where.x = need
     elif where is Rect2 and need > where.size.x:
@@ -176,21 +175,20 @@ static func pill(parent: Control, where: Variant, icon: String,
     var p := Panel.new()
     var sz := _place(p, where, h_flag)
     p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    p.add_theme_stylebox_override("panel",
-        nine("hud_banner_flat", PILL_INS))
+    p.add_theme_stylebox_override("panel", nine("glass_pill"))
     parent.add_child(p)
-    var xo := 6.0
+    var xo := 8.0
     if icon != "":
         var t := TextureRect.new()
         t.texture = UIKit.icon(icon)
         t.stretch_mode = TextureRect.STRETCH_KEEP
         t.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-        t.position = Vector2(UITokens.SP1, (sz.y - 16) / 2.0)
+        t.position = Vector2(6, (sz.y - 16) / 2.0)
         t.mouse_filter = Control.MOUSE_FILTER_IGNORE
         p.add_child(t)
         p.set_meta("icon", t)
-        xo = 22.0
-    var l := label_for(text, UITokens.TypeRole.HEAD, UITokens.INK)
+        xo = 24.0
+    var l := label_for(text, UITokens.TypeRole.HEAD, UITokens.PAPER)
     l.position = Vector2(xo, (sz.y - 10) / 2.0 - 1)
     p.add_child(l)
     return l
@@ -206,7 +204,7 @@ static func pill_fit(l: Label) -> void:
     var f := l.get_theme_font("font")
     var tw: float = f.get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT,
         -1.0, l.get_theme_font_size("font_size")).x
-    var need: float = l.position.x + tw + 20.0
+    var need: float = l.position.x + tw + 12.0
     p.size.x = maxf(need, p.size.x)
     p.custom_minimum_size.x = p.size.x
 
@@ -232,13 +230,13 @@ static func spacer(parent: Control, w: float, h := 0.0) -> Control:
 
 
 # ------------------------------------------------------------- buttons
-## Real Button nodes with the five interactive states (UI-008): the
-## atlas already ships the art — pill chrome for neutral, green for
-## safe/ok, gold for primary, round_gold for icon-only controls, and a
-## dedicated disabled piece.  Hover/pressed reuse the same nine-slice
-## tinted (a press is a darkening dip, not a new piece).
+## Real Button nodes with the five interactive states (UI-008) on the
+## lacquer glass kit (D-UI-1): btn_pill neutral, btn_green safe/ok,
+## btn_gold = vermilion-seal primary, round_gold for icon-only controls
+## (retired paper art until the glass round ships), btn_disabled.
+## Hover/pressed are nine-slice tints — a dip, not a new piece.
 const BTN_KINDS := {
-    "pill":  "hud_banner_flat",
+    "pill":  "btn_pill",
     "green": "btn_green",
     "gold":  "btn_gold",
     "round": "btn_round_gold",
@@ -270,7 +268,7 @@ static func btn(parent: Control, where: Variant, text: String,
                 h_flag := Control.SIZE_SHRINK_BEGIN) -> Button:
     _ensure()
     var piece: String = BTN_KINDS.get(kind, kind)
-    var ins: Dictionary = PILL_INS if piece == "hud_banner_flat" else {}
+    var ins := {}
     var b := Button.new()
     _place(b, where, h_flag)
     b.text = text
@@ -282,7 +280,7 @@ static func btn(parent: Control, where: Variant, text: String,
         type_size(UITokens.TypeRole.HEAD))
     for c in ["font_color", "font_hover_color", "font_pressed_color",
               "font_focus_color"]:
-        b.add_theme_color_override(c, UITokens.INK)
+        b.add_theme_color_override(c, UITokens.PAPER)
     b.add_theme_color_override("font_disabled_color", UITokens.DIM)
     b.add_theme_stylebox_override("normal", nine(piece, ins))
     b.add_theme_stylebox_override("hover", state_nine(piece, ins, 1.1))

@@ -18,22 +18,29 @@ const SP8 := 32
 const MARGIN := SP2                        # screen-edge margin
 
 # ------------------------------------------------------------- palette
-const PAPER := Color("f5e9c8")             # parchment — light text on dark
-const INK := Color("3e2814")               # dark ink on parchment pills
+## Text on glass (D-UI-1 lacquer kit): eggshell is the body light,
+## the accents are Eastward's semantic set retuned ≥4.5 on our glass.
+const PAPER := Color("edf0d4")             # pale cream — text on glass
+const INK := Color("3e2814")               # dark ink (cream bubbles only)
 const SHADOW := Color("1c2413")            # 1px text drop shadow
 const GOLD := Color("ffcf7d")              # elite / rating accent
-const GREEN := Color("b8d7a8")             # ok / camp green
+const GREEN := Color("7ed957")             # ok / camp green
 const RED := Color("f0a48e")               # aversion / penalty terms
-const DIM := Color("c2b78d")               # muted text
+const DIM := Color("aab08c")               # muted text — cool sage grey
+const BLUE := Color("69bffd")              # info / water (Eastward set)
+# Lacquer kit metals — the frame/selection/primary palette.
+const LEAF := Color("c9a45c")              # gold-leaf 1px line frame
+const GLOW := Color("e8c46a")              # selection glow
+const VERMILION := Color("b8322a")         # sơn mài seal — primary btn
 # On-PAPER variants — the accents above are tuned for dark chrome and
 # wash out on parchment; these deep variants carry the same meaning.
 # (All WCAG-4.5-verified vs their surfaces — UI-018 lint contrast.)
-const MUTE := Color("7a6742")              # muted text on paper
-const PLUS := Color("4a7534")              # positive terms on paper
-const MINUS := Color("a8442f")             # negative terms on paper
-const GOLD_DEEP := Color("8a6113")         # accent / coin text on paper
-const DIMMER := Color(0.09, 0.06, 0.02, 0.4)
-                                           # panel scrim, paper-dark ~40%
+const MUTE := Color("6b5836")              # muted text on paper
+const PLUS := Color("40682c")              # positive terms on paper
+const MINUS := Color("9a3a28")             # negative terms on paper
+const GOLD_DEEP := Color("7a5510")         # accent / coin text on paper
+const DIMMER := Color(0.05, 0.07, 0.06, 0.45)
+                                           # panel scrim — cool pine dim
 
 # ------------------------------------------------------------ elevation
 ## CanvasLayer tiers — lower draws first.  World content (tilemap,

@@ -34,6 +34,16 @@ func _ready() -> void:
         func(): _dimmer.size = get_viewport().get_visible_rect().size)
     _dimmer.visible = false
     _dimmer.mouse_filter = Control.MOUSE_FILTER_STOP
+    # §8.1 Eastward backdrop: halftone dots over the dim — a 3px tile
+    # stretched across the scrim, filtered out of input entirely
+    var dots := TextureRect.new()
+    dots.name = "Halftone"
+    dots.texture = UIKit.tex("ui/halftone_3")
+    dots.stretch_mode = TextureRect.STRETCH_TILE
+    dots.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+    dots.set_anchors_preset(Control.PRESET_FULL_RECT)
+    dots.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    _dimmer.add_child(dots)
     # §17.6: a tap on the scrim dismisses the top sheet
     _dimmer.gui_input.connect(func(e: InputEvent) -> void:
         if e is InputEventMouseButton and e.pressed \
