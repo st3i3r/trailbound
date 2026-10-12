@@ -13,6 +13,13 @@ signal letter_delivered(letter: Dictionary)
 
 enum Phase { BOOT, TITLE, MORNING, PREP, EVENING, NIGHT }
 
+# Leaf subsystems (RefCounted, scripts/systems/): state stays here
+# for the save schema; behavior lives in the subsystem and public
+# functions below are one-line delegates, so the API never moved.
+const SysErrands := preload("res://scripts/systems/errands.gd")
+const SysDog := preload("res://scripts/systems/dog.gd")
+const SysDaily := preload("res://scripts/systems/daily.gd")
+
 const SPEEDUP_MIN_CHUNK := 900.0   # §6.10: chunk = max(15 min, stage / 6)
 const SPEEDUPS_PER_STAGE := 3
 const SPEEDUPS_PER_DAY := 6
@@ -40,9 +47,15 @@ var recipes_cooked: Array = []              # recipe ids cooked ≥once — the 
 var pairs_tried := {}                       # "a+b" -> recipe id | "camp_mash" | "oven_hint"
 var _next_structure := 0
 var _tick_accum := 0.0
+var errands: RefCounted
+var dog_sys: RefCounted
+var daily_sys: RefCounted
 
 
 func _ready() -> void:
+	errands = SysErrands.new(self)
+	dog_sys = SysDog.new(self)
+	daily_sys = SysDaily.new(self)
 	_crew_reset()
 
 
@@ -437,10 +450,8 @@ func new_day() -> void:
 	st["guests"] = {}
 	st["fish_taken"] = {}
 	bought_today = []
-	st["forage_nodes"] = _roll_forage()
-	dog["pet_today"] = false
-	if dog["met"]:
-		_dog_dig()                               # §9: 1 bonus item/day
+	st["forage_nodes"] = errands.roll_forage()
+	dog_sys.morning()                              # §9: pet reset + dig
 	if site_id == &"pinewatch" and site_day() == 1:
 		journal_event("fire_lit")                # §8.1 P1: day-1 tutorial
 	st["board"] = Seating.board(site_row(),
@@ -574,11 +585,7 @@ func goodnight() -> Dictionary:
 	var meal_sales := 0
 	for m in sold:
 		meal_sales += int(m.get("price", 0))
-	if not dog["met"] and site_id == &"pinewatch" and site_day() == 1:
-		dog["met"] = true                          # §9: night-1 stray
-	if dog["met"]:
-		dog["bond"] += int(_dog_cfg().get("bond_leftover", 1)) \
-			* (leftover.size() - sold.size())
+	dog_sys.eat(leftover.size() - sold.size())   # §9: stray + scraps
 	st["blogger_bonus"] = elite5
 	var vig := _pick_vignette(st, seated)
 	st["assignments"] = {}
@@ -919,133 +926,25 @@ func _ingredients_of_kind(kind: String, site := site_id) -> Array:
 	return out
 
 
-## §7.1: six seeded nodes a day, two items each, positions and
-## contents rolled fresh each morning; Goldcap about one day in three.
+## Errands delegates — §7.1–7.3 live in systems/errands.gd.
 func _roll_forage() -> Array:
-	var pool := _ingredients_of_kind("forage")
-	var rng := _rng_for("forage")
-	var fpx: Array = Catalog.data.get("layouts", {}).get(
-		site_id, {}).get("errand_spots", {}).get("forage", [96, 72])
-	var nodes := []
-	var goldcap_day := rng.randf() < 1.0 / 3.0 \
-		and pool.any(func(i): return i.get("rare", false))
-	var goldcap_slot := rng.randi() % 6
-	for i in 6:
-		var items := []
-		for j in 2:
-			items.append(_pick_weighted(pool, rng,
-				func(i2): return i2.get("rare", false)))
-		if goldcap_day and i == goldcap_slot:
-			items[0] = "goldcap"
-		nodes.append({"id": "f%d" % i, "items": items,
-			"px": [fpx[0] + rng.randi_range(-72, 72),
-				fpx[1] + rng.randi_range(-28, 28)]})
-	return nodes
+	return errands.roll_forage()
 
 
-func _pick_weighted(pool: Array, rng: RandomNumberGenerator,
-		skip: Callable = Callable()) -> String:
-	var usable := pool
-	if skip.is_valid():
-		usable = pool.filter(func(i): return not skip.call(i))
-	var total := 0.0
-	for i in usable:
-		total += float(i.get("weight", 1))
-	var roll := rng.randf() * total
-	for i in usable:
-		roll -= float(i.get("weight", 1))
-		if roll <= 0.0:
-			return i["id"]
-	return usable.back()["id"] if not usable.is_empty() else ""
-
-
-## §7.1: gather a node — items land in the pantry until it's full;
-## the node keeps whatever didn't fit.
 func gather(node_id: String) -> Array:
-	var st := site_state()
-	var got := []
-	for node in st["forage_nodes"]:
-		if node["id"] != node_id:
-			continue
-		var left := []
-		for item in node["items"]:
-			if pantry_add(item, 1) > 0:
-				got.append(item)
-			else:
-				left.append(item)
-		node["items"] = left
-	return got
+	return errands.gather(node_id)
 
 
-## §7.2: 3 catches per spot per day, +1 in rain; needs the rod.
 func fish_catch(spot: String) -> String:
-	if "fishing_rod" not in gear:
-		return ""
-	var st := site_state()
-	var limit := 3 + (1 if st["weather"] == "rain" else 0)
-	var taken := int(st["fish_taken"].get(spot, 0))
-	if taken >= limit:
-		return ""
-	var rng := _rng_for("fish_" + spot)
-	var kinds := _ingredients_of_kind("fish")
-	var pick := ""
-	for i in taken + 1:
-		pick = kinds[rng.randi() % kinds.size()]["id"] if kinds else ""
-	st["fish_taken"][spot] = taken + 1
-	if pantry_add(pick, 1) == 0:
-		st["fish_taken"][spot] = taken               # full pantry: no catch
-		return ""
-	var logged: Array = st["counters"]["fish_kinds"]
-	if pick not in logged:
-		logged.append(pick)
-		_check_pages()                               # e.g. W1 "3 kinds"
-	return pick
+	return errands.fish_catch(spot)
 
 
-## §7.3: the lookout, once per site day, needs the Binoculars —
-## logs one bird not yet in Field Notes and reveals a bonus forage
-## node. All birds logged → the node still appears.
 func can_spot() -> bool:
-	return "binoculars" in gear \
-		and site_state()["spot_day"] != site_day()
+	return errands.can_spot()
 
 
 func spot() -> Dictionary:
-	if not can_spot():
-		return {}
-	var st := site_state()
-	st["spot_day"] = site_day()
-	var rng := _rng_for("bird")
-	var unlogged: Array = Catalog.data.get("birds", []).filter(
-		func(b): return b.get("site") == site_id \
-			and b["id"] not in field_notes)
-	var bird := {}
-	if not unlogged.is_empty():
-		bird = unlogged[rng.randi() % unlogged.size()]
-		field_notes.append(bird["id"])
-	var fpx: Array = site_row().get("errand_spots", {}).get(
-		"forage", [96, 72])
-	var pool := _ingredients_of_kind("forage")
-	var items := []
-	for i in 2:
-		items.append(_pick_weighted(pool, rng,
-			func(i2): return i2.get("rare", false)))
-	st["forage_nodes"].append({"id": "fb", "items": items,
-		"bonus": true,
-		"px": [fpx[0] + rng.randi_range(-72, 72),
-			fpx[1] + rng.randi_range(-28, 28)]})
-	return {"bird": bird,
-		"all_logged": _site_bird_count() <= field_notes.filter(
-			func(b): return _bird_site(b) == site_id).size()}
-
-
-func _bird_site(bird_id: String) -> String:
-	return String(_row("birds", bird_id).get("site", ""))
-
-
-func _site_bird_count() -> int:
-	return Catalog.data.get("birds", []).filter(
-		func(b): return b.get("site") == site_id).size()
+	return errands.spot()
 
 
 ## Recipes a guest could plausibly crave at this site (§5.2 card):
@@ -1136,58 +1035,26 @@ func cook(a: String, b: String) -> Dictionary:
 # penalties, never lost; its guest effect only ever comes from the
 # Dog Bed decor item, so wandering never touches scoring.
 
-func _dog_cfg() -> Dictionary:
-	return Catalog.data.get("dog", {})
-
-
-## Seeded bonus forage each morning — straight into the pantry; a
-## full pantry means the dog buries it for later (no item).
-func _dog_dig() -> void:
-	var pool := _ingredients_of_kind("forage")
-	if pool.is_empty():
-		return
-	var rng := _rng_for("dog")
-	var pick: Dictionary = pool[rng.randi() % pool.size()]
-	pantry_add(pick["id"], 1)
-
-
-## One pet per day, +bond per dog.json. Returns false once petted.
+## Dog delegates — §9 lives in systems/dog.gd; `dog` state stays
+## above for the save schema.
 func dog_pet() -> bool:
-	if not dog["met"] or dog["pet_today"]:
-		return false
-	dog["pet_today"] = true
-	dog["bond"] += int(_dog_cfg().get("bond_pet", 2))
-	return true
+	return dog_sys.pet()
 
 
 func name_dog(n: String) -> void:
-	if n.strip_edges() != "":
-		dog["name"] = n
+	dog_sys.rename(n)
 
 
-## Bond level 0-4 from the thresholds in dog.json; each level
-## unlocks a cosmetic trick, the last is the đá cầu chase (§9).
 func dog_level() -> int:
-	var lvl := 0
-	var levels: Array = _dog_cfg().get("levels", [])
-	for i in levels.size():
-		if dog["bond"] >= int(levels[i].get("bond", 0)):
-			lvl = i
-	return lvl
+	return dog_sys.level()
 
 
 func dog_trick() -> String:
-	var levels: Array = _dog_cfg().get("levels", [])
-	if levels.is_empty():
-		return ""
-	return String(levels[dog_level()].get("trick", ""))
+	return dog_sys.trick()
 
 
-## Is the Dog Bed placed here? (The dog sleeps on it — §9 — but the
-## guest effect already flows through the decor, nothing to score.)
 func dog_bed_placed() -> bool:
-	return site_state()["decor"].any(
-		func(d): return d["id"] == "dog_bed")
+	return dog_sys.bed_placed()
 
 
 # ------------------------------------------------------------- Daily (§10)
@@ -1196,66 +1063,39 @@ func dog_bed_placed() -> bool:
 # One scored attempt; unlimited practice afterwards. Unlocks with
 # Pinewatch letter 6 (p06).
 
-const DAILY_EPOCH := "2025-01-01"
+const DAILY_EPOCH := SysDaily.EPOCH
 
 var daily_state := {"date": "", "score": -1}      # last scored attempt
 
 
+## Daily delegates — §10 lives in systems/daily.gd; `daily_state`
+## stays above for the save schema.
 func daily_unlocked() -> bool:
-	return "p06" in site_state(&"pinewatch")["letters_delivered"]
+	return daily_sys.unlocked()
 
 
 func _daily_date(date_str := "") -> String:
-	return date_str if date_str != "" \
-		else Time.get_date_string_from_system()
+	return daily_sys.date(date_str)
 
 
 func daily_n(date_str: String) -> int:
-	var a := Time.get_unix_time_from_datetime_string(
-		DAILY_EPOCH + "T00:00:00")
-	var b := Time.get_unix_time_from_datetime_string(
-		date_str + "T00:00:00")
-	return int((b - a) / 86400.0)
+	return daily_sys.n(date_str)
 
 
-## The seeded puzzle for a date — deterministic, so a reload shows
-## the same cards, kit and meals.
 func daily(date_str := "") -> Dictionary:
-	var d := _daily_date(date_str)
-	var pz := _daily_gen(d, _daily_tries(d))
-	pz["date"] = d
-	pz["n"] = daily_n(d)
-	pz["attempted"] = daily_state["date"] == d \
-		and daily_state["score"] >= 0
-	return pz
+	return daily_sys.puzzle(date_str)
 
 
-## Deterministic reroll chain (§10): attempt k>0 uses seed
-## "daily|date|rk". The CI solver (tests/daily_check) bakes the
-## accepted try count into data/daily_seeds.json; dates beyond the
-## table fall back to the raw seed.
 func _daily_seed(d: String, tries: int) -> int:
-	var s := "daily|" + d
-	if tries > 0:
-		s += "|r%d" % tries
-	return absi(int(s.hash()))
+	return daily_sys.seed_for(d, tries)
 
 
 func _daily_tries(d: String) -> int:
-	return int(Catalog.data.get("daily_seeds", {}).get(
-		"seeds", {}).get(d, 0))
+	return daily_sys.tries(d)
 
 
 func _daily_gen(d: String, tries: int) -> Dictionary:
-	var rng := RandomNumberGenerator.new()
-	rng.seed = _daily_seed(d, tries)
-	var skip := ["seats", "warmth_upgrade", "none"]
-	var kit_pool: Array = Catalog.data.get("decor", []).filter(
-		func(x): return String(x.get("unlock", "")).begins_with("P") \
-			and x.get("effect") not in skip)
-	return Seating.daily_puzzle(site_row(&"pinewatch"),
-		Catalog.data.get("archetypes", []), kit_pool,
-		_favourite_pool(&"pinewatch"), rng)
+	return daily_sys.gen(d, tries)
 
 
 func _trait_kinds() -> Dictionary:
@@ -1265,58 +1105,13 @@ func _trait_kinds() -> Dictionary:
 	return kinds
 
 
-## Score an attempt. assignments: {guest_id: [pad_ids]};
-## placements: {kit_item_id: [Vector2i cells]}. submit=true records
-## the score if today's attempt is unused (§10 one scored attempt).
 func daily_score(puzzle: Dictionary, assignments: Dictionary,
 		placements: Dictionary, submit := false) -> Dictionary:
-	var kit_rows := {}
-	for k in puzzle["kit"]:
-		kit_rows[k["id"]] = k
-	var decor_items := []
-	for iid in placements:
-		var row: Dictionary = kit_rows.get(iid, {})
-		decor_items.append({"id": iid, "cells": placements[iid],
-			"effect": row.get("effect", ""),
-			"reach": int(row.get("reach", 1))})
-	var guests := {}
-	var occupants := {}
-	var seated := []
-	for r in puzzle["requests"]:
-		guests[r["id"]] = r
-	for gid in assignments:
-		if gid not in guests:
-			continue
-		for pid in assignments[gid]:
-			occupants[pid] = gid
-		seated.append({"guest": guests[gid],
-			"pad_ids": assignments[gid]})
-	var kinds := _trait_kinds()
-	var world := Seating.daily_world(puzzle, decor_items, occupants,
-		guests, kinds, Catalog.data.get("reviews", {}))
-	var plan := Seating.allocate_meals(puzzle["meals"], seated)
-	var results := []
-	var total := 0
-	for s in seated:
-		var rr := Seating.resolve_guest(s["guest"], s["pad_ids"],
-			world, int(plan["terms"].get(s["guest"]["id"], -1)))
-		results.append(rr)
-		total += rr["stars"]
-	if submit and puzzle.get("date") == _daily_date() \
-			and daily_state["date"] != puzzle.get("date"):
-		daily_state = {"date": puzzle["date"], "score": total}
-	return {"score": total, "results": results,
-		"share": daily_share(puzzle, results)}
+	return daily_sys.score(puzzle, assignments, placements, submit)
 
 
 func daily_share(puzzle: Dictionary, results: Array) -> String:
-	var row := ""
-	for r in results:
-		row += "★".repeat(int(r["stars"])) + " "
-	return "Trailbound Daily #%d — %d/25\n%s" % [
-		int(puzzle.get("n", 0)), int(
-			results.reduce(func(a, x): return a + x["stars"], 0)),
-		row.strip_edges()]
+	return daily_sys.share(puzzle, results)
 
 
 # ------------------------------------------------------------- save (§22)
