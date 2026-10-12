@@ -124,15 +124,24 @@ canonical Pinewatch art. Commands (from repo root; `godot.cmd` on this
 host):
 
 ```bat
-run_pinewatch.cmd                                      :: interactive
-godot.cmd --path game --import                          :: after asset changes
+run_pinewatch.cmd                                      :: interactive, dev chrome on
+godot.cmd --path game --import                          :: after asset changes (also regenerates strings.*.translation)
 godot.cmd --path game res://scenes/pinewatch_test.tscn  :: interactive
+godot.cmd --path game res://scenes/pinewatch_test.tscn --dev-ui  :: interactive + dev labels
 godot.cmd --path game res://scenes/pinewatch_test.tscn --shot
+godot.cmd --path game res://scenes/pinewatch_test.tscn --resolution 2400x1080 --shot=path.png
+godot.cmd --headless --path game res://scenes/pinewatch_test.tscn --smoke
 ```
 
 `--shot` captures the viewport after two frames and writes
 `assets_src/cleanup/pinewatch_engine_graded.png` (test-scene only flag,
-handled in `pinewatch_test.gd`). Compare against
+handled in `pinewatch_test.gd`; `--shot=PATH` writes elsewhere — use it
+for wide-viewport checks like the 20:9 `--resolution 2400x1080` run,
+which should show the map centred on the dark clear colour, not grey).
+`--smoke` is the headless UI assertion pass (Back → quit-confirm →
+close, fire-proximity bubble) — run it after touching `game/ui/`.
+`--dev-ui` opts the scene into dev labels (off by default so `--shot`
+stays clean). Compare against
 `assets_src/cleanup/pinewatch_comp_v3.png` — the scene's layout
 authority is `tools/scene_comp_v2.py`.
 

@@ -16,6 +16,7 @@ const PILL_INS := {"l": 14, "r": 14, "t": 5, "b": 6}
 static var _f_head: FontFile
 static var _f_body: FontFile
 static var _ui_meta := {}
+static var _icons := {}                       # semantic name -> "I1_n"
 static var _tex_cache := {}
 static var _ready := false
 
@@ -31,7 +32,38 @@ static func _ensure() -> void:
     _f_body.fallbacks.append(ThemeDB.fallback_font)
     _ui_meta = JSON.parse_string(FileAccess.get_file_as_string(
         UITokens.ASSETS + "ui/ui_atlas_meta.json"))
+    # semantic icon registry (data/icons.json): flatten the category
+    # tables into name -> file id; raw "I1_n" names still pass through
+    var reg: Dictionary = JSON.parse_string(
+        FileAccess.get_file_as_string("res://data/icons.json"))
+    for cat in reg:
+        if reg[cat] is Dictionary:
+            for k in reg[cat]:
+                if k != "comment":
+                    _icons[k] = reg[cat][k]
     _ready = true
+
+
+static func icon_name(name: String) -> String:
+    ## Semantic name -> file id ("coin" -> "I1_0"); passes raw ids through.
+    _ensure()
+    return _icons.get(name, name)
+
+
+static func icon(name: String) -> Texture2D:
+    return tex("icons/" + icon_name(name))
+
+
+## trait id -> its registry icon (falls back to the trait name itself
+## so a raw "I1_n" still resolves).
+static func trait_icon(trait_id: String) -> Texture2D:
+    return icon(trait_id)
+
+
+## weather string ("clear"/"rain") -> weather icon texture.
+static func weather_icon(weather: String) -> Texture2D:
+    _ensure()
+    return icon(weather if _icons.has(weather) else "clear")
 
 
 static func font_head() -> Font:
@@ -76,7 +108,7 @@ static func nine(name: String, ins := {}) -> StyleBoxTexture:
     return sb
 
 
-static func label(text: String, size := 8, font: Font = null,
+static func label(text: String, size := 9, font: Font = null,
                   color := UITokens.PAPER) -> Label:
     _ensure()
     var l := Label.new()
@@ -88,9 +120,12 @@ static func label(text: String, size := 8, font: Font = null,
     l.add_theme_font_override("font", font if font else _f_body)
     l.add_theme_font_size_override("font_size", size)
     l.add_theme_color_override("font_color", color)
-    l.add_theme_color_override("font_shadow_color", UITokens.SHADOW)
-    l.add_theme_constant_override("shadow_offset_x", 1)
-    l.add_theme_constant_override("shadow_offset_y", 1)
+    # 1px shadow lifts light text off the ground; on dark-on-paper ink
+    # it just muddies the strokes (UI-002) — only light text gets it
+    if color != UITokens.INK:
+        l.add_theme_color_override("font_shadow_color", UITokens.SHADOW)
+        l.add_theme_constant_override("shadow_offset_x", 1)
+        l.add_theme_constant_override("shadow_offset_y", 1)
     return l
 
 
@@ -118,8 +153,19 @@ static func _place(c: Control, where: Variant,
 static func pill(parent: Control, where: Variant, icon: String,
                  text: String,
                  h_flag := Control.SIZE_SHRINK_BEGIN) -> Label:
-    ## Banner pill: optional 16px icon at left, F1 heading text, capsule
-    ## ends.  Returns the inner Label (its parent is the Panel).
+    ## Banner pill: optional 16px icon at left (semantic registry name
+    ## or raw "I1_n"), heading text, capsule ends.  Grows to fit the
+    ## text so callers can pass a minimum, not a guess.  Returns the
+    ## inner Label; the Panel parent carries the icon in its "icon"
+    ## meta for later swaps (e.g. the weather glyph).
+    _ensure()
+    var tw := _f_body.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT,
+        -1.0, type_size(UITokens.TypeRole.HEAD)).x
+    var need := (22.0 if icon != "" else 6.0) + tw + 14.0
+    if where is Vector2 and need > where.x:
+        where.x = need
+    elif where is Rect2 and need > where.size.x:
+        where.size.x = need
     var p := Panel.new()
     var sz := _place(p, where, h_flag)
     p.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -129,15 +175,16 @@ static func pill(parent: Control, where: Variant, icon: String,
     var xo := 6.0
     if icon != "":
         var t := TextureRect.new()
-        t.texture = tex("icons/" + icon)
+        t.texture = UIKit.icon(icon)
         t.stretch_mode = TextureRect.STRETCH_KEEP
         t.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
         t.position = Vector2(UITokens.SP1, (sz.y - 16) / 2.0)
         t.mouse_filter = Control.MOUSE_FILTER_IGNORE
         p.add_child(t)
+        p.set_meta("icon", t)
         xo = 22.0
-    var l := label(text, 8, _f_head, UITokens.INK)
-    l.position = Vector2(xo, (sz.y - 9) / 2.0 - 1)
+    var l := label_for(text, UITokens.TypeRole.HEAD, UITokens.INK)
+    l.position = Vector2(xo, (sz.y - 10) / 2.0 - 1)
     p.add_child(l)
     return l
 

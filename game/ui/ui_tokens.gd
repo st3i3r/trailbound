@@ -34,24 +34,31 @@ const DIMMER := Color(0.09, 0.06, 0.02, 0.4)
 enum Tier { WORLD_FEEDBACK = 5, HUD = 10, PANEL = 20, MODAL = 30 }
 
 # ----------------------------------------------------------------- type
-## Type roles -> which font + px size.  f_head = F1 pixel caps (the EN
-## display font, ASCII-only); f_body = BeVietnamPro (VI body copy, full
-## diacritics).  UIKit.font_for() resolves a role to a Font.
+## Type roles -> which font + px size.  D-UI-2: Be Vietnam Pro (f_body)
+## is the UI typeface for every role — F1 is ASCII-only and retired
+## from text.  Sizes are 360p virtual px (the stretch scale re-renders
+## them crisp on device).  UIKit.font_for() resolves a role to a Font.
 enum TypeRole { DISPLAY, HEAD, BODY, CAPTION, MONO }
 const TYPE := {
-    TypeRole.DISPLAY: {"font": "head", "size": 12},
-    TypeRole.HEAD:    {"font": "head", "size": 9},
-    TypeRole.BODY:    {"font": "body", "size": 8},
-    TypeRole.CAPTION: {"font": "head", "size": 8},
-    TypeRole.MONO:    {"font": "head", "size": 8},
+    TypeRole.DISPLAY: {"font": "body", "size": 14},
+    TypeRole.HEAD:    {"font": "body", "size": 10},
+    TypeRole.BODY:    {"font": "body", "size": 9},
+    TypeRole.CAPTION: {"font": "body", "size": 9},
+    TypeRole.MONO:    {"font": "body", "size": 9},
 }
 
+# ----------------------------------------------------------------- touch
+## 48dp on a phone-density screen ≈ 40 virtual px at the 360p base.
+## Hit areas must reach this even when the art is smaller.
+const MIN_TOUCH := 40
+
 # --------------------------------------------------------------- debug
-## Dev chrome (dev/report/status labels, the guest-click hint) only
-## exists in debug builds or while this flag is set.  Flip to false for
-## clean production screenshots.
-const DEBUG_UI := true
+## Dev chrome (dev/report/status labels, the guest-click hint) is an
+## opt-in: the const, or --dev-ui on a debug build (run_pinewatch.cmd
+## passes it).  Release exports and plain --shot runs stay clean.
+const DEBUG_UI := false
 
 
 static func debug_ui() -> bool:
-    return DEBUG_UI or OS.is_debug_build()
+    return DEBUG_UI or (OS.is_debug_build()
+        and OS.get_cmdline_args().has("--dev-ui"))

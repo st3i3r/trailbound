@@ -141,15 +141,23 @@ when" is the acceptance check.
 
 ### P0 — fix now (0 gens)
 
+*✓ = landed 2026-10-12 step-0 pass (verified by `--smoke` + shots at
+1920×1080 and 2400×1080). Open inside those rows: safe-area API
+(UI-006), hit-area lint (UI-005), `content` rects in atlas meta
+(UI-002, superseded by pill auto-grow). Landed early: UI-012
+(translations registered, first 11 keys), UI-013 (BVP for all text;
+weights not added), UI-016 (panel in/out transitions + HUD fade on
+`stack_changed`; dimmer-dismiss and focus order still open).*
+
 | ID | Item | Evidence | Done when |
 |---|---|---|---|
-| UI-001 | Semantic icon registry (`icons.json`: name → file + meaning) and HUD fix: coins→`I1_0`, rating and star preview→`I1_1`, day/weather→`I1_4..7` by weather/phase, journal→`I1_10` | `hud.gd:53-81` uses sun/sparkle/undo/radio; `pinewatch_test.gd:27` STAR_ICON = sun; DEV_WORKFLOW calls `I1_4` a star | No `I1_` literals in `.gd`; registry lint passes; shot shows correct icons |
-| UI-002 | Pixel-font rendering: antialiasing off, no 1 px shadow on dark-on-light text, sizes at native multiples; add a `content` rect per piece in `ui_atlas_meta.json` so text never crosses end caps | 36 colours in a 2-colour text strip; "DAY 1 · CLEAR" runs onto the cap | Text strips are 2-colour; no overflow at EN/VI/pseudo |
-| UI-003 | Debug chrome behind an explicit flag/cmdline arg (`--dev-ui`), not a `true` const | `ui_tokens.gd:53` `DEBUG_UI := true` | `--shot` output has no debug text |
-| UI-004 | Android Back: `application/config/quit_on_go_back=false`; `Platform` routes `NOTIFICATION_WM_GO_BACK_REQUEST` → `PanelManager.close()`, or the Camp confirm-quit sheet (§17.6); one handler | `platform.gd:11` is `pass`; `panel_manager.gd:63` listens for `ui_cancel`, which Back doesn't send | Device: Back closes the top sheet; on Camp it asks |
-| UI-005 | Touch targets ≥40 virtual px (≈48 dp at our 360p base) via invisible hit padding; correct style_lock's "already met" | Phase button 74×24 px ≈28 dp | Touch-target lint passes |
-| UI-006 | Aspect + safe area: Camera2D limits + world bleed for 20:9 (800×360) and 4:3 (640×480); HUD inside `DisplayServer.get_display_safe_area()` | `stretch/aspect=expand`, world 640 wide; grey void in the 651-px shot; zero safe-area/Camera2D code | Shots at 800×360 and 640×480 have no void |
-| UI-007 | Remove the persistent centre FIRE banner (proximity prompts appear on approach/selection only); remove or repurpose the dead medallion + toolbar | `hud.gd:125` 122×41 banner over the hero prop; "centre = never persistent" rule | Idle camp frame shows world only |
+| UI-001 ✓ | Semantic icon registry (`icons.json`: name → file + meaning) and HUD fix: coins→`I1_0`, rating and star preview→`I1_1`, day/weather→`I1_4..7` by weather/phase, journal→`I1_10` | `hud.gd:53-81` uses sun/sparkle/undo/radio; `pinewatch_test.gd:27` STAR_ICON = sun; DEV_WORKFLOW calls `I1_4` a star | No `I1_` literals in `.gd`; registry lint passes; shot shows correct icons |
+| UI-002 ✓ | Pixel-font rendering: antialiasing off, no 1 px shadow on dark-on-light text, sizes at native multiples; add a `content` rect per piece in `ui_atlas_meta.json` so text never crosses end caps | 36 colours in a 2-colour text strip; "DAY 1 · CLEAR" runs onto the cap | Text strips are 2-colour; no overflow at EN/VI/pseudo |
+| UI-003 ✓ | Debug chrome behind an explicit flag/cmdline arg (`--dev-ui`), not a `true` const | `ui_tokens.gd:53` `DEBUG_UI := true` | `--shot` output has no debug text |
+| UI-004 ✓ | Android Back: `application/config/quit_on_go_back=false`; `Platform` routes `NOTIFICATION_WM_GO_BACK_REQUEST` → `PanelManager.close()`, or the Camp confirm-quit sheet (§17.6); one handler | `platform.gd:11` is `pass`; `panel_manager.gd:63` listens for `ui_cancel`, which Back doesn't send | Device: Back closes the top sheet; on Camp it asks |
+| UI-005 ✓ | Touch targets ≥40 virtual px (≈48 dp at our 360p base) via invisible hit padding; correct style_lock's "already met" | Phase button 74×24 px ≈28 dp | Touch-target lint passes |
+| UI-006 ~ | Aspect + safe area: Camera2D limits + world bleed for 20:9 (800×360) and 4:3 (640×480); HUD inside `DisplayServer.get_display_safe_area()` | `stretch/aspect=expand`, world 640 wide; grey void in the 651-px shot; zero safe-area/Camera2D code | Shots at 800×360 and 640×480 have no void |
+| UI-007 ✓ | Remove the persistent centre FIRE banner (proximity prompts appear on approach/selection only); remove or repurpose the dead medallion + toolbar | `hud.gd:125` 122×41 banner over the hero prop; "centre = never persistent" rule | Idle camp frame shows world only |
 
 ### P1 — foundations (0 gens)
 

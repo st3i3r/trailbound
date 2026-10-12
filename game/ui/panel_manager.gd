@@ -43,6 +43,7 @@ func open(panel: Control) -> void:
     _dimmer.mouse_filter = Control.MOUSE_FILTER_STOP
     add_child(panel)                    # after the dimmer: draws above
     _stack.append(panel)
+    _animate_in(panel, _stack.size() == 1)
     stack_changed.emit()
 
 
@@ -51,9 +52,43 @@ func close() -> void:
     if p == null:
         return
     _stack.pop_back()
-    p.queue_free()
-    _dimmer.visible = not _stack.is_empty()
+    _animate_out(p)
+    if _stack.is_empty():
+        _animate_dimmer(false)
     stack_changed.emit()
+
+
+func _animate_in(p: Control, first_panel: bool) -> void:
+    ## Scale+fade pop for the panel; the scrim only fades in on the
+    ## first panel (re-fading per push would flash the stack).
+    if first_panel:
+        _animate_dimmer(true)
+    else:
+        _dimmer.modulate.a = 1.0
+    p.pivot_offset = p.size / 2.0
+    p.scale = Vector2(0.96, 0.96)
+    p.modulate.a = 0.0
+    var tw := create_tween().set_parallel()
+    tw.tween_property(p, "scale", Vector2.ONE, 0.16)
+    tw.tween_property(p, "modulate:a", 1.0, 0.16)
+
+
+func _animate_out(p: Control) -> void:
+    var tw := create_tween().set_parallel()
+    tw.tween_property(p, "scale", Vector2(0.96, 0.96), 0.12)
+    tw.tween_property(p, "modulate:a", 0.0, 0.12)
+    tw.chain().tween_callback(p.queue_free)
+
+
+func _animate_dimmer(on: bool) -> void:
+    if on:
+        _dimmer.visible = true
+        _dimmer.modulate.a = 0.0
+        create_tween().tween_property(_dimmer, "modulate:a", 1.0, 0.15)
+    else:
+        var tw := create_tween()
+        tw.tween_property(_dimmer, "modulate:a", 0.0, 0.12)
+        tw.tween_callback(_dimmer.hide)
 
 
 func top() -> Control:

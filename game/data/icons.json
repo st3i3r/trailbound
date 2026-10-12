@@ -1,0 +1,40 @@
+{
+ "comment": "Semantic icon registry (UI-066 step 0). Names -> files under assets/pinewatch/icons/. Painterly object-illustration icons (the I1 batch) — symbolic, not 3/4 world-view sprites; matches Eastward's item-icon treatment. Chrome tabs/controls go flat one-colour separately (D-UI-5). Identified by eye 2026-10-12 (I1 was an unnamed 64-slot batch job; ids 28/34/37/39 do not exist). For future batches: dish/food icons at a slight 3/4 so contents show; tools/gear profile.",
+ "values": {
+  "coin": "I1_0", "star_full": "I1_1", "star_half": "I1_2",
+  "star_empty": "I1_3", "heart": "I1_23"
+ },
+ "weather": {
+  "clear": "I1_4", "cloud": "I1_5", "rain": "I1_6",
+  "night": "I1_7", "sunrise": "I1_8"
+ },
+ "chrome": {
+  "lantern": "I1_9", "journal": "I1_10", "map": "I1_11",
+  "gear": "I1_12", "close": "I1_13", "check": "I1_14",
+  "back": "I1_15", "plus": "I1_16", "minus": "I1_17",
+  "lock": "I1_18", "hourglass": "I1_19", "bell": "I1_22",
+  "hand": "I1_29", "sparkle": "I1_49", "music": "I1_27",
+  "note": "I1_33", "radio": "I1_26", "megaphone": "I1_41"
+ },
+ "objects": {
+  "campfire": "I1_24", "tent": "I1_25", "person": "I1_30",
+  "elder": "I1_32", "pot": "I1_35", "kite": "I1_36",
+  "camera": "I1_38", "firefly_jar": "I1_40", "flame": "I1_42",
+  "kettle": "I1_43", "sprout": "I1_44", "leaf": "I1_31",
+  "umbrella": "I1_45", "bush": "I1_46", "paw": "I1_47",
+  "guitar": "I1_48", "backpack": "I1_56", "binoculars": "I1_57",
+  "fishing_rod": "I1_55", "pick": "I1_20", "bindle": "I1_21",
+  "vista": "I1_52", "sparkler": "I1_53", "thermos": "I1_54",
+  "first_aid": "I1_58", "compass": "I1_59", "bowl": "I1_60",
+  "banh_mi": "I1_61", "canister": "I1_62", "pine": "I1_63",
+  "crab": "I1_50", "droplet": "I1_51"
+ },
+ "traits": {
+  "comment": "trait id -> icon (13 traits from traits.json; dog_wary shares paw until a drawn set lands)",
+  "chilly": "I1_24", "social": "I1_30", "introvert": "I1_25",
+  "nature_lover": "I1_31", "night_owl": "I1_7",
+  "music_lover": "I1_27", "light_sleeper": "I1_22",
+  "dog_lover": "I1_47", "dog_wary": "I1_47", "kids": "I1_36",
+  "angler": "I1_55", "shutterbug": "I1_38", "stargazer": "I1_49"
+ }
+}

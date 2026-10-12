@@ -24,8 +24,6 @@ const GW := 20                               # ground width  (tiles)
 const GH := 12                               # ground height (tiles)
 const UUUU := Vector2i(0, 3)                 # atlas coords of the all-upper
                                              # wang tile in every pro sheet
-const STAR_ICON := "I1_4"                    # the gold icon the comp uses
-                                             # for the rating star
 
 # ---------------------------------------------------------------- terrain
 # masks copied from tools/scene_comp_v2.py — the layout authority.
@@ -174,6 +172,8 @@ var anchors := {}                            # "cat/name.png" -> {anchor_x,y}
 var pad_cells := {}                          # pid -> Rect2 (px)
 
 var ground: TileMapLayer
+var stage: Node2D                            # all world layers — centred on
+                                             # wide viewports (aspect=expand)
 var scatter: Node2D
 var pads_node: Node2D
 var world: Node2D
@@ -185,6 +185,10 @@ var panel_mgr: PanelManager                  # modal panel stack (PANEL tier)
 var markers: WorldMarkers                    # floating world markers layer
 var hud_tween: Tween
 var idle_ms := 0.0
+var fire_bubble: Panel                       # marker content over the fire
+var _fire_on := false
+var _fire_tween: Tween
+var _quit: Control                           # quit-confirm panel (one at a time)
 
 var selected := ""                           # guest id being placed
 var guest_nodes := {}                        # gid -> Node2D
@@ -247,6 +251,12 @@ func _ready() -> void:
     grade.color = WARM_MUL                   # CanvasLayer, unaffected
     add_child(grade)
 
+    stage = Node2D.new()                     # every world layer lives under
+    stage.name = "Stage"                     # Stage so _fit_stage() can centre
+    add_child(stage)                         # the map inside wide viewports
+    _fit_stage()
+    get_viewport().size_changed.connect(_fit_stage)
+
     _build_ground()
     _build_backdrop()
     _build_scatter(rng)
@@ -257,23 +267,23 @@ func _ready() -> void:
     tint.name = "GroundTint"
     tint.texture = _tex("fx/ground_tintmap")
     tint.centered = false
-    add_child(tint)
+    stage.add_child(tint)
     pads_node = Node2D.new()
     pads_node.name = "Pads"
-    add_child(pads_node)
+    stage.add_child(pads_node)
     _build_pads(rng)
     world = Node2D.new()
     world.name = "World"
     world.y_sort_enabled = true
-    add_child(world)
+    stage.add_child(world)
     _build_props()
     _build_actors()
     tray = Node2D.new()
     tray.name = "Tray"
-    add_child(tray)
+    stage.add_child(tray)
     marks = Node2D.new()
     marks.name = "Marks"
-    add_child(marks)
+    stage.add_child(marks)
     hover = Sprite2D.new()
     hover.texture = _tex("pad_hover")
     hover.centered = false
@@ -283,12 +293,21 @@ func _ready() -> void:
     Game.advance_day()
     _spawn_board()
     _status()
-    # capture engine render for pipeline review (test scene only)
-    if OS.get_cmdline_args().has("--shot"):
+    if OS.get_cmdline_args().has("--smoke"):
+        _smoke()
+        return
+    # capture engine render for pipeline review (test scene only);
+    # --shot writes the canonical graded shot, --shot=PATH elsewhere
+    var shot_arg := ""
+    for a in OS.get_cmdline_args():
+        if a.begins_with("--shot="):
+            shot_arg = a.get_slice("=", 1)
+    if shot_arg != "" or OS.get_cmdline_args().has("--shot"):
         await get_tree().process_frame
         await get_tree().process_frame
         var img := get_viewport().get_texture().get_image()
-        var out := "D:/monet/trail-bound/assets_src/cleanup/pinewatch_engine_graded.png"
+        var out := shot_arg if shot_arg != "" else \
+            "D:/monet/trail-bound/assets_src/cleanup/pinewatch_engine_graded.png"
         print("scene shot ->", out, " err:", img.save_png(out))
         get_tree().quit()
 
@@ -319,6 +338,17 @@ func _wake_chrome() -> void:
 func _notification(what: int) -> void:
     if what == NOTIFICATION_WM_MOUSE_ENTER:
         _wake_chrome()
+
+
+## Centre the 640x360 map when the stretched viewport is larger —
+## aspect=expand shows extra room on wide phones (~800px virtual at
+## 20:9) and taller tablets; the empty margin paints with the dark
+## clear colour, not the mid-grey default.
+func _fit_stage() -> void:
+    var vp := get_viewport_rect().size
+    stage.position = Vector2(
+        maxf(0.0, (vp.x - float(GW * T)) / 2.0),
+        maxf(0.0, (vp.y - float(GH * T)) / 2.0))
 
 
 # ------------------------------------------------------------- scenery
@@ -355,7 +385,7 @@ func _build_ground() -> void:
     ground = TileMapLayer.new()
     ground.name = "Ground"
     ground.tile_set = load("res://resources/pinewatch_terrain.tres")
-    add_child(ground)
+    stage.add_child(ground)
     var forest_cells: Array[Vector2i] = []
     var pond_cells: Array[Vector2i] = []
     var path_cells: Array[Vector2i] = []
@@ -425,7 +455,7 @@ func _build_backdrop() -> void:
     ## below them it could never be seen — and below everything else.
     var bd := Node2D.new()
     bd.name = "Backdrop"
-    add_child(bd)
+    stage.add_child(bd)
     # sky -> dirt fill first; trees land on top of it
     var sky := Polygon2D.new()
     sky.polygon = PackedVector2Array([
@@ -459,7 +489,7 @@ func _build_backdrop() -> void:
 func _build_scatter(rng: RandomNumberGenerator) -> void:
     scatter = Node2D.new()
     scatter.name = "Scatter"
-    add_child(scatter)
+    stage.add_child(scatter)
     # edge-clustered decals (ground recipe): DECAL_CLUSTERS is a fixed
     # list — one family per cluster, only at prop bases / shoreline /
     # treeline feet; the open-field interior stays empty because the
@@ -608,13 +638,140 @@ func _build_ui() -> void:
     add_child(hud_layer)
     hud = HUD.new()                            # the chrome root itself —
     hud.name = "Chrome"                        # _fade_chrome modulates it
-    hud.fire_pos = FIRE_POS
     hud_layer.add_child(hud)
     hud.phase_pressed.connect(_advance_phase)
 
     panel_mgr = PanelManager.new()             # PANEL tier, dimmer stack
     panel_mgr.name = "Panels"
     add_child(panel_mgr)
+    panel_mgr.stack_changed.connect(_on_panels_changed)
+    Platform.back_pressed.connect(_on_back)
+
+    # fire proximity bubble — a world marker so it rides the canvas
+    # transform (stage margins included); shown only while the pointer
+    # is near the fire ring (GDD 17.5: bubbles over interactive objects)
+    var fire_anchor := Node2D.new()
+    fire_anchor.position = FIRE_POS
+    stage.add_child(fire_anchor)
+    var tok := markers.marker(fire_anchor, Vector2(-61, -74))
+    fire_bubble = UIKit.panel(markers.marker_control(tok),
+        Rect2(0, 0, 122, 41), "bubble_prompt")
+    var fico := TextureRect.new()
+    fico.texture = UIKit.icon("campfire")
+    fico.position = Vector2(10, 3)
+    fico.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    fire_bubble.add_child(fico)
+    var bl := UIKit.label_for(tr("hud_fire").to_upper(),
+        UITokens.TypeRole.HEAD, UITokens.INK)
+    bl.position = Vector2(30, 4)
+    fire_bubble.add_child(bl)
+    fire_bubble.modulate.a = 0.0
+    fire_bubble.visible = false
+
+
+func _fire_near(on: bool) -> void:
+    if on == _fire_on or fire_bubble == null:
+        return
+    _fire_on = on
+    if _fire_tween and _fire_tween.is_running():
+        _fire_tween.kill()
+    if on:
+        fire_bubble.visible = true
+    _fire_tween = create_tween()
+    _fire_tween.tween_property(fire_bubble, "modulate:a",
+        1.0 if on else 0.0, 0.2)
+    if not on:
+        _fire_tween.tween_callback(fire_bubble.hide)
+
+
+func _on_panels_changed() -> void:
+    if panel_mgr.top() != null:
+        _fade_chrome(0.12)
+    else:
+        _wake_chrome()
+
+
+func _on_back() -> void:
+    ## §17.6: Back closes the top sheet; on the camp screen it asks first.
+    if panel_mgr.top() != null:
+        panel_mgr.close()
+    else:
+        _confirm_quit()
+
+
+func _confirm_quit() -> void:
+    if _quit != null:
+        return
+    _quit = _quit_dialog()
+    _quit.tree_exited.connect(func(): _quit = null)
+    panel_mgr.open(_quit)
+
+
+func _quit_dialog() -> Control:
+    var vp := get_viewport_rect().size
+    var p := Panel.new()
+    p.size = Vector2(188, 96)
+    p.position = (vp - p.size) / 2.0
+    p.add_theme_stylebox_override("panel",
+        UIKit.nine("panel_window_flat"))
+    var l := UIKit.label_for(tr("quit_title"), UITokens.TypeRole.HEAD,
+        UITokens.INK)
+    l.set_anchors_preset(Control.PRESET_TOP_WIDE)
+    l.offset_top = 18
+    l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    p.add_child(l)
+    _dialog_button(p, Rect2(14, 48, 74, UITokens.MIN_TOUCH),
+        tr("quit_stay"), panel_mgr.close)
+    _dialog_button(p, Rect2(100, 48, 74, UITokens.MIN_TOUCH),
+        tr("quit_leave"), get_tree().quit)
+    return p
+
+
+func _dialog_button(p: Control, r: Rect2, text: String,
+                    on_press: Callable) -> Panel:
+    var b := UIKit.button(p, r)
+    var l := UIKit.label_for(text, UITokens.TypeRole.HEAD, UITokens.INK)
+    l.set_anchors_preset(Control.PRESET_FULL_RECT)
+    l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+    b.add_child(l)
+    b.gui_input.connect(func(e: InputEvent) -> void:
+        if e is InputEventMouseButton and e.pressed \
+                and e.button_index == MOUSE_BUTTON_LEFT:
+            on_press.call())
+    return b
+
+
+## Headless smoke (godot --headless --path game <scene> --smoke):
+## exercises Back -> quit-confirm -> close and the fire-proximity
+## bubble, prints assertions, quits.  Runs beside --shot, no prod cost.
+func _smoke() -> void:
+    await get_tree().process_frame
+    _on_back()
+    await _frames_until(func(): return panel_mgr.top() != null \
+        and panel_mgr.top().modulate.a > 0.9)
+    var top: Control = panel_mgr.top()
+    print("SMOKE back -> quit panel open: ", top != null,
+          " size:", top.size if top else Vector2.ZERO)
+    _on_back()
+    await _frames_until(func(): return _quit == null)
+    print("SMOKE back -> closed: ", panel_mgr.top() == null,
+          " quit cleared:", _quit == null)
+    _fire_near(true)
+    await _frames_until(func(): return fire_bubble.modulate.a > 0.9)
+    print("SMOKE fire bubble a=", snappedf(fire_bubble.modulate.a, 0.01))
+    _fire_near(false)
+    await _frames_until(func(): return not fire_bubble.visible)
+    print("SMOKE fire bubble hidden:", not fire_bubble.visible)
+    get_tree().quit()
+
+
+## Poll a condition each frame (cap ~4s) — tween timing varies headless.
+func _frames_until(cond: Callable, cap := 240) -> void:
+    for i in cap:
+        if cond.call():
+            return
+        await get_tree().process_frame
 
 
 # ------------------------------------------------------------- guests
@@ -731,15 +888,16 @@ func _show_previews(gid: String) -> void:
         var r := Game.preview(gid, pick)
         if r.is_empty():
             continue
-        # no star glyph in either font — gold icon + number, comp-style
+        # star icon + number, comp-style
         var m := Node2D.new()
         m.position = pad_cells[pid].position + Vector2(18, 2)
         var t := TextureRect.new()
-        t.texture = _tex("icons/" + STAR_ICON)
+        t.texture = UIKit.icon("star_full")
         t.stretch_mode = TextureRect.STRETCH_KEEP
         t.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
         m.add_child(t)
-        var l := UIKit.label("%d" % r["stars"], 9)
+        var l := UIKit.label_for("%d" % r["stars"],
+            UITokens.TypeRole.HEAD)
         l.position = Vector2(17, 2)
         m.add_child(l)
         star_labels[pid] = m
@@ -765,8 +923,13 @@ func _status() -> void:
     hud.set_status(("day %d · site day %d · %s · %dc   " \
         + "[click guest, then pad · Enter = Goodnight]") % [
         Game.day, Game.site_day(), st["weather"].to_upper(), Game.coins])
-    hud.set_phase("EVENING" if evening_open else "NIGHT")
+    hud.set_phase(tr("hud_evening").to_upper() if evening_open \
+        else tr("hud_night").to_upper())
     hud.set_rating(night_rating if night_rating else "—")
+    hud.set_coins(tr("hud_coins_short") % Game.coins)
+    hud.set_day("%s %d · %s" % [tr("hud_day").to_upper(), Game.day,
+        tr("weather_" + String(st["weather"])).to_upper()],
+        st["weather"])
 
 
 func _goodnight() -> void:
@@ -823,9 +986,11 @@ func _unhandled_input(event: InputEvent) -> void:
     var st: Dictionary = Game.site_state()
     if event is InputEventMouseMotion:
         _wake_chrome()
+        var px := get_global_mouse_position() - stage.position
+        _fire_near(px.distance_to(FIRE_POS) <= 56.0)
         if not evening_open:
             return                                    # night: watch the fire
-        var pid := _pad_at(get_global_mouse_position())
+        var pid := _pad_at(px)
         var ok: bool = pid != "" \
             and st["pads"].get(pid, {}).get("open", false) == true \
             and not _pad_occupied(pid) and selected != ""
@@ -837,8 +1002,10 @@ func _unhandled_input(event: InputEvent) -> void:
         return                                        # night: watch the fire
     if event is InputEventMouseButton and event.pressed \
             and event.button_index == MOUSE_BUTTON_LEFT:
-        var px := get_global_mouse_position()
-        var gid := _guest_at(px)
+        var mpx := get_global_mouse_position()
+        var px := mpx - stage.position
+        _fire_near(px.distance_to(FIRE_POS) <= 56.0)
+        var gid := _guest_at(mpx)
         var pid := _pad_at(px)
         if gid != "" and gid in st["guests"]:
             if st["assignments"].has(gid):            # pull back to tray
