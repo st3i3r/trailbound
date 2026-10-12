@@ -106,6 +106,35 @@ Density through **clustering**, variety through **large soft gradients**,
 texture through **low-amplitude dither**.  Props carry the detail;
 ground supports it.
 
+## Prop era spec (decided 2026-10-12 — contemporary camping, not heritage)
+
+Reference: Eastward: Octopia camp frames — the gear reads modern
+through *silhouette*, not clutter.
+
+**Era is 2026.**  Camping equipment is contemporary: dome / pop-up
+tents, cooler boxes, folding camp chairs, propane-butane stoves,
+string lights, solar lanterns, dry bags, thermoses, insulated mugs,
+folding tables, camp showers.  NOT heritage scout-camp: no patched
+canvas wall tents on wood poles, no rusted enamel-surplus reads on
+*equipment*.
+
+**Neglect is told by nature, not aged gear.**  The abandoned-site
+story comes from overgrowth, moss, leaf litter, fallen branches and
+weeds over pads — the *gear* a traveller brings is clean and new.
+Equipment wear stays light (a scuff, dirt splash, a faded sticker);
+rust-out and patched-canvas are era cues and are banned on items.
+
+**Minimalism — one silhouette + one accent.**  A tent is a dome mass,
+a door arc, maybe one guyline — not ropes + stakes + patches + poles
+all at once.  Every prop earns ~60–70% empty ground around it; the
+Octopia frames keep props sparse and let each object read alone.
+
+Camper van exception: the VW-shape van stays — a classic camper is a
+contemporary lifestyle object (same family as Octopia's RV), not an
+"ancient" one.  The shipped canvas A-frame pad tents, the warden tent
+and the brown tarp tent are queued for re-authoring as modern domes —
+that is a prop-art regen, not a layout change.
+
 ## UI recipe (SOTA, decided 2026-10-12 — cozy HUD discipline)
 
 Research: cozy-UI guides ("great game UI disappears — start with nothing,

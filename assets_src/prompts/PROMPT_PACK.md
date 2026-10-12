@@ -31,8 +31,10 @@ pack at execution time; this file is what gets reviewed. Rosters come from
 > fronts drawn straight-on (not isometric), sunlight from the upper left,
 > full value range from deep cool shadows to bright warm highlights,
 > hue-shifted colour ramps, adaptive dark coloured outlines (never pure
-> black), chunky readable silhouette, handcrafted imperfect detail, no
-> text, no letters, no numbers
+> black), chunky readable silhouette, handcrafted imperfect detail,
+> contemporary everyday objects and clothing of the 2020s — never
+> antique, medieval or vintage surplus gear, no text, no letters, no
+> numbers
 
 Cut-out clause (objects, characters, items):
 > single subject centred on a transparent background, no ground plane, no
@@ -57,7 +59,7 @@ Cast, food, fauna and keepsakes are site-neutral: no site module.
 | Class | Tool and canvas | Module (appended) |
 |---|---|---|
 | Terrain | `create_topdown_tileset` pro, 32 px, `high top-down` | calm low-detail ground wash, large soft tonal patches, no flowers, no tufts, no speckles, no repeating motif (detail comes from `tb_dither` + decals) |
-| Hero prop / structure | Batch tool ≤170 (4 slots, 128–160 style refs); Pro Flash custom for non-square | hand-painted miniature density, weathered surfaces (wood grain, rust, patched canvas), small story details, slight lean or sag, base embedded, top and front faces both visible |
+| Hero prop / structure | Batch tool ≤170 (4 slots, 128–160 style refs); Pro Flash custom for non-square | hand-painted miniature density, contemporary 2026 camping equipment (style_lock prop era spec: dome tents, coolers, chairs, stoves — never patched canvas / rusted surplus), clean surfaces with light wear (scuffs, dirt splash), one strong silhouette with one accent detail, base embedded, top and front faces both visible |
 | Small item (L6) | Batch tool ≤42 (64 slots, 32 px refs) or ≤85 (16 slots, 64 px refs) | small and simple, readable at 1×, two or three tones plus outline, one clear silhouette, no fine noise |
 | Foliage / tree | Batch tool ≤170 | leaf masses as clumps (not single dots), lit top-left rim, cool shaded underside, visible trunk and root flare |
 | Character | `create_character_pro_flash` 48×48, `low top-down`, template `mannequin`, 8 directions, `style_options.detail=false` | full body about 3.5 heads tall filling about 90% of the canvas height, readable face with simple eyes, distinctive silhouette with one signature colour, clothing folds in two or three tones, relaxed standing pose facing south |
@@ -195,7 +197,8 @@ Walks: `animate_character` template, south / north / east (west mirrored)
 
 - **H1 Warden's Hut stages** (`edit_image_pro_flash` from the restored `cottage_shed`, 128 px, palette correction on, 3 × 2 seeds ≈36): `hut_s0` ruined, collapsed roof, broken shutters, brambles and vines over the walls · `hut_s1` brambles cleared, roof open with bare rafters · `hut_s2` new roof tiles, shutters still broken · `hut_s3` = restored (existing)
 - **H2 overgrown pads** (batch ≤85, 16 slots, ≈10): `pad_overgrown_a..d` square of earth covered by tall weeds, brambles, a fallen branch and stones · `pad_clearing_a..b` patchy dirt with weed stubs · `pad_cleared_a..b` freshly cleared packed earth with a few pebbles
-- **H3 night/occupied states** (`create_object_state`, ≈5 each, ≈20): `tent_green_night`, `tent_red_night` warm lantern glow inside, flap half open · `cabin_night` warm light in the windows · `pallet_deck_occupied` bedroll and a small lantern on the deck
+- **H3 night/occupied states** (`create_object_state`, ≈5 each, ≈20): `tent_green_night`, `tent_red_night` warm lantern glow inside the modern dome tent, door half open · `cabin_night` warm light in the windows · `pallet_deck_occupied` bedroll and a small lantern on the deck
+- **H4 tent re-author** (batch ≤170, ≈15): the shipped canvas A-frame pad tents (`tent_green`, `tent_red`), the warden tent and the brown tarp tent regenerate as **modern dome tents** per the style_lock prop era spec — clean two-tone ripstop, door arc, one guyline; the era-spec neglect story lives in weeds/debris on the pad, not in aged canvas
 - Boathouse and Lantern Workshop stages: with their sites
 
 ### Batch I — events (§13.5)
@@ -216,9 +219,9 @@ Walks: `animate_character` template, south / north / east (west mirrored)
 | E decor | ≈30 | |
 | F cut-in | ≈27 | |
 | G animation | ≈220 | Walks: 39 walkers × 3 dirs = 117; ~85 custom anims × 1 (each sprite needs its own copy); prop loops ≈14 |
-| H states | ≈66 | |
+| H states | ≈81 | incl. H4 dome-tent re-author of the shipped canvas tents |
 | I events | ≈55 | |
-| **Total** | **≈990** (+20% contingency ≈1,190) | vs ~475 in the old manifest — characters and animation were under-priced |
+| **Total** | **≈1,005** (+20% contingency ≈1,205) | vs ~475 in the old manifest — characters and animation were under-priced |
 
 Balance 1,633 now; the allowance refills to 2,000 on 2026-11-11 and
 each cycle after. Fits this cycle with ≈440 left after contingency.
@@ -232,6 +235,7 @@ instead of 7, west mirrored (already assumed).
 | D-PP-1 | Field Notes bird roster | Keep the 12 slots but use species that plausibly live in each site's setting (e.g. a scops owl instead of the Tawny Owl, a brown dipper instead of the White-throated Dipper, blue-tailed bee-eater, oriental skylark; keep jay, kingfisher, heron, hoopoe, kestrel, wagtail, bulbul if ranges fit) — verify ranges before Batch C; names stay generic per D-07 |
 | D-PP-2 | Persona roster | 17 personas: add cyclist, backpacker pair, angler uncle, food vlogger, scout kid so every archetype has a persona that reads right → Guestbook 21 entries, collectible total 88 |
 | D-PP-3 | Spend order | A → D1/C1 (cheap, unblock UI) → B named + regulars → H → B personas → G → E/F → I |
+| D-PP-4 | **Era: contemporary 2026** — Eastward-modern (Octopia camp frames), not heritage scout-camp; gear is new/clean, neglect told by nature; canvas tents re-author as domes (H4) | Decided 2026-10-12 (user); era clause baked into the House core + hero-prop class; style_lock prop era spec is the checklist |
 
 ## 6. Generation hygiene
 
