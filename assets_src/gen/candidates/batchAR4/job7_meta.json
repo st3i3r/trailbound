@@ -1,0 +1,18 @@
+{
+ "job": "batchAR5_decals",
+ "canvas": 40,
+ "styles": [
+  "tuft_a",
+  "tuft_b",
+  "tuft_c"
+ ],
+ "items": {
+  "tuft_grass_a": "small tuft of grass blades",
+  "tuft_grass_b": "wider low tuft of grass with seed heads",
+  "tuft_grass_c": "tuft of grass with tiny yellow wildflowers",
+  "tuft_grass_d": "dry golden grass tuft",
+  "tuft_leaf_litter": "scattered brown fallen leaves on bare ground",
+  "tuft_moss_patch": "flat patch of green moss with tiny sprouts"
+ },
+ "description": "painterly pixel art in the style of Eastward, top-down view, sunlight from the upper left, full value range, hue-shifted colour ramps, adaptive dark coloured outlines (never pure black), chunky readable silhouette, no text + a tiny ground decal centred on a transparent background \u2014 a small flat patch of growth or litter that sits ON the ground, no object, no shadow + two or three tones, small and simple, readable at 1x + cool highland pine forest palette"
+}

@@ -1,0 +1,16 @@
+{
+ "job": "batchAR1_canopies",
+ "canvas": 160,
+ "styles": [
+  "tree_a",
+  "tree_b",
+  "tree_c"
+ ],
+ "items": {
+  "canopy_broadleaf": "dense round broadleaf evergreen canopy, deep green leaf clumps",
+  "canopy_maple": "highland maple canopy in copper-orange autumn foliage, leaf clumps",
+  "canopy_feathery": "slender canopy of feathery drooping foliage strands, willow-like",
+  "canopy_cherry": "wild Himalayan cherry canopy in soft pink blossom, petal clumps"
+ },
+ "description": "painterly pixel art in the style of Eastward, 3/4 top-down view with fronts drawn straight-on (not isometric), sunlight from the upper left, full value range from deep cool shadows to bright warm highlights, hue-shifted colour ramps, adaptive dark coloured outlines (never pure black), chunky readable silhouette, handcrafted imperfect detail, no text + a tree canopy crown only \u2014 leaf clumps seen from a 3/4 angle, NO trunk, NO branches below the crown, no ground, centred on a transparent background + leaf masses as big clumps (not single dots), lit top-left rim, cool shaded underside with a darker crown base where the trunk would meet it, calm interior masses + cool highland pine forest palette"
+}

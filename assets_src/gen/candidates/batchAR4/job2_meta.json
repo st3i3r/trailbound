@@ -1,0 +1,24 @@
+{
+ "job": "batchAR4_2",
+ "canvas": 160,
+ "styles": [
+  "camp_gear",
+  "tent_ground",
+  "tent_edge"
+ ],
+ "items": {
+  "cooler_box": "modern 2026 hard-sided camping cooler box, white lid on a teal-blue body, latches on the front, short carry handles on the sides",
+  "folding_chair_pair": "modern 2026 folding camp chair, tubular metal frame with fabric seat and back, compact, slight recline",
+  "propane_stove": "modern 2026 two-burner propane camp stove, suitcase-style body with the lid open, two round burners and small control knobs",
+  "solar_lantern": "modern 2026 collapsible solar camping lantern, small solar panel on top, warm diffused light panel, hanging handle"
+ },
+ "description": "painterly pixel art in the style of Eastward, 3/4 top-down view with fronts drawn straight-on (not isometric), sunlight from the upper left, full value range from deep cool shadows to bright warm highlights, hue-shifted colour ramps, adaptive dark coloured outlines (never pure black), chunky readable silhouette, handcrafted imperfect detail, contemporary everyday objects of the 2020s \u2014 never antique, medieval or vintage surplus gear, no text, no letters, no numbers + single subject centred on a transparent background, no ground plane, no cast shadow, nothing cropped at the edges + hand-painted miniature density, contemporary 2026 camping equipment, clean surfaces with light wear only (a scuff, a dirt splash), one strong silhouette with one accent detail, calm interior masses with detail concentrated at the silhouette, thin adaptive coloured outline + cool highland pine forest palette with ember-orange accents",
+ "object_ids": {
+  "cooler_box": "9dd031e5-9b28-411d-ae71-2880361006c4",
+  "folding_chair_pair": "51602e3a-63c1-4986-8c26-cdade2876876",
+  "propane_stove": "86927c42-fbc2-4847-88c0-64fc7437b841",
+  "solar_lantern": "dfacebaa-f578-44e5-bde2-4167d06a0267"
+ },
+ "cost": 15,
+ "status": "selected all 4"
+}

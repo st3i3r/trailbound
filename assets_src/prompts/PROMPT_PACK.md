@@ -91,6 +91,21 @@ prop/farm for A-R4, water for A-R3).
 Each line is the content slot only; HOUSE + SITE + CLASS are appended.
 `id` becomes the semantic file name.
 
+**Generation modes (decided 2026-10-13) — pick the right tool, not the
+biggest tool:**
+
+| Mode | Tool | Rule |
+|---|---|---|
+| Static prop | `create_1_direction_object`, `view=top-down` | World props are fixed-orientation, fronts to camera — never spend 8-dir on objects |
+| Directional | `create_character_pro_flash` 8-dir | Characters, pets, anything that walks. **Only creatures get directions** |
+| Multi-state | gen master first → `create_object_state` / `edit` | night-lit windows, occupied pads, restoration stages. Master must exist before states |
+| Loop anim | `animate_object` v3 / `vfx_workbench` (free) | flutters, sway, smoke, fire |
+| Variant | `tb_variant` ramp-swap / `tb_dither` noise | foliage palettes, water shimmer — 0 gens, deterministic |
+
+Per-asset state/anim needs are noted inline as `[+state:…]` /
+`[+anim:…]` — the master job gen's the base only; states and anims are
+follow-on jobs riding the master's `source_image_id`.
+
 ### Batch A — Pinewatch world (site: Pinewatch)
 
 **A1 · small items (batch tool ≤42, 64 slots, 1 job ≈10)**
@@ -125,8 +140,9 @@ painted; this batch adds the layered family on top.  **H4's dome-tent
 re-author folds in here** — superseded by A-R4.
 
 **A-R1 · tree family (batch ≤170, 6 slots, 2 jobs ≈20)**
-3 canopy masters (`tree_broadleaf_round` · `tree_maple_copper` ·
-`tree_feathery_droop`) + 3 trunk cut-outs — two separate gens per
+All `1_direction` statics.  3 canopy masters
+(`tree_broadleaf_round` · `tree_maple_copper` · `tree_feathery_droop`)
+`[+anim: canopy sway → G]` + 3 trunk cut-outs — two separate gens per
 tree, composited by `tb_post` (T2).  `tree_pine_highland` is dropped:
 the shipped `pine_tall_a/b` are already variant-able masters —
 `tb_variant` dry-run on them extracts a clean continuous ramp, so
@@ -147,10 +163,12 @@ corner, water to the north-east") or the model will draw whole ponds.
 `tb_dither` — 0 gens; runtime frame swap.
 
 **A-R4 · modern camp props (batch ≤170, 9 slots, 3 jobs ≈30) — replaces the canvas set**
-`dome_tent_{sage,amber,slate}` — one dome silhouette, three colours ·
-`cooler_box` · `folding_chair_pair` · `propane_stove` ·
-`solar_lantern` · `dry_bag` · `camp_table_fold`.  (`string_lights_seg`
-dropped — `props_large/string_lights` already ships.)  Era spec
+All `1_direction` statics; states are follow-on jobs:
+`dome_tent_{sage,amber,slate}` — one dome silhouette, three colours
+`[+state: night-lit ×2 → H3]` · `cooler_box` · `folding_chair_pair` ·
+`propane_stove` · `solar_lantern` `[+state: lit]` · `dry_bag` ·
+`camp_table_fold`.  (`string_lights_seg` dropped —
+`props_large/string_lights` already ships `[+anim: sway]`.)  Era spec
 applies (style_lock): clean surfaces, light wear only.  The shipped
 canvas A-frames, warden tent and tarp tent retire to `_superseded/`
 on landing — **integration step:** `tent_green`/`tent_red` are
@@ -275,7 +293,7 @@ Walks: `animate_character` template, south / north / east (west mirrored)
 | E decor | ≈30 | |
 | F cut-in | ≈27 | |
 | G animation | ≈220 | Walks: 39 walkers × 3 dirs = 117; ~85 custom anims × 1 (each sprite needs its own copy); prop loops ≈14 |
-| A-R refresh | ≈80 | Masters only — foliage variants + water shimmer are deterministic pipeline derivatives (tb_variant/tb_dither), 0 gens; A3's tree species folded into A-R1 (canopy+trunk splits) and pine dropped (shipped pines are variant-able masters) |
+| A-R refresh | ≈105 | **Flat 15 gens/job at every slot count** (verified 2026-10-13: ≤170 4-slot, ≤85 16-slot, ≤42 64-slot all = 15) — pack items tight: 64-slot jobs are ~0.23/item. A-R = 7 jobs; bonus auto-fills covered A1 debris + extra trunk/decal vocabulary free |
 | H states | ≈66 | H4 dome-tent re-author moved to A-R4 |
 | I events | ≈55 | |
 | **Total** | **≈1,075** (+20% contingency ≈1,290) | vs ~475 in the old manifest — characters and animation were under-priced |
@@ -298,8 +316,37 @@ instead of 7, west mirrored (already assumed).
 
 - Record `seed`, style-ref file and the assembled prompt in every job
   entry (batch JSON) — reproducible rerolls.
+- **Review flow:** batch jobs land in `review` — `get_object` → view
+  candidates → `select_object_frames(indices)` (or `dismiss_review`).
+  **Select promptly** — review objects can auto-finalize (job
+  `08a95d4c` consumed itself before a delayed select; the 404 means
+  the frames already became standalone objects, recoverable via
+  `list_objects`).  Selected frames get NEW object ids — record them
+  in the job meta.
+- **Item grid semantics:** `item_descriptions` maps to grid slots in
+  order; fewer lines than the grid auto-fills the rest FROM THE JOB
+  DESCRIPTION — free bonus candidates in the same style (J3's 10
+  auto-fills covered half the A1 debris family).  Every job costs a
+  flat **15 gens regardless of slot count** — always fill slots.
+- **Repair ladder before reroll:** `correct_pixelart` (off-grid) →
+  `reduce_colors` (noisy palette) → `inpaint_image` (local fix) →
+  reroll only when the silhouette itself is wrong.
 - Pipeline unchanged: `tb_grade` → palette snap (dE>30) → `tb_post`
   (contact shadow, anchor) → stage → integrate.
 - QA gate per asset: `pixelart_workbench lint` + `score`, plus the
   style_lock craft rubric for heroes.
+- `style_options.detail=false` exists **only on Pro Flash tools** —
+  the batch tool has no style toggles; calm comes from the crop +
+  prompt words.
+- **Canvas-vs-display ratio ≤1.8×** (verified 2026-10-13 — NEAREST
+  downscale at 1.5–1.8× tightens AI painterliness into pixel snap;
+  ≥2.5× destroys pixel clusters).  Gen canvas ≈ display × 1.2–1.8,
+  ship resize lives in `tb_post`.
+- **Ship resize is per-family** (verified 2026-10-13): organic/
+  curve-dominant props (tents, canopies, bushes) → **LANCZOS**
+  (smooth arcs, slight softening); hard-edged items (cooler, stove,
+  tools, straight linework) → **NEAREST** (keeps edges, can stair-step
+  curves).  `tb_post` takes `--resample smooth|sharp`.
+- `transfer_outfit` noted for Batch B: persona variants from one base
+  character instead of full char gens (potential ~100-gen saving).
 - Semantic ids everywhere (`item_names`); no new `S_n`/`M1_n` names.

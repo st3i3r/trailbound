@@ -1,0 +1,18 @@
+{
+ "job": "batchAR23",
+ "canvas": 85,
+ "styles": [
+  "bush_green",
+  "bush_green2",
+  "bush_teal"
+ ],
+ "items": {
+  "bush_round_m": "round medium bush with dense green leaf clumps",
+  "bush_white_flower_v": "round bush dotted with small white flowers",
+  "fern_bank": "bank of unfurling fern fronds",
+  "grass_tussock": "tussock of tall grass blades leaning in one direction",
+  "reed_shore": "clump of shore reeds with thin upright stems",
+  "dry_bag": "modern 2026 roll-top dry bag in teal waterproof fabric, buckled top, clean new surface"
+ },
+ "description": "painterly pixel art in the style of Eastward, 3/4 top-down view with fronts drawn straight-on (not isometric), sunlight from the upper left, full value range from deep cool shadows to bright warm highlights, hue-shifted colour ramps, adaptive dark coloured outlines (never pure black), chunky readable silhouette, handcrafted imperfect detail, no text, no letters, no numbers + single subject centred on a transparent background, no ground plane, no cast shadow, nothing cropped at the edges + leaf masses as clumps (not single dots), lit top-left rim, cool shaded underside, calm interior masses with detail concentrated at the silhouette + cool highland pine forest greens with ember-orange accents"
+}

@@ -1,0 +1,15 @@
+{
+ "job": "batchAR1_trunks",
+ "canvas": 85,
+ "styles": [
+  "trunks_a",
+  "trunks_b"
+ ],
+ "items": {
+  "trunk_broadleaf": "sturdy broadleaf tree trunk, straight with a slight lean, wide root flare",
+  "trunk_maple": "maple tree trunk, smooth grey-brown bark with horizontal lenticel marks",
+  "trunk_feathery": "slender willow trunk with a gentle S-curve, fibrous bark texture",
+  "trunk_cherry": "cherry tree trunk with dark mahogany bark and a few bare lower branches"
+ },
+ "description": "painterly pixel art in the style of Eastward, 3/4 top-down view with fronts drawn straight-on (not isometric), sunlight from the upper left, full value range from deep cool shadows to bright warm highlights, hue-shifted colour ramps, adaptive dark coloured outlines (never pure black), chunky readable silhouette, no text + a tree trunk with root flare only \u2014 NO foliage, NO leaves, no ground, centred on a transparent background + bark in warm browns with vertical grain ridges, moss patches at the base, root flare spreading at the bottom, darker shaded side on the right + cool highland pine forest palette"
+}

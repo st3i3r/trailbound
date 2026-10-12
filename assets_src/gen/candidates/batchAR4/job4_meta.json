@@ -1,0 +1,20 @@
+{
+ "job": "batchAR3_shore",
+ "canvas": 85,
+ "styles": [
+  "ring_corner",
+  "ring_top",
+  "edge_strip"
+ ],
+ "items": {
+  "shore_ring_n": "straight horizontal row of fitted mossy shore stones, wet darker stone along the bottom edge (water south of the rim)",
+  "shore_ring_s": "straight horizontal row of fitted mossy shore stones, wet darker stone along the top edge (water north of the rim)",
+  "shore_ring_e": "straight vertical row of fitted mossy shore stones, wet darker stone along the left edge (water west of the rim)",
+  "shore_ring_w": "straight vertical row of fitted mossy shore stones, wet darker stone along the right edge (water east of the rim)",
+  "shore_ring_ne": "quarter-arc corner of fitted mossy shore stones curving around the north-east, wet darker stone on the south-west faces",
+  "shore_ring_nw": "quarter-arc corner of fitted mossy shore stones curving around the north-west, wet darker stone on the south-east faces",
+  "shore_ring_se": "quarter-arc corner of fitted mossy shore stones curving around the south-east, wet darker stone on the north-west faces",
+  "shore_ring_sw": "quarter-arc corner of fitted mossy shore stones curving around the south-west, wet darker stone on the north-east faces"
+ },
+ "description": "painterly pixel art in the style of Eastward, 3/4 top-down view with fronts drawn straight-on (not isometric), sunlight from the upper left, full value range from deep cool shadows to bright warm highlights, hue-shifted colour ramps, adaptive dark coloured outlines (never pure black), chunky readable silhouette, no text + a flat stone-rim border piece centred on a transparent background \u2014 only the fitted stones and moss, no water, no grass fill + mossy fitted shore stones, wet dark stone on the water side, dry sandy stone on the land side, small moss and lichen patches + cool highland pine forest palette"
+}

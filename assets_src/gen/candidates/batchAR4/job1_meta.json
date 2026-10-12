@@ -1,0 +1,24 @@
+{
+ "job": "batchAR4_1",
+ "canvas": 160,
+ "styles": [
+  "camp_gear",
+  "tent_ground",
+  "tent_edge"
+ ],
+ "items": {
+  "dome_tent_sage": "modern 2026 two-person dome camping tent in muted sage green ripstop nylon, arched crossover poles, zipped door arc on the front face, one guyline, clean new fabric",
+  "dome_tent_amber": "modern 2026 two-person dome camping tent in warm amber-orange ripstop nylon, arched crossover poles, zipped door arc on the front face, one guyline, clean new fabric",
+  "dome_tent_slate": "modern 2026 two-person dome camping tent in slate blue-grey ripstop nylon, arched crossover poles, zipped door arc on the front face, one guyline, clean new fabric",
+  "camp_table_fold": "modern 2026 folding aluminium camp table with roll-top slats, legs extended, compact campsite furniture, clean surfaces"
+ },
+ "description": "painterly pixel art in the style of Eastward, 3/4 top-down view with fronts drawn straight-on (not isometric), sunlight from the upper left, full value range from deep cool shadows to bright warm highlights, hue-shifted colour ramps, adaptive dark coloured outlines (never pure black), chunky readable silhouette, handcrafted imperfect detail, contemporary everyday objects of the 2020s \u2014 never antique, medieval or vintage surplus gear, no text, no letters, no numbers + single subject centred on a transparent background, no ground plane, no cast shadow, nothing cropped at the edges + hand-painted miniature density, contemporary 2026 camping equipment, clean surfaces with light wear only (a scuff, a dirt splash), one strong silhouette with one accent detail, calm interior masses with detail concentrated at the silhouette, thin adaptive coloured outline + cool highland pine forest palette with ember-orange accents",
+ "object_ids": {
+  "dome_tent_sage": "dd33a1ec-1fba-4654-9dc6-15d0cc287c80",
+  "dome_tent_amber": "7a5013a6-5ae4-4dd4-b4d9-7848d7920e9b",
+  "dome_tent_slate": "bc16028c-52f0-47c6-ab5d-d23878433d31",
+  "camp_table_fold": "c63726a3-8614-4db0-9d95-068efe32f2f0"
+ },
+ "cost": 15,
+ "status": "selected all 4"
+}
