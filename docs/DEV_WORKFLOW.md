@@ -160,8 +160,9 @@ HUD notes: pills/buttons use nine-slice insets from
 `ui/ui_atlas_meta.json`; chrome fades to 20 % after ~3 s idle (mouse
 motion wakes it); F1 toggles the dev-only Vietnamese diacritics label.
 Fonts: F1 (display) → Be Vietnam Pro (body) → engine fallback. Neither
-bundled font has ★/→ glyphs — star previews draw the gold `I1_4` icon
-plus a number instead.
+bundled font has ★/→ glyphs — star previews draw an icon plus a number.
+Known bug (UI-001, `docs/UI_PRODUCTION.md`): the code uses `I1_4`, which
+is the *sun*; the star is `I1_1` and the coin is `I1_0`.
 
 #### Canonical assets
 

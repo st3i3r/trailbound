@@ -83,7 +83,10 @@ pass. Two structural gaps remain, both decoded and spec'd in
    the test HUD is ~15% of a production UI. Missing: 8-panel suite,
    diegetic open-from-object layer, need-bubbles/floaters, alert rail,
    time controls, modal stack, juice, designed states, i18n. ~0 gens —
-   atlas+fonts already cover it; code work only.
+   atlas+fonts already cover it; code work only. *Superseded by
+   `docs/UI_PRODUCTION.md` (audit 2026-10-12): time controls and the
+   alert rail are withdrawn, the fonts do not cover Vietnamese, and the
+   flagship is the Evening tray.*
 
 ## Phase 4 — character/life pass (re-ranked after RPS review)
 
@@ -154,7 +157,9 @@ koi pond — audit first); keepsakes x9; vignette art (koi release,
 pennant ceremony, photo-wall unveiling).
 
 **Batch F — UI (~20):** need+mood+alert+speed icons, missing atlas
-ornaments.
+ornaments. *Re-aimed (D-UI-4/D-UI-5, `docs/UI_PRODUCTION.md`): chrome,
+value and trait icons become flat glyphs drawn by us (0 gens); Batch F =
+~10–12 gens of cooking cut-in close-up art. Speed icons dropped.*
 
 **Batch G — animation sets (~70):** Bean personality set (dig,
 curl-by-fire, excited-wag, follow, eat-leftovers), warden quirks,

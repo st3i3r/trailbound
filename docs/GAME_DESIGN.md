@@ -611,7 +611,7 @@ Each site has five pages, completed in any order. A page pays its gift (§6.6), 
 | Section | Entries | Filled by |
 |---|---|---|
 | Chapters | 15 pages | Completing pages |
-| Guestbook | 13 (9 archetypes + 4 regulars) | A first stay; a regular's finished story |
+| Guestbook | One per persona + 4 regulars (count fixed with the cast roster; 12 personas today → 16) | A persona's first stay; a regular's finished story. Archetype is hidden metadata; the guest renders as a persona, picked from the save seed with an unseen-first bias (§21.3). Content lint: every persona reachable in the arc |
 | Field Notes | 22 (5 forage finds, 5 fish including the Golden Koi, 12 birds) | A first find, catch or sighting |
 | Recipes | 21 | A first cook |
 | Keepsakes | 9 (3 per site) | Collecting a crew stage (§8.4) |
@@ -619,7 +619,7 @@ Each site has five pages, completed in any order. A page pays its gift (§6.6), 
 | Days log | One line per day | Each night: site, weather, guests, best review, coins |
 | Then/Now | 1 per site | Auto-photo of the camp on day 1 vs current — the before/after payoff |
 
-The cover shows completion as a percentage of the 72 collectible entries (Chapters, Guestbook, Field Notes, Recipes, Keepsakes). The Then/Now photo pair sits inside the cover, not the count.
+The cover shows completion as a percentage of the collectible entries (Chapters, Guestbook, Field Notes, Recipes, Keepsakes) — 83 with today's 16 Guestbook entries (15 + 16 + 22 + 21 + 9); the total follows the final persona roster. (The earlier "72" did not match this table, which summed to 80.) The Then/Now photo pair sits inside the cover, not the count.
 
 ### 8.4 The crew and grandpa's structures
 
@@ -1765,6 +1765,7 @@ for A,K,lab in ((0.5,1.25,'median'),(1.0,1.25,'median'),(1.0,1.0,'casual'),(1.0,
 - **Later:** photo mode; a shareable camp image, if it doesn't make v1 (§27).
 - **Platforms and languages:** iOS; Spanish; Brazilian Portuguese.
 - **Parked 2.x ideas** (each needs a design reason to return): auto-running sites, supply runs, warden ranks, upkeep, hazards, prestige.
+- **UI production (pre-launch):** audit, Eastward UI DNA, tooling and the UI-0xx backlog live in `docs/UI_PRODUCTION.md` (2026-10-12). §17.2 stays the screen authority.
 
 ## Appendix E — Glossary
 

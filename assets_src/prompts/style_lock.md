@@ -135,6 +135,17 @@ Rules:
 
 ## Production UI spec (decided 2026-10-12 — scope beyond chrome)
 
+> **Under reconciliation (UI audit 2026-10-12, `docs/UI_PRODUCTION.md`
+> §3).** Time controls, food/rest/social need-bubbles, the booking
+> calendar, stay length/mood and the alert rail contradict GDD §4/§5 and
+> are withdrawn. Screen list authority is GDD §17.2. "48dp+ everywhere
+> (already met)" was false (UI-005). Star row, close X, back and settings
+> icons already exist (I1_1–3, 13, 15, 12). **D-UI-1 decided: Eastward
+> glass** — the cream-paper panel kit and the "Physicality: cream paper,
+> wood trim" rule above retire; cream stays only for speech bubbles.
+> Fonts: Be Vietnam Pro family, hi-res (D-UI-2). Glass spec v0 and the
+> lacquer-tint proposal: `docs/UI_PRODUCTION.md` §8.1. Rewrite = UI-010.
+
 Benchmark formula: Eastward diegesis x Bear&Breakfast management
 clarity x Two Point alert discipline x mobile touch ergonomics.
 Current state: HUD chrome ~15% of a production UI — style is right,
