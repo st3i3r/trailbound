@@ -884,13 +884,13 @@ The identity stays subtle (D-07, confirmed; Q2 resolved).
 |---|---|
 | `reference/eastward.jpg` | Primary: fixed 3/4 top-down view (flat ground, object fronts), painterly soft-dithered pixel art, bright lush daylight |
 | `reference/example.png` | Prop density and the ember-lit dusk mood, which comes from lighting rather than baked-in art |
-| `reference/eastward_ui.webp` | UI: cream paper panels, forest green and ember gold accents, chunky rounded controls |
+| `reference/ui/` | UI: Eastward glass menus with a Vietnamese lacquer tint, cream speech bubbles, flat one-colour glyphs (D-UI-1/5, `docs/UI_PRODUCTION.md`) |
 
 ### 16.2 Technical rules
 
 - 640×360 base resolution with integer scaling (§20).
 - 32 px tiles and 64 px placement cells.
-- Characters about 48 px tall in 64×64 frames, anchored bottom-center.
+- Characters about 43 px tall (≤12% of the 360 px frame) in 48×48 frames, anchored bottom-center; children about two-thirds of that.
 - One pixel density everywhere, enforced on import.
 - One sun angle and one wind direction across all assets.
 - A contact shadow under every object and character.

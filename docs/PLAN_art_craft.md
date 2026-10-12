@@ -159,7 +159,7 @@ pennant ceremony, photo-wall unveiling).
 **Batch F — UI (~20):** need+mood+alert+speed icons, missing atlas
 ornaments. *Re-aimed (D-UI-4/D-UI-5, `docs/UI_PRODUCTION.md`): chrome,
 value and trait icons become flat glyphs drawn by us (0 gens); Batch F =
-~10–12 gens of cooking cut-in close-up art. Speed icons dropped.*
+≈27 gens of cooking cut-in close-up art. Speed icons dropped.*
 
 **Batch G — animation sets (~70):** Bean personality set (dig,
 curl-by-fire, excited-wag, follow, eat-leftovers), warden quirks,
@@ -172,6 +172,11 @@ confetti), ALL transitions, 2.5D lighting, juice.
 **Totals: ~110+170+30+30+45+20+70 = ~475 gens (~29% of ~1633) —
 leaves ~1160 for future sites.** The cast is the biggest line
 item, as the RPS review predicted: the game lives on its people.
+
+*Re-priced 2026-10-12 with verified tool costs and the data rosters:
+≈990 gens (+20% ≈1,190) — prompts, per-batch job lists and the budget
+now live in `assets_src/prompts/PROMPT_PACK.md`, which supersedes the
+estimates above.*
 
 ## Budget
 

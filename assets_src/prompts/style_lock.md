@@ -9,6 +9,11 @@ batch inherits this look — do not restyle per batch.
 
 ## Prompt language (bake into every description)
 
+> **Superseded 2026-10-12 by `assets_src/prompts/PROMPT_PACK.md` §2**
+> (house core v3 + site + class modules). The block below contradicts
+> the approved v2 colour direction (it asks for muted water and gentle
+> contrast) — kept only as a record of what batches 0–3 used.
+
 > cozy pixel art in the style of Eastward with a Vietnamese
 > pine-highland flavour: 3/4 top-down view, fronts drawn straight-on
 > facing the viewer (not isometric), soft painterly shading, warm
