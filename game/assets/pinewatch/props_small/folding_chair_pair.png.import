@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d4bllhp0lsg2b"
-path="res://.godot/imported/cooler_box.png-d062e21be61dbb9b80d4010865371ee8.ctex"
+uid="uid://sbp6wycqgduh"
+path="res://.godot/imported/folding_chair_pair.png-81e2b82edda8736c4ee4d9b4040345dd.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/pinewatch/props_medium/cooler_box.png"
-dest_files=["res://.godot/imported/cooler_box.png-d062e21be61dbb9b80d4010865371ee8.ctex"]
+source_file="res://assets/pinewatch/props_small/folding_chair_pair.png"
+dest_files=["res://.godot/imported/folding_chair_pair.png-81e2b82edda8736c4ee4d9b4040345dd.ctex"]
 
 [params]
 

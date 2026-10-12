@@ -93,8 +93,8 @@ const PROPS := [
     ["props_medium", "radio_stump",       370, 258],
     ["props_medium", "log_bench",         256, 262],
     # A-R4 gear cluster by the sage dome: cooler + chair at its mouth
-    ["props_medium", "cooler_box",        238, 244],
-    ["props_medium", "folding_chair_pair", 188, 248, -4.0],
+    ["props_small",  "cooler_box",        240, 246],
+    ["props_small",  "folding_chair_pair", 200, 258, -4.0],
     # ---------- rest corner (E): hammock by the pine, picnic set below
     ["props_large",  "hammock",           566, 150],
     ["props_large",  "picnic_table",      516, 250],
@@ -108,7 +108,7 @@ const PROPS := [
     # spare unlit fire pit near the rest corner (storytelling; the A1b
     # flame loop stays on the shipped ring at the kitchen fire)
     ["props_medium", "fire_ring_unlit_v2", 565, 294],
-    ["props_medium", "propane_stove",     330, 266],
+    ["props_small",  "propane_stove",     300, 264],
     # A-R1 T2 composite: feathery canopy drooping over the pond west edge
     ["props_large",  "tree_feathery",     108, 272],
     # ------- work edge (NE/E): coop, herbs, broom, planter, spirit house

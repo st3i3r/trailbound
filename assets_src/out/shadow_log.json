@@ -459,7 +459,7 @@
  "props_medium/camp_table_fold.png": {
   "ellipse": [
    12,
-   57,
+   41,
    44,
    9
   ],
@@ -473,15 +473,6 @@
    9
   ],
   "shadow_px": 285
- },
- "props_medium/cooler_box.png": {
-  "ellipse": [
-   12,
-   57,
-   44,
-   9
-  ],
-  "shadow_px": 236
  },
  "props_medium/debris_brambles.png": {
   "ellipse": [
@@ -568,15 +559,6 @@
   ],
   "shadow_px": 192
  },
- "props_medium/folding_chair_pair.png": {
-  "ellipse": [
-   16,
-   58,
-   35,
-   7
-  ],
-  "shadow_px": 158
- },
  "props_medium/lantern_post.png": {
   "ellipse": [
    25,
@@ -649,15 +631,6 @@
   ],
   "shadow_px": 231
  },
- "props_medium/propane_stove.png": {
-  "ellipse": [
-   12,
-   57,
-   43,
-   9
-  ],
-  "shadow_px": 228
- },
  "props_medium/radio_stump.png": {
   "ellipse": [
    18,
@@ -713,8 +686,6 @@
   ],
   "shadow_px": 188
  },
- "props_medium/tent_green.png": "has_soft_shadow",
- "props_medium/tent_red.png": "has_soft_shadow",
  "props_medium/tripod_cauldron.png": {
   "ellipse": [
    17,
@@ -1210,6 +1181,15 @@
   ],
   "shadow_px": 35
  },
+ "props_small/cooler_box.png": {
+  "ellipse": [
+   10,
+   35,
+   27,
+   5
+  ],
+  "shadow_px": 96
+ },
  "props_small/dried_fish_rack.png": {
   "ellipse": [
    8,
@@ -1236,6 +1216,15 @@
    7
   ],
   "shadow_px": 134
+ },
+ "props_small/folding_chair_pair.png": {
+  "ellipse": [
+   14,
+   39,
+   23,
+   5
+  ],
+  "shadow_px": 85
  },
  "props_small/grass_tussock.png": "has_soft_shadow",
  "props_small/lantern_post_small.png": {
@@ -1274,6 +1263,15 @@
   ],
   "shadow_px": 32
  },
+ "props_small/propane_stove.png": {
+  "ellipse": [
+   10,
+   35,
+   26,
+   5
+  ],
+  "shadow_px": 93
+ },
  "props_small/rock_mossy_s.png": {
   "ellipse": [
    9,
@@ -1304,12 +1302,12 @@
  },
  "props_small/solar_lantern.png": {
   "ellipse": [
-   19,
-   44,
-   13,
+   12,
+   28,
+   10,
    3
   ],
-  "shadow_px": 27
+  "shadow_px": 19
  },
  "props_small/spirit_house.png": {
   "ellipse": [

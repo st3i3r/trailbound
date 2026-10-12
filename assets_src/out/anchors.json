@@ -2410,13 +2410,13 @@
  },
  "props_medium/camp_table_fold.png": {
   "anchor_x": 32,
-  "anchor_y": 63,
+  "anchor_y": 47,
   "anchor": "bottom-center",
   "content": [
    1,
-   17,
+   1,
    63,
-   63
+   47
   ]
  },
  "props_medium/chicken_coop.png": {
@@ -2428,17 +2428,6 @@
    3,
    62,
    61
-  ]
- },
- "props_medium/cooler_box.png": {
-  "anchor_x": 32,
-  "anchor_y": 63,
-  "anchor": "bottom-center",
-  "content": [
-   1,
-   1,
-   63,
-   63
   ]
  },
  "props_medium/debris_brambles.png": {
@@ -2584,17 +2573,6 @@
    56
   ]
  },
- "props_medium/folding_chair_pair.png": {
-  "anchor_x": 32,
-  "anchor_y": 63,
-  "anchor": "bottom-center",
-  "content": [
-   7,
-   1,
-   56,
-   63
-  ]
- },
  "props_medium/lantern_post.png": {
   "anchor_x": 34,
   "anchor_y": 59,
@@ -2683,17 +2661,6 @@
    63
   ]
  },
- "props_medium/propane_stove.png": {
-  "anchor_x": 32,
-  "anchor_y": 63,
-  "anchor": "bottom-center",
-  "content": [
-   2,
-   1,
-   62,
-   63
-  ]
- },
  "props_medium/radio_stump.png": {
   "anchor_x": 32,
   "anchor_y": 55,
@@ -2769,28 +2736,6 @@
    17,
    57,
    57
-  ]
- },
- "props_medium/tent_green.png": {
-  "anchor_x": 47,
-  "anchor_y": 64,
-  "anchor": "bottom-center",
-  "content": [
-   2,
-   0,
-   92,
-   64
-  ]
- },
- "props_medium/tent_red.png": {
-  "anchor_x": 48,
-  "anchor_y": 64,
-  "anchor": "bottom-center",
-  "content": [
-   3,
-   0,
-   94,
-   64
   ]
  },
  "props_medium/tripod_cauldron.png": {
@@ -3398,6 +3343,17 @@
    30
   ]
  },
+ "props_small/cooler_box.png": {
+  "anchor_x": 22,
+  "anchor_y": 39,
+  "anchor": "bottom-center",
+  "content": [
+   3,
+   1,
+   41,
+   39
+  ]
+ },
  "props_small/dried_fish_rack.png": {
   "anchor_x": 16,
   "anchor_y": 30,
@@ -3429,6 +3385,17 @@
    1,
    45,
    47
+  ]
+ },
+ "props_small/folding_chair_pair.png": {
+  "anchor_x": 24,
+  "anchor_y": 43,
+  "anchor": "bottom-center",
+  "content": [
+   7,
+   1,
+   40,
+   43
   ]
  },
  "props_small/grass_tussock.png": {
@@ -3486,6 +3453,17 @@
    25
   ]
  },
+ "props_small/propane_stove.png": {
+  "anchor_x": 22,
+  "anchor_y": 39,
+  "anchor": "bottom-center",
+  "content": [
+   3,
+   1,
+   40,
+   39
+  ]
+ },
  "props_small/rock_mossy_s.png": {
   "anchor_x": 24,
   "anchor_y": 47,
@@ -3531,14 +3509,14 @@
   ]
  },
  "props_small/solar_lantern.png": {
-  "anchor_x": 24,
-  "anchor_y": 47,
+  "anchor_x": 16,
+  "anchor_y": 31,
   "anchor": "bottom-center",
   "content": [
-   14,
+   9,
    1,
-   33,
-   47
+   22,
+   31
   ]
  },
  "props_small/spirit_house.png": {
