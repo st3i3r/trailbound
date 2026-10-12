@@ -43,22 +43,21 @@ def fill(h, w, top, bot):
     return a
 
 
-def notch_mask(h, w, n):
-    """Micro corner notches — a 2,1 staircase, n px deep."""
-    m = np.ones((h, w), bool)
-    for i in range(n):
-        for j in range(n - i):
-            m[i, j] = False
-            m[i, w - 1 - j] = False
-            m[h - 1 - i, j] = False
-            m[h - 1 - i, w - 1 - j] = False
+def rr_mask(h, w, r):
+    """Rounded-rect mask — smooth pixel corners, radius r.  The frame
+    then follows the arc at a consistent 1 px (v4: rounder + even)."""
+    yy, xx = np.mgrid[0:h, 0:w]
+    m = ((xx >= r) & (xx <= w - 1 - r)) | ((yy >= r) & (yy <= h - 1 - r))
+    for cx, cy in [(r, r), (w - 1 - r, r),
+                   (r, h - 1 - r), (w - 1 - r, h - 1 - r)]:
+        m |= ((xx - cx) ** 2 + (yy - cy) ** 2) <= r * r
     return m
 
 
-def hairline(h, w, n, col, alpha=255):
-    """1 px frame following the notch cut; alpha<255 = recessed line."""
+def hairline(h, w, r, col, alpha=255):
+    """Consistent 1 px frame following the rounded corner."""
     f = np.zeros((h, w), bool)
-    m = notch_mask(h, w, n)
+    m = rr_mask(h, w, r)
     for y in range(h):
         for x in range(w):
             if not m[y, x]:
@@ -68,30 +67,29 @@ def hairline(h, w, n, col, alpha=255):
                     or not m[y, x - 1] or not m[y, x + 1]):
                 f[y, x] = True
     out = np.zeros((h, w, 4), np.uint8)
-    c = (col[0], col[1], col[2], alpha)
-    out[f] = c
+    out[f] = (col[0], col[1], col[2], alpha)
     return out
 
 
-def surface(w, h, top, bot, ncol=2, line=LINE):
-    """Base glass surface: flat fill, hairline frame, micro notches,
-    whisper sheen under the top edge."""
+def surface(w, h, top, bot, r=4, line=LINE):
+    """Base glass surface: flat fill, consistent hairline frame on a
+    rounded corner, whisper sheen under the top edge."""
     a = fill(h, w, top, bot)
-    a[~notch_mask(h, w, ncol)] = 0
-    f = hairline(h, w, ncol, line)
+    a[~rr_mask(h, w, r)] = 0
+    f = hairline(h, w, r, line)
     a[f[..., 3] > 0] = f[f[..., 3] > 0]
-    for x in range(ncol + 2, w - ncol - 2):      # sheen, inside frame
+    for x in range(r + 2, w - r - 2):            # sheen, inside frame
         if a[2, x, 3] > 0:
             a[2, x] = SHEEN
     return a
 
 
 def button(w, h, top, bot, outer=LINE, inner=None):
-    """Button: hairline outer + recessed inner line 2px in (§2.1
-    double-line).  inner=None -> 40%-alpha of outer."""
+    """Button: rounded hairline outer + recessed inner line 2px in
+    (§2.1 double-line).  inner=None -> 40%-alpha of outer."""
     a = fill(h, w, top, bot)
-    a[~notch_mask(h, w, 2)] = 0
-    f = hairline(h, w, 2, outer)
+    a[~rr_mask(h, w, 4)] = 0
+    f = hairline(h, w, 4, outer)
     a[f[..., 3] > 0] = f[f[..., 3] > 0]
     icol = inner if inner else (outer[0], outer[1], outer[2], 102)
     g = 3                                        # inner line at px 3
@@ -131,9 +129,9 @@ def capsule(w, h, top, bot, line=LINE):
 
 
 def sel_glow(s=32):
-    """Selection: 1 px glow ring + faint outer halo, micro notches."""
+    """Selection: rounded 1 px glow ring + faint outer halo."""
     a = np.zeros((s, s, 4), np.uint8)
-    m = notch_mask(s, s, 3)
+    m = rr_mask(s, s, 5)
     ring = np.zeros((s, s), bool)
     ring[2:-2, 2:-2] = m[2:-2, 2:-2]
     ring[3:-3, 3:-3] = False
@@ -155,8 +153,8 @@ def halftone(pitch=3):
 def seal(s=20):
     """Vermilion seal chip — the one place solid lacquer red speaks."""
     a = fill(s, s, (190, 52, 43, 255), (140, 34, 28, 255))
-    a[~notch_mask(s, s, 2)] = 0
-    f = hairline(s, s, 2, (222, 226, 194, 255))
+    a[~rr_mask(s, s, 3)] = 0
+    f = hairline(s, s, 3, (222, 226, 194, 255))
     a[f[..., 3] > 0] = f[f[..., 3] > 0]
     return a
 
@@ -165,7 +163,7 @@ def seal(s=20):
 pieces = {
     "glass_panel": surface(48, 48, GLASS, GLASS_LO),
     "glass_chip": surface(24, 24, (16, 24, 21, 232), (22, 30, 26, 232),
-                          2, LINE_DIM),
+                          3, LINE),
     "glass_pill": capsule(40, 20, GLASS, GLASS_LO),
     # buttons: all dark glass — intent reads via the inner line only:
     # neutral sage, safe green, primary vermilion.  No gold chrome.
