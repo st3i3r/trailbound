@@ -304,6 +304,17 @@ read "big and empty" even with good anchors.
 - Small items: 1–3% frame width each, 4–6 per anchor's footprint
 - Pixel budget: every object carries internal detail per Craft spec
 
+*Mobile SOTA check (2026-10-12): base-res + character-share benchmarked
+against shipped peers — Eastward renders at 360p (Pixpil patch notes +
+Steam teardown), Stardew/Terraria ship 16px tiles with pinch/button
+zoom, Kairosoft's keitai engine ran 240×135–240×240, Into the Breach's
+Netflix port chose 64px tiles for board legibility, and the pixeli
+proportion rules put characters at ~10–16% of screen height for
+top-down. Our 640×360 / 32px-tile / 43px-figure (12%) spec sits inside
+that band — the scale spec is validated, not the current oversized
+warden sprite. 24px tiles would move toward the open-world density
+branch (needs zoom to compensate) — wrong branch for a fixed board.*
+
 ### Pinewatch gap list (what the restructure must deliver)
 
 - [ ] Real spine: trailhead (bottom) → road → fire hub → branches to

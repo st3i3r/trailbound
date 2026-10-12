@@ -211,6 +211,7 @@ QA and the content lint remain open.*
 | UI-040 | New-mechanic surfaces: Clear hold-ring + debris pull, Music Night sheet with star-delta preview, trailhead queue cue, tier-up reveal |
 | UI-041 | Designed empty / loading / error / first-run states for every panel |
 | UI-042 | Cinematic letterbox for night vignettes and story beats |
+| UI-043 | Display/world zoom — the one SOTA gap vs mobile peers (Stardew pinch, Terraria ± buttons, Kairosoft pinch all ship a zoom control). A fixed one-screen board can't zoom in without cropping the puzzle, so the honest form is: **(a)** UI/text-scale steps in Settings (§17.4 already has text size), **(b)** pinch-zoom + camera pan reserved for any future site larger than the viewport (the pan-capable-site option). Done when: Settings exposes only pixel-safe scale steps; no fractional world scale ever ships |
 
 ### P4 — platform (GDD Phase 5)
 
