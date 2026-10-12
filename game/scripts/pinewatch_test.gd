@@ -199,6 +199,7 @@ var night_rating := ""
 var _press := {}                             # pending card press {gid, pos}
 var _drag_ghost: Sprite2D                    # sprite following a card drag
 var _trait_names := {}                       # tid -> name (lazy)
+var guest_bubbles := {}                      # gid -> trait-state marker token
 
 var _tex_cache := {}
 
@@ -308,19 +309,28 @@ func _ready() -> void:
         hud_layer.visible = false
         markers.visible = false
         pads_node.visible = false
-    # --pose: QA screenshot staging — selects the first guest and
-    # hovers its first open pad so the strip + previews are visible
+    # --pose: QA screenshot staging — seats the first guest (trait
+    # bubble visible), selects the second and hovers a pad (strip +
+    # star previews visible)
     if OS.get_cmdline_args().has("--pose"):
         var st0: Dictionary = Game.site_state()
-        if not st0["board"].is_empty():
-            _select(st0["board"][0]["id"])
+        var b0: Array = st0["board"]
+        if not b0.is_empty():
             for pid0 in pad_cells:
                 if st0["pads"][pid0].get("open", false) \
                         and not _pad_occupied(pid0):
-                    _update_strip(pad_cells[pid0].get_center())
-                    hover.position = pad_cells[pid0].position
-                    hover.visible = true
+                    selected = b0[0]["id"]
+                    _try_seat(pid0)
                     break
+            if b0.size() > 1:
+                _select(b0[1]["id"])
+                for pid0 in pad_cells:
+                    if st0["pads"][pid0].get("open", false) \
+                            and not _pad_occupied(pid0):
+                        _update_strip(pad_cells[pid0].get_center())
+                        hover.position = pad_cells[pid0].position
+                        hover.visible = true
+                        break
     var shot_arg := ""
     for a in OS.get_cmdline_args():
         if a.begins_with("--shot="):
@@ -792,12 +802,15 @@ func _smoke() -> void:
             pid0 = pid
             break
     _try_seat(pid0)
+    await get_tree().process_frame
     print("SMOKE seat:", st["assignments"].has(g0),
-          " card dimmed:", hud.tray.is_seated(g0))
+          " card dimmed:", hud.tray.is_seated(g0),
+          " bubble:", guest_bubbles.has(g0))
     _do_unseat(g0)
     print("SMOKE unseat:",
           not Game.site_state()["assignments"].has(g0),
-          " card restored:", not hud.tray.is_seated(g0))
+          " card restored:", not hud.tray.is_seated(g0),
+          " bubble freed:", not guest_bubbles.has(g0))
     _tap_card(g0)
     _tap_card(g0)
     print("SMOKE toggle-deselect:", selected == "")
@@ -850,6 +863,7 @@ func _spawn_board() -> void:
     if _drag_ghost != null:
         _drag_ghost.queue_free()
         _drag_ghost = null
+    _clear_bubbles()
     hud.tray.visible = true
     hud.tray.build(st["board"], _trait_map(), _card_sprite)
     evening_open = true
@@ -881,6 +895,7 @@ func _seat_visual(gid: String, pads: Array) -> void:
         world.add_child(t)
         tent_nodes[gid].append(t)
     hud.tray.mark_seated(gid)
+    _refresh_bubbles()
     _sync_marks()
 
 
@@ -891,8 +906,91 @@ func _unseat_visual(gid: String) -> void:
     for t in tent_nodes.get(gid, []):
         t.queue_free()
     tent_nodes[gid] = []
+    if guest_bubbles.has(gid):
+        markers.release(guest_bubbles[gid])
+        guest_bubbles.erase(gid)
     hud.tray.mark_unseated(gid)
+    _refresh_bubbles()
     _sync_marks()
+
+
+## UI-021: trait-state bubbles over seated guests.  Every trait gets a
+## state glyph — "+" met, "−" tripped, "·" unresolved — never colour
+## alone; the same sign vocabulary the breakdown strip uses before
+## seating.  States come from the real resolve_guest detail, and every
+## seat/unseat re-evaluates ALL seated guests because neighbour effects
+## move other people's states (social fills, loud trips light_sleeper).
+func _bubble_state(d: Dictionary) -> Dictionary:
+    if d.get("tripped", false):
+        return {"sign": "−", "color": UITokens.RED}
+    if d.get("met", false):
+        return {"sign": "+", "color": UITokens.GREEN}
+    return {"sign": "·", "color": UITokens.DIM}
+
+
+func _refresh_bubbles() -> void:
+    var st: Dictionary = Game.site_state()
+    for gid in st["assignments"]:
+        var r := Game.preview(gid, st["assignments"][gid])
+        if r.is_empty():
+            continue
+        var control: Control = null
+        if guest_bubbles.has(gid):
+            control = markers.marker_control(guest_bubbles[gid])
+            if not is_instance_valid(control):
+                control = null
+        if control == null:
+            var g: Node2D = guest_nodes.get(gid)
+            if g == null:
+                continue
+            var anchor := Node2D.new()
+            anchor.position = Vector2(0, -80)   # above the sprite's head
+            g.add_child(anchor)
+            guest_bubbles[gid] = markers.marker(anchor,
+                Vector2(-40, 0))
+            control = markers.marker_control(guest_bubbles[gid])
+        _fill_bubble(control, r["detail"])
+
+
+## Rebuild one bubble's chips: trait icons in a slot-dark tag, each
+## carrying its state sign on the lower edge.
+func _fill_bubble(control: Control, detail: Array) -> void:
+    for c in control.get_children():
+        c.queue_free()
+    var w := detail.size() * 18 + 10
+    var p := Panel.new()
+    p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    p.add_theme_stylebox_override("panel",
+        UIKit.state_nine("slot_dark", {}, 0.92))
+    p.position = Vector2(40 - w / 2.0, 0)        # centred on the anchor
+    p.size = Vector2(w, 22)
+    control.add_child(p)
+    var x := 5
+    for d in detail:
+        var st := _bubble_state(d)
+        var chip := Control.new()
+        chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+        chip.position = Vector2(x, 3)
+        chip.size = Vector2(16, 16)
+        var t := TextureRect.new()
+        t.texture = UIKit.trait_icon(String(d.get("trait", "")))
+        t.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+        t.stretch_mode = TextureRect.STRETCH_KEEP
+        if st["sign"] == "·":
+            t.modulate = Color(1, 1, 1, 0.65)  # unresolved dims back
+        chip.add_child(t)
+        var l := UIKit.label_for(st["sign"], UITokens.TypeRole.HEAD,
+            st["color"])
+        l.position = Vector2(9, 5)
+        chip.add_child(l)
+        p.add_child(chip)
+        x += 18
+
+
+func _clear_bubbles() -> void:
+    for tok in guest_bubbles.values():
+        markers.release(tok)
+    guest_bubbles = {}
 
 
 ## Selection is the tap-tap path (UI-020): card tap -> previews +
@@ -1075,6 +1173,7 @@ func _goodnight() -> void:
     evening_open = false
     Game.set_phase(Game.Phase.NIGHT)
     _deselect()
+    _clear_bubbles()
     hud.tray.reset()
     hud.tray.visible = false
     _status()
