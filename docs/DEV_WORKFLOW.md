@@ -141,9 +141,25 @@ which should show the map centred on the dark clear colour, not grey).
 `--smoke` is the headless UI assertion pass (Back → quit-confirm →
 close, fire-proximity bubble) — run it after touching `game/ui/`.
 `--dev-ui` opts the scene into dev labels (off by default so `--shot`
-stays clean). Compare against
-`assets_src/cleanup/pinewatch_comp_v3.png` — the scene's layout
+stays clean). `--bare` strips HUD + markers + pad/tray overlays — pure
+world art; the title vista is captured with
+`--bare --shot=res://assets/pinewatch/ui/title_vista.png`. Compare
+against `assets_src/cleanup/pinewatch_comp_v3.png` — the scene's layout
 authority is `tools/scene_comp_v2.py`.
+
+App shell (the real boot path — `run/main_scene` is `title.tscn`):
+
+```bat
+godot.cmd --path game                              :: title -> veil -> camp
+godot.cmd --path game res://scenes/title.tscn --shot   :: title screen shot
+godot.cmd --headless --path game res://scenes/title.tscn --smoke  :: routes to camp, camp smoke runs
+```
+
+`Transition` autoload owns the scene-change veil (deep-forest fade,
+input-locked while opaque); each scene calls `Transition.reveal()`
+when built, shots/smokes call `Transition.snap_reveal()`. Continue
+gates on `Save.has_save()`; Back on Title quits (confirm sheet is
+Camp-only).
 
 Art pipeline (style-locked — `assets_src/prompts/style_lock.md`):
 `generate → tools/tb_grade.py --site X → palette-snap (dE>30) → stage →

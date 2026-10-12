@@ -16,6 +16,7 @@ signal stack_changed
 
 var _stack: Array[Control] = []
 var _dimmer: ColorRect
+var _prev_focus: Control                   # focus owner to restore on pop
 
 
 func _init() -> void:
@@ -33,6 +34,11 @@ func _ready() -> void:
         func(): _dimmer.size = get_viewport().get_visible_rect().size)
     _dimmer.visible = false
     _dimmer.mouse_filter = Control.MOUSE_FILTER_STOP
+    # §17.6: a tap on the scrim dismisses the top sheet
+    _dimmer.gui_input.connect(func(e: InputEvent) -> void:
+        if e is InputEventMouseButton and e.pressed \
+                and e.button_index == MOUSE_BUTTON_LEFT:
+            close())
     add_child(_dimmer)
     # keep the dimmer under whatever panel is on top
     move_child(_dimmer, 0)
@@ -43,7 +49,13 @@ func open(panel: Control) -> void:
     _dimmer.mouse_filter = Control.MOUSE_FILTER_STOP
     add_child(panel)                    # after the dimmer: draws above
     _stack.append(panel)
+    panel.theme = UITheme.theme()       # raw children inherit kit styles
     _animate_in(panel, _stack.size() == 1)
+    # UI-016: modal focus — remember the owner, hand the panel's first
+    # focusable button control once it exists on screen
+    var vp := get_viewport()
+    _prev_focus = vp.gui_get_focus_owner()
+    _grab_panel_focus.call_deferred(panel)
     stack_changed.emit()
 
 
@@ -55,7 +67,25 @@ func close() -> void:
     _animate_out(p)
     if _stack.is_empty():
         _animate_dimmer(false)
+    _restore_focus()
     stack_changed.emit()
+
+
+func _grab_panel_focus(p: Control) -> void:
+    if not is_instance_valid(p):
+        return
+    var buttons := p.find_children("", "Button", true, false)
+    if not buttons.is_empty():
+        (buttons[0] as Button).grab_focus()
+
+
+func _restore_focus() -> void:
+    var vp := get_viewport()
+    if is_instance_valid(_prev_focus):
+        _prev_focus.grab_focus()
+    else:
+        vp.gui_release_focus()
+    _prev_focus = null
 
 
 func _animate_in(p: Control, first_panel: bool) -> void:

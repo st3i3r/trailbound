@@ -13,8 +13,9 @@ extends RefCounted
 ## nine_slice insets so the ends stay round at any width.
 const PILL_INS := {"l": 14, "r": 14, "t": 5, "b": 6}
 
-static var _f_head: FontFile
-static var _f_body: FontFile
+static var _f_head: FontFile                 # BeVietnamPro-Medium (heads)
+static var _f_disp: FontFile                 # BeVietnamPro-SemiBold
+static var _f_body: FontFile                 # BeVietnamPro-Regular
 static var _ui_meta := {}
 static var _icons := {}                       # semantic name -> "I1_n"
 static var _tex_cache := {}
@@ -24,12 +25,12 @@ static var _ready := false
 static func _ensure() -> void:
     if _ready:
         return
-    _f_head = load(UITokens.FONTS + "F1_1.ttf")
     _f_body = load(UITokens.FONTS + "BeVietnamPro-Regular.ttf")
-    # F1 is ASCII-only: Be Vietnam Pro catches · — “” etc; the engine
-    # fallback covers whatever both fonts lack.
-    _f_head.fallbacks.append(_f_body)
+    _f_head = load(UITokens.FONTS + "BeVietnamPro-Medium.ttf")
+    _f_disp = load(UITokens.FONTS + "BeVietnamPro-SemiBold.ttf")
     _f_body.fallbacks.append(ThemeDB.fallback_font)
+    _f_head.fallbacks.append(_f_body)
+    _f_disp.fallbacks.append(_f_head)
     _ui_meta = JSON.parse_string(FileAccess.get_file_as_string(
         UITokens.ASSETS + "ui/ui_atlas_meta.json"))
     # semantic icon registry (data/icons.json): flatten the category
@@ -78,7 +79,10 @@ static func font_body() -> Font:
 
 static func font_for(role: UITokens.TypeRole) -> Font:
     _ensure()
-    return _f_head if UITokens.TYPE[role]["font"] == "head" else _f_body
+    match UITokens.TYPE[role]["font"]:
+        "semi": return _f_disp
+        "med":  return _f_head
+        _:      return _f_body
 
 
 static func type_size(role: UITokens.TypeRole) -> int:
@@ -189,6 +193,21 @@ static func pill(parent: Control, where: Variant, icon: String,
     return l
 
 
+static func pill_fit(l: Label) -> void:
+    ## Re-measure a pill()'s text and grow its parent to fit — pills are
+    ## created with "" or short text and set later, so width can't be
+    ## known at build time.  Grow-only: never shrinks (containers would
+    ## jitter); the label's left offset already accounts for the icon.
+    _ensure()
+    var p: Control = l.get_parent()
+    var f := l.get_theme_font("font")
+    var tw: float = f.get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT,
+        -1.0, l.get_theme_font_size("font_size")).x
+    var need: float = l.position.x + tw + 14.0
+    p.size.x = maxf(need, p.size.x)
+    p.custom_minimum_size.x = p.size.x
+
+
 static func panel(parent: Control, where: Variant, piece: String,
                   ins := {}, h_flag := Control.SIZE_SHRINK_BEGIN) -> Panel:
     ## Generic nine-slice panel (bubble_prompt, card_guest, panel_window…)
@@ -200,19 +219,6 @@ static func panel(parent: Control, where: Variant, piece: String,
     return p
 
 
-static func button(parent: Control, where: Variant,
-                   h_flag := Control.SIZE_SHRINK_BEGIN) -> Panel:
-    ## Pill-chrome interactive button — same look as pill() but eats
-    ## clicks; connect its gui_input (or wrap the press in a signal).
-    var p := Panel.new()
-    _place(p, where, h_flag)
-    p.add_theme_stylebox_override("panel",
-        nine("hud_banner_flat", PILL_INS))
-    p.mouse_filter = Control.MOUSE_FILTER_STOP
-    parent.add_child(p)
-    return p
-
-
 static func spacer(parent: Control, w: float, h := 0.0) -> Control:
     ## Transparent layout shim for container rows (mouse-filtered out).
     var s := Control.new()
@@ -220,3 +226,65 @@ static func spacer(parent: Control, w: float, h := 0.0) -> Control:
     s.mouse_filter = Control.MOUSE_FILTER_IGNORE
     parent.add_child(s)
     return s
+
+
+# ------------------------------------------------------------- buttons
+## Real Button nodes with the five interactive states (UI-008): the
+## atlas already ships the art — pill chrome for neutral, green for
+## safe/ok, gold for primary, round_gold for icon-only controls, and a
+## dedicated disabled piece.  Hover/pressed reuse the same nine-slice
+## tinted (a press is a darkening dip, not a new piece).
+const BTN_KINDS := {
+    "pill":  "hud_banner_flat",
+    "green": "btn_green",
+    "gold":  "btn_gold",
+    "round": "btn_round_gold",
+}
+
+static func state_nine(piece: String, ins := {}, mod := 1.0) -> StyleBoxTexture:
+    ## nine() + a brightness multiplier — cheap hover/pressed variants.
+    var sb := nine(piece, ins)
+    sb.modulate_color = Color(mod, mod, mod)
+    return sb
+
+
+static func focus_box() -> StyleBoxFlat:
+    ## 1px gold focus ring — drawn over the control when a gamepad /
+    ## keyboard owns it, invisible otherwise (mouse focus shows hover).
+    var sb := StyleBoxFlat.new()
+    sb.draw_center = false
+    sb.border_color = UITokens.GOLD
+    sb.set_border_width_all(1)
+    sb.corner_radius_top_left = 10
+    sb.corner_radius_top_right = 10
+    sb.corner_radius_bottom_left = 10
+    sb.corner_radius_bottom_right = 10
+    return sb
+
+
+static func btn(parent: Control, where: Variant, text: String,
+                kind := "pill",
+                h_flag := Control.SIZE_SHRINK_BEGIN) -> Button:
+    _ensure()
+    var piece: String = BTN_KINDS.get(kind, kind)
+    var ins: Dictionary = PILL_INS if piece == "hud_banner_flat" else {}
+    var b := Button.new()
+    _place(b, where, h_flag)
+    b.text = text
+    b.focus_mode = Control.FOCUS_ALL
+    b.mouse_filter = Control.MOUSE_FILTER_STOP
+    b.add_theme_font_override("font",
+        font_for(UITokens.TypeRole.HEAD))
+    b.add_theme_font_size_override("font_size",
+        type_size(UITokens.TypeRole.HEAD))
+    for c in ["font_color", "font_hover_color", "font_pressed_color",
+              "font_focus_color"]:
+        b.add_theme_color_override(c, UITokens.INK)
+    b.add_theme_color_override("font_disabled_color", UITokens.DIM)
+    b.add_theme_stylebox_override("normal", nine(piece, ins))
+    b.add_theme_stylebox_override("hover", state_nine(piece, ins, 1.1))
+    b.add_theme_stylebox_override("pressed", state_nine(piece, ins, 0.8))
+    b.add_theme_stylebox_override("disabled", nine("btn_disabled"))
+    b.add_theme_stylebox_override("focus", focus_box())
+    parent.add_child(b)
+    return b

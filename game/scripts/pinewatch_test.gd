@@ -181,6 +181,7 @@ var tray: Node2D
 var marks: Node2D                            # hover + star previews above world
 var hover: Sprite2D
 var hud: HUD                                 # chrome root (fades when idle)
+var hud_layer: CanvasLayer                   # HUD tier (hidden by --bare)
 var panel_mgr: PanelManager                  # modal panel stack (PANEL tier)
 var markers: WorldMarkers                    # floating world markers layer
 var hud_tween: Tween
@@ -291,18 +292,30 @@ func _ready() -> void:
     marks.add_child(hover)
     _build_ui()
     Game.advance_day()
+    Game.set_phase(Game.Phase.EVENING)
     _spawn_board()
     _status()
+    Transition.reveal()
     if OS.get_cmdline_args().has("--smoke"):
+        Transition.snap_reveal()
         _smoke()
         return
     # capture engine render for pipeline review (test scene only);
-    # --shot writes the canonical graded shot, --shot=PATH elsewhere
+    # --shot writes the canonical graded shot, --shot=PATH elsewhere;
+    # --bare strips chrome+markers+gameplay overlays entirely — pure
+    # world art for the title vista (pad rings and tray cards are UI,
+    # not scenery)
+    if OS.get_cmdline_args().has("--bare"):
+        hud_layer.visible = false
+        markers.visible = false
+        pads_node.visible = false
+        tray.visible = false
     var shot_arg := ""
     for a in OS.get_cmdline_args():
         if a.begins_with("--shot="):
             shot_arg = a.get_slice("=", 1)
     if shot_arg != "" or OS.get_cmdline_args().has("--shot"):
+        Transition.snap_reveal()
         await get_tree().process_frame
         await get_tree().process_frame
         var img := get_viewport().get_texture().get_image()
@@ -632,7 +645,7 @@ func _build_ui() -> void:
     markers.name = "Markers"
     add_child(markers)
 
-    var hud_layer := CanvasLayer.new()
+    hud_layer = CanvasLayer.new()
     hud_layer.name = "HUD"
     hud_layer.layer = UITokens.Tier.HUD
     add_child(hud_layer)
@@ -720,26 +733,13 @@ func _quit_dialog() -> Control:
     l.offset_top = 18
     l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     p.add_child(l)
-    _dialog_button(p, Rect2(14, 48, 74, UITokens.MIN_TOUCH),
-        tr("quit_stay"), panel_mgr.close)
-    _dialog_button(p, Rect2(100, 48, 74, UITokens.MIN_TOUCH),
-        tr("quit_leave"), get_tree().quit)
+    var stay := UIKit.btn(p, Rect2(14, 48, 74, UITokens.MIN_TOUCH),
+        tr("quit_stay"), "green")
+    stay.pressed.connect(panel_mgr.close)
+    var leave := UIKit.btn(p, Rect2(100, 48, 74, UITokens.MIN_TOUCH),
+        tr("quit_leave"))
+    leave.pressed.connect(get_tree().quit)
     return p
-
-
-func _dialog_button(p: Control, r: Rect2, text: String,
-                    on_press: Callable) -> Panel:
-    var b := UIKit.button(p, r)
-    var l := UIKit.label_for(text, UITokens.TypeRole.HEAD, UITokens.INK)
-    l.set_anchors_preset(Control.PRESET_FULL_RECT)
-    l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-    b.add_child(l)
-    b.gui_input.connect(func(e: InputEvent) -> void:
-        if e is InputEventMouseButton and e.pressed \
-                and e.button_index == MOUSE_BUTTON_LEFT:
-            on_press.call())
-    return b
 
 
 ## Headless smoke (godot --headless --path game <scene> --smoke):
@@ -949,6 +949,7 @@ func _goodnight() -> void:
             rep["income"]])
     night_rating = "%.1f" % rep["rating"]
     evening_open = false
+    Game.set_phase(Game.Phase.NIGHT)
     _clear_previews()
     _status()
 
@@ -959,6 +960,9 @@ func _advance_phase() -> void:
     else:
         hud.set_report("")
         Game.advance_day()
+        # the scene skips Morning/Prep interaction for now — the board
+        # spawns straight into Evening so the phase machine stays true
+        Game.set_phase(Game.Phase.EVENING)
         _spawn_board()
         _status()
 

@@ -16,8 +16,9 @@ signal phase_pressed
 var coins_label: Label
 var day_label: Label
 var rating_label: Label
-var phase_button: Panel
-var phase_label: Label
+var phase_button: Button
+var _tl: VBoxContainer
+var _tr: VBoxContainer
 # debug-gated (null when UITokens.debug_ui() is false)
 var dev_label: Label
 var report_label: Label
@@ -25,73 +26,90 @@ var status_label: Label
 
 
 func _ready() -> void:
+    theme = UITheme.theme()
     # a Control under a CanvasLayer gets no parent area — anchors can't
     # resolve — so the root sizes itself from the viewport outright
     # (children may then anchor against it normally)
     size = get_viewport_rect().size
-    get_viewport().size_changed.connect(
-        func(): size = get_viewport_rect().size)
+    get_viewport().size_changed.connect(_on_viewport_resized)
     mouse_filter = Control.MOUSE_FILTER_IGNORE
     _build()
+    _apply_insets()
+
+
+func _on_viewport_resized() -> void:
+    size = get_viewport_rect().size
+    _apply_insets()
+
+
+## Notch/punch-hole insets — keep chrome inside the display safe area
+## (UI-015; zero on desktop).  Edge stacks shift by the matching inset.
+func _apply_insets() -> void:
+    var ins := UITokens.safe_insets(size)
+    if _tl:
+        _tl.position = Vector2(UITokens.MARGIN + ins["l"],
+            6 + ins["t"])
+    if _tr:
+        _tr.offset_left = -(UITokens.MARGIN + ins["r"] + 74)
+        _tr.offset_right = -(UITokens.MARGIN + ins["r"])
+        _tr.offset_top = 6 + ins["t"]
+    if phase_button:
+        phase_button.offset_left = -(UITokens.MIN_TOUCH + 48 \
+            + 10 + ins["r"])
+        phase_button.offset_top = -(UITokens.MIN_TOUCH \
+            + 10 + ins["b"])
+        phase_button.offset_right = -(10 + ins["r"])
+        phase_button.offset_bottom = -(10 + ins["b"])
 
 
 func _build() -> void:
     # --------------------------------- top-left: coins + day/weather
     # VBox stack — left edge on MARGIN, 6px top, SP1 row separation.
-    var tl := VBoxContainer.new()
-    tl.name = "StatusStack"
-    tl.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    tl.position = Vector2(UITokens.MARGIN, 6)
-    tl.size = Vector2(96, 44)
-    tl.add_theme_constant_override("separation", UITokens.SP1)
-    add_child(tl)
-    coins_label = UIKit.pill(tl, Vector2(78, 20), "coin", "")
-    day_label = UIKit.pill(tl, Vector2(96, 20), "clear", "")
+    _tl = VBoxContainer.new()
+    _tl.name = "StatusStack"
+    _tl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    _tl.position = Vector2(UITokens.MARGIN, 6)
+    _tl.size = Vector2(96, 44)
+    _tl.add_theme_constant_override("separation", UITokens.SP1)
+    add_child(_tl)
+    coins_label = UIKit.pill(_tl, Vector2(78, 20), "coin", "")
+    day_label = UIKit.pill(_tl, Vector2(96, 20), "clear", "")
 
     # -------------------------------- top-right: rating + journal badge
     # VBox pinned to the right margin; children shrink-end so their right
     # edges ride the margin.  The journal badge keeps its 4px inset from
     # the margin via a trailing spacer.
-    var tr := VBoxContainer.new()
-    tr.name = "RatingStack"
-    tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    tr.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-    tr.offset_left = -(UITokens.MARGIN + 74)
-    tr.offset_right = -UITokens.MARGIN
-    tr.offset_top = 6
-    tr.offset_bottom = 50
-    tr.add_theme_constant_override("separation", UITokens.SP1)
-    add_child(tr)
-    rating_label = UIKit.pill(tr, Vector2(74, 20), "star_full", "—",
+    _tr = VBoxContainer.new()
+    _tr.name = "RatingStack"
+    _tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    _tr.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+    _tr.offset_left = -(UITokens.MARGIN + 74)
+    _tr.offset_right = -UITokens.MARGIN
+    _tr.offset_top = 6
+    _tr.offset_bottom = 50
+    _tr.add_theme_constant_override("separation", UITokens.SP1)
+    add_child(_tr)
+    rating_label = UIKit.pill(_tr, Vector2(74, 20), "star_full", "—",
         Control.SIZE_SHRINK_END)
     var jrow := HBoxContainer.new()
     jrow.name = "JournalRow"
     jrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
     jrow.alignment = BoxContainer.ALIGNMENT_END
     jrow.add_theme_constant_override("separation", 0)
-    tr.add_child(jrow)
+    _tr.add_child(jrow)
     UIKit.pill(jrow, Vector2(28, 20), "journal", "")
     UIKit.spacer(jrow, UITokens.SP1)
 
     # ---------------- bottom-right: phase button (click = Goodnight)
-    # MIN_TOUCH: 88x40 hit area, label centred inside.
-    phase_button = Panel.new()
+    # MIN_TOUCH: 88x40 hit area, real Button -> pressed/hover/focus
+    # states come free (UI-008).
+    phase_button = UIKit.btn(self, Rect2(0, 0, 0, 0), "", "gold")
     phase_button.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
     phase_button.offset_left = -UITokens.MIN_TOUCH - 48 - 10
     phase_button.offset_top = -UITokens.MIN_TOUCH - 10
     phase_button.offset_right = -10
     phase_button.offset_bottom = -10
-    phase_button.add_theme_stylebox_override("panel",
-        UIKit.nine("hud_banner_flat", UIKit.PILL_INS))
-    phase_button.mouse_filter = Control.MOUSE_FILTER_STOP
-    phase_button.gui_input.connect(_on_phase_gui_input)
-    add_child(phase_button)
-    phase_label = UIKit.label_for("EVENING", UITokens.TypeRole.HEAD,
-        UITokens.INK)
-    phase_label.set_anchors_preset(Control.PRESET_FULL_RECT)
-    phase_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    phase_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-    phase_button.add_child(phase_label)
+    phase_button.pressed.connect(func(): phase_pressed.emit())
 
     # --------------------------------------------- dev chrome (gated)
     if UITokens.debug_ui():
@@ -99,8 +117,8 @@ func _build() -> void:
         dev_label = UIKit.label_for(
             "Hồ Chào Mào — phở, đá cầu, nón lá, bánh mì",
             UITokens.TypeRole.BODY)
-        tl.add_child(dev_label)
-        tl.size.y += UITokens.SP1 + 13
+        _tl.add_child(dev_label)
+        _tl.size.y += UITokens.SP1 + 13
 
         report_label = UIKit.label_for("", UITokens.TypeRole.BODY)
         report_label.position = Vector2(150, 8)
@@ -113,16 +131,10 @@ func _build() -> void:
         add_child(status_label)
 
 
-func _on_phase_gui_input(event: InputEvent) -> void:
-    if event is InputEventMouseButton and event.pressed \
-            and event.button_index == MOUSE_BUTTON_LEFT:
-        phase_pressed.emit()
-
-
 # ------------------------------------------------------------ setters
 
 func set_phase(text: String) -> void:
-    phase_label.text = text
+    phase_button.text = text
 
 
 func set_rating(text: String) -> void:
@@ -131,6 +143,7 @@ func set_rating(text: String) -> void:
 
 func set_coins(text: String) -> void:
     coins_label.text = text
+    UIKit.pill_fit(coins_label)
 
 
 ## text + weather id ("clear"/"rain"/…) — swaps the pill's icon glyph.
@@ -138,6 +151,7 @@ func set_day(text: String, weather: String) -> void:
     day_label.text = text
     var ico: TextureRect = day_label.get_parent().get_meta("icon")
     ico.texture = UIKit.weather_icon(weather)
+    UIKit.pill_fit(day_label)
 
 
 func set_status(text: String) -> void:

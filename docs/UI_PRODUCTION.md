@@ -142,12 +142,9 @@ when" is the acceptance check.
 ### P0 — fix now (0 gens)
 
 *✓ = landed 2026-10-12 step-0 pass (verified by `--smoke` + shots at
-1920×1080 and 2400×1080). Open inside those rows: safe-area API
-(UI-006), hit-area lint (UI-005), `content` rects in atlas meta
-(UI-002, superseded by pill auto-grow). Landed early: UI-012
-(translations registered, first 11 keys), UI-013 (BVP for all text;
-weights not added), UI-016 (panel in/out transitions + HUD fade on
-`stack_changed`; dimmer-dismiss and focus order still open).*
+1920×1080 and 2400×1080). Open inside those rows: hit-area lint
+(UI-005), `content` rects in atlas meta (UI-002, superseded by pill
+auto-grow).*
 
 | ID | Item | Evidence | Done when |
 |---|---|---|---|
@@ -164,15 +161,29 @@ weights not added), UI-016 (panel in/out transitions + HUD fade on
 | ID | Item | Done when |
 |---|---|---|
 | UI-010 | Rewrite style_lock "Production UI spec" from GDD §17.2 + §3 above; look per D-UI-1 | style_lock lists the 14 GDD screens + new surfaces; removed items gone |
-| UI-011 | `trailbound_theme.tres` generated from tokens, with type variations (PaperPanel, GlassPanel, PillButton, IconButton, TabButton, ListRow, Chip); real `Button`/`TextureButton` states normal/hover/pressed/disabled/focus | No `Panel`+`gui_input` buttons; no per-control style overrides |
-| UI-012 | i18n: every string via `tr()` keys in `en.csv`/`vi.csv`, translations registered, `tr_n` plurals, locale number format; Godot's built-in pseudolocalization on in QA | Content lint: zero hardcoded UI strings; pseudo-locale shots clean |
-| UI-013 | Font path per D-UI-2; a VI pangram renders in every type role | Pangram shot at 1×/2×/3× scale |
-| UI-014 | Phase-aware HUD: Morning / Prep / Evening / Night each own the bottom band (Evening = guest tray) | Four layouts, one per phase |
-| UI-015 | App shell: boot → cold open (first launch) or live camp → title; scene router with mist/smoke wipe; replace the Phase-0 `main.tscn` | `run/main_scene` boots the real flow |
-| UI-016 | PanelManager v2: in/out transitions, tap-dimmer-to-dismiss for sheets, HUD fades on `stack_changed`, focus order; free only after the out-animation | Stack test: open/close/back/animate |
+| UI-011 ✓ | `trailbound_theme.tres` generated from tokens, with type variations (PaperPanel, GlassPanel, PillButton, IconButton, TabButton, ListRow, Chip); real `Button`/`TextureButton` states normal/hover/pressed/disabled/focus | No `Panel`+`gui_input` buttons; no per-control style overrides |
+| UI-012 ~ | i18n: every string via `tr()` keys in `en.csv`/`vi.csv`, translations registered, `tr_n` plurals, locale number format; Godot's built-in pseudolocalization on in QA | Content lint: zero hardcoded UI strings; pseudo-locale shots clean |
+| UI-013 ~ | Font path per D-UI-2; a VI pangram renders in every type role | Pangram shot at 1×/2×/3× scale |
+| UI-014 ~ | Phase-aware HUD: Morning / Prep / Evening / Night each own the bottom band (Evening = guest tray) | Four layouts, one per phase |
+| UI-015 ✓ | App shell: boot → cold open (first launch) or live camp → title; scene router with mist/smoke wipe; replace the Phase-0 `main.tscn` | `run/main_scene` boots the real flow |
+| UI-016 ✓ | PanelManager v2: in/out transitions, tap-dimmer-to-dismiss for sheets, HUD fades on `stack_changed`, focus order; free only after the out-animation | Stack test: open/close/back/animate |
 | UI-017 | Motion + haptics tokens (duration/easing per component; `Input.vibrate_handheld` on press/confirm/pay); reduced-motion honoured | Tokens in `ui_tokens.gd`; setting toggles motion |
 | UI-018 | QA harness (§5.4): UI gallery scene + golden shots; lints for touch target, overflow under pseudo-locale, contrast, icon registry, missing keys | Runs headless; diffs reported |
 | UI-019 | Glass kit, procedural (`tools/tb_ui_kit.py`): glass fill, 1 px line frame + corner notches, band, halftone tile, glow selection, double-line button, chip, sticker-outline pass for icons → Theme (UI-011). Tokens per §8.1 | Every component renders in the gallery at all states |
+
+*P1 landed 2026-10-12 (foundations pass): **UI-011** shipped as a
+code-built `UITheme` — not a `.tres` — so tokens stay the source of
+truth; `UIKit.btn()` returns real Buttons with normal/hover/pressed/
+disabled/focus states (atlas art + modulate dips; named type-variation
+classes still TODO as panels arrive). **UI-015** shipped as
+`title.tscn` + `Transition` autoload (dark-forest veil, not mist);
+Continue gates on `Save.has_save()`; the vista is a `--bare` capture.
+**UI-016** adds tap-dimmer-dismiss + focus grab/restore on push/pop.
+Partial: **UI-013** weights landed (DISPLAY→SemiBold, HEAD→Medium);
+pangram QA open. **UI-014** `Game.set_phase` is now real (EVENING on
+board, NIGHT on Goodnight); per-phase bottom-band layouts still
+scaffold. **UI-012** 18 keys registered EN/VI; `tr_n`, pseudo-locale
+QA and the content lint remain open.*
 
 ### P2 — flagship: the core loop
 

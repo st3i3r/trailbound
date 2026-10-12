@@ -13,7 +13,7 @@ config_version=5
 config/name="Trailbound"
 config/version="0.1.0"
 config/quit_on_go_back=false
-run/main_scene="res://scenes/main.tscn"
+run/main_scene="res://scenes/title.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -28,6 +28,7 @@ Audio="*res://scripts/autoload/audio.gd"
 Analytics="*res://scripts/autoload/analytics.gd"
 Ads="*res://scripts/autoload/ads.gd"
 Platform="*res://scripts/autoload/platform.gd"
+Transition="*res://scripts/autoload/transition.gd"
 
 [display]
 

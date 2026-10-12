@@ -1,8 +1,15 @@
 keys,en,vi
 title,Trailbound,Trailbound
 hud_day,Day,Ngày
+hud_morning,Morning,Buổi sáng
+hud_prep,Prep,Chuẩn bị
 hud_evening,Evening,Buổi tối
 hud_night,Night,Đêm
+title_tag,Your campsite awaits,Khu trại đang chờ bạn
+menu_continue,Continue,Tiếp tục
+menu_new_game,New game,Chơi mới
+menu_settings,Settings,Cài đặt
+menu_exit,Exit,Thoát
 weather_clear,Clear,Trời quang
 weather_rain,Rain,Mưa
 hud_coins_short,%dc,%dc

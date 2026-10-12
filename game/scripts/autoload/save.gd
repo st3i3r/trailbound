@@ -42,6 +42,13 @@ func save_state(state: Dictionary) -> void:
 	DirAccess.rename_absolute(SAVE_PATH + ".tmp", SAVE_PATH)
 
 
+## Title-menu gate: any restorable file (main or backup) means the
+## Continue button is live.
+func has_save() -> bool:
+	return FileAccess.file_exists(SAVE_PATH) \
+		or FileAccess.file_exists(BACKUP_PATH)
+
+
 func load_state() -> Dictionary:
 	for path in [SAVE_PATH, BACKUP_PATH]:
 		if not FileAccess.file_exists(path):
