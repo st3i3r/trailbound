@@ -72,3 +72,30 @@ set_credit_font,BeVietnamPro — OFL,BeVietnamPro — OFL
 set_credit_us,Trailbound — everything else: proprietary,Trailbound — nội dung còn lại: bản quyền riêng
 set_offline_note,Trailbound plays fully offline — no data leaves the device.,Trailbound chơi offline hoàn toàn — không có dữ liệu nào rời thiết bị.
 set_back,Back,Quay lại
+jrnl_title,Journal,Nhật ký
+jrnl_t_chapters,Chapters,Chương
+jrnl_t_guestbook,Guestbook,Sổ khách
+jrnl_t_field,Field Notes,Ghi chép
+jrnl_t_recipes,Recipes,Công thức
+jrnl_t_keepsakes,Keepsakes,Kỷ vật
+jrnl_t_letters,Letters,Thư
+jrnl_t_days,Days,Nhật ngày
+jrnl_t_thennow,Then & Now,Xưa & nay
+jrnl_regulars,Regulars,Khách quen
+jrnl_visits,%d visits,%d lần ghé
+jrnl_not_cooked,not cooked yet,chưa nấu
+jrnl_day_line,Day %d · %s,Ngày %d · %s
+jrnl_day_sub,%d guests · +%dc,%d khách · +%dc
+jrnl_from,From %s,Thư của %s
+jrnl_back,Back,Quay lại
+jrnl_vol2,The Second Volume,Cuốn sổ thứ hai
+jrnl_then_line,Day 1 → day %d,Ngày 1 → ngày %d
+jrnl_then_note,Camp photos pair up here once the capture pass lands.,Ảnh trại xưa-nay sẽ ghép ở đây khi tính năng chụp hoàn thiện.
+jrnl_empty_guestbook,No guests have stayed yet — seat someone tonight.,Chưa có khách nào trọ lại — mời ai đó tối nay.
+jrnl_empty_regulars,Regulars appear after their third visit.,Khách quen xuất hiện sau lần ghé thứ ba.
+jrnl_empty_field,Watch for birds at the fire ring and treeline.,Để ý chim quanh bếp lửa và mép rừng.
+jrnl_empty_recipes,Nothing cooked yet — light the fire and try a recipe.,Chưa nấu món nào — nhóm lửa và thử một công thức.
+jrnl_empty_keepsakes,Keepsakes arrive as crew restore the site.,Kỷ vật sẽ đến khi ekip trùng tu khu trại.
+jrnl_empty_letters,No letters yet — they arrive with the mornings.,Chưa có thư nào — thư đến vào mỗi buổi sáng.
+jrnl_empty_days,Nights write this log as they pass.,Nhật ký này tự viết sau mỗi đêm.
+jrnl_empty_thennow,Reach a site and it will start keeping photos.,Đến một khu trại và nơi đó sẽ bắt đầu lưu ảnh.

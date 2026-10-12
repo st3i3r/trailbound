@@ -354,6 +354,17 @@ func _ready() -> void:
     # --settings: stage the §17.4 sheet for QA shots
     if OS.get_cmdline_args().has("--settings"):
         panel_mgr.open(SettingsSheet.make())
+    # --journal: stage the §8.3 journal for QA shots (optionally a tab:
+    # --journal=letters)
+    var journal_arg := ""
+    for a in OS.get_cmdline_args():
+        if a.begins_with("--journal"):
+            journal_arg = a.get_slice("=", 1) if "=" in a else "open"
+    if journal_arg != "":
+        var js := JournalSheet.make()
+        panel_mgr.open(js)
+        if journal_arg != "open":
+            js._select_tab(journal_arg)
     var shot_arg := ""
     for a in OS.get_cmdline_args():
         if a.begins_with("--shot="):
@@ -699,12 +710,18 @@ func _build_ui() -> void:
     hud.phase_pressed.connect(_advance_phase)
     hud.settings_pressed.connect(
         func(): panel_mgr.open(SettingsSheet.make()))
+    hud.journal_pressed.connect(
+        func(): panel_mgr.open(JournalSheet.make()))
 
     panel_mgr = PanelManager.new()             # PANEL tier, dimmer stack
     panel_mgr.name = "Panels"
     add_child(panel_mgr)
     panel_mgr.stack_changed.connect(_on_panels_changed)
     Platform.back_pressed.connect(_on_back)
+    # §8.3 journal badge: unread mail count; refreshed on delivery and
+    # whenever the panel stack settles (reading happens inside the sheet)
+    Game.letter_delivered.connect(_refresh_journal_badge.unbind(1))
+    _refresh_journal_badge()
 
     # fire proximity bubble — a world marker so it rides the canvas
     # transform (stage margins included); shown only while the pointer
@@ -754,6 +771,12 @@ func _on_panels_changed() -> void:
         _fade_chrome(0.0)
     else:
         _wake_chrome()
+    _refresh_journal_badge()
+
+
+func _refresh_journal_badge() -> void:
+    if hud:
+        hud.set_journal_badge(Game.unread_letters().size())
 
 
 func _on_back() -> void:
@@ -898,6 +921,36 @@ func _smoke() -> void:
               == (not rm0))
         Game.setting("reduced_motion", rm0)      # restore for later steps
         panel_mgr.close()
+    # UI-030: journal button opens the §8.3 sheet; tabs switch; the
+    # badge mirrors unread mail; days log gains a line per goodnight
+    var badge0 := Game.unread_letters().size()
+    print("SMOKE journal badge:", hud.journal_badge.text == (
+        str(badge0) if badge0 > 0 else ""))
+    hud.journal_pressed.emit()
+    await _frames_until(func(): return panel_mgr.top() != null)
+    var js := panel_mgr.top()
+    print("SMOKE journal sheet:", js is JournalSheet)
+    if js is JournalSheet:
+        var comp := Game.journal_completion()
+        print("SMOKE journal completion:",
+              comp["done"] >= 0 and comp["total"] > 0)
+        for tab in ["chapters", "letters", "days", "then_now"]:
+            js._select_tab(tab)
+            await get_tree().process_frame
+        print("SMOKE journal tabs:",
+              js._content.get_child_count() > 0)
+        # read every staged unread letter — mornings deliver one each,
+        # so the run can carry more than one
+        var unread := Game.unread_letters()
+        for l in unread:
+            Game.read_letter(l["id"])
+        if not unread.is_empty():
+            print("SMOKE letter read:",
+                  unread.all(func(l): return l["id"] in Game.letters_read))
+        panel_mgr.close()
+        await get_tree().process_frame
+        print("SMOKE badge cleared:",
+              hud.journal_badge.text == "")
     get_tree().quit()
 
 

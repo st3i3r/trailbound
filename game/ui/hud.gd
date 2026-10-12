@@ -13,12 +13,15 @@ extends Control
 
 signal phase_pressed
 signal settings_pressed
+signal journal_pressed
 
 var coins_label: Label
 var day_label: Label
 var rating_label: Label
 var phase_button: Button
 var tray: EveningTray                      # UI-020 evening seating band
+var journal_btn: Button
+var journal_badge: Label
 var _tl: VBoxContainer
 var _tr: VBoxContainer
 # debug-gated (null when UITokens.debug_ui() is false)
@@ -57,6 +60,13 @@ func _apply_insets() -> void:
         _tr.offset_right = -(UITokens.MARGIN + ins["r"])
         _tr.offset_top = 6 + ins["t"]
     apply_handedness()
+
+
+## §8.3 journal badge: unread-letter count on the journal button;
+## hidden at zero (a badge must mean something, not decorate).
+func set_journal_badge(n: int) -> void:
+    if journal_badge:
+        journal_badge.text = str(n) if n > 0 else ""
 
 
 ## §17.4 left-handed layout (UI-036): the action side mirrors — phase
@@ -131,7 +141,17 @@ func _build() -> void:
     # settings gear — the §17.4 sheet (UI-036); full MIN_TOUCH target
     var gear := UIKit.icon_btn(jrow, "gear")
     gear.pressed.connect(func(): settings_pressed.emit())
-    UIKit.pill(jrow, Vector2(28, 20), "journal", "")
+    # journal button + unread-letters badge (UI-030 §8.3)
+    journal_btn = UIKit.icon_btn(jrow, "journal")
+    journal_btn.pressed.connect(func(): journal_pressed.emit())
+    journal_badge = UIKit.label_for("", UITokens.TypeRole.CAPTION,
+        UITokens.GOLD)
+    journal_badge.position = Vector2(
+        UITokens.MIN_TOUCH - 14, UITokens.MIN_TOUCH - 16)
+    journal_badge.size = Vector2(14, 12)
+    journal_badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+    journal_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    journal_btn.add_child(journal_badge)
     UIKit.spacer(jrow, UITokens.SP1)
 
     # ---------------- bottom-right: phase button (click = Goodnight)

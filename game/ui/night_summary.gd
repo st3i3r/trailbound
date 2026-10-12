@@ -47,7 +47,7 @@ func _ready() -> void:
 func _build(day: int, forecast: String) -> void:
 	custom_minimum_size = Vector2(W, H)
 	size = Vector2(W, H)
-	add_theme_stylebox_override("panel", UIKit.nine("glass_band"))
+	add_theme_stylebox_override("panel", UIKit.flat("sheet"))
 	# container layout: one margin column — content can never reach
 	# the frame's decorated zone by construction
 	var m := MarginContainer.new()

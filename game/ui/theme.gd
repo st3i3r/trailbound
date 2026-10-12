@@ -34,7 +34,7 @@ static func theme() -> Theme:
     # make one file serve every state.
     t.set_color("icon_normal_color", "Button", UITokens.PAPER)
     t.set_color("icon_hover_color", "Button", UITokens.PAPER)
-    t.set_color("icon_pressed_color", "Button", UITokens.GLOW)
+    t.set_color("icon_pressed_color", "Button", UITokens.GOLD)
     t.set_color("icon_focus_color", "Button", UITokens.PAPER)
     t.set_color("icon_disabled_color", "Button", UITokens.DIM)
     # ---- Label: body defaults; INK-on-paper labels and role fonts

@@ -18,16 +18,17 @@ const SP8 := 32
 const MARGIN := SP2                        # screen-edge margin
 
 # ------------------------------------------------------------- palette
-## Text on glass (D-UI-1 lacquer kit): eggshell is the body light,
-## the accents are Eastward's semantic set retuned ≥4.5 on our glass.
-const PAPER := Color("edf0d4")             # pale cream — text on glass
+## Silver-sheet chrome (post-D-UI-1): light translucent surfaces over
+## the dark world — the Eastward dialogue-box read.  Text on chrome is
+## warm dark ink; the accents are deep variants tuned ≥4.5 on silver.
+const PAPER := Color("332e22")             # dark warm ink — text on silver
 const INK := Color("3e2814")               # dark ink (cream bubbles only)
 const SHADOW := Color("1c2413")            # 1px text drop shadow
-const GOLD := Color("ffcf7d")              # elite / rating accent
-const GREEN := Color("7ed957")             # ok / camp green
-const RED := Color("f0a48e")               # aversion / penalty terms
-const DIM := Color("aab08c")               # muted text — cool sage grey
-const BLUE := Color("69bffd")              # info / water (Eastward set)
+const GOLD := Color("644508")              # deep gold — coin/star on silver
+const GREEN := Color("2f5218")             # ok — deep camp green
+const RED := Color("7c2e1e")               # aversion / penalty — dark sienna
+const DIM := Color("514a3a")               # muted text — warm grey-sage
+const BLUE := Color("234a6e")              # info / water — deep sky
 # Lacquer kit metals — the frame/selection/primary palette.
 const LEAF := Color("c9a45c")              # gold-leaf 1px line frame
 const GLOW := Color("e8c46a")              # selection glow
@@ -41,14 +42,16 @@ const MINUS := Color("9a3a28")             # negative terms on paper
 const GOLD_DEEP := Color("7a5510")         # accent / coin text on paper
 const DIMMER := Color(0.05, 0.07, 0.06, 0.45)
                                            # panel scrim — cool pine dim
-# Glass surfaces (D-UI-1) — fills + hairline for StyleBoxFlat chrome.
-# Keep in sync with tools/tb_glass_kit.py for the textured pieces.
-const GLASS := Color(20.0/255, 29.0/255, 26.0/255, 232.0/255)
-const CHIP  := Color(16.0/255, 24.0/255, 21.0/255, 232.0/255)
-const LINE  := Color("b3b795")             # pale sage 1px hairline
-const LINE_DIM := Color("5f6652")          # recessed line — chips/disabled
-const GREEN_BG := Color(20.0/255, 38.0/255, 28.0/255)
-const DIM_BG := Color(30.0/255, 34.0/255, 30.0/255, 220.0/255)
+# Silver surfaces — fills + hairline for StyleBoxFlat chrome.  Faint
+# alpha keeps a whisper of the world behind (the ref's float feel).
+const GLASS := Color("e8e5d8cc")           # sheet silver, ~80% opaque
+const CHIP  := Color("e0dcccbc")           # recessed silver, ~74%
+const LINE  := Color("6f6752")             # graphite-sage hairline
+const LINE_DIM := Color("a89f8a")          # recessed line — disabled
+const GREEN_BG := Color("dce5cd")          # ok-fill on silver
+const DIM_BG := Color("d9d5c8e0")          # disabled fill
+const SHADOW_SOFT := Color(0.0, 0.0, 0.0, 0.35)
+                                           # sheet drop shadow
 
 # ------------------------------------------------------------ elevation
 ## CanvasLayer tiers — lower draws first.  World content (tilemap,

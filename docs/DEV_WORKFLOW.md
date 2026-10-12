@@ -155,6 +155,14 @@ world art; the title vista is captured with
 against `assets_src/cleanup/pinewatch_comp_v3.png` — the scene's layout
 authority is `tools/scene_comp_v2.py`.
 
+Sheet staging flags (`pinewatch_test.gd`, combine with `--shot=`):
+`--settings` opens the §17.4 sheet; `--journal[=<tab>]` opens the §8.3
+journal (tab ids: `chapters`, `guestbook`, `field_notes`, `recipes`,
+`keepsakes`, `letters`, `days`, `then_now`); `--pose --night` stages the
+night summary; `--pose --morning` stages the board marker; `--board`
+opens the booking sheet; `--reduced-motion` runs the UI under the
+reduced-motion policy.
+
 UI gallery (the §5.4 storybook — UI-018): every chrome component in
 labeled sections, golden-shot ready, plus the automated lints.
 

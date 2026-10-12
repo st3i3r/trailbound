@@ -55,6 +55,8 @@ var daily_sys: RefCounted
 var restore: RefCounted
 var gatherings: RefCounted
 var passport_stamps: Array = []             # §33.5: one per scored Daily
+var days_log: Array = []                    # §8.3 journal — one row/day
+var personas_met := {}                      # archetype -> display name
 var settings := {}                          # §17.4 — see Save.default_state
 
 
@@ -264,6 +266,86 @@ func unread_letters(site := site_id) -> Array:
 func read_letter(id: String) -> void:
 	if id not in letters_read:
 		letters_read.append(id)
+
+
+## Delivered letters for a site, unread first — the journal list.
+func letters_for(site := site_id) -> Array:
+	var st := site_state(site)
+	return _letters_for(site).filter(func(l):
+		return l["id"] in st["letters_delivered"])
+
+
+## One delivered letter by id (the reading view).
+func letter(id: String, site := site_id) -> Dictionary:
+	for l in _letters_for(site):
+		if l["id"] == id:
+			return l
+	return {}
+
+
+# ------------------------------------------------------- journal UI (§8.3)
+
+const JOURNAL_SITES := [&"pinewatch", &"whisper_river", &"lantern_valley"]
+
+func chapter_pages(site := site_id) -> Array:
+	return _chapter(site).get("pages", [])
+
+
+## Keepsake catalog row by id — {label, art, note_key} + who held it.
+func keepsake(id: String) -> Dictionary:
+	for s in _structures():
+		for stage in s.get("stages", []):
+			var k: Dictionary = stage.get("keepsake", {})
+			if k.get("id") == id:
+				var out := k.duplicate()
+				out["site"] = s["id"]
+				return out
+	return {}
+
+
+## §8.3 cover count: collected / total over the five fill-in
+## sections (chapters v1 pages, guestbook, field notes, recipes,
+## keepsakes). Letters + days log don't count — they write
+## themselves.
+func journal_completion() -> Dictionary:
+	var done := 0
+	var total := 0
+	for s in JOURNAL_SITES:
+		var pd: Array = site_state(s)["pages_done"]
+		done += pd.filter(func(n): return int(n) <= 5).size()
+		total += 5
+	var archs: Array = Catalog.data.get("archetypes", [])
+	var regs: Array = Catalog.data.get("regulars", [])
+	total += archs.size() + regs.size()
+	done += mini(personas_met.size(), archs.size())
+	var met_regs: Dictionary = site_state()["counters"].get(
+		"regular_visits", {})
+	for s in JOURNAL_SITES:
+		var v: Dictionary = site_state(s)["counters"].get(
+			"regular_visits", {})
+		for k in v:
+			met_regs[k] = true
+	done += met_regs.size()
+	var birds: Array = Catalog.data.get("birds", [])
+	var fish: Array = Catalog.data.get("fish", [])
+	total += birds.size() + fish.size()
+	done += mini(field_notes.size(), birds.size() + fish.size())
+	var recipe_total: int = Catalog.data.get("recipes", []).size()
+	total += recipe_total
+	done += mini(recipes_cooked.size(), recipe_total)
+	var ks_total: int = Catalog.data.get("crew", {}).get(
+		"structures", []).size()
+	total += ks_total
+	done += mini(crew["collected"].size(), ks_total)
+	return {"done": done, "total": total}
+
+
+## Site display name for journal headers.
+func site_name(id: StringName) -> String:
+	for s in Catalog.data.get("sites", []):
+		if s.get("id") == id:
+			return s.get("name", String(id))
+	return String(id)
 
 
 # ------------------------------------------------------------- crew (§8.4)
@@ -713,6 +795,9 @@ func goodnight() -> Dictionary:
 		if regular != "":
 			cnt["regular_visits"][regular] = int(
 				cnt["regular_visits"].get(regular, 0)) + 1
+		# §8.3 guestbook: the persona's first stay, keyed by archetype
+		if arch != "" and arch not in personas_met:
+			personas_met[arch] = s["guest"].get("name", "")
 		if r["stars"] == 5:
 			night["five_stars"] += 1
 			if "stargazer" in s["guest"].get("traits", []):
@@ -759,6 +844,11 @@ func goodnight() -> Dictionary:
 		if best.is_empty() or int(r["stars"]) > int(best["stars"]):
 			best = {"id": r["id"], "stars": r["stars"],
 				"comment": r["comment"]}
+	# §8.3 days log: one line per night, before the state clears
+	days_log.append({"day": day, "site": String(site_id),
+		"weather": st["weather"], "guests": seated.size(),
+		"best": int(best.get("stars", 0)),
+		"income": fees + tips + meal_sales + gather_bonus})
 	return {"results": results, "fees": fees, "tips": tips,
 		"walk_ins": sold.size(), "meal_sales": meal_sales,
 		"income": fees + tips + meal_sales + gather_bonus,
@@ -1311,7 +1401,9 @@ func state_dict() -> Dictionary:
 		"recipes": recipes_cooked.duplicate(),
 		"pairs_tried": pairs_tried.duplicate(),
 		"letters": letters_read.duplicate(),
-		"journal": {"vignettes_seen": vignettes_seen.duplicate()},
+		"journal": {"vignettes_seen": vignettes_seen.duplicate(),
+			"days_log": days_log.duplicate(true),
+			"personas_met": personas_met.duplicate()},
 		"daily": daily_state.duplicate(),
 		"dog": dog.duplicate(),
 		"field_notes": field_notes.duplicate(),
@@ -1371,6 +1463,9 @@ func load_state(state: Dictionary) -> void:
 	letters_read = state.get("letters", letters_read)
 	vignettes_seen = state.get("journal", {}).get(
 		"vignettes_seen", vignettes_seen)
+	days_log = state.get("journal", {}).get("days_log", days_log)
+	personas_met = state.get("journal", {}).get(
+		"personas_met", personas_met)
 	daily_state = state.get("daily", daily_state)
 	dog = state.get("dog", dog)
 	field_notes = state.get("field_notes", field_notes)

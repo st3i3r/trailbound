@@ -153,24 +153,18 @@ def seal(s=20):
 ## to code — UIKit.flat() draws them as StyleBoxFlat from the same
 ## tokens, so borders are consistent by construction and nothing waits
 ## on a PNG import.  What stays textured is only what StyleBoxFlat
-## can't draw: the banded sheet surface, the halo ring, the seal, the
-## dimmer halftone.
+## can't draw: the halo ring, the seal, the dimmer halftone.  (The old
+## banded sheet surface "glass_band" retired with the dark-glass kit —
+## sheets are now the flat "sheet" piece, see UIKit.flat.)
 pieces = {
     "sel_glow": sel_glow(),
     "halftone_3": halftone(),
     "seal_lacquer": seal(),
 }
-# glass_band: the sheet surface — top strip is the band + separator
-b = surface(48, 64, GLASS, GLASS_LO)
-b[2:13, 3:-3][b[2:13, 3:-3, 3] > 0] = BAND
-for x in range(3, 45):
-    b[13, x] = LINE
-pieces["glass_band"] = b
 
 # ---------------------------------------------------------------- writes
 meta = json.load(open(META)) if os.path.exists(META) else {}
 insets = {
-    "glass_band": {"l": 8, "r": 8, "t": 16, "b": 8},
     "sel_glow": {"l": 8, "r": 8, "t": 8, "b": 8},
     "seal_lacquer": {"l": 5, "r": 5, "t": 5, "b": 5},
 }

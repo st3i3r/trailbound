@@ -42,7 +42,7 @@ func _build(weather: String, open_pads: int,
 		sprite_cb: Callable) -> void:
 	custom_minimum_size = Vector2(W, H)
 	size = Vector2(W, H)
-	add_theme_stylebox_override("panel", UIKit.nine("glass_band"))
+	add_theme_stylebox_override("panel", UIKit.flat("sheet"))
 	# container layout — same margin discipline as the night sheet
 	var m := MarginContainer.new()
 	m.set_anchors_preset(Control.PRESET_FULL_RECT)

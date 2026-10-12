@@ -458,18 +458,6 @@
   "h": 514,
   "pad": 2
  },
- "glass_band": {
-  "nine_slice": {
-   "l": 8,
-   "r": 8,
-   "t": 16,
-   "b": 8
-  },
-  "src": {
-   "file": "glass_band.png",
-   "derived": "tb_glass_kit v2"
-  }
- },
  "sel_glow": {
   "nine_slice": {
    "l": 8,

@@ -306,15 +306,16 @@ static func focus_box() -> StyleBox:
 ## StyleBoxFlat surfaces — radius/border/fill come straight from
 ## UITokens, so every flat piece shares ONE border by construction
 ## (no PNG, no import cache, no nine-slice insets to go stale).
-## Only the decorated few stay textures: glass_band, sel_glow,
-## seal_lacquer, halftone, bubble_*.
-const FLAT_PIECES := ["glass_panel", "glass_chip", "glass_pill",
+## Only the decorated few stay textures: sel_glow, seal_lacquer,
+## halftone, bubble_*.  "sheet" is the silver floating-panel surface.
+const FLAT_PIECES := ["sheet", "glass_panel", "glass_chip", "glass_pill",
     "btn_pill", "btn_green", "btn_gold", "btn_disabled"]
 
 
 static func flat(piece: String, mod := 1.0, alpha := 1.0) -> StyleBoxFlat:
     var bg: Color; var line: Color; var r := 4
     match piece:
+        "sheet":         bg = UITokens.GLASS;    line = UITokens.LINE; r = 6
         "glass_chip":    bg = UITokens.CHIP;     line = UITokens.LINE; r = 3
         "glass_pill":    bg = UITokens.GLASS;    line = UITokens.LINE; r = 999
         "btn_green":     bg = UITokens.GREEN_BG; line = UITokens.LINE
@@ -332,6 +333,12 @@ static func flat(piece: String, mod := 1.0, alpha := 1.0) -> StyleBoxFlat:
     sb.set_corner_radius_all(r)
     sb.corner_detail = 6
     sb.anti_aliasing = true
+    if piece == "sheet":
+        # the floating shadow sells "panel over world" (the Eastward
+        # dialogue-box read); StyleBoxFlat draws it offset under the rect
+        sb.shadow_color = UITokens.SHADOW_SOFT
+        sb.shadow_size = 8
+        sb.shadow_offset = Vector2(0, 3)
     return sb
 
 

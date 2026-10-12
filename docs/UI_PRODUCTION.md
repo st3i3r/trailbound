@@ -16,7 +16,7 @@ built yet.
 
 | Axis | Today | Eastward grade reachable? | Path |
 |---|---|---|---|
-| Visual language | Opaque cream-paper kit, heavy wood frames | Yes | D-UI-1 (§8); glass + line kit is mostly procedural |
+| Visual language | Opaque cream-paper kit, heavy wood frames | Yes | D-UI-1 → D-UI-6 (§8): silver-sheet chrome is code, not textures |
 | Typography | F1 pixel font, antialiased, ASCII-only | Yes | Hi-res text via font oversampling (§5.3), D-UI-2 |
 | Iconography | 4 of 5 HUD icons semantically wrong; flat, no outline | Yes | Icon registry + scripted sticker outline |
 | Layout/systems | Hand-placed controls, no Theme, Panel-as-button | Yes | Theme + containers + phase layouts |
@@ -51,9 +51,20 @@ captures; sizes are converted to our 360p base.
 | 14 | Cinematic letterbox | Black bars during story scenes | None |
 
 **Key read:** Eastward is two-layered — *light paper* for things spoken in
-the world (bubbles), *dark glass + thin lines* for the player's interface.
-Our kit applied paper to everything and added heavy frames. Eastward's
-grade comes from restraint, layering, typography and motion, not ornament.
+the world (bubbles, dialogue boxes), *dark glass + thin lines* for its
+controller menus. Our kit applied paper to everything and added heavy
+frames. Eastward's grade comes from restraint, layering, typography and
+motion, not ornament.
+
+**Amended 2026-10-13 (D-UI-6):** the player-facing sheet surface is the
+**silver panel** — a light translucent fill (`GLASS #e8e5d8 @80%`) with a
+graphite hairline and a soft offset shadow, over the halftone dimmer —
+Eastward's *dialogue-box* read taken across every sheet, not its dark
+menu glass. Ink text (`PAPER #332e22`), deep-tuned accents ≥4.5 on the
+composited surface (`GOLD #644508`, `GREEN #2f5218`, `RED #7c2e1e`,
+`DIM #514a3a`, `BLUE #234a6e`); vermilion stays the primary accent.
+HUD pills/cards share the same silver chips — light chrome floating on
+the dark world. Lacquer tokens (§8.1) are retired.
 
 ### 2.1 Chrome icon system — modern flat glyphs (D-UI-5)
 
@@ -169,7 +180,7 @@ auto-grow).*
 | UI-016 ✓ | PanelManager v2: in/out transitions, tap-dimmer-to-dismiss for sheets, HUD fades on `stack_changed`, focus order; free only after the out-animation | Stack test: open/close/back/animate |
 | UI-017 ✓ | Motion + haptics tokens: `UITokens.MOTION` (duration/easing/`kind` per component) + `UIFeel` (`dur()`/`apply()` route every tween — panel pop, dimmer, chrome/fire fades, count-ups, marker bob). Haptics: `UIFeel.haptic()` semantic events — `press` auto-wired in `UIKit.btn`, `confirm` on seat/sleep/head-out, `pay` on double-tips, `warn` on refused seat — Android-gated `Input.vibrate_handheld`, 8-30 ms. Reduced-motion: `UIFeel.reduced_motion` collapses scale/motion to ~0, keeps 60 ms fades; `--reduced-motion` QA flag + `settings.reduced_motion` save slot ready for the P3 settings sheet | `--smoke` green under both policies; no bare `create_tween()` + magic duration left in UI |
 | UI-018 ✓ | QA harness (§5.4): `scenes/ui_gallery.tscn` storybook (type roles on dark/paper, nine pieces, pills, buttons + state swatches, full icon registry, sign vocabulary) + `--shot` golden path + `--lint`: touch ≥40 both axes, icon registry, literal+prefix tr() keys in strings.csv, WCAG-4.5 token-on-surface contrast (caught 6 under-ratio tokens — fixed in tokens.gd), advisory VI-width drift list | `--lint` headless, exits non-zero on fail; shots need a real window (no `--headless` — no framebuffer) |
-| UI-019 ✓ | Glass kit — **flat chrome is code, not textures**: `UIKit.flat()` draws panels/chips/pills/buttons as `StyleBoxFlat` from UITokens (rounded r3-4, 1 px sage hairline, consistent by construction — no PNGs, no import cache, no nine-slice insets; the "stacked borders" debug round traced to a stale `.ctex`). `tools/tb_glass_kit.py` now generates only what StyleBoxFlat can't: `glass_band` sheet surface (band + separator), `sel_glow` halo, `seal_lacquer`, `halftone`. Sheet layouts moved off absolute rects to MarginContainer+VBox (content can't reach the frame zone by construction). Left: sticker-outline pass on content icons | Every component renders in the gallery; no parchment/rope art on shipped screens; contrast lint measures real surfaces |
+| UI-019 ✓ | Chrome kit — **flat chrome is code, not textures**: `UIKit.flat()` draws sheets/panels/chips/pills/buttons as `StyleBoxFlat` from UITokens (rounded corners, 1 px hairline, consistent by construction — no PNGs, no import cache, no nine-slice insets; the "stacked borders" debug round traced to a stale `.ctex`). Sheets use the `"sheet"` piece — silver fill + soft offset shadow (D-UI-6). `tools/tb_glass_kit.py` now generates only what StyleBoxFlat can't: `sel_glow` halo, `seal_lacquer`, `halftone` (`glass_band` retired with the dark kit). Sheet layouts are MarginContainer+VBox (content can't reach the frame zone by construction). Left: sticker-outline pass on content icons | Every component renders in the gallery; no parchment/rope art on shipped screens; contrast lint measures the real composited surface |
 
 *P1 landed 2026-10-12 (foundations pass): **UI-011** shipped as a
 code-built `UITheme` — not a `.tres` — so tokens stay the source of
@@ -198,7 +209,7 @@ QA and the content lint remain open.*
 
 | ID | Item |
 |---|---|
-| UI-030 | Journal (8 sections incl. Then/Now), cover completion % |
+| UI-030 ✓ | Journal (`game/ui/journal.gd`, §8.3): 8 icon-tab sections on the silver sheet — **chapters** (page goals per site, stamped/locked/vol-II dimmed, coin gifts), **guestbook** (personas by archetype + regulars × visits — `Game.personas_met` written at first stay, `regular_visits` counters), **field notes** (birds found/unknown; fish join when `fish.json` fills), **recipes** (cooked vs undiscovered), **keepsakes** (crew-stage keepsakes + notes + the Vol II book), **letters** (delivered mail; unread marked; tap → in-sheet reading view + `read_letter`), **days log** (`Game.days_log` — one line per `goodnight()`, newest first, weather glyph + best-star), **then/now** (per-site day-1→today card; photo pair is honest text until the capture pass). Cover completion `Game.journal_completion()` = collected/total over the five fill-in sections (15 v1 pages + personas&regulars + field notes + recipes + 9 keepsakes). Entry: HUD journal `icon_btn` + unread-letter count badge (`hud.set_journal_badge`, refreshed on `letter_delivered` + `stack_changed`). QA: `--journal[=<tab>]` staging flag; smoke asserts open/tab/badge/read |
 | UI-031 | Pantry and cooking, with an Eastward-style cooking cut-in and result card |
 | UI-032 | Outfitter with tabs (decor, pads/upgrades, gear, staples, cosmetics) |
 | UI-033 | Build mode: ghost, radius rings, star-change preview, store/return |
@@ -329,18 +340,26 @@ Batch A world art does not block any step and can run alongside.
 
 | ID | Decision | Status |
 |---|---|---|
-| D-UI-1 | **Visual language: Eastward glass.** The cream-paper kit retires. We follow Eastward's whole system, which includes its *light cream speech bubbles* (DNA #12) — glass for every interface surface, cream only for words spoken in the world. Tint: Vietnamese lacquer (§8.1) | Decided 2026-10-12 (user); lacquer tint approved |
+| D-UI-1 | **Visual language: Eastward glass.** The cream-paper kit retires. We follow Eastward's whole system, which includes its *light cream speech bubbles* (DNA #12) — glass for every interface surface, cream only for words spoken in the world. Tint: Vietnamese lacquer (§8.1) | Decided 2026-10-12 (user); lacquer tint approved; **tint superseded by D-UI-6** — sheets are silver |
 | D-UI-2 | **Fonts: Be Vietnam Pro family, hi-res, for all UI text** (bubbles included). Free (OFL), already in the repo, 102/102 Vietnamese; add the Medium/Bold weights from the same family. The pixel font retires from text. Not urgent — lands with UI-013 | Decided 2026-10-12 (user: free + ready) |
 | D-UI-3 | **Guestbook collects personas**, not archetypes: one entry per persona + the 4 regulars (GDD §8.3). Roster is final with Batch B; personas pick deterministically (§21.3) with an unseen-first bias; content lint proves every persona is reachable in the arc | Decided 2026-10-12 (user) |
 | D-UI-4 | **Batch F re-aimed at what reads as Eastward grade** — ≈27 gens (3 seeds × 9 at 256×128) for spectacle close-up art (cooking cut-in at the campfire: fire pit, pot/wok, steam — DNA #13). Icons cost 0 since D-UI-5 (glyphs drawn by us); sticker outlines on content icons by script; glass kit pieces procedural (UI-019); old paper ornaments dropped | Approved 2026-10-12 (user); icon share → 0 after D-UI-5 |
 | D-UI-5 | **Modern chrome icons: flat one-colour filled glyphs** (§2.1) — system glyphs from HackerNoon solid (MIT) + pixelarticons (MIT), Trailbound-object section glyphs drawn to match, state colour from the Theme; I1 painterly icons stay only as content icons | Decided 2026-10-12 (user request: modern, not journal style) |
+| D-UI-6 | **Sheet surface: silver panel, not dark glass.** Every player sheet, HUD pill, card and chip draws `GLASS #e8e5d8 @80%` translucent silver + graphite hairline + soft offset shadow — Eastward's dialogue-box read over the dimmed world. Text = warm ink (`PAPER #332e22`), accents deep-tuned ≥4.5 on the composited surface; vermilion stays primary. The lacquer spec (§8.1) and `glass_band` retire | Decided 2026-10-13 (user, ref: Eastward dialogue panel; "don't keep the original theme") |
 
 Retired by D-UI-1: the paper atlas pieces except `bubble_speech`,
 `bubble_tail` and `seal_red` (kept as the lacquer seal accent);
 `docs/paper-kit.html`; the U1–U5 `create_ui_asset` outputs; the panel
 mock (kept in `reference/ui/` only as a before image).
+Retired by D-UI-6: the lacquer dark-glass palette (§8.1 table kept as
+history), `glass_band` (banded sheet texture — the flat `"sheet"`
+piece draws its surface now).
 
-### 8.1 Glass spec v0 (tune in the UI gallery, UI-018)
+### 8.1 Lacquer spec v0 — **superseded by D-UI-6** (kept as history)
+
+*The shipped palette is the silver set in `ui_tokens.gd` (§2 amended
+note). This table documented the dark-glass direction before the user
+picked the silver read.*
 
 | Token | Eastward (measured) | Trailbound proposal — lacquer (sơn mài) tint |
 |---|---|---|

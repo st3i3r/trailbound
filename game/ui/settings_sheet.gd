@@ -35,7 +35,7 @@ func _ready() -> void:
 func _build() -> void:
     custom_minimum_size = Vector2(W, H)
     size = Vector2(W, H)
-    add_theme_stylebox_override("panel", UIKit.nine("glass_band"))
+    add_theme_stylebox_override("panel", UIKit.flat("sheet"))
     var m := MarginContainer.new()
     m.set_anchors_preset(Control.PRESET_FULL_RECT)
     m.add_theme_constant_override("margin_top", 5)

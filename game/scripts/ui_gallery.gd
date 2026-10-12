@@ -114,7 +114,7 @@ func _sec_panels(root: Control) -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", UITokens.SP2)
 	box.add_child(row)
-	for piece in ["glass_panel", "glass_band", "glass_chip",
+	for piece in ["sheet", "glass_panel", "glass_chip",
 			"glass_pill", "sel_glow", "seal_lacquer",
 			"bubble_speech_flat"]:
 		var p := _chip(row, 84, 40, piece)
@@ -304,20 +304,25 @@ func _gd_files(dir: String) -> Array:
 ## exists to catch; declaring surfaces keeps that flag meaningful.)
 func _lint_contrast() -> int:
 	var bad := []
-	# measured surfaces: glass_panel fill, bubble_speech cream —
-	# the lint checks the real art, not approximations
-	var L_GLASS := _lum(Color("141d1a"))
+	# measured surfaces: the silver sheet composited over the scene-dark
+	# backdrop (GLASS is ~80% alpha — the scrimmed world ghosts through
+	# and must count toward the surface), bubble_speech cream
+	var silver := Color(
+		lerpf(UITokens.GLASS.r, 0.165, 1.0 - UITokens.GLASS.a),
+		lerpf(UITokens.GLASS.g, 0.208, 1.0 - UITokens.GLASS.a),
+		lerpf(UITokens.GLASS.b, 0.125, 1.0 - UITokens.GLASS.a))
+	var L_SILVER := _lum(silver)
 	var L_CREAM := _lum(Color("eed6ac"))
 	var usage := {   # token -> the measured surface it is allowed on
-		"PAPER": L_GLASS, "GOLD": L_GLASS, "GREEN": L_GLASS,
-		"RED": L_GLASS, "DIM": L_GLASS, "BLUE": L_GLASS,
-		"GLOW": L_GLASS,
+		"PAPER": L_SILVER, "GOLD": L_SILVER, "GREEN": L_SILVER,
+		"RED": L_SILVER, "DIM": L_SILVER, "BLUE": L_SILVER,
 		"INK": L_CREAM, "MUTE": L_CREAM, "PLUS": L_CREAM,
 		"MINUS": L_CREAM, "GOLD_DEEP": L_CREAM}
+	# (GLOW is a halo texture token — additive light, not an ink — so it
+	# isn't linted; it never renders as text.)
 	var cols := {"PAPER": UITokens.PAPER, "INK": UITokens.INK,
 		"GOLD": UITokens.GOLD, "GREEN": UITokens.GREEN,
 		"RED": UITokens.RED, "DIM": UITokens.DIM, "BLUE": UITokens.BLUE,
-		"GLOW": UITokens.GLOW,
 		"MUTE": UITokens.MUTE, "PLUS": UITokens.PLUS,
 		"MINUS": UITokens.MINUS, "GOLD_DEEP": UITokens.GOLD_DEEP}
 	for n in usage:
