@@ -58,10 +58,10 @@ Cast, food, fauna and keepsakes are site-neutral: no site module.
 
 | Class | Tool and canvas | Module (appended) |
 |---|---|---|
-| Terrain | `create_topdown_tileset` pro, 32 px, `high top-down` | calm low-detail ground wash, large soft tonal patches, no flowers, no tufts, no speckles, no repeating motif (detail comes from `tb_dither` + decals) |
+| Terrain | `create_topdown_tileset` pro, 32 px, `high top-down` | calm low-detail ground wash, large soft tonal patches, no flowers, no tufts, no speckles, no repeating motif (detail comes from `tb_dither` + decals); pond/lake shores get a stone-ring edge band + 2–3 frame shimmer overlay, not a flat fill (T4) |
 | Hero prop / structure | Batch tool ≤170 (4 slots, 128–160 style refs); Pro Flash custom for non-square | hand-painted miniature density, contemporary 2026 camping equipment (style_lock prop era spec: dome tents, coolers, chairs, stoves — never patched canvas / rusted surplus), clean surfaces with light wear (scuffs, dirt splash), one strong silhouette with one accent detail, base embedded, top and front faces both visible |
 | Small item (L6) | Batch tool ≤42 (64 slots, 32 px refs) or ≤85 (16 slots, 64 px refs) | small and simple, readable at 1×, two or three tones plus outline, one clear silhouette, no fine noise |
-| Foliage / tree | Batch tool ≤170 | leaf masses as clumps (not single dots), lit top-left rim, cool shaded underside, visible trunk and root flare |
+| Foliage / tree | Batch tool ≤170 | leaf masses as clumps (not single dots), lit top-left rim, cool shaded underside, visible trunk and root flare; **canopy and trunk as separate sprites** (T2); **variants re-shaded on the same silhouette — new light structure, never a hue swap** (T1) |
 | Character | `create_character_pro_flash` 48×48, `low top-down`, template `mannequin`, 8 directions, `style_options.detail=false` | full body about 3.5 heads tall filling about 90% of the canvas height, readable face with simple eyes, distinctive silhouette with one signature colour, clothing folds in two or three tones, relaxed standing pose facing south |
 | Child | same, 48×48 | child about two-thirds adult height, figure fills about 60% of the canvas height |
 | Persona | Character class + | an ordinary person on a weekend nature trip, everyday clothes (not hiking gear unless stated) |
@@ -109,6 +109,49 @@ Each line is the content slot only; HOUSE + SITE + CLASS are appended.
 
 **A7 · trail-map site thumbnail (Pro Flash 96×64, ≈10)**
 `map_thumb_pinewatch` tiny vignette of a campfire clearing under tall pines with two tents and a van — later sites when they are built
+
+### Batch A-R — world refresh (post-reference pass, decided 2026-10-13)
+
+Why: the shipped world is one painted canvas — flat pond edges, baked
+static trees, canvas-era tents.  Reference study (`assets_src/reference/`)
+settled the fix: techniques T1–T5 in `style_lock.md`.  The world stays
+painted; this batch adds the layered family on top.  **H4's dome-tent
+re-author folds in here** — superseded by A-R4.
+
+**A-R1 · tree family, canopy+trunk pairs (batch ≤170, ≈40)**
+Masters: `tree_pine_highland` · `tree_broadleaf_round` ·
+`tree_maple_copper` · `tree_feathery_droop` — each ships as canopy
+sprite + shared trunk sprite (T2), then **2 re-shaded canopy variants**
+(deep-summer, dry-gold) on the same silhouette description (T1) —
+≈4 masters + 8 variants.  Replaces the trees baked into the backdrop.
+
+**A-R2 · bush + undergrowth family (batch ≤85, ≈15)**
+`bush_round_m` · `bush_white_flower_v` · `fern_bank` ·
+`grass_tussock` · `reed_shore` — master + 1 re-shaded variant where a
+second palette earns its slot.
+
+**A-R3 · pond edge + water (batch ≤85 + Pro Flash, ≈15)**
+`shore_ring_{n,ne,e,se,s,sw,w,nw}` mossy stone-ring shore edges in the
+Pinewatch palette (T4) · `water_shimmer_{f1,f2}` — two low-frequency
+shimmer overlays at tile size; animation is a runtime frame swap, not
+an animated gen.
+
+**A-R4 · modern camp props (batch ≤170, ≈30) — replaces the canvas set**
+`dome_tent_{sage,amber,slate}` — one dome silhouette, three colours ·
+`cooler_box` · `folding_chair_pair` · `propane_stove` ·
+`solar_lantern` · `string_lights_seg` · `dry_bag` ·
+`camp_table_fold`.  Era spec applies (style_lock): clean surfaces,
+light wear only.  The shipped canvas A-frames, warden tent and tarp
+tent retire to `_superseded/` on landing.
+
+**A-R5 · grounding decal family (batch ≤42, ≈10)**
+`tuft_grass_{a,b,c,d}` · `tuft_leaf_litter` · `tuft_moss_patch` —
+small base-blend decals in site palette; the layout pass stamps 1–3 at
+every prop base (T3).
+
+**Keep, no re-gen:** graded site backdrop, terrain tiles + wang
+transitions, buildings/van, pads + fire pit, path + jetty, A1/A2 item
+families that already read 2026.
 
 ### Batch B — the cast (character class)
 
@@ -219,12 +262,13 @@ Walks: `animate_character` template, south / north / east (west mirrored)
 | E decor | ≈30 | |
 | F cut-in | ≈27 | |
 | G animation | ≈220 | Walks: 39 walkers × 3 dirs = 117; ~85 custom anims × 1 (each sprite needs its own copy); prop loops ≈14 |
-| H states | ≈81 | incl. H4 dome-tent re-author of the shipped canvas tents |
+| A-R refresh | ≈95 | Net of H4's folded-in tent re-author (gross ≈110) |
+| H states | ≈66 | H4 dome-tent re-author moved to A-R4 |
 | I events | ≈55 | |
-| **Total** | **≈1,005** (+20% contingency ≈1,205) | vs ~475 in the old manifest — characters and animation were under-priced |
+| **Total** | **≈1,100** (+20% contingency ≈1,320) | vs ~475 in the old manifest — characters and animation were under-priced |
 
 Balance 1,633 now; the allowance refills to 2,000 on 2026-11-11 and
-each cycle after. Fits this cycle with ≈440 left after contingency.
+each cycle after. Fits this cycle with ≈330 left after contingency.
 Levers if needed: one seed per persona, portraits for 4 characters
 instead of 7, west mirrored (already assumed).
 

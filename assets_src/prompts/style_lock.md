@@ -135,6 +135,21 @@ contemporary lifestyle object (same family as Octopia's RV), not an
 and the brown tarp tent are queued for re-authoring as modern domes —
 that is a prop-art regen, not a layout change.
 
+## World-art techniques (decided 2026-10-13 — reference study pass)
+
+Reference library: `assets_src/reference/SOURCES.md`.  These rules come
+from studying Immunity's `resurrected_rpg` + `fm32x32` sheets — the
+closest Eastward-adjacent top-down craft we have found.  Study-only:
+nothing ships from the packs; the techniques do.
+
+| # | Technique | Rule |
+|---|---|---|
+| T1 | **Foliage variants are re-shaded, never hue-swapped** | Each palette variant of a tree/bush gets its own highlight structure and dither pass — compare `resurrected_rpg/Plants.png`: the autumn crown is not the summer crown shifted. Prompts describe variants as *a new shading pass on the same silhouette* ("same silhouette and trunk, re-shaded in {palette}, new light structure"), never "recoloured". One gen per variant. |
+| T2 | **Trees ship in three layers** | canopy sprite · trunk sprite · baked ground shadow — the `fm32x32/Trees_seperated.png` compositor. Canopy alone takes colour variants + future sway animation; trunk is shared across variants; shadow comes from `tb_post`, never the prompt. Batch A-refresh gens trees as canopy+trunk pairs. |
+| T3 | **Prop grounding is systematic** | Every placed prop gets a ground blend — contact shadow (`tb_post`) plus 1–3 grass-tuft/leaf-gap decals at its base rim (`resurrected_rpg/Props.png`: every statue/stone sits in tufts). Extends the ground recipe's "decals clustered at prop bases" from suggestion to rule — a grounding decal family is gen'd once per site palette and stamped by the layout pass. |
+| T4 | **Water gets a ring, not a flat fill** | Pond/lake shores draw a stone-ring edge band (`fm32x32/WaterTiles-6frames.png`: ringed shore tiles + animated surface). Ours simplifies to: edge-ring sprites per shore direction + a 2–3 frame low-frequency shimmer overlay on the water plane. Fixes the flat pond read. |
+| T5 | **Cinematic ≠ world** | Licensed vista/sky art (`SOURCES.md` — CraftPix skies/nature/city/winter, vnitti CC-BY) is for cards, ceremonies, letterbox and title only — never inside the site scene, where it would clash with the painterly grade. |
+
 ## UI recipe (SOTA, decided 2026-10-12 — cozy HUD discipline)
 
 Research: cozy-UI guides ("great game UI disappears — start with nothing,
