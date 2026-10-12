@@ -62,11 +62,7 @@ func _build(weather: String, open_pads: int,
 	# forecast row — the morning forecast IS tonight's weather (§5.7)
 	var frow := HBoxContainer.new()
 	frow.add_theme_constant_override("separation", 6)
-	var wico := TextureRect.new()
-	wico.texture = UIKit.weather_icon(weather)
-	wico.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	wico.stretch_mode = TextureRect.STRETCH_KEEP
-	frow.add_child(wico)
+	frow.add_child(UIKit.icon_rect(weather))
 	frow.add_child(UIKit.label_for(
 		tr("board_forecast") % tr("weather_" + weather),
 		UITokens.TypeRole.BODY, UITokens.PAPER))
@@ -126,10 +122,7 @@ func _card(req: Dictionary, sprite_cb: Callable) -> Panel:
 	name_l.position = Vector2(44, 4)
 	name_l.size = Vector2(W - 32 - 46, 10)
 	c.add_child(name_l)
-	var coin := TextureRect.new()
-	coin.texture = UIKit.icon("coin")
-	coin.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	coin.stretch_mode = TextureRect.STRETCH_KEEP
+	var coin := UIKit.icon_rect("coin")
 	coin.position = Vector2(44, 16)
 	c.add_child(coin)
 	var fee_l := UIKit.label_for("%dc" % int(req.get("fee", 0)),
@@ -140,19 +133,12 @@ func _card(req: Dictionary, sprite_cb: Callable) -> Panel:
 	# explains the same trait vocabulary live while seating
 	var tx := 44
 	for tid in req.get("traits", []).slice(0, 4):
-		var t := TextureRect.new()
-		t.texture = UIKit.trait_icon(String(tid))
-		t.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		t.stretch_mode = TextureRect.STRETCH_KEEP
+		var t := UIKit.icon_rect(String(tid))
 		t.position = Vector2(tx, 28)
 		c.add_child(t)
 		tx += 18
 	# favourite: heart + "?" until the recipe is cooked (§5.2)
-	var fav := TextureRect.new()
-	fav.texture = UIKit.icon("heart")
-	fav.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	fav.stretch_mode = TextureRect.STRETCH_KEEP
-	fav.modulate = UITokens.DIM
+	var fav := UIKit.icon_rect("heart", UITokens.DIM)
 	fav.position = Vector2(W - 32 - 40, 4)
 	c.add_child(fav)
 	var q := UIKit.label_for("?", UITokens.TypeRole.BODY, UITokens.DIM)
@@ -160,11 +146,7 @@ func _card(req: Dictionary, sprite_cb: Callable) -> Panel:
 	c.add_child(q)
 	# regulars arrive on ribboned cards (§5.2) — gold star badge
 	if req.get("regular", false):
-		var rib := TextureRect.new()
-		rib.texture = UIKit.icon("star_full")
-		rib.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		rib.stretch_mode = TextureRect.STRETCH_KEEP
-		rib.modulate = UITokens.GOLD
+		var rib := UIKit.icon_rect("star_full")
 		rib.position = Vector2(W - 32 - 40, 22)
 		c.add_child(rib)
 	return c

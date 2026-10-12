@@ -29,6 +29,14 @@ static func theme() -> Theme:
     t.set_stylebox("disabled", "Button", UIKit.flat("btn_disabled"))
     t.set_stylebox("focus", "Button", UIKit.focus_box())
     t.set_constant("h_separation", "Button", UITokens.SP1)
+    # ---- Button icon colors (UI-066): glyph masks tint per state —
+    # muted idle, warm on press, dim when disabled; white mask assets
+    # make one file serve every state.
+    t.set_color("icon_normal_color", "Button", UITokens.PAPER)
+    t.set_color("icon_hover_color", "Button", UITokens.PAPER)
+    t.set_color("icon_pressed_color", "Button", UITokens.GLOW)
+    t.set_color("icon_focus_color", "Button", UITokens.PAPER)
+    t.set_color("icon_disabled_color", "Button", UITokens.DIM)
     # ---- Label: body defaults; INK-on-paper labels and role fonts
     # still override per-node via UIKit.label().
     var body := UIKit.font_for(UITokens.TypeRole.BODY)

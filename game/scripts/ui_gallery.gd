@@ -150,23 +150,32 @@ func _sec_pills_buttons(root: Control) -> void:
 
 
 func _sec_icons(root: Control) -> void:
-	var box := _section(root, "Icon registry — every semantic name resolves")
-	var flow := HFlowContainer.new()
-	flow.add_theme_constant_override("h_separation", 3)
-	flow.add_theme_constant_override("v_separation", 2)
-	flow.custom_minimum_size = Vector2(612, 0)
-	box.add_child(flow)
+	var box := _section(root, "Icon registry — glyphs tinted, objects painterly (UI-066)")
 	var reg: Dictionary = JSON.parse_string(
 		FileAccess.get_file_as_string("res://data/icons.json"))
-	for cat in reg:
-		if reg[cat] is Dictionary:
-			for k in reg[cat]:
-				if k != "comment":
-					var t := TextureRect.new()
-					t.texture = UIKit.icon(k)
-					t.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-					t.stretch_mode = TextureRect.STRETCH_KEEP
-					flow.add_child(t)
+	for cat in ["values", "weather", "chrome", "sections", "traits",
+			"objects", "inline12"]:
+		var table: Dictionary = reg.get(cat, {})
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", UITokens.SP2)
+		box.add_child(row)
+		var cap := UIKit.label_for(cat, UITokens.TypeRole.CAPTION,
+			UITokens.DIM)
+		cap.custom_minimum_size = Vector2(52, 0)
+		row.add_child(cap)
+		var flow := HFlowContainer.new()
+		flow.add_theme_constant_override("h_separation", 3)
+		flow.add_theme_constant_override("v_separation", 2)
+		flow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(flow)
+		for k in table:
+			if k == "comment":
+				continue
+			# glyph masks get semantic tints; painterly objects render raw
+			var t := UIKit.icon_rect(k) \
+				if String(table[k]).begins_with("G_") \
+				else UIKit.icon_rect(k, Color.WHITE)
+			flow.add_child(t)
 
 
 func _sec_chips(root: Control) -> void:

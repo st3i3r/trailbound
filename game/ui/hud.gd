@@ -173,6 +173,7 @@ func set_day(text: String, weather: String) -> void:
     day_label.text = text
     var ico: TextureRect = day_label.get_parent().get_meta("icon")
     ico.texture = UIKit.weather_icon(weather)
+    ico.modulate = UIKit.GLYPH_TINT.get(weather, UITokens.PAPER)
     UIKit.pill_fit(day_label)
 
 

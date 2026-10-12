@@ -46,13 +46,53 @@ static func _ensure() -> void:
 
 
 static func icon_name(name: String) -> String:
-    ## Semantic name -> file id ("coin" -> "I1_0"); passes raw ids through.
+    ## Semantic name -> file id ("coin" -> "G_coin"); passes raw ids through.
     _ensure()
     return _icons.get(name, name)
 
 
 static func icon(name: String) -> Texture2D:
     return tex("icons/" + icon_name(name))
+
+
+## G_* glyphs are white masks — colour is a UI concern.  Semantic
+## defaults keep call sites honest: a coin is gold everywhere, not
+## whatever the local rect happened to modulate.
+const GLYPH_TINT := {
+    "coin": UITokens.GOLD, "coins": UITokens.GOLD,
+    "star_full": UITokens.GOLD, "star_half": UITokens.GOLD,
+    "star_empty": UITokens.DIM, "heart": UITokens.RED,
+    "check": UITokens.GREEN, "alert": UITokens.GOLD,
+    "question": UITokens.DIM, "clear": UITokens.GOLD,
+    "sun": UITokens.GOLD, "sunrise": UITokens.GOLD,
+    "moon": UITokens.BLUE, "night": UITokens.BLUE,
+    "cloud": UITokens.DIM, "rain": UITokens.BLUE,
+    "fire": UITokens.RED, "leaf": UITokens.GREEN,
+}
+
+
+static func icon_rect(name: String, tint: Variant = null,
+                      size := 16) -> TextureRect:
+    ## Icon as a ready control: `size` px, NEAREST, IGNORE filter,
+    ## semantic glyph tint (pass `tint` to override — e.g. DIM idle).
+    ## Glyph masks ship _16/_12 size variants — dense slots get a
+    ## grid-exact small file, never a scaled one.
+    _ensure()
+    var id := icon_name(name)
+    if size != 24 and id.begins_with("G_"):
+        var v := "%s_%d" % [id, size]
+        if ResourceLoader.exists("res://assets/pinewatch/icons/%s.png"
+                % v):
+            id = v
+    var t := TextureRect.new()
+    t.texture = tex("icons/" + id)
+    t.custom_minimum_size = Vector2(size, size)
+    t.stretch_mode = TextureRect.STRETCH_KEEP
+    t.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+    t.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    t.modulate = GLYPH_TINT.get(name, UITokens.PAPER) \
+        if tint == null else tint
+    return t
 
 
 ## trait id -> its registry icon (falls back to the trait name itself
@@ -179,12 +219,8 @@ static func pill(parent: Control, where: Variant, icon: String,
     parent.add_child(p)
     var xo := 8.0
     if icon != "":
-        var t := TextureRect.new()
-        t.texture = UIKit.icon(icon)
-        t.stretch_mode = TextureRect.STRETCH_KEEP
-        t.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+        var t := icon_rect(icon)
         t.position = Vector2(6, (sz.y - 16) / 2.0)
-        t.mouse_filter = Control.MOUSE_FILTER_IGNORE
         p.add_child(t)
         p.set_meta("icon", t)
         xo = 24.0

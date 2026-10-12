@@ -1,40 +1,85 @@
 {
- "comment": "Semantic icon registry (UI-066 step 0). Names -> files under assets/pinewatch/icons/. Painterly object-illustration icons (the I1 batch) — symbolic, not 3/4 world-view sprites; matches Eastward's item-icon treatment. Chrome tabs/controls go flat one-colour separately (D-UI-5). Identified by eye 2026-10-12 (I1 was an unnamed 64-slot batch job; ids 28/34/37/39 do not exist). For future batches: dish/food icons at a slight 3/4 so contents show; tools/gear profile.",
+ "comment": "Semantic icon registry. Names -> files under assets/pinewatch/icons/. Two families (D-UI-5, UI-066): G_* = flat one-colour WHITE MASK glyphs — chrome/values/weather/traits/sections; tint comes from modulate/theme, never baked in. Sources: pixelarticons (MIT, github.com/halfmage/pixelarticons) where imported by tools/tb_glyphs.py IMPORT, Trailbound-drawn string-art otherwise; MIT notice in credits (GDD §18). I1_* = painterly full-colour CONTENT icons only (items, dishes, keepsakes) — never chrome. *_12 = hand-drawn 12px inline set (chips/text badges), never downscaled.",
  "values": {
-  "coin": "I1_0", "star_full": "I1_1", "star_half": "I1_2",
-  "star_empty": "I1_3", "heart": "I1_23"
+  "coin": "G_coin", "star_full": "G_star_full",
+  "star_half": "G_star_half", "star_empty": "G_star_empty",
+  "heart": "G_heart"
  },
  "weather": {
-  "clear": "I1_4", "cloud": "I1_5", "rain": "I1_6",
-  "night": "I1_7", "sunrise": "I1_8"
+  "clear": "G_sun", "cloud": "G_cloud", "rain": "G_rain",
+  "night": "G_moon", "sunrise": "G_sunrise"
  },
  "chrome": {
-  "lantern": "I1_9", "journal": "I1_10", "map": "I1_11",
-  "gear": "I1_12", "close": "I1_13", "check": "I1_14",
-  "back": "I1_15", "plus": "I1_16", "minus": "I1_17",
-  "lock": "I1_18", "hourglass": "I1_19", "bell": "I1_22",
-  "hand": "I1_29", "sparkle": "I1_49", "music": "I1_27",
-  "note": "I1_33", "radio": "I1_26", "megaphone": "I1_41"
+  "close": "G_close", "back": "G_back", "check": "G_check",
+  "plus": "G_plus", "minus": "G_minus", "lock": "G_lock",
+  "unlock": "G_unlock", "gear": "G_gear", "sliders": "G_sliders",
+  "info": "G_info", "alert": "G_alert", "question": "G_question",
+  "undo": "G_undo", "play": "G_play", "pause": "G_pause",
+  "volume": "G_volume", "volume_x": "G_volume_x",
+  "music": "G_music", "note": "G_note", "bell": "G_bell",
+  "hourglass": "G_hourglass", "hand": "G_hand", "sparkle": "G_sparkle",
+  "radio": "G_radio", "megaphone": "G_megaphone",
+  "search": "G_search", "filter": "G_filter", "share": "G_share",
+  "trash": "G_trash", "edit": "G_edit", "checkbox": "G_checkbox",
+  "spinner": "G_spinner", "eye": "G_eye", "eye_off": "G_eye_off",
+  "zap": "G_zap", "arrow_up": "G_arrow_up",
+  "arrow_down": "G_arrow_down", "arrow_right": "G_arrow_right",
+  "plus_box": "G_plus_box", "minus_box": "G_minus_box",
+  "map_pin": "G_map_pin", "compass": "G_compass",
+  "mail": "G_mail", "mailbox": "G_mailbox", "calendar": "G_calendar",
+  "image": "G_image", "bookmark": "G_bookmark", "inbox": "G_inbox",
+  "card": "G_card", "credit_card": "G_credit_card",
+  "users": "G_users", "user": "G_user", "user_plus": "G_user_plus",
+  "human": "G_human", "backpack": "G_backpack", "tools": "G_tools",
+  "tool_case": "G_tool_case", "store": "G_store", "box": "G_box",
+  "scroll": "G_scroll", "lightbulb": "G_lightbulb", "bed": "G_bed",
+  "pen_square": "G_pen_square", "flag": "G_flag",
+  "tent": "G_tent", "camera": "G_camera", "fish": "G_fish",
+  "dog": "G_dog", "fire": "G_fire", "leaf": "G_leaf",
+  "tree_pine": "G_tree_pine", "snowflake": "G_snowflake",
+  "wind": "G_wind", "thermometer": "G_thermometer",
+  "snail": "G_snail", "car": "G_car", "bus": "G_bus",
+  "truck": "G_truck", "potion": "G_potion", "coins": "G_coins",
+  "sun": "G_sun", "moon": "G_moon", "cloud": "G_cloud",
+  "lantern": "G_lantern", "rain": "G_rain", "sunrise": "G_sunrise",
+  "cook": "G_pot"
+ },
+ "sections": {
+  "comment": "the ~14 tab/section glyphs — Trailbound objects, drawn in tb_glyphs.py (0 gens)",
+  "journal": "G_notebook", "trail_map": "G_map", "pantry": "G_bowl_pho",
+  "outfitter": "G_van", "build": "G_build", "crew": "G_crew",
+  "daily": "G_daily", "guestbook": "G_guestbook",
+  "field_notes": "G_field_notes", "recipes": "G_pot",
+  "keepsakes": "G_keepsakes", "letters": "G_letters",
+  "settings": "G_gear", "camp": "G_tent"
  },
  "objects": {
-  "campfire": "I1_24", "tent": "I1_25", "person": "I1_30",
+  "comment": "painterly CONTENT icons (I1 batch) — items/dishes/fauna; keep colour, sticker-outline pass pending (UI-019 tail)",
+  "campfire": "I1_24", "person": "I1_30",
   "elder": "I1_32", "pot": "I1_35", "kite": "I1_36",
-  "camera": "I1_38", "firefly_jar": "I1_40", "flame": "I1_42",
-  "kettle": "I1_43", "sprout": "I1_44", "leaf": "I1_31",
-  "umbrella": "I1_45", "bush": "I1_46", "paw": "I1_47",
-  "guitar": "I1_48", "backpack": "I1_56", "binoculars": "I1_57",
+  "firefly_jar": "I1_40", "flame": "I1_42",
+  "kettle": "I1_43", "sprout": "I1_44",
+  "umbrella": "I1_45", "bush": "I1_46",
+  "backpack": "I1_56", "binoculars": "I1_57",
   "fishing_rod": "I1_55", "pick": "I1_20", "bindle": "I1_21",
   "vista": "I1_52", "sparkler": "I1_53", "thermos": "I1_54",
-  "first_aid": "I1_58", "compass": "I1_59", "bowl": "I1_60",
+  "first_aid": "I1_58", "bowl": "I1_60",
   "banh_mi": "I1_61", "canister": "I1_62", "pine": "I1_63",
-  "crab": "I1_50", "droplet": "I1_51"
+  "crab": "I1_50", "droplet": "I1_51", "guitar": "I1_48"
  },
  "traits": {
-  "comment": "trait id -> icon (13 traits from traits.json; dog_wary shares paw until a drawn set lands)",
-  "chilly": "I1_24", "social": "I1_30", "introvert": "I1_25",
-  "nature_lover": "I1_31", "night_owl": "I1_7",
-  "music_lover": "I1_27", "light_sleeper": "I1_22",
-  "dog_lover": "I1_47", "dog_wary": "I1_47", "kids": "I1_36",
-  "angler": "I1_55", "shutterbug": "I1_38", "stargazer": "I1_49"
+  "comment": "trait id -> glyph (13 traits from traits.json); flat marks, tinted at call site",
+  "chilly": "G_fire", "social": "G_users", "introvert": "G_tent",
+  "nature_lover": "G_leaf", "night_owl": "G_moon",
+  "music_lover": "G_note", "light_sleeper": "G_bell",
+  "dog_lover": "G_paw", "dog_wary": "G_dog_wary", "kids": "G_kite",
+  "angler": "G_fish", "shutterbug": "G_camera", "stargazer": "G_stargazer"
+ },
+ "inline12": {
+  "comment": "12px hand-drawn inline set — chips and text badges only",
+  "coin_12": "G_coin_12", "star_12": "G_star_full_12",
+  "check_12": "G_check_12", "plus_12": "G_plus_12",
+  "minus_12": "G_minus_12", "heart_12": "G_heart_12",
+  "alert_12": "G_alert_12"
  }
 }

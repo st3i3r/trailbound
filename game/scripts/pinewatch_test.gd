@@ -1037,12 +1037,8 @@ func _fill_bubble(control: Control, detail: Array) -> void:
         chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
         chip.position = Vector2(x, 3)
         chip.size = Vector2(16, 16)
-        var t := TextureRect.new()
-        t.texture = UIKit.trait_icon(String(d.get("trait", "")))
-        t.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-        t.stretch_mode = TextureRect.STRETCH_KEEP
-        if st["sign"] == "·":
-            t.modulate = Color(1, 1, 1, 0.65)  # unresolved dims back
+        var t := UIKit.icon_rect(String(d.get("trait", "")),
+            Color(1, 1, 1, 0.65) if st["sign"] == "·" else null)
         chip.add_child(t)
         var l := UIKit.label_for(st["sign"], UITokens.TypeRole.HEAD,
             st["color"])
@@ -1182,10 +1178,7 @@ func _show_previews(gid: String) -> void:
         # star icon + number, comp-style
         var m := Node2D.new()
         m.position = pad_cells[pid].position + Vector2(18, 2)
-        var t := TextureRect.new()
-        t.texture = UIKit.icon("star_full")
-        t.stretch_mode = TextureRect.STRETCH_KEEP
-        t.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+        var t := UIKit.icon_rect("star_full")
         m.add_child(t)
         var l := UIKit.label_for("%d" % r["stars"],
             UITokens.TypeRole.HEAD)

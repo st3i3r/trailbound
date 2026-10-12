@@ -140,11 +140,8 @@ func _card(req: Dictionary, sprite: Dictionary) -> Panel:
 	name_l.size = Vector2(CARD_W - 43, 10)
 	c.add_child(name_l)
 	# fee: coin icon + amount
-	var coin := TextureRect.new()
+	var coin := UIKit.icon_rect("coin")
 	coin.name = "FeeIcon"
-	coin.texture = UIKit.icon("coin")
-	coin.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	coin.stretch_mode = TextureRect.STRETCH_KEEP
 	coin.position = Vector2(41, 14)
 	c.add_child(coin)
 	var fee_l := UIKit.label_for("%dc" % int(req.get("fee", 0)),
@@ -156,10 +153,7 @@ func _card(req: Dictionary, sprite: Dictionary) -> Panel:
 	# trait icons: up to 3, 16px at 13px stride so three fit the column
 	var tx := 41
 	for tid in req.get("traits", []).slice(0, 3):
-		var t := TextureRect.new()
-		t.texture = UIKit.trait_icon(String(tid))
-		t.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		t.stretch_mode = TextureRect.STRETCH_KEEP
+		var t := UIKit.icon_rect(String(tid))
 		t.position = Vector2(tx, 29)
 		c.add_child(t)
 		tx += 13
@@ -171,12 +165,8 @@ func _card(req: Dictionary, sprite: Dictionary) -> Panel:
 		by += 13
 	if req.get("loud", false):
 		_badge(c, "megaphone", Vector2(1, by), Color.WHITE)
-	var fav := TextureRect.new()
+	var fav := UIKit.icon_rect("heart", UITokens.DIM)
 	fav.name = "Fav"
-	fav.texture = UIKit.icon("heart")
-	fav.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	fav.stretch_mode = TextureRect.STRETCH_KEEP
-	fav.modulate = UITokens.DIM
 	fav.position = Vector2(CARD_W - 15, 1)
 	c.add_child(fav)
 	var q := UIKit.label_for("?", UITokens.TypeRole.BODY, UITokens.DIM)
@@ -184,11 +174,8 @@ func _card(req: Dictionary, sprite: Dictionary) -> Panel:
 	q.position = Vector2(CARD_W - 7, 3)
 	c.add_child(q)
 	# seated check + selection ring (toggled, both drawn last = on top)
-	var chk := TextureRect.new()
+	var chk := UIKit.icon_rect("check")
 	chk.name = "Seated"
-	chk.texture = UIKit.icon("check")
-	chk.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	chk.stretch_mode = TextureRect.STRETCH_KEEP
 	chk.position = Vector2(13, 15)
 	chk.visible = false
 	c.add_child(chk)
@@ -213,11 +200,7 @@ func _card_name(req: Dictionary) -> String:
 
 func _badge(card: Control, icon_name: String, pos: Vector2,
 		tint: Color) -> void:
-	var b := TextureRect.new()
-	b.texture = UIKit.icon(icon_name)
-	b.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	b.stretch_mode = TextureRect.STRETCH_KEEP
-	b.modulate = tint
+	var b := UIKit.icon_rect(icon_name, tint)
 	b.position = pos
 	card.add_child(b)
 
@@ -229,7 +212,7 @@ func _badge(card: Control, icon_name: String, pos: Vector2,
 func show_guest_terms(guest: Dictionary, hint: String) -> void:
 	var chips := []
 	for tid in guest.get("traits", []):
-		chips.append({"icon": UIKit.trait_icon(String(tid)),
+		chips.append({"icon": String(tid),
 			"name": _trait_names.get(tid, tid), "sign": "·",
 			"color": UITokens.DIM})
 	chips.append({"text": hint, "color": UITokens.DIM})
@@ -250,19 +233,19 @@ func show_preview(r: Dictionary) -> void:
 		elif d.get("met", false):
 			sign = "+1"
 			color = UITokens.GREEN
-		chips.append({"icon": UIKit.trait_icon(String(d.get("trait", ""))),
+		chips.append({"icon": String(d.get("trait", "")),
 			"name": _trait_names.get(d.get("trait", ""), ""),
 			"sign": sign, "color": color})
 	var comfort := int(r.get("comfort", 0))
-	chips.append({"icon": UIKit.icon("tent"),
+	chips.append({"icon": "tent",
 		"name": tr("tray_shelter"),
 		"sign": "+%d" % comfort if comfort > 0 else "·",
 		"color": UITokens.GREEN if comfort > 0 else UITokens.DIM})
 	if int(r.get("weather", 0)) != 0:
-		chips.append({"icon": UIKit.weather_icon("rain"),
+		chips.append({"icon": "rain",
 			"name": tr("tray_rain"), "sign": "−1",
 			"color": UITokens.RED})
-	chips.append({"icon": UIKit.icon("star_full"),
+	chips.append({"icon": "star_full",
 		"name": "=", "sign": "%d" % int(r.get("stars", 0)),
 		"color": UITokens.GOLD})
 	_show(chips)
@@ -281,10 +264,7 @@ func _show(chips: Array) -> void:
 		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		row.add_theme_constant_override("separation", 2)
 		if ch.has("icon"):
-			var t := TextureRect.new()
-			t.texture = ch["icon"]
-			t.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-			t.stretch_mode = TextureRect.STRETCH_KEEP
+			var t := UIKit.icon_rect(ch["icon"])
 			row.add_child(t)
 		var name := String(ch.get("name", ""))
 		if name != "":

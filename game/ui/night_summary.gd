@@ -103,18 +103,9 @@ func _review_block(r: Dictionary, is_best: bool) -> Control:
 		r["id"])), UITokens.TypeRole.HEAD, UITokens.PAPER)
 	top.add_child(name_l)
 	if is_best:
-		var b := TextureRect.new()
-		b.texture = UIKit.icon("sparkle")
-		b.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		b.stretch_mode = TextureRect.STRETCH_KEEP
-		b.modulate = UITokens.GOLD
-		top.add_child(b)
+		top.add_child(UIKit.icon_rect("sparkle", UITokens.GOLD))
 	for i in int(r.get("stars", 0)):
-		var s := TextureRect.new()
-		s.texture = UIKit.icon("star_full")
-		s.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		s.stretch_mode = TextureRect.STRETCH_KEEP
-		top.add_child(s)
+		top.add_child(UIKit.icon_rect("star_full"))
 	var pay := UIKit.label_for("+%dc" % (int(r.get("fee", 0))
 		+ int(round(r.get("tip", 0.0)))),
 		UITokens.TypeRole.HEAD, UITokens.GREEN)
@@ -124,17 +115,17 @@ func _review_block(r: Dictionary, is_best: bool) -> Control:
 	var chips := HBoxContainer.new()
 	chips.add_theme_constant_override("separation", 5)
 	for d in r.get("detail", []):
-		chips.add_child(_term(UIKit.trait_icon(String(d.get("trait", ""))),
+		chips.add_child(_term(String(d.get("trait", "")),
 			"+1" if d.get("met", false) else \
 			("−1" if d.get("tripped", false) else "·")))
 	if int(r.get("comfort", 0)) > 0:
-		chips.add_child(_term(UIKit.icon("tent"),
+		chips.add_child(_term("tent",
 			"+%d" % int(r["comfort"])))
 	if int(r.get("weather", 0)) != 0:
-		chips.add_child(_term(UIKit.weather_icon("rain"), "−1"))
+		chips.add_child(_term("rain", "−1"))
 	var meal := int(r.get("meal", 0))
 	if meal != 0:
-		chips.add_child(_term(UIKit.icon("pot"),
+		chips.add_child(_term("cook",
 			"%+d" % meal))
 	box.add_child(chips)
 	# line 3: the review quote
@@ -144,15 +135,11 @@ func _review_block(r: Dictionary, is_best: bool) -> Control:
 	return box
 
 
-func _term(icon: Texture2D, sign: String) -> Control:
+func _term(icon_name: String, sign: String) -> Control:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 1)
-	var t := TextureRect.new()
-	t.texture = icon
-	t.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	t.stretch_mode = TextureRect.STRETCH_KEEP
-	if sign == "·":
-		t.modulate = Color(1, 1, 1, 0.6)
+	var t := UIKit.icon_rect(icon_name,
+		Color(1, 1, 1, 0.6) if sign == "·" else null)
 	row.add_child(t)
 	var color := UITokens.DIM
 	if sign.begins_with("+"):
@@ -195,10 +182,7 @@ func _build_totals(forecast: String, parent: Control) -> void:
 	# forecast row: weather left, money pushed right — no floating numbers
 	var last := HBoxContainer.new()
 	last.add_theme_constant_override("separation", 6)
-	var wico := TextureRect.new()
-	wico.texture = UIKit.weather_icon(forecast)
-	wico.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	wico.stretch_mode = TextureRect.STRETCH_KEEP
+	var wico := UIKit.icon_rect(forecast)
 	last.add_child(wico)
 	last.add_child(UIKit.label_for(
 		"%s: %s" % [tr("night_tomorrow"),
@@ -209,11 +193,7 @@ func _build_totals(forecast: String, parent: Control) -> void:
 	last.add_child(push)
 	last.add_child(UIKit.label_for("+%dc" % income,
 		UITokens.TypeRole.HEAD, UITokens.GREEN))
-	var cico := TextureRect.new()
-	cico.texture = UIKit.icon("coin")
-	cico.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	cico.stretch_mode = TextureRect.STRETCH_KEEP
-	last.add_child(cico)
+	last.add_child(UIKit.icon_rect("coin"))
 	_coins_l = UIKit.label_for("%dc" % Game.coins,
 		UITokens.TypeRole.HEAD, UITokens.GOLD)
 	last.add_child(_coins_l)
