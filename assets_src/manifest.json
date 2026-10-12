@@ -1,727 +1,7696 @@
 {
-  "project": "Trailbound",
-  "palette": "Pinewatch site ramp: 40 colors, cleanup/site_palette.json (tools/palette_lock.py pools all manifest files). Per-site ramps: Pinewatch = deep greens + ember-orange accents; Whisper River = river blues + bamboo green; Lantern Valley = golden meadow + dusk violet (\u00a711). Dusk warmth is a \u00a716.3 lighting layer \u2014 do NOT bake it into sprites",
-  "sun_angle": "upper left",
-  "assets": [
-    {
-      "id": "campfire_ring",
-      "category": "structures",
-      "status": "generated",
-      "files": [
-        "gen/campfire_0.png"
-      ],
-      "canvas": "64x64",
-      "frames": 1,
-      "batch": 0,
-      "source": "pixellab pixen 'high top-down'",
-      "notes": "stone ring only \u00e2\u20ac\u201d flame is a separate animated layer (campfire_flame)"
-    },
-    {
-      "id": "campfire_flame",
-      "category": "anims",
-      "status": "generated",
-      "files": [
-        "gen/flame_frames_0.png",
-        "gen/flame_00.png",
-        "gen/flame_01.png",
-        "gen/flame_02.png",
-        "gen/flame_03.png"
-      ],
-      "canvas": "128x32",
-      "frames": "4x32x32 strip",
-      "batch": 0,
-      "source": "pixellab pixen 'side'",
-      "notes": "flicker loop 1-2-4-2; frame 3 doubles as wind-gust variant; sits on campfire_ring + glow layer; sliced + despeckled via tools/slice_sheet.py"
-    },
-    {
-      "id": "player_idle",
-      "category": "characters",
-      "status": "generated",
-      "files": [
-        "gen/player_front_0.png"
-      ],
-      "canvas": "64x64",
-      "frames": 1,
-      "batch": 0,
-      "source": "pixellab pixen 'low top-down'",
-      "notes": "front-facing idle \u00e2\u20ac\u201d the character style anchor; 4-dir sheet later via create_character"
-    },
-    {
-      "id": "player_walk_away",
-      "category": "characters",
-      "status": "generated",
-      "files": [
-        "gen/player_0.png"
-      ],
-      "canvas": "64x64",
-      "frames": 1,
-      "batch": 0,
-      "source": "pixellab pixen 'low top-down'",
-      "notes": "back-three-quarter pose \u00e2\u20ac\u201d kept as the walk-away (north) pose for the 4-dir sheet"
-    },
-    {
-      "id": "terrain_grass_pinewatch",
-      "category": "terrain",
-      "status": "generated",
-      "files": [
-        "gen/terrain_grass_p1_0.png",
-        "gen/terrain_grass_p_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 0,
-      "source": "pixellab pixen 'high top-down'",
-      "notes": "p1 (current candidate): sunlit yellow-green base, ember litter accents \u00e2\u20ac\u201d matches eastward1.jpg ground; mild litter cluster right-center to thin in cleanup. p0 superseded: dark moss + dense amber"
-    },
-    {
-      "id": "terrain_shore_sample",
-      "category": "terrain",
-      "status": "generated",
-      "files": [
-        "gen/terrain_shore_p_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 0,
-      "source": "pixellab pixen 'high top-down'",
-      "notes": "sandy bank \u00e2\u2020\u2019 foam \u00e2\u2020\u2019 blue water, horizontal transition for vertical tiling; sand tone is material-true warm tan"
-    },
-    {
-      "id": "prop_outfitter_van",
-      "category": "props",
-      "status": "generated",
-      "files": [
-        "gen/prop_van_p_0.png"
-      ],
-      "canvas": "64x64",
-      "frames": 1,
-      "batch": 0,
-      "source": "pixellab pixen 'high top-down'",
-      "notes": "vintage outfitter van, warm paint + cream roof \u00e2\u20ac\u201d warmth on the prop is per the Eastward rule (structures/props carry the warm tones, ground stays green)"
-    },
-    {
-      "id": "terrain_grass_lush",
-      "category": "terrain",
-      "status": "generated",
-      "files": [
-        "gen/terrain_grass_lush_v2_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "v2 fills frame; diagonal sandy band needs cloning out or it will seam on repeat; v1 island superseded",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "terrain_grass_worn",
-      "category": "terrain",
-      "status": "generated",
-      "files": [
-        "gen/terrain_grass_worn_v2_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "v2 full-bleed dry olive ground; v1 sparse/dark superseded",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "terrain_dirt",
-      "category": "terrain",
-      "status": "generated",
-      "files": [
-        "gen/terrain_dirt_v2_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "v2 full-bleed packed earth + pebbles; v1 island superseded",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "terrain_path_dirt",
-      "category": "terrain",
-      "status": "generated",
-      "files": [
-        "gen/terrain_path_dirt_v2_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "v2 marginal \u2014 wear streaks read as diagonal tiger stripes; use dirt_v2 as fallback or fix streaks in cleanup; v1 island (paw print) superseded",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "terrain_forest_floor",
-      "category": "terrain",
-      "status": "generated",
-      "files": [
-        "gen/terrain_forest_floor_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "full-bleed needle litter, tiles as-is",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "terrain_path_stone",
-      "category": "terrain",
-      "status": "generated",
-      "files": [
-        "gen/terrain_path_stone_v2_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "v2 full-bleed flagstones + moss gaps; v1 island superseded",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "terrain_pond_water",
-      "category": "terrain",
-      "status": "generated",
-      "files": [
-        "gen/terrain_pond_water_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "full-bleed dark water + ripples, tiles as-is",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "terrain_shore_corner_in",
-      "category": "terrain",
-      "status": "generated",
-      "files": [
-        "gen/terrain_shore_cin_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "inside corner, mates with terrain_shore_p_0 straight edges",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "terrain_shore_corner_out",
-      "category": "terrain",
-      "status": "generated",
-      "files": [
-        "gen/terrain_shore_cout_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "outside corner (sandy point)",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "decal_grass_tuft_a",
-      "category": "clutter",
-      "status": "generated",
-      "files": [
-        "gen/decal_tuft_a_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "clean tuft on transparency",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "decal_grass_tuft_b",
-      "category": "clutter",
-      "status": "generated",
-      "files": [
-        "gen/decal_tuft_b_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "second tuft silhouette",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "decal_pine_needles",
-      "category": "clutter",
-      "status": "generated",
-      "files": [
-        "gen/decal_needles_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "needle drift scatter",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "decal_pebbles",
-      "category": "clutter",
-      "status": "generated",
-      "files": [
-        "gen/decal_pebbles_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "pebble cluster \u2014 slightly clumpy, may shrink in cleanup",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "decal_fern",
-      "category": "clutter",
-      "status": "generated",
-      "files": [
-        "gen/decal_fern_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "bluer-green fronds contrast grass nicely",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "decal_wildflower",
-      "category": "clutter",
-      "status": "generated",
-      "files": [
-        "gen/decal_flower_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "violet flower cluster \u2014 denser than spec'd 2-3 dots but usable",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "decal_mushroom",
-      "category": "clutter",
-      "status": "generated",
-      "files": [
-        "gen/decal_mushroom_v2_0.png"
-      ],
-      "canvas": "32x32",
-      "frames": 1,
-      "batch": 1,
-      "notes": "v2 clean pair on transparency; v1 had a grass blob under it",
-      "source": "pixellab pixen 'high top-down'"
-    },
-    {
-      "id": "tree_pine_large",
-      "category": "structures",
-      "status": "generated",
-      "files": [
-        "gen/tree_pine_green_2.png"
-      ],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": 2,
-      "source": "pixellab v2 style-transfer (ref: docs/reference/tree.jpg, palette off)",
-      "notes": "APPROVED PICK \u2014 fullest-canopy green pine, the signature silhouette; alts green_1/3, pixen tree_pine_large_0.png"
-    },
-    {
-      "id": "tree_pine_young",
-      "category": "structures",
-      "status": "generated",
-      "files": [
-        "gen/tree_pine_green_0.png"
-      ],
-      "canvas": "64x64",
-      "frames": 1,
-      "batch": 2,
-      "source": "pixellab v2 style-transfer (ref: docs/reference/tree.jpg, palette off)",
-      "notes": "APPROVED PICK \u2014 narrow conical spruce reads as the young/midground pine"
-    },
-    {
-      "id": "tree_autumn_accent_a",
-      "category": "structures",
-      "status": "generated",
-      "files": [
-        "gen/tree_ref_2.png"
-      ],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": 2,
-      "source": "pixellab v2 style-transfer (ref: docs/reference/tree.jpg)",
-      "notes": "APPROVED PICK \u2014 tiered-bough autumn accent (the eastward1.jpg accent-tree role); alts gen/tree_ref_0/1.png"
-    },
-    {
-      "id": "tree_autumn_accent_b",
-      "category": "structures",
-      "status": "generated",
-      "files": [
-        "gen/tree_ref_3.png"
-      ],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": 2,
-      "source": "pixellab v2 style-transfer (ref: docs/reference/tree.jpg)",
-      "notes": "APPROVED PICK \u2014 wide-spread autumn accent; second accent silhouette for variety"
-    },
-    {
-      "id": "prop_tent_olive",
-      "category": "props",
-      "status": "generated",
-      "files": [
-        "gen/prop_tent_olive_0.png"
-      ],
-      "canvas": "64x64",
-      "frames": 1,
-      "batch": 2,
-      "source": "pixellab pixen 'high top-down'",
-      "notes": "olive A-frame with pole frame + guy lines \u2014 primary pad tent"
-    },
-    {
-      "id": "prop_tent_rust",
-      "category": "props",
-      "status": "generated",
-      "files": [
-        "gen/prop_tent_rust_0.png"
-      ],
-      "canvas": "64x64",
-      "frames": 1,
-      "batch": 2,
-      "source": "pixellab pixen 'high top-down'",
-      "notes": "rust-orange colorway \u2014 second silhouette-matched tent for pad variety"
-    },
-    {
-      "id": "prop_log_bench",
-      "category": "props",
-      "status": "generated",
-      "files": [
-        "gen/prop_log_bench_0.png"
-      ],
-      "canvas": "64x64",
-      "frames": 1,
-      "batch": 2,
-      "source": "pixellab pixen 'high top-down'",
-      "notes": "split-log campfire bench"
-    },
-    {
-      "id": "prop_stump",
-      "category": "props",
-      "status": "generated",
-      "files": [
-        "gen/prop_stump_0.png"
-      ],
-      "canvas": "64x64",
-      "frames": 1,
-      "batch": 2,
-      "source": "pixellab pixen 'high top-down'",
-      "notes": "mossy-top stump with roots + sprout \u2014 campfire stool"
-    },
-    {
-      "id": "prop_lantern_post",
-      "category": "props",
-      "status": "generated",
-      "files": [
-        "gen/prop_lantern_post_0.png"
-      ],
-      "canvas": "64x64",
-      "frames": 1,
-      "batch": 2,
-      "source": "pixellab pixen 'high top-down'",
-      "notes": "post + cross-arm + hanging paper lantern; top silhouette slightly muddy \u2014 acceptable at 3x, cleanup optional"
-    },
-    {
-      "id": "prop_signpost",
-      "category": "props",
-      "status": "generated",
-      "files": [
-        "gen/prop_signpost_0.png"
-      ],
-      "canvas": "64x64",
-      "frames": 1,
-      "batch": 2,
-      "source": "pixellab pixen 'high top-down'",
-      "notes": "two-way arrow boards + base tuft"
-    },
-    {
-      "id": "prop_supply_crate",
-      "category": "props",
-      "status": "generated",
-      "files": [
-        "gen/prop_supply_crate_0.png"
-      ],
-      "canvas": "64x64",
-      "frames": 1,
-      "batch": 2,
-      "source": "pixellab pixen 'high top-down'",
-      "notes": "tarped crate stack \u2014 reads as one crate, fine for clutter"
-    },
-    {
-      "id": "prop_boulder",
-      "category": "props",
-      "status": "generated",
-      "files": [
-        "gen/prop_boulder_0.png"
-      ],
-      "canvas": "64x64",
-      "frames": 1,
-      "batch": 2,
-      "source": "pixellab pixen 'high top-down'",
-      "notes": "mossy granite + tiny red sprout accent"
-    },
-    {
-      "id": "wardens_hut_ruin",
-      "category": "structures",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "\u00c2\u00a78.4 Pinewatch structure, state 1/4: overgrown ruin on the crew plot; brambles + fallen porch"
-    },
-    {
-      "id": "wardens_hut_brambles_cleared",
-      "category": "structures",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "state 2/4: cleared ground, sagging roof; scaffold overlay optional"
-    },
-    {
-      "id": "wardens_hut_roof_fixed",
-      "category": "structures",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "state 3/4: new roof, porch still broken"
-    },
-    {
-      "id": "wardens_hut_restored",
-      "category": "structures",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "state 4/4: porch rebuilt, warm light for the 'porch_light' vignette"
-    },
-    {
-      "id": "boathouse_states",
-      "category": "structures",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 4,
-      "batch": "crew",
-      "notes": "\u00c2\u00a78.4 Whisper River: ruin \u00e2\u2020\u2019 stage_1 \u00e2\u2020\u2019 stage_2 \u00e2\u2020\u2019 restored (boat afloat); boat-on-river vignette state"
-    },
-    {
-      "id": "lantern_workshop_states",
-      "category": "structures",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 4,
-      "batch": "crew",
-      "notes": "\u00c2\u00a78.4 Lantern Valley: ruin \u00e2\u2020\u2019 stage_1 \u00e2\u2020\u2019 stage_2 \u00e2\u2020\u2019 restored; lanterns-over-the-valley vignette state"
-    },
-    {
-      "id": "overgrown_plot_pinewatch",
-      "category": "structures",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "reserved_overgrown scenery, pine undergrowth \u00e2\u20ac\u201d v1 placeholder for Fire Tower + Pond Dock (\u00c2\u00a76.11)"
-    },
-    {
-      "id": "overgrown_plot_whisper_river",
-      "category": "structures",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "riverbank weeds \u00e2\u20ac\u201d placeholder for Bamboo Treehouse + Bathhouse"
-    },
-    {
-      "id": "overgrown_plot_lantern_valley",
-      "category": "structures",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "meadow grass mound \u00e2\u20ac\u201d placeholder for Observatory + Long Table"
-    },
-    {
-      "id": "crew_scaffold_overlay",
-      "category": "structures",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "bamboo scaffold + tarp layer shown on any structure while a stage is being worked"
-    },
-    {
-      "id": "crew_volunteer_a",
-      "category": "characters",
-      "status": "planned",
-      "files": [],
-      "canvas": "64x64",
-      "frames": "4-frame work loop + idle",
-      "batch": "crew",
-      "notes": "volunteer: hammer/saw loop while a stage runs, idle otherwise; hard hat + hi-vis over hoodie, cozy chunky style"
-    },
-    {
-      "id": "crew_volunteer_b",
-      "category": "characters",
-      "status": "planned",
-      "files": [],
-      "canvas": "64x64",
-      "frames": "4-frame work loop + idle",
-      "batch": "crew",
-      "notes": "second volunteer silhouette (carry planks, sweep); same work/idle set"
-    },
-    {
-      "id": "keepsake_thermos",
-      "category": "journal",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "\u00c2\u00a78.4 stage 1 keepsake art (Warden's Hut): grandpa's dented thermos, journal illustration style"
-    },
-    {
-      "id": "keepsake_register",
-      "category": "journal",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "old trail register, weathered logbook"
-    },
-    {
-      "id": "keepsake_photo",
-      "category": "journal",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "faded photo of grandpa on the porch \u00e2\u20ac\u201d the one image of him (\u00c2\u00a712.1)"
-    },
-    {
-      "id": "keepsake_oar",
-      "category": "journal",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "oar carved with two sets of initials (Boathouse)"
-    },
-    {
-      "id": "keepsake_chart",
-      "category": "journal",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "grandpa's river chart, hand-drawn bends and notes"
-    },
-    {
-      "id": "keepsake_boat",
-      "category": "journal",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "the boat shared with Old Ba, afloat again"
-    },
-    {
-      "id": "keepsake_frames",
-      "category": "journal",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "bamboo frames and rice paper (Lantern Workshop)"
-    },
-    {
-      "id": "keepsake_book",
-      "category": "journal",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "grandpa's lantern pattern book"
-    },
-    {
-      "id": "keepsake_lantern",
-      "category": "journal",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": 1,
-      "batch": "crew",
-      "notes": "his last unfinished lantern, finished \u00e2\u20ac\u201d may foreshadow the cove (Q8)"
-    },
-    {
-      "id": "crew_ready_bubble",
-      "category": "ui",
-      "status": "planned",
-      "files": [],
-      "canvas": "32x32",
-      "frames": "2-frame bob",
-      "batch": "crew",
-      "notes": "stage-ready bubble over the structure and the site's trail-map marker (\u00c2\u00a78.4, \u00c2\u00a717.2)"
-    },
-    {
-      "id": "crew_sheet_ui",
-      "category": "ui",
-      "status": "planned",
-      "files": [],
-      "canvas": "kit",
-      "frames": "panel + buttons",
-      "batch": "crew",
-      "notes": "crew sheet panel: stage label, time-left bar, Collect, speed-up '\u00e2\u2013\u00b6 \u00e2\u02c6\u201940 min', Finish (\u00c2\u00a717.2)"
-    },
-    {
-      "id": "collect_sparkle_vfx",
-      "category": "vfx",
-      "status": "planned",
-      "files": [],
-      "canvas": "64x64",
-      "frames": "6-8 frame strip",
-      "batch": "crew",
-      "notes": "2-4 s collect ceremony (\u00c2\u00a717.3): sparkle burst + keepsake rise; warm dust motes"
-    },
-    {
-      "id": "restore_dust_vfx",
-      "category": "vfx",
-      "status": "planned",
-      "files": [],
-      "canvas": "96x96",
-      "frames": "6-frame strip",
-      "batch": "crew",
-      "notes": "plank-dust poof + falling leaf puff when a structure state swaps"
-    },
-    {
-      "id": "vol2_structures",
-      "category": "structures",
-      "status": "draft",
-      "files": [],
-      "canvas": "96x96",
-      "frames": "6 structures x ~3 states",
-      "batch": "v1.1",
-      "notes": "\u00c2\u00a76.11 draft: fire_tower, pond_dock (P), bamboo_treehouse, bathhouse (W), observatory, long_table (L); scaffold + restored states; sizing/design may change at the v1.1 gate"
-    }
-  ]
+ "project": "Trailbound",
+ "palette": "Pinewatch site ramp v2: 48 colors, out/site_palette_v2.json (green 58.0%, warm 31.9%, neutral 9.1%, cool 1.0%) \u2014 built from staged batch3+4 winners; greens dominate. Old cleanup/site_palette.json retired (warm-heavy). Dusk warmth is a \u00a716.3 lighting layer \u2014 do NOT bake into sprites",
+ "sun_angle": "upper left",
+ "pipeline": "PixelLab -> gen/candidates/<batchN> -> winners staged at staging/pinewatch -> post-processed copies at out/ (contact shadows, anchors.json, palette outlier snap, terrain fixes, ui kit) -> sheets/atlases -> game/assets",
+ "scale_check": {
+  "camp": {
+   "min": 36,
+   "max": 45,
+   "mean": 39.6,
+   "spec": 48,
+   "in_window_38_52": false
+  },
+  "ranger": {
+   "min": 57,
+   "max": 60,
+   "mean": 58.1,
+   "spec": 48,
+   "in_window_38_52": false
+  },
+  "warden": {
+   "min": 57,
+   "max": 59,
+   "mean": 58.2,
+   "spec": 48,
+   "in_window_38_52": false
+  },
+  "action": "no resample per brief; sizes left as authored, deviation noted"
+ },
+ "assets": [
+  {
+   "id": "terrain_grass_water_pro_0",
+   "category": "terrain",
+   "job": "T2",
+   "batch": 3,
+   "file": "staging/pinewatch/terrain/terrain_grass_water_pro_0.png",
+   "size": "128x128",
+   "content_bbox": [
+    0,
+    0,
+    128,
+    128
+   ],
+   "anchor": {
+    "x": 64,
+    "y": 64,
+    "kind": "center"
+   },
+   "out": "out/terrain/terrain_grass_water_pro_0.png",
+   "status": "post",
+   "role": "water_lake_wang",
+   "job_notes": "Teal slightly saturated; cool down ~10% in palette pass. Lily pads baked into water tiles."
+  },
+  {
+   "id": "terrain_grass_forest_pro_0",
+   "category": "terrain",
+   "job": "T3",
+   "batch": 3,
+   "file": "staging/pinewatch/terrain/terrain_grass_forest_pro_0.png",
+   "size": "128x128",
+   "content_bbox": [
+    0,
+    0,
+    128,
+    128
+   ],
+   "anchor": {
+    "x": 64,
+    "y": 64,
+    "kind": "center"
+   },
+   "out": "out/terrain/terrain_grass_forest_pro_0.png",
+   "status": "post",
+   "role": "forest_floor_wang",
+   "job_notes": "Faint waffle/bump grid in fill; soften 2-3 repeating bumps in cleanup."
+  },
+  {
+   "id": "terrain_grass_stone_pro_0",
+   "category": "terrain",
+   "job": "T4",
+   "batch": 3,
+   "file": "staging/pinewatch/terrain/terrain_grass_stone_pro_0.png",
+   "size": "128x128",
+   "content_bbox": [
+    0,
+    0,
+    128,
+    128
+   ],
+   "anchor": {
+    "x": 64,
+    "y": 64,
+    "kind": "center"
+   },
+   "out": "out/terrain/terrain_grass_stone_pro_0.png",
+   "status": "post",
+   "role": "stone_path_wang",
+   "job_notes": "Mossy cobbles, good."
+  },
+  {
+   "id": "XS_0",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_0.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    6,
+    13,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 10,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_0.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_1",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_1.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    2,
+    14,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_1.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_10",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_10.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    3,
+    15,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_10.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_11",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_11.png",
+   "size": "16x16",
+   "content_bbox": [
+    4,
+    3,
+    13,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_11.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_12",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_12.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    4,
+    13,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_12.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_13",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_13.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    5,
+    14,
+    12
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_13.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_14",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_14.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    4,
+    13,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_14.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_15",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_15.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    4,
+    14,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_15.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_16",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_16.png",
+   "size": "16x16",
+   "content_bbox": [
+    4,
+    4,
+    12,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_16.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_17",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_17.png",
+   "size": "16x16",
+   "content_bbox": [
+    4,
+    3,
+    12,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_17.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_18",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_18.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    2,
+    15,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_18.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_19",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_19.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    3,
+    14,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_19.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_2",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_2.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    3,
+    15,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_2.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_20",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_20.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    3,
+    15,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_20.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_21",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_21.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    2,
+    14,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_21.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_22",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_22.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    3,
+    14,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_22.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_23",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_23.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    3,
+    14,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_23.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_24",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_24.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    2,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_24.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_25",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_25.png",
+   "size": "16x16",
+   "content_bbox": [
+    5,
+    3,
+    12,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_25.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_26",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_26.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    3,
+    15,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_26.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_27",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_27.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    3,
+    13,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_27.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_28",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_28.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    4,
+    14,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_28.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_29",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_29.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    3,
+    15,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_29.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_3",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_3.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    3,
+    14,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_3.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_30",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_30.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    2,
+    14,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_30.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_31",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_31.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    2,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_31.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_32",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_32.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    1,
+    14,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_32.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_34",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_34.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    5,
+    15,
+    12
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_34.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_35",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_35.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    2,
+    15,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_35.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_36",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_36.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    3,
+    13,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_36.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_37",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_37.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    1,
+    13,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_37.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_38",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_38.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    4,
+    13,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_38.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_39",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_39.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    3,
+    14,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_39.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_4",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_4.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    4,
+    14,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 9,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_4.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_40",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_40.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    4,
+    13,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_40.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_41",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_41.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    3,
+    14,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_41.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_42",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_42.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_42.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_43",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_43.png",
+   "size": "16x16",
+   "content_bbox": [
+    4,
+    4,
+    12,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_43.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_44",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_44.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    3,
+    15,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_44.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_45",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_45.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    3,
+    13,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_45.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_46",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_46.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    2,
+    14,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_46.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_47",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_47.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    3,
+    15,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_47.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_48",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_48.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    3,
+    12,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_48.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_5",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_5.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    3,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 9,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_5.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_51",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_51.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    4,
+    13,
+    12
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_51.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_52",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_52.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    3,
+    14,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_52.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_53",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_53.png",
+   "size": "16x16",
+   "content_bbox": [
+    4,
+    3,
+    12,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_53.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_54",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_54.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    2,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_54.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_55",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_55.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    2,
+    14,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 9,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_55.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_56",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_56.png",
+   "size": "16x16",
+   "content_bbox": [
+    4,
+    3,
+    13,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_56.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_57",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_57.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    3,
+    14,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_57.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_58",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_58.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    3,
+    13,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_58.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_59",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_59.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    3,
+    13,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_59.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_6",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_6.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    2,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_6.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_61",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_61.png",
+   "size": "16x16",
+   "content_bbox": [
+    4,
+    3,
+    12,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_61.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_62",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_62.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    2,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_62.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_63",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_63.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    3,
+    14,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_63.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_7",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_7.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    3,
+    12,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_7.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_8",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_8.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    3,
+    14,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_8.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "XS_9",
+   "category": "decals",
+   "job": "XS",
+   "batch": 3,
+   "file": "staging/pinewatch/decals/XS_9.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    3,
+    14,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/decals/XS_9.png",
+   "status": "post",
+   "role": "ground_clutter",
+   "job_notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+  },
+  {
+   "id": "lantern_post_small",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/lantern_post_small.png",
+   "size": "32x32",
+   "content_bbox": [
+    8,
+    2,
+    23,
+    31
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 31,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/lantern_post_small.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "stool_plastic_red",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/stool_plastic_red.png",
+   "size": "32x32",
+   "content_bbox": [
+    4,
+    5,
+    28,
+    29
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 29,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/stool_plastic_red.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_10",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_10.png",
+   "size": "32x32",
+   "content_bbox": [
+    4,
+    3,
+    28,
+    29
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 29,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_10.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_11",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_11.png",
+   "size": "32x32",
+   "content_bbox": [
+    5,
+    4,
+    27,
+    28
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 28,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_11.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_12",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_12.png",
+   "size": "32x32",
+   "content_bbox": [
+    5,
+    4,
+    27,
+    28
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 28,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_12.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_13",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_13.png",
+   "size": "32x32",
+   "content_bbox": [
+    5,
+    4,
+    26,
+    29
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 29,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_13.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_14",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_14.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    7,
+    30,
+    26
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 26,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_14.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_15",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_15.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    1,
+    28,
+    30
+   ],
+   "anchor": {
+    "x": 15,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_15.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_16",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_16.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    5,
+    30,
+    28
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 28,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_16.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_17",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_17.png",
+   "size": "32x32",
+   "content_bbox": [
+    3,
+    3,
+    27,
+    31
+   ],
+   "anchor": {
+    "x": 15,
+    "y": 31,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_17.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_18",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_18.png",
+   "size": "32x32",
+   "content_bbox": [
+    6,
+    2,
+    25,
+    31
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 31,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_18.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_19",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_19.png",
+   "size": "32x32",
+   "content_bbox": [
+    7,
+    3,
+    25,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_19.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "stool_plastic_blue",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/stool_plastic_blue.png",
+   "size": "32x32",
+   "content_bbox": [
+    5,
+    7,
+    27,
+    29
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 29,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/stool_plastic_blue.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_20",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_20.png",
+   "size": "32x32",
+   "content_bbox": [
+    3,
+    1,
+    29,
+    31
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 31,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_20.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_21",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_21.png",
+   "size": "32x32",
+   "content_bbox": [
+    5,
+    2,
+    27,
+    31
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 31,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_21.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "silk_lantern_red",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/silk_lantern_red.png",
+   "size": "32x32",
+   "content_bbox": [
+    8,
+    2,
+    30,
+    31
+   ],
+   "anchor": {
+    "x": 19,
+    "y": 31,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/silk_lantern_red.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "lotus_bowl",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/lotus_bowl.png",
+   "size": "32x32",
+   "content_bbox": [
+    4,
+    2,
+    28,
+    31
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 31,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/lotus_bowl.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_24",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_24.png",
+   "size": "32x32",
+   "content_bbox": [
+    3,
+    2,
+    29,
+    31
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 31,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_24.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_25",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_25.png",
+   "size": "32x32",
+   "content_bbox": [
+    5,
+    3,
+    27,
+    29
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 29,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_25.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_26",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_26.png",
+   "size": "32x32",
+   "content_bbox": [
+    4,
+    4,
+    28,
+    29
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 29,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_26.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_27",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_27.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    2,
+    31,
+    31
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 31,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_27.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_28",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_28.png",
+   "size": "32x32",
+   "content_bbox": [
+    8,
+    5,
+    26,
+    30
+   ],
+   "anchor": {
+    "x": 17,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_28.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_29",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_29.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    6,
+    30,
+    27
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 27,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_29.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_3",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_3.png",
+   "size": "32x32",
+   "content_bbox": [
+    5,
+    3,
+    27,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_3.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_30",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_30.png",
+   "size": "32x32",
+   "content_bbox": [
+    8,
+    5,
+    24,
+    28
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 28,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_30.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_32",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_32.png",
+   "size": "32x32",
+   "content_bbox": [
+    4,
+    2,
+    29,
+    31
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 31,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_32.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_33",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_33.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    6,
+    30,
+    29
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 29,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_33.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_34",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_34.png",
+   "size": "32x32",
+   "content_bbox": [
+    5,
+    4,
+    28,
+    28
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 28,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_34.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "bird_cage",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/bird_cage.png",
+   "size": "32x32",
+   "content_bbox": [
+    7,
+    2,
+    25,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/bird_cage.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_36",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_36.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    6,
+    30,
+    27
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 27,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_36.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_37",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_37.png",
+   "size": "32x32",
+   "content_bbox": [
+    6,
+    5,
+    26,
+    29
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 29,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_37.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_38",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_38.png",
+   "size": "32x32",
+   "content_bbox": [
+    4,
+    4,
+    28,
+    29
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 29,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_38.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_39",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_39.png",
+   "size": "32x32",
+   "content_bbox": [
+    3,
+    2,
+    29,
+    31
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 31,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_39.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_4",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_4.png",
+   "size": "32x32",
+   "content_bbox": [
+    6,
+    2,
+    26,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_4.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_40",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_40.png",
+   "size": "32x32",
+   "content_bbox": [
+    6,
+    2,
+    27,
+    31
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 31,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_40.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "dried_fish_rack",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/dried_fish_rack.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    4,
+    30,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/dried_fish_rack.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "chili_garlic_string",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/chili_garlic_string.png",
+   "size": "32x32",
+   "content_bbox": [
+    3,
+    2,
+    30,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/chili_garlic_string.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_43",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_43.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    6,
+    30,
+    27
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 27,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_43.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_44",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_44.png",
+   "size": "32x32",
+   "content_bbox": [
+    4,
+    3,
+    28,
+    31
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 31,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_44.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_45",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_45.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    3,
+    30,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_45.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_46",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_46.png",
+   "size": "32x32",
+   "content_bbox": [
+    4,
+    2,
+    29,
+    31
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 31,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_46.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_47",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_47.png",
+   "size": "32x32",
+   "content_bbox": [
+    4,
+    3,
+    28,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_47.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_48",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_48.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    7,
+    30,
+    28
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 28,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_48.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_49",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_49.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    4,
+    30,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_49.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_5",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_5.png",
+   "size": "32x32",
+   "content_bbox": [
+    10,
+    2,
+    24,
+    31
+   ],
+   "anchor": {
+    "x": 17,
+    "y": 31,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_5.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_50",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_50.png",
+   "size": "32x32",
+   "content_bbox": [
+    4,
+    2,
+    28,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_50.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_51",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_51.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    3,
+    29,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_51.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_52",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_52.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    3,
+    30,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_52.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_53",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_53.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    5,
+    30,
+    28
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 28,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_53.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_54",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_54.png",
+   "size": "32x32",
+   "content_bbox": [
+    3,
+    4,
+    29,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_54.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "campfire_small",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/campfire_small.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    4,
+    30,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/campfire_small.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_56",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_56.png",
+   "size": "32x32",
+   "content_bbox": [
+    3,
+    3,
+    30,
+    28
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 28,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_56.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_57",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_57.png",
+   "size": "32x32",
+   "content_bbox": [
+    1,
+    7,
+    31,
+    25
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 25,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_57.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_59",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_59.png",
+   "size": "32x32",
+   "content_bbox": [
+    6,
+    2,
+    26,
+    29
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 29,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_59.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_6",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_6.png",
+   "size": "32x32",
+   "content_bbox": [
+    3,
+    5,
+    27,
+    29
+   ],
+   "anchor": {
+    "x": 15,
+    "y": 29,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_6.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_61",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_61.png",
+   "size": "32x32",
+   "content_bbox": [
+    3,
+    2,
+    29,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_61.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_62",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_62.png",
+   "size": "32x32",
+   "content_bbox": [
+    3,
+    2,
+    29,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_62.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "spirit_house",
+   "category": "props_small",
+   "job": "B6",
+   "batch": 6,
+   "file": "staging/pinewatch/props_small/spirit_house.png",
+   "size": "48x64",
+   "content_bbox": [
+    5,
+    1,
+    36,
+    63
+   ],
+   "anchor": {
+    "x": 20,
+    "y": 63,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/spirit_house.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "batch-6 hero regen (5 gens). 48x64 vs old 32x32. graded pinewatch_v2 + v3 snap."
+  },
+  {
+   "id": "S_7",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_7.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    4,
+    30,
+    28
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 28,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_7.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "S_8",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/S_8.png",
+   "size": "32x32",
+   "content_bbox": [
+    2,
+    2,
+    30,
+    30
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 30,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/S_8.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "non_la_hat",
+   "category": "props_small",
+   "job": "S",
+   "batch": 3,
+   "file": "staging/pinewatch/props_small/non_la_hat.png",
+   "size": "32x32",
+   "content_bbox": [
+    3,
+    7,
+    29,
+    25
+   ],
+   "anchor": {
+    "x": 16,
+    "y": 25,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/non_la_hat.png",
+   "status": "post",
+   "role": "small_props",
+   "job_notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+  },
+  {
+   "id": "stool_pair",
+   "category": "props_medium",
+   "job": "M1",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/stool_pair.png",
+   "size": "64x64",
+   "content_bbox": [
+    10,
+    24,
+    54,
+    51
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 51,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/stool_pair.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "Item 9 is flame animation base; 10 is static-lit variant only."
+  },
+  {
+   "id": "log_bench",
+   "category": "props_medium",
+   "job": "M1",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/log_bench.png",
+   "size": "64x64",
+   "content_bbox": [
+    7,
+    14,
+    58,
+    52
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 52,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/log_bench.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "Item 9 is flame animation base; 10 is static-lit variant only."
+  },
+  {
+   "id": "fire_ring_lit_static",
+   "category": "props_medium",
+   "job": "M1",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/fire_ring_lit_static.png",
+   "size": "64x64",
+   "content_bbox": [
+    9,
+    14,
+    56,
+    54
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 54,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/fire_ring_lit_static.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "Item 9 is flame animation base; 10 is static-lit variant only."
+  },
+  {
+   "id": "tent_green",
+   "category": "props_medium",
+   "job": "B6",
+   "batch": 6,
+   "file": "staging/pinewatch/props_medium/tent_green.png",
+   "size": "96x64",
+   "content_bbox": [
+    2,
+    0,
+    92,
+    64
+   ],
+   "anchor": {
+    "x": 47,
+    "y": 64,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/tent_green.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "batch-6 hero regen (5 gens). 96px wide vs old 64 \u2014 overhangs 64px pad, allowed. graded pinewatch_v2 + v3 snap."
+  },
+  {
+   "id": "tent_red",
+   "category": "props_medium",
+   "job": "B6",
+   "batch": 6,
+   "file": "staging/pinewatch/props_medium/tent_red.png",
+   "size": "96x64",
+   "content_bbox": [
+    3,
+    0,
+    94,
+    64
+   ],
+   "anchor": {
+    "x": 48,
+    "y": 64,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/tent_red.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "batch-6 hero regen (5 gens). 96px wide vs old 64 \u2014 overhangs 64px pad, allowed. graded pinewatch_v2 + v3 snap."
+  },
+  {
+   "id": "dirt_patch",
+   "category": "props_medium",
+   "job": "M1",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/dirt_patch.png",
+   "size": "64x64",
+   "content_bbox": [
+    2,
+    11,
+    62,
+    55
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 55,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/dirt_patch.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "Item 9 is flame animation base; 10 is static-lit variant only."
+  },
+  {
+   "id": "pallet_deck",
+   "category": "props_medium",
+   "job": "M1",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/pallet_deck.png",
+   "size": "64x64",
+   "content_bbox": [
+    2,
+    11,
+    62,
+    55
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 55,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/pallet_deck.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "Item 9 is flame animation base; 10 is static-lit variant only."
+  },
+  {
+   "id": "signpost",
+   "category": "props_small",
+   "job": "B6",
+   "batch": 6,
+   "file": "staging/pinewatch/props_small/signpost.png",
+   "size": "48x64",
+   "content_bbox": [
+    4,
+    0,
+    46,
+    63
+   ],
+   "anchor": {
+    "x": 25,
+    "y": 63,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_small/signpost.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "batch-6 hero regen (5 gens). MOVED props_medium -> props_small. graded pinewatch_v2 + v3 snap."
+  },
+  {
+   "id": "lantern_post",
+   "category": "props_medium",
+   "job": "M1",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/lantern_post.png",
+   "size": "64x64",
+   "content_bbox": [
+    18,
+    4,
+    51,
+    59
+   ],
+   "anchor": {
+    "x": 34,
+    "y": 59,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/lantern_post.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "Item 9 is flame animation base; 10 is static-lit variant only."
+  },
+  {
+   "id": "flower_box",
+   "category": "props_medium",
+   "job": "M1",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/flower_box.png",
+   "size": "64x64",
+   "content_bbox": [
+    6,
+    5,
+    58,
+    56
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 56,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/flower_box.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "Item 9 is flame animation base; 10 is static-lit variant only."
+  },
+  {
+   "id": "drying_tarp",
+   "category": "props_medium",
+   "job": "M1",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/drying_tarp.png",
+   "size": "64x64",
+   "content_bbox": [
+    2,
+    5,
+    62,
+    59
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 59,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/drying_tarp.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "Item 9 is flame animation base; 10 is static-lit variant only."
+  },
+  {
+   "id": "M1_5",
+   "category": "props_medium",
+   "job": "M1",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/M1_5.png",
+   "size": "64x64",
+   "content_bbox": [
+    5,
+    8,
+    59,
+    57
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 57,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/M1_5.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "Item 9 is flame animation base; 10 is static-lit variant only."
+  },
+  {
+   "id": "picnic_basket",
+   "category": "props_medium",
+   "job": "M1",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/picnic_basket.png",
+   "size": "64x64",
+   "content_bbox": [
+    6,
+    17,
+    58,
+    54
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 54,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/picnic_basket.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "Item 9 is flame animation base; 10 is static-lit variant only."
+  },
+  {
+   "id": "M1_7",
+   "category": "props_medium",
+   "job": "M1",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/M1_7.png",
+   "size": "64x64",
+   "content_bbox": [
+    8,
+    7,
+    58,
+    57
+   ],
+   "anchor": {
+    "x": 33,
+    "y": 57,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/M1_7.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "Item 9 is flame animation base; 10 is static-lit variant only."
+  },
+  {
+   "id": "radio_stump",
+   "category": "props_medium",
+   "job": "M1",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/radio_stump.png",
+   "size": "64x64",
+   "content_bbox": [
+    10,
+    9,
+    53,
+    55
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 55,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/radio_stump.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "Item 9 is flame animation base; 10 is static-lit variant only."
+  },
+  {
+   "id": "fire_ring_unlit",
+   "category": "props_medium",
+   "job": "M1",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/fire_ring_unlit.png",
+   "size": "64x64",
+   "content_bbox": [
+    9,
+    19,
+    56,
+    53
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 53,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/fire_ring_unlit.png",
+   "status": "post",
+   "role": "medium_props_a",
+   "job_notes": "Item 9 is flame animation base; 10 is static-lit variant only."
+  },
+  {
+   "id": "fire_ring_unlit_v2",
+   "category": "props_medium",
+   "job": "B6",
+   "batch": 6,
+   "file": "staging/pinewatch/props_medium/fire_ring_unlit_v2.png",
+   "size": "48x40",
+   "content_bbox": [
+    1,
+    1,
+    46,
+    39
+   ],
+   "anchor": {
+    "x": 24,
+    "y": 39,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/fire_ring_unlit_v2.png",
+   "status": "post",
+   "role": "medium_props",
+   "job_notes": "batch-6 fire_ring candidate (5 gens). NOT swapped over the shipped ring \u2014 the A1b flame loop is painted on the old ring. Staged as a spare unlit pit; placed near the rest corner in pinewatch_test/scene_comp_v2."
+  },
+  {
+   "id": "M2_0",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/M2_0.png",
+   "size": "64x64",
+   "content_bbox": [
+    2,
+    10,
+    62,
+    54
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 54,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/M2_0.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "M2_1",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/M2_1.png",
+   "size": "64x64",
+   "content_bbox": [
+    19,
+    4,
+    45,
+    61
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 61,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/M2_1.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "tea_table",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/tea_table.png",
+   "size": "64x64",
+   "content_bbox": [
+    7,
+    17,
+    57,
+    57
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 57,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/tea_table.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "M2_11",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/M2_11.png",
+   "size": "64x64",
+   "content_bbox": [
+    9,
+    10,
+    55,
+    57
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 57,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/M2_11.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "M2_12",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/M2_12.png",
+   "size": "64x64",
+   "content_bbox": [
+    3,
+    15,
+    60,
+    55
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 55,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/M2_12.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "M2_13",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/M2_13.png",
+   "size": "64x64",
+   "content_bbox": [
+    6,
+    10,
+    60,
+    57
+   ],
+   "anchor": {
+    "x": 33,
+    "y": 57,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/M2_13.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "viewpoint_binoculars",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/viewpoint_binoculars.png",
+   "size": "64x64",
+   "content_bbox": [
+    16,
+    7,
+    49,
+    59
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 59,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/viewpoint_binoculars.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "M2_15",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/M2_15.png",
+   "size": "64x64",
+   "content_bbox": [
+    13,
+    3,
+    52,
+    58
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 58,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/M2_15.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "chicken_coop",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/chicken_coop.png",
+   "size": "64x64",
+   "content_bbox": [
+    3,
+    3,
+    62,
+    61
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 61,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/chicken_coop.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "moped_cub",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/moped_cub.png",
+   "size": "64x64",
+   "content_bbox": [
+    4,
+    9,
+    60,
+    55
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 55,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/moped_cub.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "M2_4",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/M2_4.png",
+   "size": "64x64",
+   "content_bbox": [
+    8,
+    5,
+    58,
+    55
+   ],
+   "anchor": {
+    "x": 33,
+    "y": 55,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/M2_4.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "M2_5",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/M2_5.png",
+   "size": "64x64",
+   "content_bbox": [
+    9,
+    9,
+    57,
+    54
+   ],
+   "anchor": {
+    "x": 33,
+    "y": 54,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/M2_5.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "M2_6",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/M2_6.png",
+   "size": "64x64",
+   "content_bbox": [
+    10,
+    10,
+    55,
+    51
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 51,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/M2_6.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "M2_7",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/M2_7.png",
+   "size": "64x64",
+   "content_bbox": [
+    6,
+    6,
+    58,
+    58
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 58,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/M2_7.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "M2_8",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/M2_8.png",
+   "size": "64x64",
+   "content_bbox": [
+    13,
+    7,
+    52,
+    58
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 58,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/M2_8.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "tripod_cauldron",
+   "category": "props_medium",
+   "job": "M2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_medium/tripod_cauldron.png",
+   "size": "64x64",
+   "content_bbox": [
+    8,
+    10,
+    60,
+    57
+   ],
+   "anchor": {
+    "x": 34,
+    "y": 57,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_medium/tripod_cauldron.png",
+   "status": "post",
+   "role": "medium_props_b"
+  },
+  {
+   "id": "pine_tall_a",
+   "category": "props_large",
+   "job": "L1",
+   "batch": 3,
+   "file": "staging/pinewatch/props_large/pine_tall_a.png",
+   "size": "128x128",
+   "content_bbox": [
+    21,
+    0,
+    107,
+    125
+   ],
+   "anchor": {
+    "x": 64,
+    "y": 125,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_large/pine_tall_a.png",
+   "status": "post",
+   "role": "large_a",
+   "job_notes": "Pines ~3x player. Van is the scene centerpiece."
+  },
+  {
+   "id": "pine_tall_b",
+   "category": "props_large",
+   "job": "L1",
+   "batch": 3,
+   "file": "staging/pinewatch/props_large/pine_tall_b.png",
+   "size": "128x128",
+   "content_bbox": [
+    15,
+    0,
+    116,
+    125
+   ],
+   "anchor": {
+    "x": 66,
+    "y": 125,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_large/pine_tall_b.png",
+   "status": "post",
+   "role": "large_a",
+   "job_notes": "Pines ~3x player. Van is the scene centerpiece."
+  },
+  {
+   "id": "flamboyant_tree",
+   "category": "props_large",
+   "job": "B6",
+   "batch": 6,
+   "file": "staging/pinewatch/props_large/flamboyant_tree.png",
+   "size": "128x128",
+   "content_bbox": [
+    1,
+    2,
+    127,
+    126
+   ],
+   "anchor": {
+    "x": 64,
+    "y": 126,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_large/flamboyant_tree.png",
+   "status": "post",
+   "role": "large_a",
+   "job_notes": "batch-6 hero regen (6 gens). graded pinewatch_v2 + v3 snap."
+  },
+  {
+   "id": "outfitter_van",
+   "category": "props_large",
+   "job": "B6",
+   "batch": 6,
+   "file": "staging/pinewatch/props_large/outfitter_van.png",
+   "size": "128x98",
+   "content_bbox": [
+    0,
+    2,
+    124,
+    97
+   ],
+   "anchor": {
+    "x": 62,
+    "y": 97,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_large/outfitter_van.png",
+   "status": "post",
+   "role": "large_a",
+   "job_notes": "batch-6 hero regen (6 gens). +2px transparent rows padded at TOP \u2014 cargo roof clipped at y=0. graded pinewatch_v2 + v3 snap."
+  },
+  {
+   "id": "cabin",
+   "category": "props_large",
+   "job": "B6",
+   "batch": 6,
+   "file": "staging/pinewatch/props_large/cabin.png",
+   "size": "128x128",
+   "content_bbox": [
+    1,
+    2,
+    118,
+    125
+   ],
+   "anchor": {
+    "x": 60,
+    "y": 125,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_large/cabin.png",
+   "status": "post",
+   "role": "large_b",
+   "job_notes": "batch-6 hero regen (6 gens). graded pinewatch_v2 + v3 snap."
+  },
+  {
+   "id": "cottage_shed",
+   "category": "props_large",
+   "job": "reuse",
+   "batch": 3,
+   "file": "staging/pinewatch/props_large/cottage_shed.png",
+   "size": "128x128",
+   "content_bbox": [
+    4,
+    13,
+    125,
+    122
+   ],
+   "anchor": {
+    "x": 64,
+    "y": 122,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_large/cottage_shed.png",
+   "status": "post",
+   "role": "structures",
+   "job_notes": "Zero-gen reuse: byte copy of the SHIPPED (batch-3) cabin sprite as a small second structure at the NE work edge (back-left of coop/spirit_house, row-3 treeline gap)."
+  },
+  {
+   "id": "banana_clump",
+   "category": "props_large",
+   "job": "L2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_large/banana_clump.png",
+   "size": "128x128",
+   "content_bbox": [
+    7,
+    3,
+    121,
+    124
+   ],
+   "anchor": {
+    "x": 64,
+    "y": 124,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_large/banana_clump.png",
+   "status": "post",
+   "role": "large_b"
+  },
+  {
+   "id": "bamboo_clump",
+   "category": "props_large",
+   "job": "L2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_large/bamboo_clump.png",
+   "size": "128x128",
+   "content_bbox": [
+    4,
+    5,
+    124,
+    122
+   ],
+   "anchor": {
+    "x": 64,
+    "y": 122,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_large/bamboo_clump.png",
+   "status": "post",
+   "role": "large_b"
+  },
+  {
+   "id": "hammock",
+   "category": "props_large",
+   "job": "L2",
+   "batch": 3,
+   "file": "staging/pinewatch/props_large/hammock.png",
+   "size": "128x128",
+   "content_bbox": [
+    10,
+    43,
+    120,
+    118
+   ],
+   "anchor": {
+    "x": 65,
+    "y": 118,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_large/hammock.png",
+   "status": "post",
+   "role": "large_b"
+  },
+  {
+   "id": "picnic_table",
+   "category": "props_large",
+   "job": "L3",
+   "batch": 3,
+   "file": "staging/pinewatch/props_large/picnic_table.png",
+   "size": "128x128",
+   "content_bbox": [
+    6,
+    26,
+    124,
+    112
+   ],
+   "anchor": {
+    "x": 65,
+    "y": 112,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_large/picnic_table.png",
+   "status": "post",
+   "role": "large_c"
+  },
+  {
+   "id": "string_lights",
+   "category": "props_large",
+   "job": "L3",
+   "batch": 3,
+   "file": "staging/pinewatch/props_large/string_lights.png",
+   "size": "128x128",
+   "content_bbox": [
+    7,
+    11,
+    122,
+    112
+   ],
+   "anchor": {
+    "x": 64,
+    "y": 112,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_large/string_lights.png",
+   "status": "post",
+   "role": "large_c"
+  },
+  {
+   "id": "pennant_string",
+   "category": "props_large",
+   "job": "L3",
+   "batch": 3,
+   "file": "staging/pinewatch/props_large/pennant_string.png",
+   "size": "128x128",
+   "content_bbox": [
+    9,
+    18,
+    122,
+    107
+   ],
+   "anchor": {
+    "x": 66,
+    "y": 107,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_large/pennant_string.png",
+   "status": "post",
+   "role": "large_c"
+  },
+  {
+   "id": "swing",
+   "category": "props_large",
+   "job": "L3",
+   "batch": 3,
+   "file": "staging/pinewatch/props_large/swing.png",
+   "size": "128x128",
+   "content_bbox": [
+    1,
+    3,
+    126,
+    125
+   ],
+   "anchor": {
+    "x": 64,
+    "y": 125,
+    "kind": "bottom-center"
+   },
+   "out": "out/props_large/swing.png",
+   "status": "post",
+   "role": "large_c"
+  },
+  {
+   "id": "warden_east",
+   "category": "characters",
+   "job": "C1",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/warden_east.png",
+   "size": "64x64",
+   "content_bbox": [
+    12,
+    3,
+    46,
+    62
+   ],
+   "anchor": {
+    "x": 29,
+    "y": 62,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/warden_east.png",
+   "status": "post",
+   "role": "warden",
+   "job_notes": "Turnaround poses only; needs walk/idle animation pass."
+  },
+  {
+   "id": "warden_north-east",
+   "category": "characters",
+   "job": "C1",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/warden_north-east.png",
+   "size": "64x64",
+   "content_bbox": [
+    13,
+    3,
+    47,
+    61
+   ],
+   "anchor": {
+    "x": 30,
+    "y": 61,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/warden_north-east.png",
+   "status": "post",
+   "role": "warden",
+   "job_notes": "Turnaround poses only; needs walk/idle animation pass."
+  },
+  {
+   "id": "warden_north-west",
+   "category": "characters",
+   "job": "C1",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/warden_north-west.png",
+   "size": "64x64",
+   "content_bbox": [
+    14,
+    2,
+    48,
+    59
+   ],
+   "anchor": {
+    "x": 31,
+    "y": 59,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/warden_north-west.png",
+   "status": "post",
+   "role": "warden",
+   "job_notes": "Turnaround poses only; needs walk/idle animation pass."
+  },
+  {
+   "id": "warden_north",
+   "category": "characters",
+   "job": "C1",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/warden_north.png",
+   "size": "64x64",
+   "content_bbox": [
+    16,
+    2,
+    49,
+    59
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 59,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/warden_north.png",
+   "status": "post",
+   "role": "warden",
+   "job_notes": "Turnaround poses only; needs walk/idle animation pass."
+  },
+  {
+   "id": "warden_south-east",
+   "category": "characters",
+   "job": "C1",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/warden_south-east.png",
+   "size": "64x64",
+   "content_bbox": [
+    15,
+    3,
+    49,
+    61
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 61,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/warden_south-east.png",
+   "status": "post",
+   "role": "warden",
+   "job_notes": "Turnaround poses only; needs walk/idle animation pass."
+  },
+  {
+   "id": "warden_south-west",
+   "category": "characters",
+   "job": "C1",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/warden_south-west.png",
+   "size": "64x64",
+   "content_bbox": [
+    16,
+    3,
+    50,
+    62
+   ],
+   "anchor": {
+    "x": 33,
+    "y": 62,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/warden_south-west.png",
+   "status": "post",
+   "role": "warden",
+   "job_notes": "Turnaround poses only; needs walk/idle animation pass."
+  },
+  {
+   "id": "warden_south",
+   "category": "characters",
+   "job": "C1",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/warden_south.png",
+   "size": "64x64",
+   "content_bbox": [
+    13,
+    2,
+    48,
+    61
+   ],
+   "anchor": {
+    "x": 30,
+    "y": 61,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/warden_south.png",
+   "status": "post",
+   "role": "warden",
+   "job_notes": "Turnaround poses only; needs walk/idle animation pass."
+  },
+  {
+   "id": "warden_west",
+   "category": "characters",
+   "job": "C1",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/warden_west.png",
+   "size": "64x64",
+   "content_bbox": [
+    17,
+    2,
+    49,
+    61
+   ],
+   "anchor": {
+    "x": 33,
+    "y": 61,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/warden_west.png",
+   "status": "post",
+   "role": "warden",
+   "job_notes": "Turnaround poses only; needs walk/idle animation pass."
+  },
+  {
+   "id": "ranger_mai_east",
+   "category": "characters",
+   "job": "C2",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/ranger_mai_east.png",
+   "size": "64x64",
+   "content_bbox": [
+    18,
+    3,
+    47,
+    61
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 61,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/ranger_mai_east.png",
+   "status": "post",
+   "role": "ranger_mai",
+   "job_notes": "Non la + clipboard. Turnaround only; needs walk/idle."
+  },
+  {
+   "id": "ranger_mai_north-east",
+   "category": "characters",
+   "job": "C2",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/ranger_mai_north-east.png",
+   "size": "64x64",
+   "content_bbox": [
+    18,
+    3,
+    45,
+    60
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 60,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/ranger_mai_north-east.png",
+   "status": "post",
+   "role": "ranger_mai",
+   "job_notes": "Non la + clipboard. Turnaround only; needs walk/idle."
+  },
+  {
+   "id": "ranger_mai_north-west",
+   "category": "characters",
+   "job": "C2",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/ranger_mai_north-west.png",
+   "size": "64x64",
+   "content_bbox": [
+    15,
+    3,
+    45,
+    60
+   ],
+   "anchor": {
+    "x": 30,
+    "y": 60,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/ranger_mai_north-west.png",
+   "status": "post",
+   "role": "ranger_mai",
+   "job_notes": "Non la + clipboard. Turnaround only; needs walk/idle."
+  },
+  {
+   "id": "ranger_mai_north",
+   "category": "characters",
+   "job": "C2",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/ranger_mai_north.png",
+   "size": "64x64",
+   "content_bbox": [
+    16,
+    3,
+    45,
+    60
+   ],
+   "anchor": {
+    "x": 30,
+    "y": 60,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/ranger_mai_north.png",
+   "status": "post",
+   "role": "ranger_mai",
+   "job_notes": "Non la + clipboard. Turnaround only; needs walk/idle."
+  },
+  {
+   "id": "ranger_mai_south-east",
+   "category": "characters",
+   "job": "C2",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/ranger_mai_south-east.png",
+   "size": "64x64",
+   "content_bbox": [
+    18,
+    3,
+    49,
+    62
+   ],
+   "anchor": {
+    "x": 34,
+    "y": 62,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/ranger_mai_south-east.png",
+   "status": "post",
+   "role": "ranger_mai",
+   "job_notes": "Non la + clipboard. Turnaround only; needs walk/idle."
+  },
+  {
+   "id": "ranger_mai_south-west",
+   "category": "characters",
+   "job": "C2",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/ranger_mai_south-west.png",
+   "size": "64x64",
+   "content_bbox": [
+    18,
+    2,
+    46,
+    60
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 60,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/ranger_mai_south-west.png",
+   "status": "post",
+   "role": "ranger_mai",
+   "job_notes": "Non la + clipboard. Turnaround only; needs walk/idle."
+  },
+  {
+   "id": "ranger_mai_south",
+   "category": "characters",
+   "job": "C2",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/ranger_mai_south.png",
+   "size": "64x64",
+   "content_bbox": [
+    17,
+    2,
+    48,
+    62
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 62,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/ranger_mai_south.png",
+   "status": "post",
+   "role": "ranger_mai",
+   "job_notes": "Non la + clipboard. Turnaround only; needs walk/idle."
+  },
+  {
+   "id": "ranger_mai_west",
+   "category": "characters",
+   "job": "C2",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/ranger_mai_west.png",
+   "size": "64x64",
+   "content_bbox": [
+    17,
+    3,
+    45,
+    62
+   ],
+   "anchor": {
+    "x": 31,
+    "y": 62,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/ranger_mai_west.png",
+   "status": "post",
+   "role": "ranger_mai",
+   "job_notes": "Non la + clipboard. Turnaround only; needs walk/idle."
+  },
+  {
+   "id": "camp_dog_east",
+   "category": "characters",
+   "job": "C3",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/camp_dog_east.png",
+   "size": "68x68",
+   "content_bbox": [
+    7,
+    13,
+    53,
+    50
+   ],
+   "anchor": {
+    "x": 30,
+    "y": 50,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/camp_dog_east.png",
+   "status": "post",
+   "role": "camp_dog",
+   "job_notes": "Needs idle/sit animation."
+  },
+  {
+   "id": "camp_dog_north-east",
+   "category": "characters",
+   "job": "C3",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/camp_dog_north-east.png",
+   "size": "68x68",
+   "content_bbox": [
+    13,
+    11,
+    51,
+    55
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 55,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/camp_dog_north-east.png",
+   "status": "post",
+   "role": "camp_dog",
+   "job_notes": "Needs idle/sit animation."
+  },
+  {
+   "id": "camp_dog_north-west",
+   "category": "characters",
+   "job": "C3",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/camp_dog_north-west.png",
+   "size": "68x68",
+   "content_bbox": [
+    16,
+    11,
+    56,
+    55
+   ],
+   "anchor": {
+    "x": 36,
+    "y": 55,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/camp_dog_north-west.png",
+   "status": "post",
+   "role": "camp_dog",
+   "job_notes": "Needs idle/sit animation."
+  },
+  {
+   "id": "camp_dog_north",
+   "category": "characters",
+   "job": "C3",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/camp_dog_north.png",
+   "size": "68x68",
+   "content_bbox": [
+    26,
+    11,
+    42,
+    56
+   ],
+   "anchor": {
+    "x": 34,
+    "y": 56,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/camp_dog_north.png",
+   "status": "post",
+   "role": "camp_dog",
+   "job_notes": "Needs idle/sit animation."
+  },
+  {
+   "id": "camp_dog_south-east",
+   "category": "characters",
+   "job": "C3",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/camp_dog_south-east.png",
+   "size": "68x68",
+   "content_bbox": [
+    15,
+    14,
+    49,
+    51
+   ],
+   "anchor": {
+    "x": 32,
+    "y": 51,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/camp_dog_south-east.png",
+   "status": "post",
+   "role": "camp_dog",
+   "job_notes": "Needs idle/sit animation."
+  },
+  {
+   "id": "camp_dog_south-west",
+   "category": "characters",
+   "job": "C3",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/camp_dog_south-west.png",
+   "size": "68x68",
+   "content_bbox": [
+    19,
+    14,
+    53,
+    51
+   ],
+   "anchor": {
+    "x": 36,
+    "y": 51,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/camp_dog_south-west.png",
+   "status": "post",
+   "role": "camp_dog",
+   "job_notes": "Needs idle/sit animation."
+  },
+  {
+   "id": "camp_dog_south",
+   "category": "characters",
+   "job": "C3",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/camp_dog_south.png",
+   "size": "68x68",
+   "content_bbox": [
+    26,
+    14,
+    42,
+    50
+   ],
+   "anchor": {
+    "x": 34,
+    "y": 50,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/camp_dog_south.png",
+   "status": "post",
+   "role": "camp_dog",
+   "job_notes": "Needs idle/sit animation."
+  },
+  {
+   "id": "camp_dog_west",
+   "category": "characters",
+   "job": "C3",
+   "batch": 3,
+   "file": "staging/pinewatch/characters/camp_dog_west.png",
+   "size": "68x68",
+   "content_bbox": [
+    15,
+    13,
+    61,
+    50
+   ],
+   "anchor": {
+    "x": 38,
+    "y": 50,
+    "kind": "bottom-center"
+   },
+   "out": "out/characters/camp_dog_west.png",
+   "status": "post",
+   "role": "camp_dog",
+   "job_notes": "Needs idle/sit animation."
+  },
+  {
+   "id": "U1_0",
+   "category": "ui",
+   "job": "U1",
+   "batch": 3,
+   "file": "staging/pinewatch/ui/U1_0.png",
+   "size": "256x256",
+   "content_bbox": [
+    23,
+    32,
+    234,
+    210
+   ],
+   "anchor": {
+    "x": 128,
+    "y": 121,
+    "kind": "center"
+   },
+   "status": "staged",
+   "role": "ui_panels"
+  },
+  {
+   "id": "U2_0",
+   "category": "ui",
+   "job": "U2",
+   "batch": 3,
+   "file": "staging/pinewatch/ui/U2_0.png",
+   "size": "256x256",
+   "content_bbox": [
+    30,
+    32,
+    161,
+    66
+   ],
+   "anchor": {
+    "x": 95,
+    "y": 49,
+    "kind": "center"
+   },
+   "status": "staged",
+   "role": "ui_buttons"
+  },
+  {
+   "id": "U3_0",
+   "category": "ui",
+   "job": "U3",
+   "batch": 3,
+   "file": "staging/pinewatch/ui/U3_0.png",
+   "size": "256x256",
+   "content_bbox": [
+    16,
+    32,
+    241,
+    242
+   ],
+   "anchor": {
+    "x": 128,
+    "y": 137,
+    "kind": "center"
+   },
+   "status": "staged",
+   "role": "ui_hud"
+  },
+  {
+   "id": "U4_0",
+   "category": "ui",
+   "job": "U4",
+   "batch": 3,
+   "file": "staging/pinewatch/ui/U4_0.png",
+   "size": "256x256",
+   "content_bbox": [
+    11,
+    19,
+    237,
+    155
+   ],
+   "anchor": {
+    "x": 124,
+    "y": 87,
+    "kind": "center"
+   },
+   "status": "staged",
+   "role": "ui_cards"
+  },
+  {
+   "id": "U5_0",
+   "category": "ui",
+   "job": "U5",
+   "batch": 3,
+   "file": "staging/pinewatch/ui/U5_0.png",
+   "size": "256x256",
+   "content_bbox": [
+    16,
+    20,
+    249,
+    180
+   ],
+   "anchor": {
+    "x": 132,
+    "y": 100,
+    "kind": "center"
+   },
+   "status": "staged",
+   "role": "ui_bubbles"
+  },
+  {
+   "id": "I1_0",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_0.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_0.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_1",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_1.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_1.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_10",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_10.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    0,
+    15,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_10.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_11",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_11.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    1,
+    16,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_11.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_12",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_12.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_12.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_13",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_13.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_13.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_14",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_14.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    1,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_14.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_15",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_15.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_15.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_16",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_16.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_16.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_17",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_17.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    6,
+    15,
+    10
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_17.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_18",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_18.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    1,
+    14,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_18.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_19",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_19.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    0,
+    13,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_19.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_2",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_2.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_2.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_20",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_20.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    0,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_20.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_21",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_21.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    0,
+    15,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_21.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_22",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_22.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    0,
+    15,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_22.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_23",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_23.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_23.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_24",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_24.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_24.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_25",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_25.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    2,
+    16,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_25.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_26",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_26.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    0,
+    16,
+    16
+   ],
+   "anchor": {
+    "x": 9,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_26.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_27",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_27.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    1,
+    14,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_27.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_29",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_29.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    1,
+    16,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_29.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_3",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_3.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_3.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_30",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_30.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    1,
+    14,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_30.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_31",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_31.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    14,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_31.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_32",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_32.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_32.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_33",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_33.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    1,
+    14,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_33.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_35",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_35.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    1,
+    16,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_35.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_36",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_36.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    1,
+    14,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_36.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_38",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_38.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    2,
+    16,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_38.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_4",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_4.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    0,
+    15,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 7,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_4.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_40",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_40.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    1,
+    16,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_40.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_41",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_41.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    1,
+    16,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_41.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_42",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_42.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    0,
+    14,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_42.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_43",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_43.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    0,
+    15,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_43.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_44",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_44.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    2,
+    15,
+    14
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_44.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_45",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_45.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    0,
+    16,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_45.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_46",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_46.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_46.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_47",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_47.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_47.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_48",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_48.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    0,
+    16,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_48.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_49",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_49.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    4,
+    12,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_49.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_5",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_5.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    3,
+    16,
+    13
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_5.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_50",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_50.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    1,
+    16,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_50.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_51",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_51.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    2,
+    13,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_51.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_52",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_52.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    0,
+    16,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_52.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_53",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_53.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    0,
+    16,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_53.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_54",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_54.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    0,
+    13,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_54.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_55",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_55.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    0,
+    15,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_55.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_56",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_56.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    0,
+    15,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_56.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_57",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_57.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    1,
+    16,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_57.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_58",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_58.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    1,
+    16,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_58.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_59",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_59.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    0,
+    15,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_59.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_6",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_6.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    1,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_6.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_60",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_60.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    1,
+    16,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_60.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_61",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_61.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_61.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_62",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_62.png",
+   "size": "16x16",
+   "content_bbox": [
+    3,
+    1,
+    14,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_62.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_63",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_63.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    0,
+    15,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_63.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_7",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_7.png",
+   "size": "16x16",
+   "content_bbox": [
+    1,
+    1,
+    15,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_7.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_8",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_8.png",
+   "size": "16x16",
+   "content_bbox": [
+    0,
+    2,
+    16,
+    16
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 9,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_8.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "I1_9",
+   "category": "icons",
+   "job": "I1",
+   "batch": 3,
+   "file": "staging/pinewatch/icons/I1_9.png",
+   "size": "16x16",
+   "content_bbox": [
+    2,
+    1,
+    14,
+    15
+   ],
+   "anchor": {
+    "x": 8,
+    "y": 8,
+    "kind": "center"
+   },
+   "out": "out/icons/I1_9.png",
+   "status": "post",
+   "role": "icon_set"
+  },
+  {
+   "id": "F1_0",
+   "category": "font",
+   "job": "F1",
+   "batch": 3,
+   "file": "staging/pinewatch/font/F1_0.png",
+   "size": "128x160",
+   "content_bbox": [
+    2,
+    2,
+    125,
+    159
+   ],
+   "anchor": {
+    "x": 64,
+    "y": 80,
+    "kind": "center"
+   },
+   "out": "out/font/F1_0.png",
+   "status": "post",
+   "role": "font_heading_en",
+   "job_notes": "ASCII only \u00e2\u20ac\u201d NO Vietnamese diacritics. Not usable for VI build. Needs extended-Latin fallback font."
+  },
+  {
+   "id": "A1_0",
+   "category": "anims",
+   "job": "A1",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A1/A1_0.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "flame loop on fire ring; A1b = alt take, used in comp v2"
+  },
+  {
+   "id": "A1_1",
+   "category": "anims",
+   "job": "A1",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A1/A1_1.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "flame loop on fire ring; A1b = alt take, used in comp v2"
+  },
+  {
+   "id": "A1_2",
+   "category": "anims",
+   "job": "A1",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A1/A1_2.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "flame loop on fire ring; A1b = alt take, used in comp v2"
+  },
+  {
+   "id": "A1_3",
+   "category": "anims",
+   "job": "A1",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A1/A1_3.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "flame loop on fire ring; A1b = alt take, used in comp v2"
+  },
+  {
+   "id": "A1_4",
+   "category": "anims",
+   "job": "A1",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A1/A1_4.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "flame loop on fire ring; A1b = alt take, used in comp v2"
+  },
+  {
+   "id": "A1_5",
+   "category": "anims",
+   "job": "A1",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A1/A1_5.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "flame loop on fire ring; A1b = alt take, used in comp v2"
+  },
+  {
+   "id": "A1_6",
+   "category": "anims",
+   "job": "A1",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A1/A1_6.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "flame loop on fire ring; A1b = alt take, used in comp v2"
+  },
+  {
+   "id": "A1b_0",
+   "category": "anims",
+   "job": "A1",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A1/A1b_0.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "flame loop on fire ring; A1b = alt take, used in comp v2"
+  },
+  {
+   "id": "A1b_1",
+   "category": "anims",
+   "job": "A1",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A1/A1b_1.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "flame loop on fire ring; A1b = alt take, used in comp v2"
+  },
+  {
+   "id": "A1b_2",
+   "category": "anims",
+   "job": "A1",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A1/A1b_2.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "flame loop on fire ring; A1b = alt take, used in comp v2"
+  },
+  {
+   "id": "A1b_3",
+   "category": "anims",
+   "job": "A1",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A1/A1b_3.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "flame loop on fire ring; A1b = alt take, used in comp v2"
+  },
+  {
+   "id": "A1b_4",
+   "category": "anims",
+   "job": "A1",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A1/A1b_4.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "flame loop on fire ring; A1b = alt take, used in comp v2"
+  },
+  {
+   "id": "A1b_5",
+   "category": "anims",
+   "job": "A1",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A1/A1b_5.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "flame loop on fire ring; A1b = alt take, used in comp v2"
+  },
+  {
+   "id": "A1b_6",
+   "category": "anims",
+   "job": "A1",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A1/A1b_6.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "flame loop on fire ring; A1b = alt take, used in comp v2"
+  },
+  {
+   "id": "A2_idle_south_0",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_idle_south_0.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_idle_south_1",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_idle_south_1.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_idle_south_2",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_idle_south_2.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_idle_south_3",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_idle_south_3.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_east_0",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_east_0.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_east_1",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_east_1.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_east_2",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_east_2.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_east_3",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_east_3.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_east_4",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_east_4.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_east_5",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_east_5.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_east_6",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_east_6.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_east_7",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_east_7.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_north_0",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_north_0.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_north_1",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_north_1.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_north_2",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_north_2.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_north_3",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_north_3.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_north_4",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_north_4.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_north_5",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_north_5.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_north_6",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_north_6.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_north_7",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_north_7.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_south_0",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_south_0.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_south_1",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_south_1.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_south_2",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_south_2.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_south_3",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_south_3.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_south_4",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_south_4.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_south_5",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_south_5.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_south_6",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_south_6.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_south_7",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_south_7.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_west_0",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_west_0.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_west_1",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_west_1.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_west_2",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_west_2.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_west_3",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_west_3.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_west_4",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_west_4.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_west_5",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_west_5.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_west_6",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_west_6.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A2_walk_west_7",
+   "category": "anims",
+   "job": "A2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A2/A2_walk_west_7.png",
+   "size": "64x64",
+   "status": "candidates",
+   "job_notes": "warden walk 4-dir + idle south"
+  },
+  {
+   "id": "A3_idle_south_0",
+   "category": "anims",
+   "job": "A3",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A3/A3_idle_south_0.png",
+   "size": "68x68",
+   "status": "candidates",
+   "job_notes": "camp dog idle/sit south"
+  },
+  {
+   "id": "A3_idle_south_1",
+   "category": "anims",
+   "job": "A3",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A3/A3_idle_south_1.png",
+   "size": "68x68",
+   "status": "candidates",
+   "job_notes": "camp dog idle/sit south"
+  },
+  {
+   "id": "A3_idle_south_2",
+   "category": "anims",
+   "job": "A3",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A3/A3_idle_south_2.png",
+   "size": "68x68",
+   "status": "candidates",
+   "job_notes": "camp dog idle/sit south"
+  },
+  {
+   "id": "A3_idle_south_3",
+   "category": "anims",
+   "job": "A3",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A3/A3_idle_south_3.png",
+   "size": "68x68",
+   "status": "candidates",
+   "job_notes": "camp dog idle/sit south"
+  },
+  {
+   "id": "A3_idle_south_4",
+   "category": "anims",
+   "job": "A3",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A3/A3_idle_south_4.png",
+   "size": "68x68",
+   "status": "candidates",
+   "job_notes": "camp dog idle/sit south"
+  },
+  {
+   "id": "A3_idle_south_5",
+   "category": "anims",
+   "job": "A3",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A3/A3_idle_south_5.png",
+   "size": "68x68",
+   "status": "candidates",
+   "job_notes": "camp dog idle/sit south"
+  },
+  {
+   "id": "A3_idle_south_6",
+   "category": "anims",
+   "job": "A3",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A3/A3_idle_south_6.png",
+   "size": "68x68",
+   "status": "candidates",
+   "job_notes": "camp dog idle/sit south"
+  },
+  {
+   "id": "A3_idle_south_7",
+   "category": "anims",
+   "job": "A3",
+   "batch": 4,
+   "file": "gen/candidates/batch4/A3/A3_idle_south_7.png",
+   "size": "68x68",
+   "status": "candidates",
+   "job_notes": "camp dog idle/sit south"
+  },
+  {
+   "id": "I2_0",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_0.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_1",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_1.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_10",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_10.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_11",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_11.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_12",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_12.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_13",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_13.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_14",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_14.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_15",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_15.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_16",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_16.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_17",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_17.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_18",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_18.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_19",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_19.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_2",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_2.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_20",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_20.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_21",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_21.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_22",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_22.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_23",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_23.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_24",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_24.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_25",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_25.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_26",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_26.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_27",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_27.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_28",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_28.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_29",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_29.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_3",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_3.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_30",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_30.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_31",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_31.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_32",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_32.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_33",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_33.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_34",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_34.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_35",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_35.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_36",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_36.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_37",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_37.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_38",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_38.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_39",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_39.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_4",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_4.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_40",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_40.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_41",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_41.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_42",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_42.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_43",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_43.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_44",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_44.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_45",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_45.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_46",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_46.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_47",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_47.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_48",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_48.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_49",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_49.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_5",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_5.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_50",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_50.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_51",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_51.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_52",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_52.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_53",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_53.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_54",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_54.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_55",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_55.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_56",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_56.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_57",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_57.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_58",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_58.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_59",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_59.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_6",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_6.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_60",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_60.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_61",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_61.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_62",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_62.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_63",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_63.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_7",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_7.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_8",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_8.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "I2_9",
+   "category": "icons",
+   "job": "I2",
+   "batch": 4,
+   "file": "gen/candidates/batch4/I2/I2_9.png",
+   "size": "16x16",
+   "status": "candidates",
+   "job_notes": "icon reroll pack (64 cands)"
+  },
+  {
+   "id": "campfire_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/campfire_0.png",
+   "status": "superseded",
+   "superseded_by": "fire_ring_unlit/lit_static (M1) + A1b flame (b4)"
+  },
+  {
+   "id": "player_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/player_0.png",
+   "status": "superseded",
+   "superseded_by": "warden_* 8-dir turnaround (C1)"
+  },
+  {
+   "id": "player_front_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/player_front_0.png",
+   "status": "superseded",
+   "superseded_by": "warden_* 8-dir turnaround (C1)"
+  },
+  {
+   "id": "prop_lantern_post_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/prop_lantern_post_0.png",
+   "status": "superseded",
+   "superseded_by": "lantern_post + lantern_post_small (M1/S)"
+  },
+  {
+   "id": "prop_log_bench_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/prop_log_bench_0.png",
+   "status": "superseded",
+   "superseded_by": "log_bench (M1)"
+  },
+  {
+   "id": "prop_signpost_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/prop_signpost_0.png",
+   "status": "superseded",
+   "superseded_by": "signpost (M1)"
+  },
+  {
+   "id": "prop_stump_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/prop_stump_0.png",
+   "status": "superseded",
+   "superseded_by": "radio_stump (M1) / stool_pair seat role"
+  },
+  {
+   "id": "prop_tent_olive_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/prop_tent_olive_0.png",
+   "status": "superseded",
+   "superseded_by": "tent_green (M1)"
+  },
+  {
+   "id": "prop_tent_rust_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/prop_tent_rust_0.png",
+   "status": "superseded",
+   "superseded_by": "tent_red (M1)"
+  },
+  {
+   "id": "prop_van_p_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/prop_van_p_0.png",
+   "status": "superseded",
+   "superseded_by": "outfitter_van (L1)"
+  },
+  {
+   "id": "terrain_dirt_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_dirt_0.png",
+   "status": "superseded",
+   "superseded_by": "dirt_patch (M1) + T4 stone wang"
+  },
+  {
+   "id": "terrain_dirt_pebbles_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_dirt_pebbles_0.png",
+   "status": "superseded",
+   "superseded_by": "dirt_patch (M1) + T4 stone wang"
+  },
+  {
+   "id": "terrain_floor_flat_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_floor_flat_0.png",
+   "status": "superseded",
+   "superseded_by": "T3 forest floor wang"
+  },
+  {
+   "id": "terrain_grass_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_grass_0.png",
+   "status": "superseded",
+   "superseded_by": "T2/T3/T4 pro wang upper (grass)"
+  },
+  {
+   "id": "terrain_grass_dirt_wang_0.json",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_grass_dirt_wang_0.json",
+   "status": "superseded",
+   "superseded_by": "T4 grass->stone pro wang"
+  },
+  {
+   "id": "terrain_grass_dirt_wang_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_grass_dirt_wang_0.png",
+   "status": "superseded",
+   "superseded_by": "T4 grass->stone pro wang"
+  },
+  {
+   "id": "terrain_grass_flat_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_grass_flat_0.png",
+   "status": "superseded",
+   "superseded_by": "T2/T3/T4 pro wang upper (grass)"
+  },
+  {
+   "id": "terrain_grass_forest_wang_0.json",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_grass_forest_wang_0.json",
+   "status": "superseded",
+   "superseded_by": "T3 grass->forest pro wang"
+  },
+  {
+   "id": "terrain_grass_forest_wang_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_grass_forest_wang_0.png",
+   "status": "superseded",
+   "superseded_by": "T3 grass->forest pro wang"
+  },
+  {
+   "id": "terrain_grass_lush_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_grass_lush_0.png",
+   "status": "superseded",
+   "superseded_by": "T2/T3/T4 pro wang upper (grass)"
+  },
+  {
+   "id": "terrain_grass_stone_wang_0.json",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_grass_stone_wang_0.json",
+   "status": "superseded",
+   "superseded_by": "T4 grass->stone pro wang"
+  },
+  {
+   "id": "terrain_grass_stone_wang_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_grass_stone_wang_0.png",
+   "status": "superseded",
+   "superseded_by": "T4 grass->stone pro wang"
+  },
+  {
+   "id": "terrain_grass_water_wang_0.json",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_grass_water_wang_0.json",
+   "status": "superseded",
+   "superseded_by": "T2 grass->water pro wang"
+  },
+  {
+   "id": "terrain_grass_water_wang_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_grass_water_wang_0.png",
+   "status": "superseded",
+   "superseded_by": "T2 grass->water pro wang"
+  },
+  {
+   "id": "terrain_grass_worn_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_grass_worn_0.png",
+   "status": "superseded",
+   "superseded_by": "T2/T3/T4 pro wang upper (grass)"
+  },
+  {
+   "id": "terrain_water_flat_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/terrain_water_flat_0.png",
+   "status": "superseded",
+   "superseded_by": "T2 grass->water pro wang"
+  },
+  {
+   "id": "tree_pine_green_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/tree_pine_green_0.png",
+   "status": "superseded",
+   "superseded_by": "pine_tall_a/b (L1)"
+  },
+  {
+   "id": "tree_pine_green_1",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/tree_pine_green_1.png",
+   "status": "superseded",
+   "superseded_by": "pine_tall_a/b (L1)"
+  },
+  {
+   "id": "tree_pine_green_2",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/tree_pine_green_2.png",
+   "status": "superseded",
+   "superseded_by": "pine_tall_a/b (L1)"
+  },
+  {
+   "id": "tree_pine_green_3",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/tree_pine_green_3.png",
+   "status": "superseded",
+   "superseded_by": "pine_tall_a/b (L1)"
+  },
+  {
+   "id": "tree_ref_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/tree_ref_0.png",
+   "status": "superseded",
+   "superseded_by": "flamboyant_tree (L1)"
+  },
+  {
+   "id": "tree_ref_1",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/tree_ref_1.png",
+   "status": "superseded",
+   "superseded_by": "flamboyant_tree (L1)"
+  },
+  {
+   "id": "tree_ref_2",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/tree_ref_2.png",
+   "status": "superseded",
+   "superseded_by": "flamboyant_tree (L1)"
+  },
+  {
+   "id": "tree_ref_3",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/_superseded/tree_ref_3.png",
+   "status": "superseded",
+   "superseded_by": "flamboyant_tree (L1)"
+  },
+  {
+   "id": "prop_boulder_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/prop_boulder_0.png",
+   "status": "generated",
+   "job_notes": "no batch3/4 replacement (boulder role)"
+  },
+  {
+   "id": "prop_supply_crate_0",
+   "category": "legacy",
+   "batch": "0-2",
+   "file": "gen/prop_supply_crate_0.png",
+   "status": "generated",
+   "job_notes": "no batch3/4 replacement (crate role)"
+  },
+  {
+   "id": "wardens_hut_ruin",
+   "category": "structures",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "\u00c2\u00a78.4 Pinewatch structure, state 1/4: overgrown ruin on the crew plot; brambles + fallen porch"
+  },
+  {
+   "id": "wardens_hut_brambles_cleared",
+   "category": "structures",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "state 2/4: cleared ground, sagging roof; scaffold overlay optional"
+  },
+  {
+   "id": "wardens_hut_roof_fixed",
+   "category": "structures",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "state 3/4: new roof, porch still broken"
+  },
+  {
+   "id": "wardens_hut_restored",
+   "category": "structures",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "state 4/4: porch rebuilt, warm light for the 'porch_light' vignette"
+  },
+  {
+   "id": "boathouse_states",
+   "category": "structures",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 4,
+   "batch": "crew",
+   "notes": "\u00c2\u00a78.4 Whisper River: ruin \u00e2\u2020\u2019 stage_1 \u00e2\u2020\u2019 stage_2 \u00e2\u2020\u2019 restored (boat afloat); boat-on-river vignette state"
+  },
+  {
+   "id": "lantern_workshop_states",
+   "category": "structures",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 4,
+   "batch": "crew",
+   "notes": "\u00c2\u00a78.4 Lantern Valley: ruin \u00e2\u2020\u2019 stage_1 \u00e2\u2020\u2019 stage_2 \u00e2\u2020\u2019 restored; lanterns-over-the-valley vignette state"
+  },
+  {
+   "id": "overgrown_plot_pinewatch",
+   "category": "structures",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "reserved_overgrown scenery, pine undergrowth \u00e2\u20ac\u201d v1 placeholder for Fire Tower + Pond Dock (\u00c2\u00a76.11)"
+  },
+  {
+   "id": "overgrown_plot_whisper_river",
+   "category": "structures",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "riverbank weeds \u00e2\u20ac\u201d placeholder for Bamboo Treehouse + Bathhouse"
+  },
+  {
+   "id": "overgrown_plot_lantern_valley",
+   "category": "structures",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "meadow grass mound \u00e2\u20ac\u201d placeholder for Observatory + Long Table"
+  },
+  {
+   "id": "crew_scaffold_overlay",
+   "category": "structures",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "bamboo scaffold + tarp layer shown on any structure while a stage is being worked"
+  },
+  {
+   "id": "crew_volunteer_a",
+   "category": "characters",
+   "status": "planned",
+   "files": [],
+   "canvas": "64x64",
+   "frames": "4-frame work loop + idle",
+   "batch": "crew",
+   "notes": "volunteer: hammer/saw loop while a stage runs, idle otherwise; hard hat + hi-vis over hoodie, cozy chunky style"
+  },
+  {
+   "id": "crew_volunteer_b",
+   "category": "characters",
+   "status": "planned",
+   "files": [],
+   "canvas": "64x64",
+   "frames": "4-frame work loop + idle",
+   "batch": "crew",
+   "notes": "second volunteer silhouette (carry planks, sweep); same work/idle set"
+  },
+  {
+   "id": "keepsake_thermos",
+   "category": "journal",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "\u00c2\u00a78.4 stage 1 keepsake art (Warden's Hut): grandpa's dented thermos, journal illustration style"
+  },
+  {
+   "id": "keepsake_register",
+   "category": "journal",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "old trail register, weathered logbook"
+  },
+  {
+   "id": "keepsake_photo",
+   "category": "journal",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "faded photo of grandpa on the porch \u00e2\u20ac\u201d the one image of him (\u00c2\u00a712.1)"
+  },
+  {
+   "id": "keepsake_oar",
+   "category": "journal",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "oar carved with two sets of initials (Boathouse)"
+  },
+  {
+   "id": "keepsake_chart",
+   "category": "journal",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "grandpa's river chart, hand-drawn bends and notes"
+  },
+  {
+   "id": "keepsake_boat",
+   "category": "journal",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "the boat shared with Old Ba, afloat again"
+  },
+  {
+   "id": "keepsake_frames",
+   "category": "journal",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "bamboo frames and rice paper (Lantern Workshop)"
+  },
+  {
+   "id": "keepsake_book",
+   "category": "journal",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "grandpa's lantern pattern book"
+  },
+  {
+   "id": "keepsake_lantern",
+   "category": "journal",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": 1,
+   "batch": "crew",
+   "notes": "his last unfinished lantern, finished \u00e2\u20ac\u201d may foreshadow the cove (Q8)"
+  },
+  {
+   "id": "crew_ready_bubble",
+   "category": "ui",
+   "status": "planned",
+   "files": [],
+   "canvas": "32x32",
+   "frames": "2-frame bob",
+   "batch": "crew",
+   "notes": "stage-ready bubble over the structure and the site's trail-map marker (\u00c2\u00a78.4, \u00c2\u00a717.2)"
+  },
+  {
+   "id": "crew_sheet_ui",
+   "category": "ui",
+   "status": "planned",
+   "files": [],
+   "canvas": "kit",
+   "frames": "panel + buttons",
+   "batch": "crew",
+   "notes": "crew sheet panel: stage label, time-left bar, Collect, speed-up '\u00e2\u2013\u00b6 \u00e2\u02c6\u201940 min', Finish (\u00c2\u00a717.2)"
+  },
+  {
+   "id": "collect_sparkle_vfx",
+   "category": "vfx",
+   "status": "planned",
+   "files": [],
+   "canvas": "64x64",
+   "frames": "6-8 frame strip",
+   "batch": "crew",
+   "notes": "2-4 s collect ceremony (\u00c2\u00a717.3): sparkle burst + keepsake rise; warm dust motes"
+  },
+  {
+   "id": "restore_dust_vfx",
+   "category": "vfx",
+   "status": "planned",
+   "files": [],
+   "canvas": "96x96",
+   "frames": "6-frame strip",
+   "batch": "crew",
+   "notes": "plank-dust poof + falling leaf puff when a structure state swaps"
+  },
+  {
+   "id": "vol2_structures",
+   "category": "structures",
+   "status": "draft",
+   "files": [],
+   "canvas": "96x96",
+   "frames": "6 structures x ~3 states",
+   "batch": "v1.1",
+   "notes": "\u00c2\u00a76.11 draft: fire_tower, pond_dock (P), bamboo_treehouse, bathhouse (W), observatory, long_table (L); scaffold + restored states; sizing/design may change at the v1.1 gate"
+  },
+  {
+   "id": "ui_atlas_pinewatch",
+   "category": "ui",
+   "batch": 3,
+   "file": "out/ui/ui_atlas.png",
+   "size": "452x514",
+   "status": "post",
+   "job_notes": "segmented U1-U5 kit; pieces in out/ui/pieces/, nine_slice insets in ui_atlas_meta.json"
+  }
+ ]
 }

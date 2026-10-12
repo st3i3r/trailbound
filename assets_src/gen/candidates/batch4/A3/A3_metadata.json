@@ -1,0 +1,14 @@
+{
+  "character_id": "3f2590a3-9614-4ac3-a66b-1f5913e0567c",
+  "name": "camp_dog",
+  "animations": {
+    "idle": {
+      "template": "idle",
+      "group": "20bc4cfc-107d-4e26-861b-3a2965ca91de",
+      "directions": [
+        "south"
+      ],
+      "frames": 8
+    }
+  }
+}

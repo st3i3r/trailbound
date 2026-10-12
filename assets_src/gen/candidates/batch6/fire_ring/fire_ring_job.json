@@ -1,0 +1,22 @@
+{
+ "prop": "fire_ring",
+ "tool": "create_image_pro_flash",
+ "job_id": "5197d40c-e221-4ffa-92ad-1725222d0b26",
+ "asset_id": "fd36afbd-2019-52ee-94ae-b1d2b0f18bdb",
+ "charged_generations": 5,
+ "canvas": [
+  48,
+  40
+ ],
+ "no_background": true,
+ "transparent": true,
+ "style_source_image_id": "d4ed23db-4d27-4daf-96d5-ab6f6f9aac33",
+ "style_options": {
+  "color_palette": true,
+  "outline": true,
+  "shading": true,
+  "detail": false
+ },
+ "status": "completed",
+ "image_file": "fire_ring_0.png"
+}

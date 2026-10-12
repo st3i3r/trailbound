@@ -1,0 +1,516 @@
+{
+ "version": 3,
+ "source": "staged assets re-graded with tb_grade.py --site pinewatch_v2 (B5 sheets, props/chars/decals unchanged)",
+ "method": "frequency-greedy, Lab dE>14 merge, top 48; ramps derived from measured fill means + HSV pushes",
+ "note": "the ground tint-map overlay (cleanup/ground_tintmap.png, engine GroundTint sprite) is a LIGHTING layer \u2014 EXEMPT from palette snapping; snap applies to art layers only",
+ "class_shares": {
+  "green": 36.7,
+  "warm": 59.5,
+  "neutral": 2.1,
+  "cool": 1.6
+ },
+ "ramps": {
+  "grass": {
+   "light": "#d4d587",
+   "mid": "#c0c879",
+   "shade": "#5a6e3c"
+  },
+  "water": {
+   "light": "#68a5a5",
+   "mid": "#5d878c",
+   "shade": "#3e5157"
+  },
+  "dirt": {
+   "light": "#daad66",
+   "mid": "#c69553",
+   "shade": "#6d4c2b"
+  },
+  "warm": {
+   "light": "#dad4bf",
+   "mid": "#968d75",
+   "shade": "#443e33"
+  }
+ },
+ "colors": [
+  {
+   "rgb": [
+    2,
+    3,
+    0
+   ],
+   "hex": "#020300",
+   "share": 2.17,
+   "class": "green"
+  },
+  {
+   "rgb": [
+    195,
+    147,
+    83
+   ],
+   "hex": "#c39353",
+   "share": 2.02,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    150,
+    141,
+    117
+   ],
+   "hex": "#968d75",
+   "share": 1.75,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    99,
+    71,
+    52
+   ],
+   "hex": "#634734",
+   "share": 0.95,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    66,
+    43,
+    35
+   ],
+   "hex": "#422b23",
+   "share": 0.75,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    90,
+    107,
+    69
+   ],
+   "hex": "#5a6b45",
+   "share": 0.69,
+   "class": "green"
+  },
+  {
+   "rgb": [
+    92,
+    133,
+    138
+   ],
+   "hex": "#5c858a",
+   "share": 0.59,
+   "class": "green"
+  },
+  {
+   "rgb": [
+    163,
+    157,
+    81
+   ],
+   "hex": "#a39d51",
+   "share": 0.43,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    160,
+    115,
+    76
+   ],
+   "hex": "#a0734c",
+   "share": 0.43,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    190,
+    200,
+    120
+   ],
+   "hex": "#bec878",
+   "share": 0.4,
+   "class": "green"
+  },
+  {
+   "rgb": [
+    46,
+    68,
+    43
+   ],
+   "hex": "#2e442b",
+   "share": 0.34,
+   "class": "green"
+  },
+  {
+   "rgb": [
+    23,
+    45,
+    42
+   ],
+   "hex": "#172d2a",
+   "share": 0.31,
+   "class": "green"
+  },
+  {
+   "rgb": [
+    233,
+    194,
+    129
+   ],
+   "hex": "#e9c281",
+   "share": 0.29,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    74,
+    128,
+    88
+   ],
+   "hex": "#4a8058",
+   "share": 0.28,
+   "class": "green"
+  },
+  {
+   "rgb": [
+    155,
+    76,
+    49
+   ],
+   "hex": "#9b4c31",
+   "share": 0.27,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    162,
+    141,
+    91
+   ],
+   "hex": "#a28d5b",
+   "share": 0.26,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    207,
+    187,
+    148
+   ],
+   "hex": "#cfbb94",
+   "share": 0.21,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    132,
+    158,
+    70
+   ],
+   "hex": "#849e46",
+   "share": 0.21,
+   "class": "green"
+  },
+  {
+   "rgb": [
+    33,
+    17,
+    31
+   ],
+   "hex": "#21111f",
+   "share": 0.19,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    17,
+    30,
+    6
+   ],
+   "hex": "#111e06",
+   "share": 0.18,
+   "class": "green"
+  },
+  {
+   "rgb": [
+    94,
+    124,
+    56
+   ],
+   "hex": "#5e7c38",
+   "share": 0.18,
+   "class": "green"
+  },
+  {
+   "rgb": [
+    151,
+    34,
+    30
+   ],
+   "hex": "#97221e",
+   "share": 0.18,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    225,
+    108,
+    65
+   ],
+   "hex": "#e16c41",
+   "share": 0.15,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    121,
+    106,
+    75
+   ],
+   "hex": "#796a4b",
+   "share": 0.15,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    73,
+    21,
+    12
+   ],
+   "hex": "#49150c",
+   "share": 0.14,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    108,
+    25,
+    16
+   ],
+   "hex": "#6c1910",
+   "share": 0.14,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    190,
+    117,
+    73
+   ],
+   "hex": "#be7549",
+   "share": 0.14,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    84,
+    84,
+    74
+   ],
+   "hex": "#54544a",
+   "share": 0.1,
+   "class": "neutral"
+  },
+  {
+   "rgb": [
+    252,
+    156,
+    99
+   ],
+   "hex": "#fc9c63",
+   "share": 0.1,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    249,
+    177,
+    132
+   ],
+   "hex": "#f9b184",
+   "share": 0.1,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    127,
+    144,
+    93
+   ],
+   "hex": "#7f905d",
+   "share": 0.09,
+   "class": "green"
+  },
+  {
+   "rgb": [
+    226,
+    225,
+    216
+   ],
+   "hex": "#e2e1d8",
+   "share": 0.09,
+   "class": "neutral"
+  },
+  {
+   "rgb": [
+    186,
+    181,
+    170
+   ],
+   "hex": "#bab5aa",
+   "share": 0.08,
+   "class": "neutral"
+  },
+  {
+   "rgb": [
+    247,
+    198,
+    49
+   ],
+   "hex": "#f7c631",
+   "share": 0.07,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    249,
+    125,
+    5
+   ],
+   "hex": "#f97d05",
+   "share": 0.05,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    245,
+    241,
+    204
+   ],
+   "hex": "#f5f1cc",
+   "share": 0.05,
+   "class": "neutral"
+  },
+  {
+   "rgb": [
+    118,
+    76,
+    32
+   ],
+   "hex": "#764c20",
+   "share": 0.05,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    65,
+    72,
+    83
+   ],
+   "hex": "#414853",
+   "share": 0.04,
+   "class": "cool"
+  },
+  {
+   "rgb": [
+    52,
+    125,
+    156
+   ],
+   "hex": "#347d9c",
+   "share": 0.04,
+   "class": "cool"
+  },
+  {
+   "rgb": [
+    20,
+    42,
+    84
+   ],
+   "hex": "#142a54",
+   "share": 0.03,
+   "class": "cool"
+  },
+  {
+   "rgb": [
+    252,
+    155,
+    35
+   ],
+   "hex": "#fc9b23",
+   "share": 0.03,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    46,
+    74,
+    141
+   ],
+   "hex": "#2e4a8d",
+   "share": 0.03,
+   "class": "cool"
+  },
+  {
+   "rgb": [
+    100,
+    139,
+    202
+   ],
+   "hex": "#648bca",
+   "share": 0.03,
+   "class": "cool"
+  },
+  {
+   "rgb": [
+    9,
+    177,
+    227
+   ],
+   "hex": "#09b1e3",
+   "share": 0.03,
+   "class": "cool"
+  },
+  {
+   "rgb": [
+    255,
+    234,
+    124
+   ],
+   "hex": "#ffea7c",
+   "share": 0.03,
+   "class": "warm"
+  },
+  {
+   "rgb": [
+    116,
+    114,
+    54
+   ],
+   "hex": "#747236",
+   "share": 0.02,
+   "class": "green"
+  },
+  {
+   "rgb": [
+    68,
+    109,
+    185
+   ],
+   "hex": "#446db9",
+   "share": 0.02,
+   "class": "cool"
+  },
+  {
+   "rgb": [
+    61,
+    100,
+    115
+   ],
+   "hex": "#3d6473",
+   "share": 0.02,
+   "class": "cool"
+  }
+ ]
+}

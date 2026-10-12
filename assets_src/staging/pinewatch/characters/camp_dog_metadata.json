@@ -1,0 +1,36 @@
+{
+  "group_id": "b134309d-482e-4dba-a888-189cc47b5fec",
+  "states": [
+    {
+      "character": {
+        "id": "3f2590a3-9614-4ac3-a66b-1f5913e0567c",
+        "name": "Idle",
+        "prompt": "scruffy tan village stray dog with perky ears and a curled tail, friendly, cozy Eastward-style pixel art",
+        "size": {
+          "width": 68,
+          "height": 68
+        },
+        "template_id": "dog",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-11T19:13:01.754071+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-11T19:14:36.504862"
+}

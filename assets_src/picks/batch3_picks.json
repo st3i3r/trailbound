@@ -1,0 +1,208 @@
+{
+  "batch": "batch3",
+  "source_root": "assets_src/gen/candidates/batch3",
+  "scale_ref": "player ~48px tall",
+  "jobs": {
+    "T2": {
+      "kind": "tileset_water",
+      "keep": "all",
+      "role": "water_lake_wang",
+      "notes": "Teal slightly saturated; cool down ~10% in palette pass. Lily pads baked into water tiles."
+    },
+    "T3": {
+      "kind": "tileset_forest_floor",
+      "keep": "all",
+      "role": "forest_floor_wang",
+      "notes": "Faint waffle/bump grid in fill; soften 2-3 repeating bumps in cleanup."
+    },
+    "T4": {
+      "kind": "tileset_stone_path",
+      "keep": "all",
+      "role": "stone_path_wang",
+      "notes": "Mossy cobbles, good."
+    },
+    "XS": {
+      "kind": "decals_16px",
+      "keep": "all_except",
+      "skip": [33, 49, 50, 60],
+      "role": "ground_clutter",
+      "notes": "Decals are forgiving at 16px; skip list is muddy/illegible only."
+    },
+    "S": {
+      "kind": "props_small_32px",
+      "keep": "all_except",
+      "skip": [31, 58, 60],
+      "role": "small_props",
+      "named": {
+        "0": "lantern_post_small",
+        "1": "stool_plastic_red",
+        "2": "stool_plastic_blue",
+        "9": "non_la_hat",
+        "22": "silk_lantern_red",
+        "23": "lotus_bowl",
+        "35": "bird_cage",
+        "41": "dried_fish_rack",
+        "42": "chili_garlic_string",
+        "55": "campfire_small",
+        "63": "spirit_house"
+      },
+      "notes": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy)."
+    },
+    "M1": {
+      "kind": "props_medium_64px",
+      "keep": "all",
+      "role": "medium_props_a",
+      "named": {
+        "0": "stool_pair",
+        "1": "log_bench",
+        "2": "lantern_post",
+        "3": "flower_box",
+        "4": "drying_tarp",
+        "6": "picnic_basket",
+        "8": "radio_stump",
+        "9": "fire_ring_unlit",
+        "10": "fire_ring_lit_static",
+        "11": "tent_green",
+        "12": "tent_red",
+        "13": "dirt_patch",
+        "14": "pallet_deck",
+        "15": "signpost"
+      },
+      "notes": "Item 9 is flame animation base; 10 is static-lit variant only."
+    },
+    "M2": {
+      "kind": "props_medium_64px",
+      "keep": "all",
+      "role": "medium_props_b",
+      "named": {
+        "2": "chicken_coop",
+        "3": "moped_cub",
+        "9": "tripod_cauldron",
+        "10": "tea_table",
+        "14": "viewpoint_binoculars"
+      }
+    },
+    "L1": {
+      "kind": "props_large",
+      "keep": "all",
+      "role": "large_a",
+      "named": {
+        "0": "pine_tall_a",
+        "1": "pine_tall_b",
+        "2": "flamboyant_tree",
+        "3": "outfitter_van"
+      },
+      "notes": "Pines ~3x player. Van is the scene centerpiece."
+    },
+    "L2": {
+      "kind": "props_large",
+      "keep": "all",
+      "role": "large_b",
+      "named": {
+        "0": "cabin",
+        "1": "banana_clump",
+        "2": "bamboo_clump",
+        "3": "hammock"
+      }
+    },
+    "L3": {
+      "kind": "props_large",
+      "keep": "all",
+      "role": "large_c",
+      "named": {
+        "0": "picnic_table",
+        "1": "string_lights",
+        "2": "pennant_string",
+        "3": "swing"
+      }
+    },
+    "C1": {
+      "kind": "character_8dir",
+      "keep": "all",
+      "role": "warden",
+      "notes": "Turnaround poses only; needs walk/idle animation pass."
+    },
+    "C2": {
+      "kind": "character_8dir",
+      "keep": "all",
+      "role": "ranger_mai",
+      "notes": "Non la + clipboard. Turnaround only; needs walk/idle."
+    },
+    "C3": {
+      "kind": "character_8dir",
+      "keep": "all",
+      "role": "camp_dog",
+      "notes": "Needs idle/sit animation."
+    },
+    "U1": {
+      "kind": "ui_window_panel",
+      "keep": "all",
+      "role": "ui_panels",
+      "post": ["flatten_parchment_center_for_9slice"]
+    },
+    "U2": {
+      "kind": "ui_buttons",
+      "keep": "all",
+      "role": "ui_buttons",
+      "post": ["recolor_variants_from_green_ramp"]
+    },
+    "U3": {
+      "kind": "ui_hud",
+      "keep": "all",
+      "role": "ui_hud",
+      "post": ["empty_avatar_portrait"]
+    },
+    "U4": {
+      "kind": "ui_cards",
+      "keep": "all",
+      "role": "ui_cards"
+    },
+    "U5": {
+      "kind": "ui_bubbles",
+      "keep": "all",
+      "role": "ui_bubbles"
+    },
+    "I1": {
+      "kind": "icons_16px",
+      "keep": "all_except",
+      "skip": [28, 34, 37, 39],
+      "role": "icon_set",
+      "reroll": {
+        "indices": [28, 34, 37, 39],
+        "add": ["phin_coffee_icon"]
+      }
+    },
+    "F1": {
+      "kind": "font_atlas",
+      "keep": "english_headings_only",
+      "role": "font_heading_en",
+      "notes": "ASCII only — NO Vietnamese diacritics. Not usable for VI build. Needs extended-Latin fallback font."
+    }
+  },
+  "reroll_jobs": [
+    {
+      "id": "I2",
+      "tool": "create_1_direction_object",
+      "desc": "6 icons: chilly/snowflake, sleepy-face, fish-hook, telescope, phin coffee drip filter, sparkler",
+      "est_cost": 10
+    },
+    {
+      "id": "A1",
+      "tool": "animate_vfx",
+      "desc": "campfire flame loop on M1.9 unlit ring, 4-6 frames, contained in frame",
+      "est_cost": 10
+    },
+    {
+      "id": "A2",
+      "tool": "animate_character",
+      "desc": "warden walk 4-dir + idle",
+      "est_cost": 15
+    },
+    {
+      "id": "A3",
+      "tool": "animate_character",
+      "desc": "camp dog idle/sit loop",
+      "est_cost": 10
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+{
+ "superseded": {
+  "campfire_0.png": {
+   "superseded_by": "fire_ring_unlit/lit_static (M1) + A1b flame (b4)",
+   "moved_to": "gen/_superseded/campfire_0.png"
+  },
+  "player_0.png": {
+   "superseded_by": "warden_* 8-dir turnaround (C1)",
+   "moved_to": "gen/_superseded/player_0.png"
+  },
+  "player_front_0.png": {
+   "superseded_by": "warden_* 8-dir turnaround (C1)",
+   "moved_to": "gen/_superseded/player_front_0.png"
+  },
+  "prop_lantern_post_0.png": {
+   "superseded_by": "lantern_post + lantern_post_small (M1/S)",
+   "moved_to": "gen/_superseded/prop_lantern_post_0.png"
+  },
+  "prop_log_bench_0.png": {
+   "superseded_by": "log_bench (M1)",
+   "moved_to": "gen/_superseded/prop_log_bench_0.png"
+  },
+  "prop_signpost_0.png": {
+   "superseded_by": "signpost (M1)",
+   "moved_to": "gen/_superseded/prop_signpost_0.png"
+  },
+  "prop_stump_0.png": {
+   "superseded_by": "radio_stump (M1) / stool_pair seat role",
+   "moved_to": "gen/_superseded/prop_stump_0.png"
+  },
+  "prop_tent_olive_0.png": {
+   "superseded_by": "tent_green (M1)",
+   "moved_to": "gen/_superseded/prop_tent_olive_0.png"
+  },
+  "prop_tent_rust_0.png": {
+   "superseded_by": "tent_red (M1)",
+   "moved_to": "gen/_superseded/prop_tent_rust_0.png"
+  },
+  "prop_van_p_0.png": {
+   "superseded_by": "outfitter_van (L1)",
+   "moved_to": "gen/_superseded/prop_van_p_0.png"
+  },
+  "terrain_dirt_0.png": {
+   "superseded_by": "dirt_patch (M1) + T4 stone wang",
+   "moved_to": "gen/_superseded/terrain_dirt_0.png"
+  },
+  "terrain_dirt_pebbles_0.png": {
+   "superseded_by": "dirt_patch (M1) + T4 stone wang",
+   "moved_to": "gen/_superseded/terrain_dirt_pebbles_0.png"
+  },
+  "terrain_floor_flat_0.png": {
+   "superseded_by": "T3 forest floor wang",
+   "moved_to": "gen/_superseded/terrain_floor_flat_0.png"
+  },
+  "terrain_grass_0.png": {
+   "superseded_by": "T2/T3/T4 pro wang upper (grass)",
+   "moved_to": "gen/_superseded/terrain_grass_0.png"
+  },
+  "terrain_grass_dirt_wang_0.json": {
+   "superseded_by": "T4 grass->stone pro wang",
+   "moved_to": "gen/_superseded/terrain_grass_dirt_wang_0.json"
+  },
+  "terrain_grass_dirt_wang_0.png": {
+   "superseded_by": "T4 grass->stone pro wang",
+   "moved_to": "gen/_superseded/terrain_grass_dirt_wang_0.png"
+  },
+  "terrain_grass_flat_0.png": {
+   "superseded_by": "T2/T3/T4 pro wang upper (grass)",
+   "moved_to": "gen/_superseded/terrain_grass_flat_0.png"
+  },
+  "terrain_grass_forest_wang_0.json": {
+   "superseded_by": "T3 grass->forest pro wang",
+   "moved_to": "gen/_superseded/terrain_grass_forest_wang_0.json"
+  },
+  "terrain_grass_forest_wang_0.png": {
+   "superseded_by": "T3 grass->forest pro wang",
+   "moved_to": "gen/_superseded/terrain_grass_forest_wang_0.png"
+  },
+  "terrain_grass_lush_0.png": {
+   "superseded_by": "T2/T3/T4 pro wang upper (grass)",
+   "moved_to": "gen/_superseded/terrain_grass_lush_0.png"
+  },
+  "terrain_grass_stone_wang_0.json": {
+   "superseded_by": "T4 grass->stone pro wang",
+   "moved_to": "gen/_superseded/terrain_grass_stone_wang_0.json"
+  },
+  "terrain_grass_stone_wang_0.png": {
+   "superseded_by": "T4 grass->stone pro wang",
+   "moved_to": "gen/_superseded/terrain_grass_stone_wang_0.png"
+  },
+  "terrain_grass_water_wang_0.json": {
+   "superseded_by": "T2 grass->water pro wang",
+   "moved_to": "gen/_superseded/terrain_grass_water_wang_0.json"
+  },
+  "terrain_grass_water_wang_0.png": {
+   "superseded_by": "T2 grass->water pro wang",
+   "moved_to": "gen/_superseded/terrain_grass_water_wang_0.png"
+  },
+  "terrain_grass_worn_0.png": {
+   "superseded_by": "T2/T3/T4 pro wang upper (grass)",
+   "moved_to": "gen/_superseded/terrain_grass_worn_0.png"
+  },
+  "terrain_water_flat_0.png": {
+   "superseded_by": "T2 grass->water pro wang",
+   "moved_to": "gen/_superseded/terrain_water_flat_0.png"
+  },
+  "tree_pine_green_0.png": {
+   "superseded_by": "pine_tall_a/b (L1)",
+   "moved_to": "gen/_superseded/tree_pine_green_0.png"
+  },
+  "tree_pine_green_1.png": {
+   "superseded_by": "pine_tall_a/b (L1)",
+   "moved_to": "gen/_superseded/tree_pine_green_1.png"
+  },
+  "tree_pine_green_2.png": {
+   "superseded_by": "pine_tall_a/b (L1)",
+   "moved_to": "gen/_superseded/tree_pine_green_2.png"
+  },
+  "tree_pine_green_3.png": {
+   "superseded_by": "pine_tall_a/b (L1)",
+   "moved_to": "gen/_superseded/tree_pine_green_3.png"
+  },
+  "tree_ref_0.png": {
+   "superseded_by": "flamboyant_tree (L1)",
+   "moved_to": "gen/_superseded/tree_ref_0.png"
+  },
+  "tree_ref_1.png": {
+   "superseded_by": "flamboyant_tree (L1)",
+   "moved_to": "gen/_superseded/tree_ref_1.png"
+  },
+  "tree_ref_2.png": {
+   "superseded_by": "flamboyant_tree (L1)",
+   "moved_to": "gen/_superseded/tree_ref_2.png"
+  },
+  "tree_ref_3.png": {
+   "superseded_by": "flamboyant_tree (L1)",
+   "moved_to": "gen/_superseded/tree_ref_3.png"
+  }
+ },
+ "kept_no_replacement": {
+  "prop_boulder_0.png": "no batch3/4 replacement (boulder role)",
+  "prop_supply_crate_0.png": "no batch3/4 replacement (crate role)"
+ },
+ "note": "gen/candidates/** is the candidate pool, not canonical \u2014 left untouched"
+}

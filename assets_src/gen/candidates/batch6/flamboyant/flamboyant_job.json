@@ -1,0 +1,22 @@
+{
+ "prop": "flamboyant",
+ "tool": "create_image_pro_flash",
+ "job_id": "fabe89b3-0717-4ac8-ac9e-04c8c2407780",
+ "asset_id": "04bdf588-45be-526f-ac2e-2cb1137e346b",
+ "charged_generations": 6,
+ "canvas": [
+  128,
+  128
+ ],
+ "no_background": true,
+ "transparent": true,
+ "style_source_image_id": "164b4188-f0b5-4365-be8e-392012b8652c",
+ "style_options": {
+  "color_palette": true,
+  "outline": true,
+  "shading": true,
+  "detail": false
+ },
+ "status": "completed",
+ "image_file": "flamboyant_0.png"
+}

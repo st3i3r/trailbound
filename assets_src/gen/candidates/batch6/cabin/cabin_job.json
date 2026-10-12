@@ -1,0 +1,22 @@
+{
+ "prop": "cabin",
+ "tool": "create_image_pro_flash",
+ "job_id": "de2682e4-1885-4f29-92c5-83af92dbafd3",
+ "asset_id": "c03a7bdf-b76d-5c60-8a2d-e6c7f5719c7c",
+ "charged_generations": 6,
+ "canvas": [
+  128,
+  128
+ ],
+ "no_background": true,
+ "transparent": true,
+ "style_source_image_id": "164b4188-f0b5-4365-be8e-392012b8652c",
+ "style_options": {
+  "color_palette": true,
+  "outline": true,
+  "shading": true,
+  "detail": false
+ },
+ "status": "completed",
+ "image_file": "cabin_0.png"
+}

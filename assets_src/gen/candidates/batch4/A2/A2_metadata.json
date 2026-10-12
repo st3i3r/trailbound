@@ -1,0 +1,25 @@
+{
+  "character_id": "41d1948b-4dea-4b4d-b689-983e03b8508e",
+  "name": "warden",
+  "animations": {
+    "walk": {
+      "template": "walking-8-frames",
+      "group": "3ccb8eb8-ae5b-4e4e-9aaa-f1dda905c6d4",
+      "directions": [
+        "south",
+        "west",
+        "north",
+        "east"
+      ],
+      "frames": 8
+    },
+    "idle": {
+      "template": "breathing-idle",
+      "group": "143cda86-e080-4c38-adc1-afa1ea124438",
+      "directions": [
+        "south"
+      ],
+      "frames": 4
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+ "description": "olive A-frame scout tent — canvas creases, guy-ropes + pegs, front flap tied open showing dark interior, groundsheet; upright canvas, tent fills ~85-90% of canvas height, groundsheet edge anchored bottom-center; painterly pixel art prop, 3/4 top-down straight-on front view — FULL VALUE RANGE (deep near-black shadows to bright highlights), hue-shifting colour ramps (warm lit side, cool shadow side), 8+ colours, adaptive dark outline matching each surface colour, weathered dithered surfaces (rust, wear, fabric, bark), handcrafted asymmetric detail, small imperfections (lean, sag, patch), object partially embedded in ground, sun upper-left, interior detail density like a hand-painted miniature — not a clean icon",
+ "width": 96,
+ "height": 64,
+ "no_background": true,
+ "style_image": {
+  "source_image_id": "d9e3e77e-2459-4894-a487-08e7a49e5076",
+  "usage_description": "copy this pixel art house style: warm sunlit graded palette, soft painterly shading, dark coloured outlines, cozy Eastward-like craft"
+ },
+ "style_options": {
+  "color_palette": true,
+  "outline": true,
+  "shading": true,
+  "detail": false
+ }
+}

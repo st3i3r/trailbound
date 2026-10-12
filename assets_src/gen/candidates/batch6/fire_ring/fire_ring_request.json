@@ -1,0 +1,16 @@
+{
+ "description": "stone campfire ring — rounded river stones, stacked twigs + kindling inside, a little ash, NO flame (flame is a separate animation); upright canvas, ring fills ~85-90% of canvas height, stones anchored bottom-center; painterly pixel art prop, 3/4 top-down straight-on front view — FULL VALUE RANGE (deep near-black shadows to bright highlights), hue-shifting colour ramps (warm lit side, cool shadow side), 8+ colours, adaptive dark outline matching each surface colour, weathered dithered surfaces (rust, wear, fabric, bark), handcrafted asymmetric detail, small imperfections (lean, sag, patch), object partially embedded in ground, sun upper-left, interior detail density like a hand-painted miniature — not a clean icon",
+ "width": 48,
+ "height": 40,
+ "no_background": true,
+ "style_image": {
+  "source_image_id": "d4ed23db-4d27-4daf-96d5-ab6f6f9aac33",
+  "usage_description": "copy this pixel art house style: warm sunlit graded palette, soft painterly shading, dark coloured outlines, cozy Eastward-like craft"
+ },
+ "style_options": {
+  "color_palette": true,
+  "outline": true,
+  "shading": true,
+  "detail": false
+ }
+}

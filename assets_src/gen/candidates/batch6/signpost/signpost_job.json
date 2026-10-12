@@ -1,0 +1,22 @@
+{
+ "prop": "signpost",
+ "tool": "create_image_pro_flash",
+ "job_id": "f751942f-eaaa-401c-acdb-18d3bd55c3d6",
+ "asset_id": "32c066fc-b20a-5148-a0ad-a3bca4993ecf",
+ "charged_generations": 5,
+ "canvas": [
+  48,
+  64
+ ],
+ "no_background": true,
+ "transparent": true,
+ "style_source_image_id": "d4ed23db-4d27-4daf-96d5-ab6f6f9aac33",
+ "style_options": {
+  "color_palette": true,
+  "outline": true,
+  "shading": true,
+  "detail": false
+ },
+ "status": "completed",
+ "image_file": "signpost_0.png"
+}

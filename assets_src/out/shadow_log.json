@@ -1,0 +1,1157 @@
+{
+ "characters/camp_dog_east.png": {
+  "ellipse": [
+   15,
+   45,
+   33,
+   7
+  ],
+  "shadow_px": 172
+ },
+ "characters/camp_dog_north-east.png": {
+  "ellipse": [
+   20,
+   51,
+   27,
+   5
+  ],
+  "shadow_px": 96
+ },
+ "characters/camp_dog_north-west.png": {
+  "ellipse": [
+   24,
+   51,
+   28,
+   5
+  ],
+  "shadow_px": 100
+ },
+ "characters/camp_dog_north.png": {
+  "ellipse": [
+   30,
+   53,
+   11,
+   3
+  ],
+  "shadow_px": 20
+ },
+ "characters/camp_dog_south-east.png": {
+  "ellipse": [
+   22,
+   47,
+   24,
+   5
+  ],
+  "shadow_px": 88
+ },
+ "characters/camp_dog_south-west.png": {
+  "ellipse": [
+   26,
+   47,
+   24,
+   5
+  ],
+  "shadow_px": 88
+ },
+ "characters/camp_dog_south.png": {
+  "ellipse": [
+   30,
+   47,
+   11,
+   3
+  ],
+  "shadow_px": 20
+ },
+ "characters/camp_dog_west.png": {
+  "ellipse": [
+   23,
+   45,
+   33,
+   7
+  ],
+  "shadow_px": 172
+ },
+ "characters/ranger_mai_east.png": {
+  "ellipse": [
+   24,
+   57,
+   20,
+   5
+  ],
+  "shadow_px": 73
+ },
+ "characters/ranger_mai_north-east.png": {
+  "ellipse": [
+   24,
+   57,
+   19,
+   3
+  ],
+  "shadow_px": 35
+ },
+ "characters/ranger_mai_north-west.png": {
+  "ellipse": [
+   21,
+   56,
+   21,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "characters/ranger_mai_north.png": {
+  "ellipse": [
+   22,
+   56,
+   20,
+   5
+  ],
+  "shadow_px": 73
+ },
+ "characters/ranger_mai_south-east.png": {
+  "ellipse": [
+   24,
+   58,
+   22,
+   5
+  ],
+  "shadow_px": 77
+ },
+ "characters/ranger_mai_south-west.png": {
+  "ellipse": [
+   24,
+   56,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "characters/ranger_mai_south.png": {
+  "ellipse": [
+   23,
+   58,
+   22,
+   5
+  ],
+  "shadow_px": 77
+ },
+ "characters/ranger_mai_west.png": {
+  "ellipse": [
+   23,
+   58,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "characters/warden_east.png": {
+  "ellipse": [
+   19,
+   58,
+   24,
+   5
+  ],
+  "shadow_px": 88
+ },
+ "characters/warden_north-east.png": {
+  "ellipse": [
+   20,
+   57,
+   24,
+   5
+  ],
+  "shadow_px": 88
+ },
+ "characters/warden_north-west.png": {
+  "ellipse": [
+   21,
+   55,
+   24,
+   5
+  ],
+  "shadow_px": 88
+ },
+ "characters/warden_north.png": {
+  "ellipse": [
+   23,
+   55,
+   23,
+   5
+  ],
+  "shadow_px": 85
+ },
+ "characters/warden_south-east.png": {
+  "ellipse": [
+   22,
+   57,
+   24,
+   5
+  ],
+  "shadow_px": 88
+ },
+ "characters/warden_south-west.png": {
+  "ellipse": [
+   23,
+   58,
+   24,
+   5
+  ],
+  "shadow_px": 88
+ },
+ "characters/warden_south.png": {
+  "ellipse": [
+   20,
+   57,
+   25,
+   5
+  ],
+  "shadow_px": 93
+ },
+ "characters/warden_west.png": {
+  "ellipse": [
+   23,
+   57,
+   23,
+   5
+  ],
+  "shadow_px": 80
+ },
+ "props_large/bamboo_clump.png": {
+  "ellipse": [
+   23,
+   116,
+   86,
+   9
+  ],
+  "shadow_px": 588
+ },
+ "props_large/banana_clump.png": {
+  "ellipse": [
+   25,
+   118,
+   82,
+   9
+  ],
+  "shadow_px": 560
+ },
+ "props_large/cabin.png": {
+  "ellipse": [
+   19,
+   119,
+   84,
+   9
+  ],
+  "shadow_px": 569
+ },
+ "props_large/flamboyant_tree.png": {
+  "ellipse": [
+   21,
+   120,
+   90,
+   9
+  ],
+  "shadow_px": 552
+ },
+ "props_large/hammock.png": {
+  "ellipse": [
+   27,
+   112,
+   79,
+   9
+  ],
+  "shadow_px": 536
+ },
+ "props_large/outfitter_van.png": {
+  "ellipse": [
+   19,
+   91,
+   89,
+   9
+  ],
+  "shadow_px": 474
+ },
+ "props_large/pennant_string.png": "skipped (line prop)",
+ "props_large/picnic_table.png": {
+  "ellipse": [
+   25,
+   106,
+   84,
+   9
+  ],
+  "shadow_px": 572
+ },
+ "props_large/pine_tall_a.png": {
+  "ellipse": [
+   35,
+   119,
+   61,
+   9
+  ],
+  "shadow_px": 412
+ },
+ "props_large/pine_tall_b.png": {
+  "ellipse": [
+   31,
+   119,
+   72,
+   9
+  ],
+  "shadow_px": 485
+ },
+ "props_large/string_lights.png": "skipped (line prop)",
+ "props_large/swing.png": {
+  "ellipse": [
+   20,
+   119,
+   90,
+   9
+  ],
+  "shadow_px": 613
+ },
+ "props_medium/M1_5.png": {
+  "ellipse": [
+   15,
+   52,
+   38,
+   7
+  ],
+  "shadow_px": 196
+ },
+ "props_medium/M1_7.png": {
+  "ellipse": [
+   17,
+   52,
+   36,
+   7
+  ],
+  "shadow_px": 188
+ },
+ "props_medium/M2_0.png": {
+  "ellipse": [
+   12,
+   48,
+   43,
+   9
+  ],
+  "shadow_px": 292
+ },
+ "props_medium/M2_1.png": {
+  "ellipse": [
+   25,
+   58,
+   18,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_medium/M2_11.png": {
+  "ellipse": [
+   17,
+   52,
+   33,
+   7
+  ],
+  "shadow_px": 172
+ },
+ "props_medium/M2_12.png": {
+  "ellipse": [
+   13,
+   49,
+   41,
+   9
+  ],
+  "shadow_px": 281
+ },
+ "props_medium/M2_13.png": {
+  "ellipse": [
+   16,
+   52,
+   38,
+   7
+  ],
+  "shadow_px": 196
+ },
+ "props_medium/M2_15.png": {
+  "ellipse": [
+   20,
+   54,
+   28,
+   5
+  ],
+  "shadow_px": 101
+ },
+ "props_medium/M2_4.png": {
+  "ellipse": [
+   17,
+   50,
+   36,
+   7
+  ],
+  "shadow_px": 188
+ },
+ "props_medium/M2_5.png": {
+  "ellipse": [
+   18,
+   49,
+   34,
+   7
+  ],
+  "shadow_px": 176
+ },
+ "props_medium/M2_6.png": {
+  "ellipse": [
+   18,
+   46,
+   32,
+   7
+  ],
+  "shadow_px": 167
+ },
+ "props_medium/M2_7.png": {
+  "ellipse": [
+   15,
+   53,
+   37,
+   7
+  ],
+  "shadow_px": 192
+ },
+ "props_medium/M2_8.png": {
+  "ellipse": [
+   20,
+   54,
+   28,
+   5
+  ],
+  "shadow_px": 101
+ },
+ "props_medium/chicken_coop.png": {
+  "ellipse": [
+   13,
+   55,
+   42,
+   9
+  ],
+  "shadow_px": 285
+ },
+ "props_medium/dirt_patch.png": {
+  "ellipse": [
+   12,
+   49,
+   43,
+   9
+  ],
+  "shadow_px": 292
+ },
+ "props_medium/drying_tarp.png": {
+  "ellipse": [
+   12,
+   53,
+   43,
+   9
+  ],
+  "shadow_px": 292
+ },
+ "props_medium/fire_ring_lit_static.png": {
+  "ellipse": [
+   18,
+   49,
+   33,
+   7
+  ],
+  "shadow_px": 171
+ },
+ "props_medium/fire_ring_unlit.png": {
+  "ellipse": [
+   18,
+   48,
+   33,
+   7
+  ],
+  "shadow_px": 171
+ },
+ "props_medium/flower_box.png": {
+  "ellipse": [
+   15,
+   51,
+   37,
+   7
+  ],
+  "shadow_px": 192
+ },
+ "props_medium/lantern_post.png": {
+  "ellipse": [
+   25,
+   55,
+   23,
+   5
+  ],
+  "shadow_px": 85
+ },
+ "props_medium/log_bench.png": {
+  "ellipse": [
+   16,
+   47,
+   36,
+   7
+  ],
+  "shadow_px": 187
+ },
+ "props_medium/moped_cub.png": {
+  "ellipse": [
+   14,
+   49,
+   40,
+   9
+  ],
+  "shadow_px": 276
+ },
+ "props_medium/pallet_deck.png": {
+  "ellipse": [
+   12,
+   49,
+   43,
+   9
+  ],
+  "shadow_px": 292
+ },
+ "props_medium/picnic_basket.png": {
+  "ellipse": [
+   15,
+   49,
+   37,
+   7
+  ],
+  "shadow_px": 192
+ },
+ "props_medium/radio_stump.png": {
+  "ellipse": [
+   18,
+   50,
+   30,
+   7
+  ],
+  "shadow_px": 155
+ },
+ "props_medium/stool_pair.png": {
+  "ellipse": [
+   18,
+   46,
+   31,
+   7
+  ],
+  "shadow_px": 160
+ },
+ "props_medium/tea_table.png": {
+  "ellipse": [
+   16,
+   52,
+   36,
+   7
+  ],
+  "shadow_px": 188
+ },
+ "props_medium/tent_green.png": {
+  "ellipse": [
+   17,
+   58,
+   64,
+   9
+  ],
+  "shadow_px": 282
+ },
+ "props_medium/tent_red.png": {
+  "ellipse": [
+   18,
+   58,
+   65,
+   9
+  ],
+  "shadow_px": 288
+ },
+ "props_medium/tripod_cauldron.png": {
+  "ellipse": [
+   17,
+   52,
+   37,
+   7
+  ],
+  "shadow_px": 192
+ },
+ "props_medium/viewpoint_binoculars.png": {
+  "ellipse": [
+   23,
+   55,
+   23,
+   5
+  ],
+  "shadow_px": 85
+ },
+ "props_small/S_10.png": {
+  "ellipse": [
+   9,
+   26,
+   17,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/S_11.png": {
+  "ellipse": [
+   10,
+   25,
+   15,
+   3
+  ],
+  "shadow_px": 28
+ },
+ "props_small/S_12.png": {
+  "ellipse": [
+   10,
+   25,
+   15,
+   3
+  ],
+  "shadow_px": 28
+ },
+ "props_small/S_13.png": {
+  "ellipse": [
+   10,
+   26,
+   15,
+   3
+  ],
+  "shadow_px": 31
+ },
+ "props_small/S_14.png": {
+  "ellipse": [
+   8,
+   22,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/S_15.png": {
+  "ellipse": [
+   8,
+   27,
+   18,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/S_16.png": {
+  "ellipse": [
+   8,
+   24,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/S_17.png": {
+  "ellipse": [
+   8,
+   28,
+   17,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/S_18.png": {
+  "ellipse": [
+   11,
+   28,
+   13,
+   3
+  ],
+  "shadow_px": 27
+ },
+ "props_small/S_19.png": {
+  "ellipse": [
+   12,
+   27,
+   12,
+   3
+  ],
+  "shadow_px": 24
+ },
+ "props_small/S_20.png": {
+  "ellipse": [
+   9,
+   28,
+   18,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/S_21.png": {
+  "ellipse": [
+   10,
+   28,
+   15,
+   3
+  ],
+  "shadow_px": 28
+ },
+ "props_small/S_24.png": {
+  "ellipse": [
+   9,
+   28,
+   18,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/S_25.png": {
+  "ellipse": [
+   10,
+   26,
+   15,
+   3
+  ],
+  "shadow_px": 28
+ },
+ "props_small/S_26.png": {
+  "ellipse": [
+   9,
+   26,
+   17,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/S_27.png": {
+  "ellipse": [
+   8,
+   27,
+   20,
+   5
+  ],
+  "shadow_px": 73
+ },
+ "props_small/S_28.png": {
+  "ellipse": [
+   13,
+   27,
+   12,
+   3
+  ],
+  "shadow_px": 24
+ },
+ "props_small/S_29.png": {
+  "ellipse": [
+   8,
+   23,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/S_3.png": {
+  "ellipse": [
+   10,
+   27,
+   15,
+   3
+  ],
+  "shadow_px": 28
+ },
+ "props_small/S_30.png": {
+  "ellipse": [
+   12,
+   25,
+   11,
+   3
+  ],
+  "shadow_px": 20
+ },
+ "props_small/S_32.png": {
+  "ellipse": [
+   9,
+   28,
+   18,
+   3
+  ],
+  "shadow_px": 35
+ },
+ "props_small/S_33.png": {
+  "ellipse": [
+   8,
+   25,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/S_34.png": {
+  "ellipse": [
+   10,
+   25,
+   16,
+   3
+  ],
+  "shadow_px": 31
+ },
+ "props_small/S_36.png": {
+  "ellipse": [
+   8,
+   23,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/S_37.png": {
+  "ellipse": [
+   11,
+   26,
+   14,
+   3
+  ],
+  "shadow_px": 28
+ },
+ "props_small/S_38.png": {
+  "ellipse": [
+   9,
+   26,
+   17,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/S_39.png": {
+  "ellipse": [
+   9,
+   28,
+   18,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/S_4.png": {
+  "ellipse": [
+   11,
+   27,
+   14,
+   3
+  ],
+  "shadow_px": 28
+ },
+ "props_small/S_40.png": {
+  "ellipse": [
+   11,
+   28,
+   15,
+   3
+  ],
+  "shadow_px": 31
+ },
+ "props_small/S_43.png": {
+  "ellipse": [
+   8,
+   23,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/S_44.png": {
+  "ellipse": [
+   9,
+   28,
+   17,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/S_45.png": {
+  "ellipse": [
+   8,
+   26,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/S_46.png": {
+  "ellipse": [
+   9,
+   28,
+   18,
+   3
+  ],
+  "shadow_px": 35
+ },
+ "props_small/S_47.png": {
+  "ellipse": [
+   9,
+   27,
+   17,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/S_48.png": {
+  "ellipse": [
+   8,
+   24,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/S_49.png": {
+  "ellipse": [
+   8,
+   26,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/S_5.png": {
+  "ellipse": [
+   14,
+   28,
+   10,
+   3
+  ],
+  "shadow_px": 20
+ },
+ "props_small/S_50.png": {
+  "ellipse": [
+   9,
+   27,
+   17,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/S_51.png": {
+  "ellipse": [
+   8,
+   27,
+   19,
+   3
+  ],
+  "shadow_px": 35
+ },
+ "props_small/S_52.png": {
+  "ellipse": [
+   8,
+   26,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/S_53.png": {
+  "ellipse": [
+   8,
+   24,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/S_54.png": {
+  "ellipse": [
+   9,
+   27,
+   18,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/S_56.png": {
+  "ellipse": [
+   9,
+   25,
+   19,
+   3
+  ],
+  "shadow_px": 35
+ },
+ "props_small/S_57.png": {
+  "ellipse": [
+   7,
+   21,
+   21,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/S_59.png": {
+  "ellipse": [
+   11,
+   26,
+   14,
+   3
+  ],
+  "shadow_px": 28
+ },
+ "props_small/S_6.png": {
+  "ellipse": [
+   8,
+   26,
+   17,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/S_61.png": {
+  "ellipse": [
+   9,
+   27,
+   18,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/S_62.png": {
+  "ellipse": [
+   9,
+   27,
+   18,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/S_7.png": {
+  "ellipse": [
+   8,
+   24,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/S_8.png": {
+  "ellipse": [
+   8,
+   26,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/bird_cage.png": {
+  "ellipse": [
+   12,
+   27,
+   12,
+   3
+  ],
+  "shadow_px": 24
+ },
+ "props_small/campfire_small.png": {
+  "ellipse": [
+   8,
+   26,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/chili_garlic_string.png": {
+  "ellipse": [
+   9,
+   27,
+   19,
+   3
+  ],
+  "shadow_px": 35
+ },
+ "props_small/dried_fish_rack.png": {
+  "ellipse": [
+   8,
+   26,
+   20,
+   5
+  ],
+  "shadow_px": 72
+ },
+ "props_small/lantern_post_small.png": {
+  "ellipse": [
+   12,
+   28,
+   10,
+   3
+  ],
+  "shadow_px": 19
+ },
+ "props_small/lotus_bowl.png": {
+  "ellipse": [
+   9,
+   28,
+   17,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/non_la_hat.png": {
+  "ellipse": [
+   9,
+   22,
+   18,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_small/silk_lantern_red.png": {
+  "ellipse": [
+   13,
+   28,
+   15,
+   3
+  ],
+  "shadow_px": 28
+ },
+ "props_small/spirit_house.png": {
+  "ellipse": [
+   11,
+   59,
+   22,
+   5
+  ],
+  "shadow_px": 77
+ },
+ "props_small/stool_plastic_blue.png": {
+  "ellipse": [
+   10,
+   26,
+   15,
+   3
+  ],
+  "shadow_px": 28
+ },
+ "props_small/stool_plastic_red.png": {
+  "ellipse": [
+   9,
+   26,
+   17,
+   3
+  ],
+  "shadow_px": 32
+ },
+ "props_large/cottage_shed.png": "inherited (copy of shipped cabin incl. shadow)",
+ "props_medium/fire_ring_unlit_v2.png": {
+  "ellipse": [
+   9,
+   34,
+   32,
+   7
+  ],
+  "shadow_px": 144
+ },
+ "props_small/signpost.png": {
+  "ellipse": [
+   12,
+   58,
+   30,
+   7
+  ],
+  "shadow_px": 136
+ }
+}

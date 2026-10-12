@@ -1,0 +1,24 @@
+{
+ "camp": {
+  "min": 36,
+  "max": 45,
+  "mean": 39.6,
+  "spec": 48,
+  "in_window_38_52": false
+ },
+ "ranger": {
+  "min": 57,
+  "max": 60,
+  "mean": 58.1,
+  "spec": 48,
+  "in_window_38_52": false
+ },
+ "warden": {
+  "min": 57,
+  "max": 59,
+  "mean": 58.2,
+  "spec": 48,
+  "in_window_38_52": false
+ },
+ "action": "no resample per brief; sizes left as authored, deviation noted"
+}

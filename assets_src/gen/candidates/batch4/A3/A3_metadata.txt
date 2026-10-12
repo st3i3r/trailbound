@@ -1,0 +1,30 @@
+status: completed
+id: 3f2590a3-9614-4ac3-a66b-1f5913e0567c
+name: camp_dog
+state_name: Idle
+directions: 8 (south, east, north, west, south-east, north-east, north-west, south-west)
+size: 68x68px
+view: low top-down
+style: basic shading, single color black outline, medium detail
+group: b134309d-482e-4dba-a888-189cc47b5fec (1 state)
+
+rotations:
+  south: https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/3f2590a3-9614-4ac3-a66b-1f5913e0567c/rotations/south.png?t=1791746055
+  east: https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/3f2590a3-9614-4ac3-a66b-1f5913e0567c/rotations/east.png?t=1791746055
+  north: https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/3f2590a3-9614-4ac3-a66b-1f5913e0567c/rotations/north.png?t=1791746055
+  west: https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/3f2590a3-9614-4ac3-a66b-1f5913e0567c/rotations/west.png?t=1791746055
+  south-east: https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/3f2590a3-9614-4ac3-a66b-1f5913e0567c/rotations/south-east.png?t=1791746055
+  north-east: https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/3f2590a3-9614-4ac3-a66b-1f5913e0567c/rotations/north-east.png?t=1791746055
+  north-west: https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/3f2590a3-9614-4ac3-a66b-1f5913e0567c/rotations/north-west.png?t=1791746055
+  south-west: https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/3f2590a3-9614-4ac3-a66b-1f5913e0567c/rotations/south-west.png?t=1791746055
+
+animations (1 group, 1 total):
+  idle — 1 dir (south), 8f 2026-10-11 [group: 20bc4cfc-107d-4e26-861b-3a2965ca91de]
+    south: https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/3f2590a3-9614-4ac3-a66b-1f5913e0567c/animations/80839265-b18c-4b28-9954-26fd64110abf/south/{i}.png?t=1791762588451 (i=0..7)
+
+download: https://api.pixellab.ai/mcp/characters/3f2590a3-9614-4ac3-a66b-1f5913e0567c/download
+spritesheet: https://api.pixellab.ai/mcp/characters/3f2590a3-9614-4ac3-a66b-1f5913e0567c/spritesheet (this state only — one uniform-grid sheet PNG + layout JSON, zipped; cells pivot-centred)
+
+available_animations: bark, fast-walk, idle, running-4-frames, running-6-frames, running-8-frames, sneaking, walk-4-frames, walk-6-frames, walk-8-frames
+
+actions: animate_character(character_id="3f2590a3-9614-4ac3-a66b-1f5913e0567c", ...) | create_character_state(character_id="3f2590a3-9614-4ac3-a66b-1f5913e0567c", ...) | delete_animation(character_id="3f2590a3-9614-4ac3-a66b-1f5913e0567c", animation_group_id="<group>") | delete_character(character_id="3f2590a3-9614-4ac3-a66b-1f5913e0567c")

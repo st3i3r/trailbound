@@ -1,0 +1,36 @@
+{
+  "group_id": "3b1398e6-af93-444b-ae90-f88664de32d4",
+  "states": [
+    {
+      "character": {
+        "id": "41d1948b-4dea-4b4d-b689-983e03b8508e",
+        "name": "Idle",
+        "prompt": "young trail warden, forest-green hoodie, khaki cargo shorts, hiking boots, small tan backpack, short black hair, friendly Southeast Asian face, cozy Eastward-style pixel art",
+        "size": {
+          "width": 64,
+          "height": 64
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-11T18:55:13.965721+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-11T19:04:12.273025"
+}

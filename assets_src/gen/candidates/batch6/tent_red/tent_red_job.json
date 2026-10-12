@@ -1,0 +1,22 @@
+{
+ "prop": "tent_red",
+ "tool": "create_image_pro_flash",
+ "job_id": "5a26f0dc-8627-4567-b91b-1c7e79cd9e61",
+ "asset_id": "4b564d95-d573-581e-a2a7-703c16f3ab09",
+ "charged_generations": 5,
+ "canvas": [
+  96,
+  64
+ ],
+ "no_background": true,
+ "transparent": true,
+ "style_source_image_id": "d9e3e77e-2459-4894-a487-08e7a49e5076",
+ "style_options": {
+  "color_palette": true,
+  "outline": true,
+  "shading": true,
+  "detail": false
+ },
+ "status": "completed",
+ "image_file": "tent_red_0.png"
+}

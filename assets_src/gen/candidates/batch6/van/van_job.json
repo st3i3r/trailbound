@@ -1,0 +1,22 @@
+{
+ "prop": "van",
+ "tool": "create_image_pro_flash",
+ "job_id": "083da4e7-95ea-4622-9256-da3280e8b00e",
+ "asset_id": "d48ed21a-d464-5ef6-9fe3-59e82b5d2898",
+ "charged_generations": 6,
+ "canvas": [
+  128,
+  96
+ ],
+ "no_background": true,
+ "transparent": true,
+ "style_source_image_id": "42c2b017-056b-4231-93c4-d257e58a9c4d",
+ "style_options": {
+  "color_palette": true,
+  "outline": true,
+  "shading": true,
+  "detail": false
+ },
+ "status": "completed",
+ "image_file": "van_0.png"
+}

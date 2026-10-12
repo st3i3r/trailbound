@@ -1,0 +1,36 @@
+{
+  "group_id": "4c5769d1-bdcc-45aa-8f86-f6a008718ab3",
+  "states": [
+    {
+      "character": {
+        "id": "68f0bd44-2e67-4220-81fa-1a6aef36b06b",
+        "name": "Idle",
+        "prompt": "Ranger Mai, cheerful Vietnamese park ranger woman, olive-green ranger shirt with a small badge, khaki trousers, conical palm-leaf hat (n\u00f3n l\u00e1), long black hair in a low ponytail, holding a clipboard, cozy Eastward-style pixel art",
+        "size": {
+          "width": 64,
+          "height": 64
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-11T19:04:42.202887+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-11T19:12:52.834941"
+}

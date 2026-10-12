@@ -1,0 +1,1407 @@
+{
+  "batch": "batch3",
+  "staging_root": "assets_src\\staging\\pinewatch",
+  "categories": {
+    "terrain": [
+      {
+        "file": "terrain_grass_water_pro_0.png",
+        "job": "T2",
+        "index": "terrain_grass_water_pro_0"
+      },
+      {
+        "file": "terrain_grass_water_pro_0.json",
+        "job": "T2",
+        "index": "terrain_grass_water_pro_0"
+      },
+      {
+        "file": "terrain_grass_forest_pro_0.png",
+        "job": "T3",
+        "index": "terrain_grass_forest_pro_0"
+      },
+      {
+        "file": "terrain_grass_forest_pro_0.json",
+        "job": "T3",
+        "index": "terrain_grass_forest_pro_0"
+      },
+      {
+        "file": "terrain_grass_stone_pro_0.png",
+        "job": "T4",
+        "index": "terrain_grass_stone_pro_0"
+      },
+      {
+        "file": "terrain_grass_stone_pro_0.json",
+        "job": "T4",
+        "index": "terrain_grass_stone_pro_0"
+      }
+    ],
+    "decals": [
+      {
+        "file": "XS_0.png",
+        "job": "XS",
+        "index": 0
+      },
+      {
+        "file": "XS_1.png",
+        "job": "XS",
+        "index": 1
+      },
+      {
+        "file": "XS_10.png",
+        "job": "XS",
+        "index": 10
+      },
+      {
+        "file": "XS_11.png",
+        "job": "XS",
+        "index": 11
+      },
+      {
+        "file": "XS_12.png",
+        "job": "XS",
+        "index": 12
+      },
+      {
+        "file": "XS_13.png",
+        "job": "XS",
+        "index": 13
+      },
+      {
+        "file": "XS_14.png",
+        "job": "XS",
+        "index": 14
+      },
+      {
+        "file": "XS_15.png",
+        "job": "XS",
+        "index": 15
+      },
+      {
+        "file": "XS_16.png",
+        "job": "XS",
+        "index": 16
+      },
+      {
+        "file": "XS_17.png",
+        "job": "XS",
+        "index": 17
+      },
+      {
+        "file": "XS_18.png",
+        "job": "XS",
+        "index": 18
+      },
+      {
+        "file": "XS_19.png",
+        "job": "XS",
+        "index": 19
+      },
+      {
+        "file": "XS_2.png",
+        "job": "XS",
+        "index": 2
+      },
+      {
+        "file": "XS_20.png",
+        "job": "XS",
+        "index": 20
+      },
+      {
+        "file": "XS_21.png",
+        "job": "XS",
+        "index": 21
+      },
+      {
+        "file": "XS_22.png",
+        "job": "XS",
+        "index": 22
+      },
+      {
+        "file": "XS_23.png",
+        "job": "XS",
+        "index": 23
+      },
+      {
+        "file": "XS_24.png",
+        "job": "XS",
+        "index": 24
+      },
+      {
+        "file": "XS_25.png",
+        "job": "XS",
+        "index": 25
+      },
+      {
+        "file": "XS_26.png",
+        "job": "XS",
+        "index": 26
+      },
+      {
+        "file": "XS_27.png",
+        "job": "XS",
+        "index": 27
+      },
+      {
+        "file": "XS_28.png",
+        "job": "XS",
+        "index": 28
+      },
+      {
+        "file": "XS_29.png",
+        "job": "XS",
+        "index": 29
+      },
+      {
+        "file": "XS_3.png",
+        "job": "XS",
+        "index": 3
+      },
+      {
+        "file": "XS_30.png",
+        "job": "XS",
+        "index": 30
+      },
+      {
+        "file": "XS_31.png",
+        "job": "XS",
+        "index": 31
+      },
+      {
+        "file": "XS_32.png",
+        "job": "XS",
+        "index": 32
+      },
+      {
+        "file": "XS_34.png",
+        "job": "XS",
+        "index": 34
+      },
+      {
+        "file": "XS_35.png",
+        "job": "XS",
+        "index": 35
+      },
+      {
+        "file": "XS_36.png",
+        "job": "XS",
+        "index": 36
+      },
+      {
+        "file": "XS_37.png",
+        "job": "XS",
+        "index": 37
+      },
+      {
+        "file": "XS_38.png",
+        "job": "XS",
+        "index": 38
+      },
+      {
+        "file": "XS_39.png",
+        "job": "XS",
+        "index": 39
+      },
+      {
+        "file": "XS_4.png",
+        "job": "XS",
+        "index": 4
+      },
+      {
+        "file": "XS_40.png",
+        "job": "XS",
+        "index": 40
+      },
+      {
+        "file": "XS_41.png",
+        "job": "XS",
+        "index": 41
+      },
+      {
+        "file": "XS_42.png",
+        "job": "XS",
+        "index": 42
+      },
+      {
+        "file": "XS_43.png",
+        "job": "XS",
+        "index": 43
+      },
+      {
+        "file": "XS_44.png",
+        "job": "XS",
+        "index": 44
+      },
+      {
+        "file": "XS_45.png",
+        "job": "XS",
+        "index": 45
+      },
+      {
+        "file": "XS_46.png",
+        "job": "XS",
+        "index": 46
+      },
+      {
+        "file": "XS_47.png",
+        "job": "XS",
+        "index": 47
+      },
+      {
+        "file": "XS_48.png",
+        "job": "XS",
+        "index": 48
+      },
+      {
+        "file": "XS_5.png",
+        "job": "XS",
+        "index": 5
+      },
+      {
+        "file": "XS_51.png",
+        "job": "XS",
+        "index": 51
+      },
+      {
+        "file": "XS_52.png",
+        "job": "XS",
+        "index": 52
+      },
+      {
+        "file": "XS_53.png",
+        "job": "XS",
+        "index": 53
+      },
+      {
+        "file": "XS_54.png",
+        "job": "XS",
+        "index": 54
+      },
+      {
+        "file": "XS_55.png",
+        "job": "XS",
+        "index": 55
+      },
+      {
+        "file": "XS_56.png",
+        "job": "XS",
+        "index": 56
+      },
+      {
+        "file": "XS_57.png",
+        "job": "XS",
+        "index": 57
+      },
+      {
+        "file": "XS_58.png",
+        "job": "XS",
+        "index": 58
+      },
+      {
+        "file": "XS_59.png",
+        "job": "XS",
+        "index": 59
+      },
+      {
+        "file": "XS_6.png",
+        "job": "XS",
+        "index": 6
+      },
+      {
+        "file": "XS_61.png",
+        "job": "XS",
+        "index": 61
+      },
+      {
+        "file": "XS_62.png",
+        "job": "XS",
+        "index": 62
+      },
+      {
+        "file": "XS_63.png",
+        "job": "XS",
+        "index": 63
+      },
+      {
+        "file": "XS_7.png",
+        "job": "XS",
+        "index": 7
+      },
+      {
+        "file": "XS_8.png",
+        "job": "XS",
+        "index": 8
+      },
+      {
+        "file": "XS_9.png",
+        "job": "XS",
+        "index": 9
+      }
+    ],
+    "props_small": [
+      {
+        "file": "lantern_post_small.png",
+        "job": "S",
+        "index": 0
+      },
+      {
+        "file": "stool_plastic_red.png",
+        "job": "S",
+        "index": 1
+      },
+      {
+        "file": "S_10.png",
+        "job": "S",
+        "index": 10
+      },
+      {
+        "file": "S_11.png",
+        "job": "S",
+        "index": 11
+      },
+      {
+        "file": "S_12.png",
+        "job": "S",
+        "index": 12
+      },
+      {
+        "file": "S_13.png",
+        "job": "S",
+        "index": 13
+      },
+      {
+        "file": "S_14.png",
+        "job": "S",
+        "index": 14
+      },
+      {
+        "file": "S_15.png",
+        "job": "S",
+        "index": 15
+      },
+      {
+        "file": "S_16.png",
+        "job": "S",
+        "index": 16
+      },
+      {
+        "file": "S_17.png",
+        "job": "S",
+        "index": 17
+      },
+      {
+        "file": "S_18.png",
+        "job": "S",
+        "index": 18
+      },
+      {
+        "file": "S_19.png",
+        "job": "S",
+        "index": 19
+      },
+      {
+        "file": "stool_plastic_blue.png",
+        "job": "S",
+        "index": 2
+      },
+      {
+        "file": "S_20.png",
+        "job": "S",
+        "index": 20
+      },
+      {
+        "file": "S_21.png",
+        "job": "S",
+        "index": 21
+      },
+      {
+        "file": "silk_lantern_red.png",
+        "job": "S",
+        "index": 22
+      },
+      {
+        "file": "lotus_bowl.png",
+        "job": "S",
+        "index": 23
+      },
+      {
+        "file": "S_24.png",
+        "job": "S",
+        "index": 24
+      },
+      {
+        "file": "S_25.png",
+        "job": "S",
+        "index": 25
+      },
+      {
+        "file": "S_26.png",
+        "job": "S",
+        "index": 26
+      },
+      {
+        "file": "S_27.png",
+        "job": "S",
+        "index": 27
+      },
+      {
+        "file": "S_28.png",
+        "job": "S",
+        "index": 28
+      },
+      {
+        "file": "S_29.png",
+        "job": "S",
+        "index": 29
+      },
+      {
+        "file": "S_3.png",
+        "job": "S",
+        "index": 3
+      },
+      {
+        "file": "S_30.png",
+        "job": "S",
+        "index": 30
+      },
+      {
+        "file": "S_32.png",
+        "job": "S",
+        "index": 32
+      },
+      {
+        "file": "S_33.png",
+        "job": "S",
+        "index": 33
+      },
+      {
+        "file": "S_34.png",
+        "job": "S",
+        "index": 34
+      },
+      {
+        "file": "bird_cage.png",
+        "job": "S",
+        "index": 35
+      },
+      {
+        "file": "S_36.png",
+        "job": "S",
+        "index": 36
+      },
+      {
+        "file": "S_37.png",
+        "job": "S",
+        "index": 37
+      },
+      {
+        "file": "S_38.png",
+        "job": "S",
+        "index": 38
+      },
+      {
+        "file": "S_39.png",
+        "job": "S",
+        "index": 39
+      },
+      {
+        "file": "S_4.png",
+        "job": "S",
+        "index": 4
+      },
+      {
+        "file": "S_40.png",
+        "job": "S",
+        "index": 40
+      },
+      {
+        "file": "dried_fish_rack.png",
+        "job": "S",
+        "index": 41
+      },
+      {
+        "file": "chili_garlic_string.png",
+        "job": "S",
+        "index": 42
+      },
+      {
+        "file": "S_43.png",
+        "job": "S",
+        "index": 43
+      },
+      {
+        "file": "S_44.png",
+        "job": "S",
+        "index": 44
+      },
+      {
+        "file": "S_45.png",
+        "job": "S",
+        "index": 45
+      },
+      {
+        "file": "S_46.png",
+        "job": "S",
+        "index": 46
+      },
+      {
+        "file": "S_47.png",
+        "job": "S",
+        "index": 47
+      },
+      {
+        "file": "S_48.png",
+        "job": "S",
+        "index": 48
+      },
+      {
+        "file": "S_49.png",
+        "job": "S",
+        "index": 49
+      },
+      {
+        "file": "S_5.png",
+        "job": "S",
+        "index": 5
+      },
+      {
+        "file": "S_50.png",
+        "job": "S",
+        "index": 50
+      },
+      {
+        "file": "S_51.png",
+        "job": "S",
+        "index": 51
+      },
+      {
+        "file": "S_52.png",
+        "job": "S",
+        "index": 52
+      },
+      {
+        "file": "S_53.png",
+        "job": "S",
+        "index": 53
+      },
+      {
+        "file": "S_54.png",
+        "job": "S",
+        "index": 54
+      },
+      {
+        "file": "campfire_small.png",
+        "job": "S",
+        "index": 55
+      },
+      {
+        "file": "S_56.png",
+        "job": "S",
+        "index": 56
+      },
+      {
+        "file": "S_57.png",
+        "job": "S",
+        "index": 57
+      },
+      {
+        "file": "S_59.png",
+        "job": "S",
+        "index": 59
+      },
+      {
+        "file": "S_6.png",
+        "job": "S",
+        "index": 6
+      },
+      {
+        "file": "S_61.png",
+        "job": "S",
+        "index": 61
+      },
+      {
+        "file": "S_62.png",
+        "job": "S",
+        "index": 62
+      },
+      {
+        "file": "spirit_house.png",
+        "job": "S",
+        "index": 63
+      },
+      {
+        "file": "S_7.png",
+        "job": "S",
+        "index": 7
+      },
+      {
+        "file": "S_8.png",
+        "job": "S",
+        "index": 8
+      },
+      {
+        "file": "non_la_hat.png",
+        "job": "S",
+        "index": 9
+      }
+    ],
+    "props_medium": [
+      {
+        "file": "stool_pair.png",
+        "job": "M1",
+        "index": 0
+      },
+      {
+        "file": "log_bench.png",
+        "job": "M1",
+        "index": 1
+      },
+      {
+        "file": "fire_ring_lit_static.png",
+        "job": "M1",
+        "index": 10
+      },
+      {
+        "file": "tent_green.png",
+        "job": "M1",
+        "index": 11
+      },
+      {
+        "file": "tent_red.png",
+        "job": "M1",
+        "index": 12
+      },
+      {
+        "file": "dirt_patch.png",
+        "job": "M1",
+        "index": 13
+      },
+      {
+        "file": "pallet_deck.png",
+        "job": "M1",
+        "index": 14
+      },
+      {
+        "file": "signpost.png",
+        "job": "M1",
+        "index": 15
+      },
+      {
+        "file": "lantern_post.png",
+        "job": "M1",
+        "index": 2
+      },
+      {
+        "file": "flower_box.png",
+        "job": "M1",
+        "index": 3
+      },
+      {
+        "file": "drying_tarp.png",
+        "job": "M1",
+        "index": 4
+      },
+      {
+        "file": "M1_5.png",
+        "job": "M1",
+        "index": 5
+      },
+      {
+        "file": "picnic_basket.png",
+        "job": "M1",
+        "index": 6
+      },
+      {
+        "file": "M1_7.png",
+        "job": "M1",
+        "index": 7
+      },
+      {
+        "file": "radio_stump.png",
+        "job": "M1",
+        "index": 8
+      },
+      {
+        "file": "fire_ring_unlit.png",
+        "job": "M1",
+        "index": 9
+      },
+      {
+        "file": "M2_0.png",
+        "job": "M2",
+        "index": 0
+      },
+      {
+        "file": "M2_1.png",
+        "job": "M2",
+        "index": 1
+      },
+      {
+        "file": "tea_table.png",
+        "job": "M2",
+        "index": 10
+      },
+      {
+        "file": "M2_11.png",
+        "job": "M2",
+        "index": 11
+      },
+      {
+        "file": "M2_12.png",
+        "job": "M2",
+        "index": 12
+      },
+      {
+        "file": "M2_13.png",
+        "job": "M2",
+        "index": 13
+      },
+      {
+        "file": "viewpoint_binoculars.png",
+        "job": "M2",
+        "index": 14
+      },
+      {
+        "file": "M2_15.png",
+        "job": "M2",
+        "index": 15
+      },
+      {
+        "file": "chicken_coop.png",
+        "job": "M2",
+        "index": 2
+      },
+      {
+        "file": "moped_cub.png",
+        "job": "M2",
+        "index": 3
+      },
+      {
+        "file": "M2_4.png",
+        "job": "M2",
+        "index": 4
+      },
+      {
+        "file": "M2_5.png",
+        "job": "M2",
+        "index": 5
+      },
+      {
+        "file": "M2_6.png",
+        "job": "M2",
+        "index": 6
+      },
+      {
+        "file": "M2_7.png",
+        "job": "M2",
+        "index": 7
+      },
+      {
+        "file": "M2_8.png",
+        "job": "M2",
+        "index": 8
+      },
+      {
+        "file": "tripod_cauldron.png",
+        "job": "M2",
+        "index": 9
+      }
+    ],
+    "props_large": [
+      {
+        "file": "pine_tall_a.png",
+        "job": "L1",
+        "index": 0
+      },
+      {
+        "file": "pine_tall_b.png",
+        "job": "L1",
+        "index": 1
+      },
+      {
+        "file": "flamboyant_tree.png",
+        "job": "L1",
+        "index": 2
+      },
+      {
+        "file": "outfitter_van.png",
+        "job": "L1",
+        "index": 3
+      },
+      {
+        "file": "cabin.png",
+        "job": "L2",
+        "index": 0
+      },
+      {
+        "file": "banana_clump.png",
+        "job": "L2",
+        "index": 1
+      },
+      {
+        "file": "bamboo_clump.png",
+        "job": "L2",
+        "index": 2
+      },
+      {
+        "file": "hammock.png",
+        "job": "L2",
+        "index": 3
+      },
+      {
+        "file": "picnic_table.png",
+        "job": "L3",
+        "index": 0
+      },
+      {
+        "file": "string_lights.png",
+        "job": "L3",
+        "index": 1
+      },
+      {
+        "file": "pennant_string.png",
+        "job": "L3",
+        "index": 2
+      },
+      {
+        "file": "swing.png",
+        "job": "L3",
+        "index": 3
+      }
+    ],
+    "characters": [
+      {
+        "file": "warden_east.png",
+        "job": "C1",
+        "index": "east"
+      },
+      {
+        "file": "warden_metadata.json",
+        "job": "C1",
+        "index": "metadata"
+      },
+      {
+        "file": "warden_north-east.png",
+        "job": "C1",
+        "index": "north-east"
+      },
+      {
+        "file": "warden_north-west.png",
+        "job": "C1",
+        "index": "north-west"
+      },
+      {
+        "file": "warden_north.png",
+        "job": "C1",
+        "index": "north"
+      },
+      {
+        "file": "warden_south-east.png",
+        "job": "C1",
+        "index": "south-east"
+      },
+      {
+        "file": "warden_south-west.png",
+        "job": "C1",
+        "index": "south-west"
+      },
+      {
+        "file": "warden_south.png",
+        "job": "C1",
+        "index": "south"
+      },
+      {
+        "file": "warden_west.png",
+        "job": "C1",
+        "index": "west"
+      },
+      {
+        "file": "ranger_mai_east.png",
+        "job": "C2",
+        "index": "east"
+      },
+      {
+        "file": "ranger_mai_metadata.json",
+        "job": "C2",
+        "index": "metadata"
+      },
+      {
+        "file": "ranger_mai_north-east.png",
+        "job": "C2",
+        "index": "north-east"
+      },
+      {
+        "file": "ranger_mai_north-west.png",
+        "job": "C2",
+        "index": "north-west"
+      },
+      {
+        "file": "ranger_mai_north.png",
+        "job": "C2",
+        "index": "north"
+      },
+      {
+        "file": "ranger_mai_south-east.png",
+        "job": "C2",
+        "index": "south-east"
+      },
+      {
+        "file": "ranger_mai_south-west.png",
+        "job": "C2",
+        "index": "south-west"
+      },
+      {
+        "file": "ranger_mai_south.png",
+        "job": "C2",
+        "index": "south"
+      },
+      {
+        "file": "ranger_mai_west.png",
+        "job": "C2",
+        "index": "west"
+      },
+      {
+        "file": "camp_dog_east.png",
+        "job": "C3",
+        "index": "east"
+      },
+      {
+        "file": "camp_dog_metadata.json",
+        "job": "C3",
+        "index": "metadata"
+      },
+      {
+        "file": "camp_dog_north-east.png",
+        "job": "C3",
+        "index": "north-east"
+      },
+      {
+        "file": "camp_dog_north-west.png",
+        "job": "C3",
+        "index": "north-west"
+      },
+      {
+        "file": "camp_dog_north.png",
+        "job": "C3",
+        "index": "north"
+      },
+      {
+        "file": "camp_dog_south-east.png",
+        "job": "C3",
+        "index": "south-east"
+      },
+      {
+        "file": "camp_dog_south-west.png",
+        "job": "C3",
+        "index": "south-west"
+      },
+      {
+        "file": "camp_dog_south.png",
+        "job": "C3",
+        "index": "south"
+      },
+      {
+        "file": "camp_dog_west.png",
+        "job": "C3",
+        "index": "west"
+      }
+    ],
+    "ui": [
+      {
+        "file": "U1_0.png",
+        "job": "U1",
+        "index": 0
+      },
+      {
+        "file": "U2_0.png",
+        "job": "U2",
+        "index": 0
+      },
+      {
+        "file": "U3_0.png",
+        "job": "U3",
+        "index": 0
+      },
+      {
+        "file": "U4_0.png",
+        "job": "U4",
+        "index": 0
+      },
+      {
+        "file": "U5_0.png",
+        "job": "U5",
+        "index": 0
+      }
+    ],
+    "icons": [
+      {
+        "file": "I1_0.png",
+        "job": "I1",
+        "index": 0
+      },
+      {
+        "file": "I1_1.png",
+        "job": "I1",
+        "index": 1
+      },
+      {
+        "file": "I1_10.png",
+        "job": "I1",
+        "index": 10
+      },
+      {
+        "file": "I1_11.png",
+        "job": "I1",
+        "index": 11
+      },
+      {
+        "file": "I1_12.png",
+        "job": "I1",
+        "index": 12
+      },
+      {
+        "file": "I1_13.png",
+        "job": "I1",
+        "index": 13
+      },
+      {
+        "file": "I1_14.png",
+        "job": "I1",
+        "index": 14
+      },
+      {
+        "file": "I1_15.png",
+        "job": "I1",
+        "index": 15
+      },
+      {
+        "file": "I1_16.png",
+        "job": "I1",
+        "index": 16
+      },
+      {
+        "file": "I1_17.png",
+        "job": "I1",
+        "index": 17
+      },
+      {
+        "file": "I1_18.png",
+        "job": "I1",
+        "index": 18
+      },
+      {
+        "file": "I1_19.png",
+        "job": "I1",
+        "index": 19
+      },
+      {
+        "file": "I1_2.png",
+        "job": "I1",
+        "index": 2
+      },
+      {
+        "file": "I1_20.png",
+        "job": "I1",
+        "index": 20
+      },
+      {
+        "file": "I1_21.png",
+        "job": "I1",
+        "index": 21
+      },
+      {
+        "file": "I1_22.png",
+        "job": "I1",
+        "index": 22
+      },
+      {
+        "file": "I1_23.png",
+        "job": "I1",
+        "index": 23
+      },
+      {
+        "file": "I1_24.png",
+        "job": "I1",
+        "index": 24
+      },
+      {
+        "file": "I1_25.png",
+        "job": "I1",
+        "index": 25
+      },
+      {
+        "file": "I1_26.png",
+        "job": "I1",
+        "index": 26
+      },
+      {
+        "file": "I1_27.png",
+        "job": "I1",
+        "index": 27
+      },
+      {
+        "file": "I1_29.png",
+        "job": "I1",
+        "index": 29
+      },
+      {
+        "file": "I1_3.png",
+        "job": "I1",
+        "index": 3
+      },
+      {
+        "file": "I1_30.png",
+        "job": "I1",
+        "index": 30
+      },
+      {
+        "file": "I1_31.png",
+        "job": "I1",
+        "index": 31
+      },
+      {
+        "file": "I1_32.png",
+        "job": "I1",
+        "index": 32
+      },
+      {
+        "file": "I1_33.png",
+        "job": "I1",
+        "index": 33
+      },
+      {
+        "file": "I1_35.png",
+        "job": "I1",
+        "index": 35
+      },
+      {
+        "file": "I1_36.png",
+        "job": "I1",
+        "index": 36
+      },
+      {
+        "file": "I1_38.png",
+        "job": "I1",
+        "index": 38
+      },
+      {
+        "file": "I1_4.png",
+        "job": "I1",
+        "index": 4
+      },
+      {
+        "file": "I1_40.png",
+        "job": "I1",
+        "index": 40
+      },
+      {
+        "file": "I1_41.png",
+        "job": "I1",
+        "index": 41
+      },
+      {
+        "file": "I1_42.png",
+        "job": "I1",
+        "index": 42
+      },
+      {
+        "file": "I1_43.png",
+        "job": "I1",
+        "index": 43
+      },
+      {
+        "file": "I1_44.png",
+        "job": "I1",
+        "index": 44
+      },
+      {
+        "file": "I1_45.png",
+        "job": "I1",
+        "index": 45
+      },
+      {
+        "file": "I1_46.png",
+        "job": "I1",
+        "index": 46
+      },
+      {
+        "file": "I1_47.png",
+        "job": "I1",
+        "index": 47
+      },
+      {
+        "file": "I1_48.png",
+        "job": "I1",
+        "index": 48
+      },
+      {
+        "file": "I1_49.png",
+        "job": "I1",
+        "index": 49
+      },
+      {
+        "file": "I1_5.png",
+        "job": "I1",
+        "index": 5
+      },
+      {
+        "file": "I1_50.png",
+        "job": "I1",
+        "index": 50
+      },
+      {
+        "file": "I1_51.png",
+        "job": "I1",
+        "index": 51
+      },
+      {
+        "file": "I1_52.png",
+        "job": "I1",
+        "index": 52
+      },
+      {
+        "file": "I1_53.png",
+        "job": "I1",
+        "index": 53
+      },
+      {
+        "file": "I1_54.png",
+        "job": "I1",
+        "index": 54
+      },
+      {
+        "file": "I1_55.png",
+        "job": "I1",
+        "index": 55
+      },
+      {
+        "file": "I1_56.png",
+        "job": "I1",
+        "index": 56
+      },
+      {
+        "file": "I1_57.png",
+        "job": "I1",
+        "index": 57
+      },
+      {
+        "file": "I1_58.png",
+        "job": "I1",
+        "index": 58
+      },
+      {
+        "file": "I1_59.png",
+        "job": "I1",
+        "index": 59
+      },
+      {
+        "file": "I1_6.png",
+        "job": "I1",
+        "index": 6
+      },
+      {
+        "file": "I1_60.png",
+        "job": "I1",
+        "index": 60
+      },
+      {
+        "file": "I1_61.png",
+        "job": "I1",
+        "index": 61
+      },
+      {
+        "file": "I1_62.png",
+        "job": "I1",
+        "index": 62
+      },
+      {
+        "file": "I1_63.png",
+        "job": "I1",
+        "index": 63
+      },
+      {
+        "file": "I1_7.png",
+        "job": "I1",
+        "index": 7
+      },
+      {
+        "file": "I1_8.png",
+        "job": "I1",
+        "index": 8
+      },
+      {
+        "file": "I1_9.png",
+        "job": "I1",
+        "index": 9
+      }
+    ],
+    "font": [
+      {
+        "file": "F1_0.png",
+        "job": "F1",
+        "index": "F1_0.png"
+      },
+      {
+        "file": "F1_1.ttf",
+        "job": "F1",
+        "index": "F1_1.ttf"
+      }
+    ]
+  },
+  "skipped": {
+    "T2": [],
+    "T3": [],
+    "T4": [],
+    "XS": [
+      33,
+      49,
+      50,
+      60
+    ],
+    "S": [
+      31,
+      58,
+      60
+    ],
+    "M1": [],
+    "M2": [],
+    "L1": [],
+    "L2": [],
+    "L3": [],
+    "C1": [],
+    "C2": [],
+    "C3": [],
+    "U1": [],
+    "U2": [],
+    "U3": [],
+    "U4": [],
+    "U5": [],
+    "I1": [
+      28,
+      34,
+      37,
+      39
+    ],
+    "F1": []
+  },
+  "notes": {
+    "T2": "Teal slightly saturated; cool down ~10% in palette pass. Lily pads baked into water tiles.",
+    "T3": "Faint waffle/bump grid in fill; soften 2-3 repeating bumps in cleanup.",
+    "T4": "Mossy cobbles, good.",
+    "XS": "Decals are forgiving at 16px; skip list is muddy/illegible only.",
+    "S": "Vietnamese signature pack. Skip 31 (checkered artifact), 58, 60 (muddy).",
+    "M1": "Item 9 is flame animation base; 10 is static-lit variant only.",
+    "L1": "Pines ~3x player. Van is the scene centerpiece.",
+    "C1": "Turnaround poses only; needs walk/idle animation pass.",
+    "C2": "Non la + clipboard. Turnaround only; needs walk/idle.",
+    "C3": "Needs idle/sit animation.",
+    "U1_post": [
+      "flatten_parchment_center_for_9slice"
+    ],
+    "U2_post": [
+      "recolor_variants_from_green_ramp"
+    ],
+    "U3_post": [
+      "empty_avatar_portrait"
+    ],
+    "F1": "ASCII only — NO Vietnamese diacritics. Not usable for VI build. Needs extended-Latin fallback font."
+  }
+}

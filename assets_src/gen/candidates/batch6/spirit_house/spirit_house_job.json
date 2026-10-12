@@ -1,0 +1,22 @@
+{
+ "prop": "spirit_house",
+ "tool": "create_image_pro_flash",
+ "job_id": "cf420e06-cb65-4d59-aff4-7298fc87dd5a",
+ "asset_id": "d98c1240-1c3b-53d8-9619-3154472bfe7d",
+ "charged_generations": 5,
+ "canvas": [
+  48,
+  64
+ ],
+ "no_background": true,
+ "transparent": true,
+ "style_source_image_id": "d4ed23db-4d27-4daf-96d5-ab6f6f9aac33",
+ "style_options": {
+  "color_palette": true,
+  "outline": true,
+  "shading": true,
+  "detail": false
+ },
+ "status": "completed",
+ "image_file": "spirit_house_0.png"
+}
