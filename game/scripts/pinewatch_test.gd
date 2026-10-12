@@ -331,6 +331,9 @@ func _ready() -> void:
                         hover.position = pad_cells[pid0].position
                         hover.visible = true
                         break
+        # --pose --night: run Goodnight so the summary sheet stages
+        if OS.get_cmdline_args().has("--night"):
+            _goodnight()
     var shot_arg := ""
     for a in OS.get_cmdline_args():
         if a.begins_with("--shot="):
@@ -814,6 +817,19 @@ func _smoke() -> void:
     _tap_card(g0)
     _tap_card(g0)
     print("SMOKE toggle-deselect:", selected == "")
+    # UI-022: Goodnight -> summary sheet -> Sleep -> next morning
+    var day_before := Game.day
+    _advance_phase()
+    await _frames_until(func(): return panel_mgr.top() != null)
+    var sheet := panel_mgr.top()
+    print("SMOKE night sheet:", sheet is NightSummary)
+    if sheet is NightSummary:
+        (sheet as NightSummary).sleep_pressed.emit()
+        await get_tree().process_frame
+        print("SMOKE sleep -> day:", Game.day == day_before + 1,
+              " closed:", panel_mgr.top() == null,
+              " tray rebuilt:", hud.tray.visible,
+              " evening:", evening_open)
     get_tree().quit()
 
 
@@ -1145,8 +1161,10 @@ func _status() -> void:
     hud.set_status(("day %d · site day %d · %s · %dc   [%s]") % [
         Game.day, Game.site_day(), st["weather"].to_upper(), Game.coins,
         tr("tray_hint")])
-    hud.set_phase(tr("hud_evening").to_upper() if evening_open \
-        else tr("hud_night").to_upper())
+    # the button is the phase action, not the phase name (§4 table:
+    # Evening -> Goodnight, Night -> Sleep)
+    hud.set_phase(tr("hud_goodnight").to_upper() if evening_open \
+        else tr("hud_sleep").to_upper())
     hud.set_rating(night_rating if night_rating else "—")
     hud.set_coins(tr("hud_coins_short") % Game.coins)
     hud.set_day("%s %d · %s" % [tr("hud_day").to_upper(), Game.day,
@@ -1155,28 +1173,32 @@ func _status() -> void:
 
 
 func _goodnight() -> void:
+    # capture names before goodnight() clears st["guests"]
     var names := {}
     for gid in Game.site_state()["guests"]:
         names[gid] = Game.site_state()["guests"][gid].get("name", gid)
     var rep := Game.goodnight()
-    var parts := []
-    for r in rep["results"]:
-        parts.append("%s *%d +%dc  “%s”" % [names.get(r["id"], r["id"]),
-            r["stars"], r["fee"] + int(r["tip"]), r["comment"]])
-    if rep["walk_ins"] > 0:
-        parts.append("%d walk-in(s) +%dc" % [rep["walk_ins"],
-            rep["meal_sales"]])
-    hud.set_report("night: " + "   ".join(parts) \
-        + "   >>  rating %.1f   income %dc" % [rep["rating"],
-            rep["income"]])
     night_rating = "%.1f" % rep["rating"]
     evening_open = false
-    Game.set_phase(Game.Phase.NIGHT)
     _deselect()
     _clear_bubbles()
     hud.tray.reset()
     hud.tray.visible = false
     _status()
+    # UI-022: the payoff sheet — reviews with breakdowns, totals,
+    # pages, forecast, Double-tips offer, Sleep
+    var sheet := NightSummary.make(rep, names, Game.day,
+        Game.forecast())
+    sheet.sleep_pressed.connect(_on_sleep)
+    panel_mgr.open(sheet)
+    sheet.run_count_up.call_deferred()
+
+
+## Sleep exits the night (§4 phase table): close the summary and roll
+## into the next morning — same path the phase button takes.
+func _on_sleep() -> void:
+    panel_mgr.close()
+    _advance_phase()
 
 
 func _advance_phase() -> void:

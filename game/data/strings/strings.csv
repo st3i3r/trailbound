@@ -21,3 +21,16 @@ tray_pick_pad,tap an open pad,chạm một ô trống
 tray_shelter,shelter,lều
 tray_rain,rain,mưa
 tray_hint,tap a card, then a pad · Goodnight ends the night,chạm thẻ rồi chạm ô · Goodnight kết thúc đêm
+hud_goodnight,Goodnight,Ngủ ngon
+hud_sleep,Sleep,Ngủ
+night_title,NIGHT · DAY %d,ĐÊM · NGÀY %d
+night_fees,Fees,Phí
+night_tips,Tips,Tiền tip
+night_walkins,%d walk-ins bought leftovers +%dc,%d khách vãng lai mua đồ thừa +%dc
+night_gathering,Gathering bonus +%dc,Thưởng hội hè +%dc
+night_page,Journal page %d,Trang nhật ký %d
+night_tomorrow,Tomorrow,Ngày mai
+night_double,Double tips +%dc,Nhân đôi tip +%dc
+night_doubled,Doubled +%dc,Đã nhân đôi +%dc
+night_sleep,Sleep,Ngủ
+night_none,No guests tonight.,Đêm nay không có khách.

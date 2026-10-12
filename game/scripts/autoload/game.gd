@@ -532,13 +532,28 @@ func new_day() -> void:
 
 
 func _roll_weather() -> String:
-	var sday := site_day()
+	return _weather_at(site_day())
+
+
+## The seeded roll for a given site day — shared by _roll_weather and
+## forecast so a peeked forecast can never drift from the real roll.
+func _weather_at(sday: int) -> String:
 	if sday <= 1:                                    # §5.7: never on day 1
 		return "clear"
 	if site_id == &"pinewatch" and sday == 4:        # §14 scripted rain
 		return "rain"
 	var chance := float(site_row().get("rain_chance", 0.2))
-	return "rain" if _rng_for("weather").randf() < chance else "clear"
+	var rng := RandomNumberGenerator.new()
+	rng.seed = ("%d|%s|%d|%s" % [seed, site_id, sday,
+		"weather"]).hash()
+	return "rain" if rng.randf() < chance else "clear"
+
+
+## §17.2 night summary: tomorrow's weather — the same deterministic
+## roll new_day() will make, peeked one site day ahead.  Pure read,
+## no state consumed (the seeded RNG is rebuilt per call).
+func forecast() -> String:
+	return _weather_at(site_day() + 1)
 
 
 ## Seating input for the pure-math layer (§5).
