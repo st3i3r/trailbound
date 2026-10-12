@@ -19,6 +19,8 @@ enum Phase { BOOT, TITLE, MORNING, PREP, EVENING, NIGHT }
 const SysErrands := preload("res://scripts/systems/errands.gd")
 const SysDog := preload("res://scripts/systems/dog.gd")
 const SysDaily := preload("res://scripts/systems/daily.gd")
+const SysRestore := preload("res://scripts/systems/restore.gd")
+const SysGatherings := preload("res://scripts/systems/gatherings.gd")
 
 const SPEEDUP_MIN_CHUNK := 900.0   # §6.10: chunk = max(15 min, stage / 6)
 const SPEEDUPS_PER_STAGE := 3
@@ -50,12 +52,17 @@ var _tick_accum := 0.0
 var errands: RefCounted
 var dog_sys: RefCounted
 var daily_sys: RefCounted
+var restore: RefCounted
+var gatherings: RefCounted
+var passport_stamps: Array = []             # §33.5: one per scored Daily
 
 
 func _ready() -> void:
 	errands = SysErrands.new(self)
 	dog_sys = SysDog.new(self)
 	daily_sys = SysDaily.new(self)
+	restore = SysRestore.new(self)
+	gatherings = SysGatherings.new(self)
 	_crew_reset()
 
 
@@ -70,6 +77,7 @@ func _process(delta: float) -> void:
 	if _tick_accum >= 1.0:
 		_tick_accum = 0.0
 		crew_tick()
+		restore.tick()                           # §6.11 site teams
 
 
 func _notification(what: int) -> void:
@@ -336,14 +344,67 @@ func crew_free_finish() -> bool:
 	return true
 
 
+# ------------------------------------------------- Volume II (§33.3)
+#
+# Restorations (§6.11), Gatherings and the Trail Passport (§33.5).
+# Live in systems/restore.gd + systems/gatherings.gd; state stays in
+# site_state()/passport_stamps for the save schema.
+
+func restore_status(site := site_id) -> Dictionary:
+	return restore.status(site)
+
+
+func restore_can_start(sid: StringName) -> bool:
+	return restore.can_start(sid)
+
+
+func restore_start(sid: StringName) -> bool:
+	return restore.start(sid)
+
+
+func restore_collect(site := site_id) -> Dictionary:
+	return restore.collect(site)
+
+
+func restore_can_speedup(site := site_id) -> bool:
+	return restore.can_speedup(site)
+
+
+func restore_speedup(site := site_id) -> float:
+	return restore.speedup(site)
+
+
+func restore_free_finish(site := site_id) -> bool:
+	return restore.free_finish(site)
+
+
+func restored(sid: StringName, site := site_id) -> bool:
+	return restore.restored(site, sid)
+
+
+## Evening preview: the offered Gathering's brief, checked live.
+func gathering_status() -> Dictionary:
+	return gatherings.status(site_state())
+
+
+## §33.5 Trail Passport: a stamp per completed Daily; every 7 unlock
+## a cosmetic. Never resets — a missed day costs nothing.
+func passport_cosmetics() -> int:
+	return int(passport_stamps.size() / 7)
+
+
 func is_stage_ready() -> bool:
 	crew_tick()
 	return crew["structure"] != "" and crew["seconds_left"] <= 0.0
 
 
+## All three v1 structures fully collected. Vol II restorations are
+## site-team work, not the v1 crew's list (§6.11).
 func crew_done() -> bool:
 	var total := 0
 	for s in _structures():
+		if s.get("volume2", false):
+			continue
 		total += s.get("stages", []).size()
 	return crew["collected"].size() >= total and total > 0
 
@@ -397,6 +458,8 @@ func _fresh_site(site: StringName) -> Dictionary:
 		"spot_day": -1,
 		"pages_done": [], "letters_delivered": [],
 		"vignette_restored": "",
+		"restored": [], "pad_tags": {}, "walk_bonus": 0,
+		"gathering_gifts": [],
 		"counters": {"guests_welcomed": 0, "families": 0,
 			"anglers_water": 0, "fish_kinds": [], "oven_recipes": 0,
 			"regular_visits": {}, "events": {}}}
@@ -454,11 +517,12 @@ func new_day() -> void:
 	dog_sys.morning()                              # §9: pet reset + dig
 	if site_id == &"pinewatch" and site_day() == 1:
 		journal_event("fire_lit")                # §8.1 P1: day-1 tutorial
-	st["board"] = Seating.board(site_row(),
+	st["board"] = Seating.board(restore.site_row(site_row(), site_id),
 		Catalog.data.get("archetypes", []), site_day(), _open_pads(st),
 		rating(), _rng_for("board"), _has_free_pair(st),
 		_favourite_pool())
 	_inject_regulars(st)
+	gatherings.maybe_offer(st)                     # §33.3 Vol II board
 	if st["board"].any(func(b): return b.get("archetype") == "family") \
 			or int(st["counters"]["families"]) > 0:
 		st["counters"]["events"]["family_booked"] = true
@@ -485,7 +549,21 @@ func _world() -> Dictionary:
 		for pid in st["assignments"][gid]:
 			occ[pid] = gid
 	var kinds := _trait_kinds()
-	return {"layout": Catalog.data.get("layouts", {}).get(site_id, {}),
+	# §6.11 restorations can add pad tags (Fire Tower view, Pond Dock
+	# water); overlay them on a private layout copy, never the shared
+	# Catalog row.
+	var layout: Dictionary = Catalog.data.get("layouts", {}).get(
+		site_id, {})
+	if not st["pad_tags"].is_empty():
+		layout = layout.duplicate(true)
+		var pad_tags: Dictionary = layout["pads"].get_or_add("tags", {})
+		for pid in st["pad_tags"]:
+			var tags: Array = pad_tags.get(pid, [])
+			for t in st["pad_tags"][pid]:
+				if t not in tags:
+					tags.append(t)
+			pad_tags[pid] = tags
+	return {"layout": layout,
 		"campfire": st["campfire"], "decor": st["decor"],
 		"pads": st["pads"], "occupants": occ,
 		"guests": st["guests"], "weather": st["weather"],
@@ -543,10 +621,12 @@ func goodnight() -> Dictionary:
 	var fees := 0
 	var tips := 0
 	var elite5 := false
+	var min_stars := 6
 	var cnt: Dictionary = st["counters"]
-	var night := {"five_stars": 0, "stargazer_five": 0, "pads_filled": 0}
-	var tags: Dictionary = Catalog.data.get("layouts", {}).get(
-		site_id, {}).get("pads", {}).get("tags", {})
+	var night := {"five_stars": 0, "stargazer_five": 0,
+		"pads_filled": 0, "all5": 0, "full4": 0, "rain_full4": 0}
+	var tags: Dictionary = _world()["layout"].get(
+		"pads", {}).get("tags", {})   # merged incl. §6.11 pad_tags
 	for s in seated:
 		var r := Seating.resolve_guest(s["guest"], s["pad_ids"],
 			_world(), int(plan["terms"].get(s["guest"]["id"], -1)))
@@ -573,9 +653,25 @@ func goodnight() -> Dictionary:
 			night["five_stars"] += 1
 			if "stargazer" in s["guest"].get("traits", []):
 				night["stargazer_five"] = 1
+		min_stars = mini(min_stars, r["stars"])
 	while st["reviews"].size() > 15:
 		st["reviews"].pop_front()
-	var walk_ins := Econ.walk_ins(st["seats"], rating_before)
+	# §33.3 Vol II night pages: a perfect 6+-party night (P9), a full
+	# 4★+ house (W9), the rainy variant (L9).
+	if not seated.is_empty():
+		if min_stars >= 5:
+			night["all5"] = seated.size()
+		var open_count: int = st["pads"].values().filter(
+			func(p): return p["open"]).size()
+		var all_open_filled: bool = night["pads_filled"] >= open_count
+		if all_open_filled and min_stars >= 4:
+			night["full4"] = night["pads_filled"]
+			if st["weather"] == "rain":
+				night["rain_full4"] = night["pads_filled"]
+	var gather_rep: Dictionary = gatherings.settle(st, seated, results)
+	var gather_bonus := int(gather_rep.get("bonus", 0))
+	var walk_ins := Econ.walk_ins(st["seats"], rating_before) \
+		+ int(st["walk_bonus"])
 	if st["blogger_bonus"]:
 		walk_ins += 1
 	var leftover: Array = plan["leftover"]
@@ -591,7 +687,7 @@ func goodnight() -> Dictionary:
 	st["assignments"] = {}
 	st["guests"] = {}
 	meals.clear()                                    # leftovers to the dog
-	coins += fees + tips + meal_sales
+	coins += fees + tips + meal_sales + gather_bonus
 	var pages := _check_pages(night)
 	set_phase(Phase.NIGHT)
 	var best := {}
@@ -601,7 +697,8 @@ func goodnight() -> Dictionary:
 				"comment": r["comment"]}
 	return {"results": results, "fees": fees, "tips": tips,
 		"walk_ins": sold.size(), "meal_sales": meal_sales,
-		"income": fees + tips + meal_sales, "rating": rating(),
+		"income": fees + tips + meal_sales + gather_bonus,
+		"gathering": gather_rep, "rating": rating(),
 		"pages": pages.map(func(p): return int(p["n"])),
 		"best": best, "vignette": vig}
 
@@ -705,6 +802,8 @@ func _goal_met(check: Dictionary, st: Dictionary,
 	var cnt: Dictionary = st["counters"]
 	if check.has("event"):
 		return cnt["events"].has(check["event"])
+	if check.has("restored"):
+		return check["restored"] in st["restored"]
 	if check.has("night"):
 		return int(night.get(check["night"], 0)) >= int(check["target"])
 	var metric: String = check.get("metric", "")
@@ -740,11 +839,14 @@ func _bump(metric: String, n := 1) -> void:
 ## the pages finished this call so the report/UI can celebrate them.
 func _check_pages(night := {}) -> Array:
 	var st := site_state()
+	var open2 := vol2_open()
 	var done := []
 	for page in _chapter().get("pages", []):
 		var n := int(page["n"])
 		if n in st["pages_done"]:
 			continue
+		if int(page.get("vol", 1)) == 2 and not open2:
+			continue                               # §33.3: post-finale
 		if not _goal_met(page.get("check", {}), st, night):
 			continue
 		st["pages_done"].append(n)
@@ -752,17 +854,37 @@ func _check_pages(night := {}) -> Array:
 		page_completed.emit(site_id, n, int(page.get("gift", 0)),
 			page.get("unlocks", []))
 		done.append(page)
+	# The 15th Vol II page hides grandpa's last keepsake (§33.3).
+	if done.size() > 0 and vol2_done() \
+			and "the_second_volume" not in crew["collected"]:
+		crew["collected"].append("the_second_volume")
 	return done
+
+
+## §33.3: the player's own volume opens the morning after the finale
+## (all three v1 chapters stamped).
+func vol2_open() -> bool:
+	return chapter_done(&"lantern_valley")
+
+
+func vol2_done() -> bool:
+	for site in [&"pinewatch", &"whisper_river", &"lantern_valley"]:
+		var pd: Array = site_state(site)["pages_done"]
+		for n in [6, 7, 8, 9, 10]:
+			if n not in pd:
+				return false
+	return true
 
 
 func page_done(page: int, site := site_id) -> bool:
 	return page in site_state(site)["pages_done"]
 
 
-## A chapter finishes when all five pages are stamped — it opens the
-## next site (§8.1).
+## A chapter finishes when all five v1 pages are stamped — it opens
+## the next site (§8.1). Vol II pages (6-10) don't count toward it.
 func chapter_done(site: StringName) -> bool:
-	return site_state(site)["pages_done"].size() >= 5
+	return site_state(site)["pages_done"].filter(
+		func(n): return int(n) <= 5).size() >= 5
 
 
 ## Unlock strings: "P3" = Pinewatch page 3, "W0" = Whisper River
@@ -1129,6 +1251,7 @@ func state_dict() -> Dictionary:
 		"daily": daily_state.duplicate(),
 		"dog": dog.duplicate(),
 		"field_notes": field_notes.duplicate(),
+		"passport": passport_stamps.duplicate(),
 		"sites": _sites_to_json()}
 
 
@@ -1186,6 +1309,7 @@ func load_state(state: Dictionary) -> void:
 	daily_state = state.get("daily", daily_state)
 	dog = state.get("dog", dog)
 	field_notes = state.get("field_notes", field_notes)
+	passport_stamps = state.get("passport", passport_stamps)
 	if state.has("sites"):
 		sites = _sites_from_json(state["sites"])
 	var saved: Dictionary = state.get("crew", {})

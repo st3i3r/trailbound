@@ -112,6 +112,8 @@ func score(puzzle: Dictionary, assignments: Dictionary,
 	if submit and puzzle.get("date") == date() \
 			and g.daily_state["date"] != puzzle.get("date"):
 		g.daily_state = {"date": puzzle["date"], "score": total}
+		if puzzle["date"] not in g.passport_stamps:   # §33.5 stamp
+			g.passport_stamps.append(puzzle["date"])
 	return {"score": total, "results": results,
 		"share": share(puzzle, results)}
 

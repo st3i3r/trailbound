@@ -1,0 +1,769 @@
+{
+ "offer_chance": 0.5,
+ "bonus_pct": 0.25,
+ "templates": [
+  {
+   "id": "p_scout_troop",
+   "site": "pinewatch",
+   "label": "Scout troop",
+   "gift": "deco_flag",
+   "brief": {
+    "kind": "within_fire",
+    "text": "everyone within reach of the campfire"
+   },
+   "parties": [
+    {
+     "archetype": "scout",
+     "traits": [
+      "chilly"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "scout",
+     "traits": [
+      "social"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "scout",
+     "traits": [
+      "social"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "scout",
+     "traits": [
+      "chilly"
+     ],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "p_hammock_circle",
+   "site": "pinewatch",
+   "label": "Hammock circle",
+   "gift": "deco_hammock",
+   "brief": {
+    "kind": "adjacent",
+    "text": "every camp beside another of theirs"
+   },
+   "parties": [
+    {
+     "archetype": "hiker",
+     "traits": [
+      "social"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "couple",
+     "traits": [
+      "social"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "scout",
+     "traits": [
+      "social"
+     ],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "p_rain_or_shine",
+   "site": "pinewatch",
+   "label": "Rain-or-shine club",
+   "gift": "deco_tarp",
+   "brief": {
+    "kind": "covered",
+    "text": "every bed under cover"
+   },
+   "parties": [
+    {
+     "archetype": "couple",
+     "traits": [
+      "light_sleeper"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "hiker",
+     "traits": [
+      "light_sleeper"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "scout",
+     "traits": [],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "p_storytellers",
+   "site": "pinewatch",
+   "label": "Storyteller night",
+   "gift": "deco_drum",
+   "brief": {
+    "kind": "min_stars",
+    "n": 4,
+    "text": "nobody below four stars"
+   },
+   "parties": [
+    {
+     "archetype": "van_lifer",
+     "traits": [
+      "music_lover"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "hiker",
+     "traits": [
+      "nature_lover"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "scout",
+     "traits": [
+      "social"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "couple",
+     "traits": [
+      "music_lover"
+     ],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "p_groundskeepers",
+   "site": "pinewatch",
+   "label": "Groundskeepers",
+   "gift": "deco_tool_rack",
+   "brief": {
+    "kind": "shelter",
+    "shelter": "platform",
+    "text": "everyone off the bare ground"
+   },
+   "parties": [
+    {
+     "archetype": "hiker",
+     "traits": [
+      "chilly"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "scout",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "couple",
+     "traits": [],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "p_cooks_of_the_trail",
+   "site": "pinewatch",
+   "label": "Trail cooks",
+   "gift": "deco_spice_box",
+   "brief": {
+    "kind": "meal",
+    "text": "everyone gets their favourite"
+   },
+   "parties": [
+    {
+     "archetype": "hiker",
+     "traits": [],
+     "pads": 1,
+     "favourite": "trail_stew"
+    },
+    {
+     "archetype": "couple",
+     "traits": [],
+     "pads": 1,
+     "favourite": "trail_stew"
+    },
+    {
+     "archetype": "scout",
+     "traits": [],
+     "pads": 1,
+     "favourite": "herb_tea"
+    }
+   ]
+  },
+  {
+   "id": "p_ember_watch",
+   "site": "pinewatch",
+   "label": "Ember watch",
+   "gift": "deco_poker",
+   "brief": {
+    "kind": "within_fire",
+    "text": "everyone within reach of the campfire"
+   },
+   "parties": [
+    {
+     "archetype": "hiker",
+     "traits": [
+      "chilly"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "couple",
+     "traits": [
+      "introvert"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "scout",
+     "traits": [],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "p_quiet_corner",
+   "site": "pinewatch",
+   "label": "Quiet corner",
+   "gift": "deco_screen",
+   "brief": {
+    "kind": "min_stars",
+    "n": 5,
+    "text": "a flawless stay for all"
+   },
+   "parties": [
+    {
+     "archetype": "couple",
+     "traits": [
+      "introvert"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "hiker",
+     "traits": [
+      "chilly"
+     ],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "w_wedding_party",
+   "site": "whisper_river",
+   "label": "Wedding party",
+   "gift": "deco_garland",
+   "brief": {
+    "kind": "min_stars",
+    "n": 4,
+    "text": "nobody below four stars"
+   },
+   "parties": [
+    {
+     "archetype": "couple",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "couple",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "couple",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "family",
+     "traits": [
+      "kids"
+     ],
+     "pads": 2
+    }
+   ]
+  },
+  {
+   "id": "w_angler_meet",
+   "site": "whisper_river",
+   "label": "Angler meet",
+   "gift": "deco_rod_rack",
+   "brief": {
+    "kind": "tag",
+    "tag": "water",
+    "text": "everyone on the riverbank"
+   },
+   "parties": [
+    {
+     "archetype": "angler",
+     "traits": [
+      "angler"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "angler",
+     "traits": [
+      "light_sleeper"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "angler",
+     "traits": [
+      "angler"
+     ],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "w_riverside_tents",
+   "site": "whisper_river",
+   "label": "Riverside tents",
+   "gift": "deco_river_flag",
+   "brief": {
+    "kind": "adjacent",
+    "text": "every camp beside another of theirs"
+   },
+   "parties": [
+    {
+     "archetype": "hiker",
+     "traits": [
+      "social"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "scout",
+     "traits": [
+      "social"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "van_lifer",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "couple",
+     "traits": [],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "w_dawn_patrol",
+   "site": "whisper_river",
+   "label": "Dawn patrol",
+   "gift": "deco_net",
+   "brief": {
+    "kind": "covered",
+    "text": "every bed under cover"
+   },
+   "parties": [
+    {
+     "archetype": "angler",
+     "traits": [
+      "light_sleeper"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "hiker",
+     "traits": [
+      "light_sleeper"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "scout",
+     "traits": [],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "w_paddlers",
+   "site": "whisper_river",
+   "label": "Paddlers' rest",
+   "gift": "deco_paddle",
+   "brief": {
+    "kind": "min_stars",
+    "n": 4,
+    "text": "nobody below four stars"
+   },
+   "parties": [
+    {
+     "archetype": "hiker",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "couple",
+     "traits": [
+      "social"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "scout",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "van_lifer",
+     "traits": [],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "w_supper_row",
+   "site": "whisper_river",
+   "label": "Supper row",
+   "gift": "deco_tureen",
+   "brief": {
+    "kind": "meal",
+    "text": "everyone gets their favourite"
+   },
+   "parties": [
+    {
+     "archetype": "angler",
+     "traits": [],
+     "pads": 1,
+     "favourite": "grilled_fish"
+    },
+    {
+     "archetype": "hiker",
+     "traits": [],
+     "pads": 1,
+     "favourite": "trail_stew"
+    },
+    {
+     "archetype": "couple",
+     "traits": [],
+     "pads": 1,
+     "favourite": "herb_tea"
+    }
+   ]
+  },
+  {
+   "id": "w_bank_stretch",
+   "site": "whisper_river",
+   "label": "Bank stretch",
+   "gift": "deco_float",
+   "brief": {
+    "kind": "tag",
+    "tag": "water",
+    "text": "everyone on the riverbank"
+   },
+   "parties": [
+    {
+     "archetype": "hiker",
+     "traits": [
+      "angler"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "angler",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "scout",
+     "traits": [],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "w_pair_bond",
+   "site": "whisper_river",
+   "label": "Pair bond",
+   "gift": "deco_ribbon",
+   "brief": {
+    "kind": "min_stars",
+    "n": 5,
+    "text": "a flawless stay for all"
+   },
+   "parties": [
+    {
+     "archetype": "couple",
+     "traits": [
+      "introvert"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "couple",
+     "traits": [
+      "light_sleeper"
+     ],
+     "pads": 1,
+     "favourite": "trail_stew"
+    }
+   ]
+  },
+  {
+   "id": "l_photo_club",
+   "site": "lantern_valley",
+   "label": "Photo club",
+   "gift": "deco_tripod",
+   "brief": {
+    "kind": "tag",
+    "tag": "view",
+    "weather": "clear",
+    "text": "view pads under clear skies"
+   },
+   "parties": [
+    {
+     "archetype": "photographer",
+     "traits": [
+      "shutterbug"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "photographer",
+     "traits": [
+      "light_sleeper"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "photographer",
+     "traits": [
+      "shutterbug"
+     ],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "l_skyline_seats",
+   "site": "lantern_valley",
+   "label": "Skyline seats",
+   "gift": "deco_frame",
+   "brief": {
+    "kind": "tag",
+    "tag": "view",
+    "text": "everyone on a view pad"
+   },
+   "parties": [
+    {
+     "archetype": "photographer",
+     "traits": [
+      "shutterbug"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "couple",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "hiker",
+     "traits": [],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "l_hill_choir",
+   "site": "lantern_valley",
+   "label": "Hill choir",
+   "gift": "deco_drum_l",
+   "brief": {
+    "kind": "adjacent",
+    "text": "every camp beside another of theirs"
+   },
+   "parties": [
+    {
+     "archetype": "scout",
+     "traits": [
+      "social"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "cyclist",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "couple",
+     "traits": [],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "l_night_watch",
+   "site": "lantern_valley",
+   "label": "Night watch",
+   "gift": "deco_scope",
+   "brief": {
+    "kind": "covered",
+    "text": "every bed under cover"
+   },
+   "parties": [
+    {
+     "archetype": "cyclist",
+     "traits": [
+      "light_sleeper"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "hiker",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "photographer",
+     "traits": [],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "l_table_set",
+   "site": "lantern_valley",
+   "label": "Table set",
+   "gift": "deco_candle",
+   "brief": {
+    "kind": "min_stars",
+    "n": 4,
+    "text": "nobody below four stars"
+   },
+   "parties": [
+    {
+     "archetype": "couple",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "van_lifer",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "cyclist",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "scout",
+     "traits": [],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "l_tasting_table",
+   "site": "lantern_valley",
+   "label": "Tasting table",
+   "gift": "deco_lantern_set",
+   "brief": {
+    "kind": "meal",
+    "text": "everyone gets their favourite"
+   },
+   "parties": [
+    {
+     "archetype": "photographer",
+     "traits": [],
+     "pads": 1,
+     "favourite": "trail_stew"
+    },
+    {
+     "archetype": "cyclist",
+     "traits": [],
+     "pads": 1,
+     "favourite": "herb_tea"
+    },
+    {
+     "archetype": "couple",
+     "traits": [],
+     "pads": 1,
+     "favourite": "grilled_fish"
+    }
+   ]
+  },
+  {
+   "id": "l_ridge_line",
+   "site": "lantern_valley",
+   "label": "Ridge line",
+   "gift": "deco_rope",
+   "brief": {
+    "kind": "shelter",
+    "shelter": "platform",
+    "text": "everyone off the bare ground"
+   },
+   "parties": [
+    {
+     "archetype": "hiker",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "cyclist",
+     "traits": [],
+     "pads": 1
+    },
+    {
+     "archetype": "scout",
+     "traits": [],
+     "pads": 1
+    }
+   ]
+  },
+  {
+   "id": "l_twin_lanterns",
+   "site": "lantern_valley",
+   "label": "Twin lanterns",
+   "gift": "deco_star_lantern",
+   "brief": {
+    "kind": "min_stars",
+    "n": 5,
+    "text": "a flawless stay for all"
+   },
+   "parties": [
+    {
+     "archetype": "photographer",
+     "traits": [
+      "shutterbug"
+     ],
+     "pads": 1
+    },
+    {
+     "archetype": "couple",
+     "traits": [
+      "introvert"
+     ],
+     "pads": 1
+    }
+   ]
+  }
+ ]
+}

@@ -1,11 +1,169 @@
 [
-  {"id": "hiker", "name": "Hiker", "pads": 1, "fees": {"pinewatch": 40, "whisper_river": 45, "lantern_valley": 50}, "signature_traits": ["chilly", "nature_lover"], "loud": false, "sites": ["pinewatch", "whisper_river", "lantern_valley"]},
-  {"id": "scout", "name": "Scout", "pads": 1, "fees": {"pinewatch": 30, "whisper_river": 35, "lantern_valley": 40}, "signature_traits": ["social", "dog_lover"], "loud": false, "sites": ["pinewatch", "whisper_river", "lantern_valley"]},
-  {"id": "couple", "name": "Couple", "pads": 1, "fees": {"pinewatch": 55, "whisper_river": 65, "lantern_valley": 70}, "signature_traits": ["introvert", "light_sleeper"], "loud": false, "sites": ["pinewatch", "whisper_river", "lantern_valley"]},
-  {"id": "family", "name": "Family", "pads": 2, "fees": {"pinewatch": 110, "whisper_river": 125, "lantern_valley": 145}, "signature_traits": ["kids"], "loud": true, "sites": ["pinewatch", "whisper_river", "lantern_valley"]},
-  {"id": "van_lifer", "name": "Van Lifer", "pads": 1, "fees": {"whisper_river": 60, "lantern_valley": 65}, "signature_traits": ["music_lover", "night_owl"], "loud": true, "sites": ["whisper_river", "lantern_valley"]},
-  {"id": "angler", "name": "Angler", "pads": 1, "fees": {"whisper_river": 60}, "signature_traits": ["angler"], "loud": false, "sites": ["whisper_river"]},
-  {"id": "photographer", "name": "Photographer", "pads": 1, "fees": {"whisper_river": 70, "lantern_valley": 80}, "signature_traits": ["shutterbug"], "loud": false, "sites": ["whisper_river", "lantern_valley"]},
-  {"id": "cyclist", "name": "Cyclist", "pads": 1, "fees": {"lantern_valley": 60}, "signature_traits": ["chilly", "stargazer"], "loud": false, "sites": ["lantern_valley"]},
-  {"id": "food_blogger", "name": "Food Blogger", "pads": 1, "fees": {"pinewatch": 150, "whisper_river": 175, "lantern_valley": 195}, "signature_traits": [], "loud": false, "elite": true, "sites": ["pinewatch", "whisper_river", "lantern_valley"]}
+ {
+  "id": "hiker",
+  "name": "Hiker",
+  "pads": 1,
+  "fees": {
+   "pinewatch": 40,
+   "whisper_river": 45,
+   "lantern_valley": 50
+  },
+  "signature_traits": [
+   "chilly",
+   "nature_lover"
+  ],
+  "loud": false,
+  "sites": [
+   "pinewatch",
+   "whisper_river",
+   "lantern_valley"
+  ]
+ },
+ {
+  "id": "scout",
+  "name": "Scout",
+  "pads": 1,
+  "fees": {
+   "pinewatch": 30,
+   "whisper_river": 35,
+   "lantern_valley": 40
+  },
+  "signature_traits": [
+   "social",
+   "dog_lover"
+  ],
+  "loud": false,
+  "sites": [
+   "pinewatch",
+   "whisper_river",
+   "lantern_valley"
+  ]
+ },
+ {
+  "id": "couple",
+  "name": "Couple",
+  "pads": 1,
+  "fees": {
+   "pinewatch": 55,
+   "whisper_river": 65,
+   "lantern_valley": 70
+  },
+  "signature_traits": [
+   "introvert",
+   "light_sleeper"
+  ],
+  "loud": false,
+  "sites": [
+   "pinewatch",
+   "whisper_river",
+   "lantern_valley"
+  ]
+ },
+ {
+  "id": "family",
+  "name": "Family",
+  "pads": 2,
+  "fees": {
+   "pinewatch": 110,
+   "whisper_river": 125,
+   "lantern_valley": 145
+  },
+  "signature_traits": [
+   "kids"
+  ],
+  "loud": true,
+  "sites": [
+   "pinewatch",
+   "whisper_river",
+   "lantern_valley"
+  ]
+ },
+ {
+  "id": "van_lifer",
+  "name": "Van Lifer",
+  "pads": 1,
+  "fees": {
+   "whisper_river": 60,
+   "lantern_valley": 65
+  },
+  "signature_traits": [
+   "music_lover",
+   "night_owl"
+  ],
+  "loud": true,
+  "sites": [
+   "whisper_river",
+   "lantern_valley"
+  ]
+ },
+ {
+  "id": "angler",
+  "name": "Angler",
+  "pads": 1,
+  "fees": {
+   "whisper_river": 60,
+   "pinewatch": 50
+  },
+  "signature_traits": [
+   "angler"
+  ],
+  "loud": false,
+  "sites": [
+   "whisper_river",
+   "pinewatch"
+  ]
+ },
+ {
+  "id": "photographer",
+  "name": "Photographer",
+  "pads": 1,
+  "fees": {
+   "whisper_river": 70,
+   "lantern_valley": 80,
+   "pinewatch": 60
+  },
+  "signature_traits": [
+   "shutterbug"
+  ],
+  "loud": false,
+  "sites": [
+   "whisper_river",
+   "lantern_valley",
+   "pinewatch"
+  ]
+ },
+ {
+  "id": "cyclist",
+  "name": "Cyclist",
+  "pads": 1,
+  "fees": {
+   "lantern_valley": 60
+  },
+  "signature_traits": [
+   "chilly",
+   "stargazer"
+  ],
+  "loud": false,
+  "sites": [
+   "lantern_valley"
+  ]
+ },
+ {
+  "id": "food_blogger",
+  "name": "Food Blogger",
+  "pads": 1,
+  "fees": {
+   "pinewatch": 150,
+   "whisper_river": 175,
+   "lantern_valley": 195
+  },
+  "signature_traits": [],
+  "loud": false,
+  "elite": true,
+  "sites": [
+   "pinewatch",
+   "whisper_river",
+   "lantern_valley"
+  ]
+ }
 ]

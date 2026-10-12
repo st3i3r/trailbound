@@ -70,6 +70,59 @@
      "metric": "rating",
      "target": 4.0
     }
+   },
+   {
+    "n": 6,
+    "goal": "Restore the Fire Tower",
+    "gift": 60,
+    "vol": 2,
+    "unlocks": [],
+    "check": {
+     "restored": "fire_tower"
+    }
+   },
+   {
+    "n": 7,
+    "goal": "Restore the Pond Dock",
+    "gift": 60,
+    "vol": 2,
+    "unlocks": [],
+    "check": {
+     "restored": "pond_dock"
+    }
+   },
+   {
+    "n": 8,
+    "goal": "Meet 3 Gathering briefs",
+    "gift": 60,
+    "vol": 2,
+    "unlocks": [],
+    "check": {
+     "metric": "gatherings_met",
+     "target": 3
+    }
+   },
+   {
+    "n": 9,
+    "goal": "A perfect night: 6+ parties, all 5-star",
+    "gift": 60,
+    "vol": 2,
+    "unlocks": [],
+    "check": {
+     "night": "all5",
+     "target": 6
+    }
+   },
+   {
+    "n": 10,
+    "goal": "Reach a 4.5 rating",
+    "gift": 60,
+    "vol": 2,
+    "unlocks": [],
+    "check": {
+     "metric": "rating",
+     "target": 4.5
+    }
    }
   ]
  },
@@ -133,6 +186,59 @@
      "metric": "rating",
      "target": 4.2
     }
+   },
+   {
+    "n": 6,
+    "goal": "Restore the Bamboo Treehouse",
+    "gift": 80,
+    "vol": 2,
+    "unlocks": [],
+    "check": {
+     "restored": "bamboo_treehouse"
+    }
+   },
+   {
+    "n": 7,
+    "goal": "Restore the Bathhouse",
+    "gift": 80,
+    "vol": 2,
+    "unlocks": [],
+    "check": {
+     "restored": "bathhouse"
+    }
+   },
+   {
+    "n": 8,
+    "goal": "Meet 3 Gathering briefs",
+    "gift": 80,
+    "vol": 2,
+    "unlocks": [],
+    "check": {
+     "metric": "gatherings_met",
+     "target": 3
+    }
+   },
+   {
+    "n": 9,
+    "goal": "All 9 pads occupied, every party 4-star+",
+    "gift": 80,
+    "vol": 2,
+    "unlocks": [],
+    "check": {
+     "night": "full4",
+     "target": 9
+    }
+   },
+   {
+    "n": 10,
+    "goal": "Reach a 4.6 rating",
+    "gift": 80,
+    "vol": 2,
+    "unlocks": [],
+    "check": {
+     "metric": "rating",
+     "target": 4.6
+    }
    }
   ]
  },
@@ -189,6 +295,59 @@
     "check": {
      "metric": "rating",
      "target": 4.4
+    }
+   },
+   {
+    "n": 6,
+    "goal": "Restore the Observatory",
+    "gift": 100,
+    "vol": 2,
+    "unlocks": [],
+    "check": {
+     "restored": "observatory"
+    }
+   },
+   {
+    "n": 7,
+    "goal": "Restore the Long Table",
+    "gift": 100,
+    "vol": 2,
+    "unlocks": [],
+    "check": {
+     "restored": "long_table"
+    }
+   },
+   {
+    "n": 8,
+    "goal": "Meet 3 Gathering briefs",
+    "gift": 100,
+    "vol": 2,
+    "unlocks": [],
+    "check": {
+     "metric": "gatherings_met",
+     "target": 3
+    }
+   },
+   {
+    "n": 9,
+    "goal": "A rainy night, 8 pads occupied, every party 4-star+",
+    "gift": 100,
+    "vol": 2,
+    "unlocks": [],
+    "check": {
+     "night": "rain_full4",
+     "target": 8
+    }
+   },
+   {
+    "n": 10,
+    "goal": "Reach a 4.7 rating",
+    "gift": 100,
+    "vol": 2,
+    "unlocks": [],
+    "check": {
+     "metric": "rating",
+     "target": 4.7
     }
    }
   ]
