@@ -20,6 +20,10 @@ static var _ui_meta := {}
 static var _icons := {}                       # semantic name -> "I1_n"
 static var _tex_cache := {}
 static var _ready := false
+# settings-backed live prefs (UI-036); Game.apply_settings() writes
+# these at boot and on every change — builders always read them live.
+static var text_scale := 0                    # 0 normal, 1 large (+2 px)
+static var left_handed := false               # HUD action side mirrors
 
 
 static func _ensure() -> void:
@@ -126,7 +130,11 @@ static func font_for(role: UITokens.TypeRole) -> Font:
 
 
 static func type_size(role: UITokens.TypeRole) -> int:
-    return UITokens.TYPE[role]["size"]
+    # §17.4 text size: large = +2 px on the text roles (integer step —
+    # the only pixel-safe scale; DISPLAY is already display-sized).
+    var s: int = UITokens.TYPE[role]["size"]
+    return s + 2 if text_scale > 0 \
+        and role != UITokens.TypeRole.DISPLAY else s
 
 
 static func tex(rel: String) -> Texture2D:
@@ -359,5 +367,33 @@ static func btn(parent: Control, where: Variant, text: String,
     b.add_theme_stylebox_override("disabled", chrome("btn_disabled"))
     b.add_theme_stylebox_override("focus", focus_box())
     b.pressed.connect(UIFeel.haptic.bind("press"))
+    parent.add_child(b)
+    return b
+
+
+## Icon-only button (close X, −/+ steppers): a chip-framed glyph on
+## the full MIN_TOUCH hit area.  The glyph is a registry mask tinted
+## per state — no text, no painted art (UI-036/066).
+static func icon_btn(parent: Control, icon_name: String,
+                   tint := UITokens.PAPER) -> Button:
+    _ensure()
+    var b := Button.new()
+    b.custom_minimum_size = Vector2(UITokens.MIN_TOUCH, UITokens.MIN_TOUCH)
+    b.focus_mode = Control.FOCUS_ALL
+    b.mouse_filter = Control.MOUSE_FILTER_STOP
+    b.add_theme_stylebox_override("normal", chrome("glass_chip"))
+    b.add_theme_stylebox_override("hover", chrome("glass_chip", 1.15))
+    b.add_theme_stylebox_override("pressed", chrome("glass_chip", 0.82))
+    b.add_theme_stylebox_override("disabled", chrome("btn_disabled"))
+    b.add_theme_stylebox_override("focus", focus_box())
+    b.pressed.connect(UIFeel.haptic.bind("press"))
+    var t := icon_rect(icon_name, tint, 16)
+    # absolute centering — anchors raced the unset size; the button's
+    # rect is fixed MIN_TOUCH so a literal offset is the honest answer
+    t.size = Vector2(16, 16)
+    t.position = Vector2((UITokens.MIN_TOUCH - 16) / 2.0,
+        (UITokens.MIN_TOUCH - 16) / 2.0)
+    t.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    b.add_child(t)
     parent.add_child(b)
     return b

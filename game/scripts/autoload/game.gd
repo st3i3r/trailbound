@@ -55,6 +55,7 @@ var daily_sys: RefCounted
 var restore: RefCounted
 var gatherings: RefCounted
 var passport_stamps: Array = []             # §33.5: one per scored Daily
+var settings := {}                          # §17.4 — see Save.default_state
 
 
 func _ready() -> void:
@@ -64,6 +65,54 @@ func _ready() -> void:
 	restore = SysRestore.new(self)
 	gatherings = SysGatherings.new(self)
 	_crew_reset()
+	# settings live outside the run state — read them off disk at boot
+	# so prefs apply on the title screen too (UI-036)
+	settings = Save.default_state()["settings"]
+	for k in Save.load_state().get("settings", {}):
+		settings[k] = Save.load_state()["settings"][k]
+	apply_settings()
+
+
+# ------------------------------------------------------------- settings (§17.4)
+
+const _BUS := {"music": "Music", "ambience": "Ambience", "sfx": "SFX"}
+
+
+## One setter for the whole sheet: store, apply the live consumers,
+## persist.  Settings persist the FULL state — the snapshot is the
+## canonical save shape (§22) and a settings change is a save-worthy
+## moment on mobile (user may background right after).
+func setting(key: String, value: Variant) -> void:
+	settings[key] = value
+	apply_settings()
+	Save.save_state(state_dict())
+
+
+func apply_settings() -> void:
+	UIFeel.reduced_motion = bool(settings["reduced_motion"])
+	UIFeel.haptics_enabled = bool(settings["haptics"])
+	UIKit.text_scale = 1 if settings["text_size"] == "large" else 0
+	UIKit.left_handed = bool(settings["left_handed"])
+	TranslationServer.set_locale(String(settings["language"]))
+	_apply_audio()
+
+
+## Buses are created lazily so the mixer exists before the audio
+## pass — a setting writes real volume_db today, and stems routed to
+## the named bus pick it up with zero rewiring later.
+func _apply_audio() -> void:
+	for key in _BUS:
+		var bname: String = _BUS[key]
+		if AudioServer.get_bus_index(bname) < 0:
+			var idx := AudioServer.bus_count
+			AudioServer.add_bus(idx)
+			AudioServer.set_bus_name(idx, bname)
+			AudioServer.set_bus_send(idx, &"Master")
+		var bus := AudioServer.get_bus_index(bname)
+		var step: int = clampi(int(settings.get(key, 3)), 0, 3)
+		AudioServer.set_bus_mute(bus, step == 0)
+		AudioServer.set_bus_volume_db(bus,
+			linear_to_db(step / 3.0) if step > 0 else 0.0)
 
 
 ## crew.json structures in site order; read lazily so autoload order
@@ -1267,6 +1316,7 @@ func state_dict() -> Dictionary:
 		"dog": dog.duplicate(),
 		"field_notes": field_notes.duplicate(),
 		"passport": passport_stamps.duplicate(),
+		"settings": settings.duplicate(true),
 		"sites": _sites_to_json()}
 
 
@@ -1327,6 +1377,9 @@ func load_state(state: Dictionary) -> void:
 	passport_stamps = state.get("passport", passport_stamps)
 	if state.has("sites"):
 		sites = _sites_from_json(state["sites"])
+	for k in state.get("settings", {}):
+		settings[k] = state["settings"][k]
+	apply_settings()
 	var saved: Dictionary = state.get("crew", {})
 	_crew_reset()
 	for key in saved:

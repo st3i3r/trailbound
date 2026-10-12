@@ -39,3 +39,36 @@ board_title,BOOKINGS · TONIGHT,ĐẶT CHỖ · TỐI NAY
 board_forecast,Tonight: %s,Tối nay: %s
 board_demand,%d requests · %d pads open,%d yêu cầu · %d ô trống
 board_wait,extra parties wait at the trailhead,khách thừa chờ ở đầu đường mòn
+set_title,Settings,Cài đặt
+set_sec_sound,Sound,Âm thanh
+set_sec_feel,Feel,Phản hồi
+set_sec_display,Display,Hiển thị
+set_sec_game,Game,Trò chơi
+set_sec_alerts,Notifications,Thông báo
+set_sec_store,Purchases,Mua hàng
+set_sec_about,About,Thông tin
+set_music,Music,Nhạc
+set_ambience,Ambience,Tiếng nền
+set_sfx,Effects,Hiệu ứng
+set_haptics,Haptics,Rung
+set_reduced_motion,Reduced motion,Giảm chuyển động
+set_reduced_flash,Reduced flashing,Giảm nhấp nháy
+set_text_size,Text size,Cỡ chữ
+set_size_normal,Normal,Thường
+set_size_large,Large,Lớn
+set_left_handed,Left-handed,Thuận tay trái
+set_language,Language,Ngôn ngữ
+set_tips,Ranger's tips,Mẹo kiểm lâm
+set_assist,Assist mode,Chế độ hỗ trợ
+set_daily_rem,Daily reminder,Nhắc mỗi ngày
+set_crew_notif,Crew notification,Tin đội ngũ
+set_remove_ads,Remove ads,Gỡ quảng cáo
+set_restore,Restore purchases,Khôi phục mua hàng
+set_soon,soon,sắp có
+set_credits,Credits & licences,Ghi công & giấy phép
+set_privacy,Privacy options,Tùy chọn quyền riêng tư
+set_credit_icons,pixelarticons — MIT © Gerrit Halfmann,pixelarticons — MIT © Gerrit Halfmann
+set_credit_font,BeVietnamPro — OFL,BeVietnamPro — OFL
+set_credit_us,Trailbound — everything else: proprietary,Trailbound — nội dung còn lại: bản quyền riêng
+set_offline_note,Trailbound plays fully offline — no data leaves the device.,Trailbound chơi offline hoàn toàn — không có dữ liệu nào rời thiết bị.
+set_back,Back,Quay lại

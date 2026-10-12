@@ -26,6 +26,7 @@
   "arrow_down": "G_arrow_down", "arrow_right": "G_arrow_right",
   "plus_box": "G_plus_box", "minus_box": "G_minus_box",
   "map_pin": "G_map_pin", "compass": "G_compass",
+ "book_open": "G_book_open",
   "mail": "G_mail", "mailbox": "G_mailbox", "calendar": "G_calendar",
   "image": "G_image", "bookmark": "G_bookmark", "inbox": "G_inbox",
   "card": "G_card", "credit_card": "G_credit_card",

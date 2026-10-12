@@ -29,7 +29,20 @@ func default_state() -> Dictionary:
 			"speedups_today": 0, "speedups_day": "", "collected": []},
 		"ads": {"remove_ads": false, "last_interstitial_day": 0,
 			"last_interstitial_utc": 0, "double_tips_used": false},
-		"settings": {"reduced_motion": false},
+		"settings": {
+			# §17.4 — volumes are 0..3 steps (0 = muted)
+			"music": 3, "ambience": 3, "sfx": 3,
+			"haptics": true,
+			"daily_reminder": false,
+			"crew_notification": true,
+			"language": "en",
+			"text_size": "normal",     # normal | large (pixel-safe +2 px)
+			"reduced_motion": false,
+			"reduced_flashing": false,
+			"assist_mode": false,
+			"left_handed": false,
+			"rangers_tips": true,
+		},
 	}
 
 

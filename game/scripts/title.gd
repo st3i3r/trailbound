@@ -11,6 +11,7 @@ const CAMP_SCENE := "res://scenes/pinewatch_test.tscn"
 const VISTA := "res://assets/pinewatch/ui/title_vista.png"
 
 var _first_button: Button
+var _panels: PanelManager
 
 
 func _ready() -> void:
@@ -121,7 +122,10 @@ func _build() -> void:
         _first_button = new_g
 
     var settings := _menu_btn(menu, tr("menu_settings"), "pill")
-    settings.disabled = true                     # settings sheet: P3
+    _panels = PanelManager.new()
+    add_child(_panels)
+    settings.pressed.connect(
+        func(): _panels.open(SettingsSheet.make()))
 
     var exit := _menu_btn(menu, tr("menu_exit"), "pill")
     exit.pressed.connect(get_tree().quit)

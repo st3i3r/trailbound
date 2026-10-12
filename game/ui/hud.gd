@@ -12,6 +12,7 @@ extends Control
 ## fires on left-click of the phase button.
 
 signal phase_pressed
+signal settings_pressed
 
 var coins_label: Label
 var day_label: Label
@@ -34,6 +35,7 @@ func _ready() -> void:
     size = get_viewport_rect().size
     get_viewport().size_changed.connect(_on_viewport_resized)
     mouse_filter = Control.MOUSE_FILTER_IGNORE
+    add_to_group("hud")            # settings sheet finds us for handedness
     _build()
     _apply_insets()
 
@@ -54,21 +56,42 @@ func _apply_insets() -> void:
         _tr.offset_left = -(UITokens.MARGIN + ins["r"] + 74)
         _tr.offset_right = -(UITokens.MARGIN + ins["r"])
         _tr.offset_top = 6 + ins["t"]
+    apply_handedness()
+
+
+## §17.4 left-handed layout (UI-036): the action side mirrors — phase
+## button and tray swap left/right so the dominant thumb stays home.
+## Called by _apply_insets and live by the settings sheet.
+func apply_handedness() -> void:
+    var ins := UITokens.safe_insets(size)
+    var lh := UIKit.left_handed
     if phase_button:
-        phase_button.offset_left = -(UITokens.MIN_TOUCH + 48 \
-            + 10 + ins["r"])
-        phase_button.offset_top = -(UITokens.MIN_TOUCH \
-            + 10 + ins["b"])
-        phase_button.offset_right = -(10 + ins["r"])
+        phase_button.set_anchors_preset(
+            Control.PRESET_BOTTOM_LEFT if lh
+            else Control.PRESET_BOTTOM_RIGHT)
+        if lh:
+            phase_button.offset_left = 10 + ins["l"]
+            phase_button.offset_right = \
+                UITokens.MIN_TOUCH + 48 + 10 + ins["l"]
+        else:
+            phase_button.offset_left = \
+                -(UITokens.MIN_TOUCH + 48 + 10 + ins["r"])
+            phase_button.offset_right = -(10 + ins["r"])
+        phase_button.offset_top = -(UITokens.MIN_TOUCH + 10 + ins["b"])
         phase_button.offset_bottom = -(10 + ins["b"])
     if tray:
         # the tray shares the bottom band with the phase button: it
-        # stops ~6px short of the button's left edge so they can never
+        # stops ~6px short of the button's edge so they can never
         # overlap at any aspect (cards scroll inside if they overflow)
-        tray.offset_left = UITokens.MARGIN + ins["l"]
         tray.offset_top = -(EveningTray.CARD_H + 10 + ins["b"])
-        tray.offset_right = -(UITokens.MIN_TOUCH + 48 + 16 + ins["r"])
         tray.offset_bottom = -(10 + ins["b"])
+        if lh:
+            tray.offset_left = UITokens.MIN_TOUCH + 48 + 16 + ins["l"]
+            tray.offset_right = -(UITokens.MARGIN + ins["r"])
+        else:
+            tray.offset_left = UITokens.MARGIN + ins["l"]
+            tray.offset_right = \
+                -(UITokens.MIN_TOUCH + 48 + 16 + ins["r"])
 
 
 func _build() -> void:
@@ -102,10 +125,12 @@ func _build() -> void:
         Control.SIZE_SHRINK_END)
     var jrow := HBoxContainer.new()
     jrow.name = "JournalRow"
-    jrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
     jrow.alignment = BoxContainer.ALIGNMENT_END
-    jrow.add_theme_constant_override("separation", 0)
+    jrow.add_theme_constant_override("separation", 4)
     _tr.add_child(jrow)
+    # settings gear — the §17.4 sheet (UI-036); full MIN_TOUCH target
+    var gear := UIKit.icon_btn(jrow, "gear")
+    gear.pressed.connect(func(): settings_pressed.emit())
     UIKit.pill(jrow, Vector2(28, 20), "journal", "")
     UIKit.spacer(jrow, UITokens.SP1)
 

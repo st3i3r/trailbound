@@ -351,6 +351,9 @@ func _ready() -> void:
                 sh.sleep_pressed.emit()
         if OS.get_cmdline_args().has("--board"):
             _open_booking()
+    # --settings: stage the §17.4 sheet for QA shots
+    if OS.get_cmdline_args().has("--settings"):
+        panel_mgr.open(SettingsSheet.make())
     var shot_arg := ""
     for a in OS.get_cmdline_args():
         if a.begins_with("--shot="):
@@ -694,6 +697,8 @@ func _build_ui() -> void:
     hud.name = "Chrome"                        # _fade_chrome modulates it
     hud_layer.add_child(hud)
     hud.phase_pressed.connect(_advance_phase)
+    hud.settings_pressed.connect(
+        func(): panel_mgr.open(SettingsSheet.make()))
 
     panel_mgr = PanelManager.new()             # PANEL tier, dimmer stack
     panel_mgr.name = "Panels"
@@ -879,6 +884,20 @@ func _smoke() -> void:
               Game.phase == Game.Phase.EVENING,
               " tray:", hud.tray.visible,
               " marker cleared:", _board_tok == 0)
+    # UI-036: gear opens the §17.4 sheet; a toggle applies + persists
+    hud.settings_pressed.emit()
+    await _frames_until(func(): return panel_mgr.top() != null)
+    var ss := panel_mgr.top()
+    print("SMOKE settings sheet:", ss is SettingsSheet)
+    if ss is SettingsSheet:
+        var rm0: bool = UIFeel.reduced_motion
+        Game.setting("reduced_motion", not rm0)
+        print("SMOKE reduced_motion applied:",
+              UIFeel.reduced_motion == (not rm0),
+              " persisted:", bool(Game.settings["reduced_motion"])
+              == (not rm0))
+        Game.setting("reduced_motion", rm0)      # restore for later steps
+        panel_mgr.close()
     get_tree().quit()
 
 

@@ -12,6 +12,7 @@ extends RefCounted
 ## --reduced-motion on the command line sets it for QA.
 
 static var reduced_motion := false
+static var haptics_enabled := true            # settings sheet writes this
 
 
 ## Duration for a token key, after the reduced-motion policy.
@@ -47,6 +48,6 @@ const HAPTIC_MS := {
 
 
 static func haptic(kind: String) -> void:
-    if not OS.has_feature("android"):
+    if not haptics_enabled or not OS.has_feature("android"):
         return
     Input.vibrate_handheld(int(HAPTIC_MS.get(kind, 0)))
