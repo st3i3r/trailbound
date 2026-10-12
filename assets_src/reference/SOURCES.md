@@ -10,5 +10,6 @@
 | `nature_landscapes/` | Free Game Assets (CraftPix) — "Nature Landscapes" (itch.io) | CraftPix licence | Vista options for site-unlock ceremonies + letterbox — 8 parallax landscapes, 2304×1296 masters (croppable). |
 | `city_backgrounds/` | Free Game Assets (CraftPix) — "Modern City Backgrounds" (itch.io) | CraftPix licence | Letters/intro/"guest's home" flavour — the city-vs-highlands contrast (Eastward's core theme). 8 seamless skylines, day→night variants. |
 | `grassy_mountains/` | vnitti — "Grassy Mountains Parallax" (itch.io) | **CC BY 4.0 — attribution required** (credits entry) | Title/intro vista candidate — golden hill + lone tree + peak over cloud sea; layered PNGs (sky/far-mountains/mid-clouds/hill/front-clouds) allow cloud drift. 384×216 — frame or crop, not full-bleed scale. |
+| `winter_nature/` | Free Game Assets (CraftPix) — "Winter Nature Backgrounds" (itch.io) | CraftPix licence | Seasonal shelf — 4 winter scenes (snow day, frozen lake, moonlit camp, dawn ice river) for a winter/festival event (Batch I) or seasonal ceremony cards. |
 
 These zips live outside `game/` so nothing ships to the build.
