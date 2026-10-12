@@ -95,6 +95,30 @@ static func safe_insets(vp_size: Vector2) -> Dictionary:
 ## Hit areas must reach this even when the art is smaller.
 const MIN_TOUCH := 40
 
+# --------------------------------------------------------------- motion
+## UI-017: every tween reads duration + curve from here — no magic
+## numbers at call sites.  kind decides what reduced-motion does:
+## "fade" survives at a snappier time, "scale" collapses to ~instant
+## (position/shape changes are the nauseating ones, opacity is not).
+const MOTION := {
+    "panel_in":   {"d": 0.16, "trans": Tween.TRANS_CUBIC,
+                   "ease": Tween.EASE_OUT,     "kind": "scale"},
+    "panel_out":  {"d": 0.12, "trans": Tween.TRANS_CUBIC,
+                   "ease": Tween.EASE_IN,      "kind": "scale"},
+    "dimmer":     {"d": 0.15, "trans": Tween.TRANS_SINE,
+                   "ease": Tween.EASE_IN_OUT,  "kind": "fade"},
+    "chrome":     {"d": 0.40, "trans": Tween.TRANS_SINE,
+                   "ease": Tween.EASE_IN_OUT,  "kind": "fade"},
+    "fire":       {"d": 0.25, "trans": Tween.TRANS_SINE,
+                   "ease": Tween.EASE_IN_OUT,  "kind": "fade"},
+    "count_up":   {"d": 0.70, "trans": Tween.TRANS_QUAD,
+                   "ease": Tween.EASE_OUT,     "kind": "fade"},
+    "recount":    {"d": 0.40, "trans": Tween.TRANS_QUAD,
+                   "ease": Tween.EASE_OUT,     "kind": "fade"},
+    "marker":     {"d": 0.50, "trans": Tween.TRANS_SINE,
+                   "ease": Tween.EASE_IN_OUT,  "kind": "scale"},
+}
+
 # --------------------------------------------------------------- debug
 ## Dev chrome (dev/report/status labels, the guest-click hint) is an
 ## opt-in: the const, or --dev-ui on a debug build (run_pinewatch.cmd

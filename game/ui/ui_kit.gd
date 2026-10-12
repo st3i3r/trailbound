@@ -322,5 +322,6 @@ static func btn(parent: Control, where: Variant, text: String,
     b.add_theme_stylebox_override("pressed", chrome(piece, 0.82))
     b.add_theme_stylebox_override("disabled", chrome("btn_disabled"))
     b.add_theme_stylebox_override("focus", focus_box())
+    b.pressed.connect(UIFeel.haptic.bind("press"))
     parent.add_child(b)
     return b

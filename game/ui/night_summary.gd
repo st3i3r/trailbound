@@ -227,9 +227,9 @@ func run_count_up() -> void:
 		return
 	var income := int(_rep.get("income", 0))
 	var from := Game.coins - income
-	var tw := create_tween()
+	var tw := UIFeel.apply(create_tween(), "count_up")
 	tw.tween_method(func(v): _coins_l.text = "%dc" % int(v),
-		float(from), float(Game.coins), 0.7)
+		float(from), float(Game.coins), UIFeel.dur("count_up"))
 
 
 # ------------------------------------------------------------ buttons
@@ -262,6 +262,8 @@ func _on_double() -> void:
 	_double_b.disabled = true
 	_double_b.text = tr("night_doubled") % tips
 	# recount to the new total so the tally never lies
-	var tw := create_tween()
+	UIFeel.haptic("pay")
+	var tw := UIFeel.apply(create_tween(), "recount")
 	tw.tween_method(func(v): _coins_l.text = "%dc" % int(v),
-		float(Game.coins - tips), float(Game.coins), 0.4)
+		float(Game.coins - tips), float(Game.coins),
+		UIFeel.dur("recount"))

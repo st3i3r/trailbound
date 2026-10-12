@@ -130,6 +130,9 @@ godot.cmd --path game --import                          :: after asset changes (
 ::   they render the cached .godot/imported/*.ctex; a stale ctex silently
 ::   shows the OLD texture (cost us a full debug round: "stacked borders"
 ::   was the v1 kit ctex). --editor --quit-after N is not a substitute.
+::   ⚠ same for a NEW class_name: scene runs can't resolve it until an
+::   editor pass refreshes global_script_class_cache.cfg (Identifier
+::   "X" not declared → script fails to load → flags silently no-op).
 godot.cmd --path game res://scenes/pinewatch_test.tscn  :: interactive
 godot.cmd --path game res://scenes/pinewatch_test.tscn --dev-ui  :: interactive + dev labels
 godot.cmd --path game res://scenes/pinewatch_test.tscn --shot

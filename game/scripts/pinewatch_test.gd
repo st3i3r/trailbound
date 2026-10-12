@@ -300,6 +300,9 @@ func _ready() -> void:
     _spawn_board()
     _status()
     Transition.reveal()
+    # QA hook: --reduced-motion exercises the UIFeel policy (the real
+    # toggle lives in the P3 settings sheet)
+    UIFeel.reduced_motion = OS.get_cmdline_args().has("--reduced-motion")
     if OS.get_cmdline_args().has("--smoke"):
         Transition.snap_reveal()
         _smoke()
@@ -374,8 +377,8 @@ func _process(delta: float) -> void:
 func _fade_chrome(a: float) -> void:
     if hud_tween and hud_tween.is_running():
         hud_tween.kill()
-    hud_tween = create_tween()
-    hud_tween.tween_property(hud, "modulate:a", a, 0.4)
+    hud_tween = UIFeel.apply(create_tween(), "chrome")
+    hud_tween.tween_property(hud, "modulate:a", a, UIFeel.dur("chrome"))
 
 
 func _wake_chrome() -> void:
@@ -731,9 +734,9 @@ func _fire_near(on: bool) -> void:
         _fire_tween.kill()
     if on:
         fire_bubble.visible = true
-    _fire_tween = create_tween()
+    _fire_tween = UIFeel.apply(create_tween(), "fire")
     _fire_tween.tween_property(fire_bubble, "modulate:a",
-        1.0 if on else 0.0, 0.2)
+        1.0 if on else 0.0, UIFeel.dur("fire"))
     if not on:
         _fire_tween.tween_callback(fire_bubble.hide)
 
@@ -1086,8 +1089,12 @@ func _try_seat(pid: String) -> void:
     var pick := _pads_for(selected, pid)
     if pick.size() == int(st["guests"][selected].get("pads", 1)) \
             and Game.seat(selected, pick):
+        UIFeel.haptic("confirm")
         _seat_visual(selected, pick)
         _deselect()
+    else:
+        # tapped a pad but couldn't seat — wrong count or camp full
+        UIFeel.haptic("warn")
 
 
 func _do_unseat(gid: String) -> void:
@@ -1245,6 +1252,7 @@ func _goodnight() -> void:
 ## Sleep exits the night (§4 phase table): close the summary and roll
 ## into the next morning — same path the phase button takes.
 func _on_sleep() -> void:
+    UIFeel.haptic("confirm")
     panel_mgr.close()
     _advance_phase()
 
@@ -1253,7 +1261,8 @@ func _advance_phase() -> void:
     if evening_open:
         _goodnight()
     elif Game.phase == Game.Phase.MORNING:
-        _start_evening()                       # Head out
+        UIFeel.haptic("confirm")               # Head out
+        _start_evening()
     else:                                      # Night -> next Morning
         hud.set_report("")
         Game.advance_day()                     # set_phase(MORNING) inside
@@ -1278,6 +1287,14 @@ func _start_morning() -> void:
     # the prop is mostly occluded by the chest + warden tent
     _board_tok = markers.marker(board_anchor, Vector2(-11, -42))
     markers.marker_control(_board_tok).add_child(bub)
+    # gentle bob so the marker reads alive, not painted on the prop
+    bub.pivot_offset = bub.size / 2.0
+    # bound to the chip so the loop dies when the marker releases —
+    # a scene-bound loop would keep stepping a freed target
+    var bob := UIFeel.apply(bub.create_tween().set_loops(), "marker")
+    var bd := UIFeel.dur("marker")
+    bob.tween_property(bub, "scale", Vector2(1.12, 1.12), bd)
+    bob.tween_property(bub, "scale", Vector2.ONE, bd)
     _status()
 
 

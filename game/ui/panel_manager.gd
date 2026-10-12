@@ -108,26 +108,30 @@ func _animate_in(p: Control, first_panel: bool) -> void:
     p.pivot_offset = p.size / 2.0
     p.scale = Vector2(0.96, 0.96)
     p.modulate.a = 0.0
-    var tw := create_tween().set_parallel()
-    tw.tween_property(p, "scale", Vector2.ONE, 0.16)
-    tw.tween_property(p, "modulate:a", 1.0, 0.16)
+    var tw := UIFeel.apply(create_tween().set_parallel(), "panel_in")
+    var d := UIFeel.dur("panel_in")
+    tw.tween_property(p, "scale", Vector2.ONE, d)
+    tw.tween_property(p, "modulate:a", 1.0, d)
 
 
 func _animate_out(p: Control) -> void:
-    var tw := create_tween().set_parallel()
-    tw.tween_property(p, "scale", Vector2(0.96, 0.96), 0.12)
-    tw.tween_property(p, "modulate:a", 0.0, 0.12)
+    var tw := UIFeel.apply(create_tween().set_parallel(), "panel_out")
+    var d := UIFeel.dur("panel_out")
+    tw.tween_property(p, "scale", Vector2(0.96, 0.96), d)
+    tw.tween_property(p, "modulate:a", 0.0, d)
     tw.chain().tween_callback(p.queue_free)
 
 
 func _animate_dimmer(on: bool) -> void:
+    var d := UIFeel.dur("dimmer")
     if on:
         _dimmer.visible = true
         _dimmer.modulate.a = 0.0
-        create_tween().tween_property(_dimmer, "modulate:a", 1.0, 0.15)
+        UIFeel.apply(create_tween(), "dimmer") \
+            .tween_property(_dimmer, "modulate:a", 1.0, d)
     else:
-        var tw := create_tween()
-        tw.tween_property(_dimmer, "modulate:a", 0.0, 0.12)
+        var tw := UIFeel.apply(create_tween(), "dimmer")
+        tw.tween_property(_dimmer, "modulate:a", 0.0, d)
         tw.tween_callback(_dimmer.hide)
 
 

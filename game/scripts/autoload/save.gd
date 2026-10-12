@@ -29,6 +29,7 @@ func default_state() -> Dictionary:
 			"speedups_today": 0, "speedups_day": "", "collected": []},
 		"ads": {"remove_ads": false, "last_interstitial_day": 0,
 			"last_interstitial_utc": 0, "double_tips_used": false},
+		"settings": {"reduced_motion": false},
 	}
 
 
