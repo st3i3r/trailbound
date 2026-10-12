@@ -58,10 +58,10 @@ Cast, food, fauna and keepsakes are site-neutral: no site module.
 
 | Class | Tool and canvas | Module (appended) |
 |---|---|---|
-| Terrain | `create_topdown_tileset` pro, 32 px, `high top-down` | calm low-detail ground wash, large soft tonal patches, no flowers, no tufts, no speckles, no repeating motif (detail comes from `tb_dither` + decals); pond/lake shores get a stone-ring edge band + 2–3 frame shimmer overlay, not a flat fill (T4) |
-| Hero prop / structure | Batch tool ≤170 (4 slots, 128–160 style refs); Pro Flash custom for non-square | hand-painted miniature density, contemporary 2026 camping equipment (style_lock prop era spec: dome tents, coolers, chairs, stoves — never patched canvas / rusted surplus), clean surfaces with light wear (scuffs, dirt splash), one strong silhouette with one accent detail, base embedded, top and front faces both visible |
+| Terrain | `create_topdown_tileset` pro, 32 px, `high top-down` | calm low-detail ground wash, large soft tonal patches, no flowers, no tufts, no speckles, no repeating motif; for shore tiles: mossy stone ring edging the water, not a plain fill *(pipeline: detail from `tb_dither` + decals; shimmer frames are derived, T4)* |
+| Hero prop / structure | Batch tool ≤170 (4 slots, 128–160 style refs); Pro Flash custom for non-square | hand-painted miniature density, contemporary 2026 camping equipment (dome tents, coolers, chairs, stoves — never patched canvas / rusted surplus), clean surfaces with light wear (scuffs, dirt splash), one strong silhouette with one accent detail, top and front faces both visible, calm interior masses with detail at the silhouette, thin adaptive coloured outline |
 | Small item (L6) | Batch tool ≤42 (64 slots, 32 px refs) or ≤85 (16 slots, 64 px refs) | small and simple, readable at 1×, two or three tones plus outline, one clear silhouette, no fine noise |
-| Foliage / tree | Batch tool ≤170 | leaf masses as clumps (not single dots), lit top-left rim, cool shaded underside, visible trunk and root flare; gen canopy and trunk as two separate cut-outs (T2); colour variants are `tb_variant` ramp-swaps, never re-gen'd (T1) |
+| Foliage / tree | Batch tool ≤170 | leaf masses as clumps (not single dots), lit top-left rim, cool shaded underside, visible trunk and root flare *(pipeline: canopy + trunk gen'd as two separate cut-outs, composited by `tb_post`, T2; colour variants are `tb_variant` ramp-swaps, never re-gen'd, T1)* |
 | Character | `create_character_pro_flash` 48×48, `low top-down`, template `mannequin`, 8 directions, `style_options.detail=false` | full body about 3.5 heads tall filling about 90% of the canvas height, readable face with simple eyes, distinctive silhouette with one signature colour, clothing folds in two or three tones, relaxed standing pose facing south |
 | Child | same, 48×48 | child about two-thirds adult height, figure fills about 60% of the canvas height |
 | Persona | Character class + | an ordinary person on a weekend nature trip, everyday clothes (not hiking gear unless stated) |
@@ -74,11 +74,17 @@ Cast, food, fauna and keepsakes are site-neutral: no site module.
 | Animation | `animate_character` template (walks, 1 gen/dir) or v3 (custom, ≈1 gen/dir at 48 px, 8 frames) | motion only, no environment words (tool rule) |
 | VFX | `vfx_workbench` (free) | fireflies, petals, smoke, steam, sparkle, confetti, stamp burst, coin pop, star twinkle, rain splash |
 
-Style references: our graded art cropped to the **exact target canvas**
-(Pro Flash and the batch tool refuse to resize; the largest batch-tool
-style image sets the output size). Build `refs/house/` crops: 32, 48
-(character), 64, 128, 160 px from `cleanup/pinewatch_engine_graded.png`
-and the canonical sprites. Eastward crops stay R&D-only.
+Style references: **target-quality crops, not our shipped art**
+(decided 2026-10-13 — self-refs cap craft at the current level; the
+style image teaches structure/shading/outline while `tb_grade` owns
+the palette).  Source: `refs/crops/` subject-organized library +
+`docs/reference/` Eastward/Octopia masters (official press + gameplay
+shots).  The Octopia images are exactly 3× our render scale — crop at
+3× multiples and downscale NEAREST ÷3 for native-res refs.  Crop to
+the **exact target canvas** (Pro Flash and the batch tool refuse to
+resize; the largest batch-tool style image sets the output size).
+Pick crops matching the job's subject family (tree crops for A-R1,
+prop/farm for A-R4, water for A-R3).
 
 ## 3. Batches — content lines
 
@@ -93,10 +99,10 @@ Each line is the content slot only; HOUSE + SITE + CLASS are appended.
 **A2 · edges, fences, yard (batch tool ≤85, 16 slots, 1 job ≈10)**
 `fence_bamboo_straight` woven bamboo fence segment · `fence_bamboo_post` bamboo fence end post · `fence_plank_straight` split-plank wooden fence segment · `fence_plank_gate` split-plank fence gate, closed · `wall_drystone_straight` low dry-stone wall segment · `wall_drystone_corner` dry-stone wall corner · `rope_barrier` rope-and-post trail barrier · `mailbox_green` green metal mailbox on a wooden post · `bicycle_old` old black bicycle on its kickstand · `terrace_steps` two stone terrace steps · `terrace_edge_mossy` mossy stone terrace edge block · `hand_pump` cast-iron hand water pump · `rain_barrel` rain barrel · `well_covered` stone well with a wooden lid · `trail_marker` trail marker post with a painted band · `laundry_short` short laundry line with two shirts
 
-**A3 · forest wall (batch tool ≤170, 4 slots, 3 jobs ≈30)**
-- A3a: `tree_broadleaf_round_a` broadleaf evergreen with a dense round crown · `tree_broadleaf_round_b` second round-crown broadleaf, taller and narrower · `tree_feathery_droop` slender tree with feathery drooping foliage · `tree_maple_copper` highland maple with copper-red foliage
-- A3b: `tree_cherry_bloom` wild Himalayan cherry in pink bloom · `tree_fern` tree fern with a tall shaggy trunk · `shrub_mass_dark` dense dark-green shrub mass for a forest base · `crown_cluster` three trees with overlapping crowns, staggered depths, trunks visible below
-- A3c: `canopy_gate` two trees arching into a doorway of leaves over a path · `repoussoir_top` dark foreground foliage hanging from the top edge, large leaves, near-silhouette · `repoussoir_bottom` dark foreground fern fronds rising from the bottom edge · `moss_vines_drape` moss and vines draping over a rock ledge
+**A3 · forest wall dressing (batch tool ≤170, 4 slots, 2 jobs ≈20)**
+*(Single-tree species moved to A-R1 — they must be canopy+trunk split masters (T2), not flat cut-outs; genning them here too would double-pay and ship two inconsistent versions of the same species.)*
+- A3a: `tree_cherry_bloom` wild Himalayan cherry in pink bloom, canopy + trunk split (T2) · `tree_fern` tree fern with a tall shaggy trunk, canopy + trunk split (T2) · `shrub_mass_dark` dense dark-green shrub mass for a forest base · `moss_vines_drape` moss and vines draping over a rock ledge
+- A3b **framing pieces — replace the cut-out clause** with "fills the stated canvas edge, exits the frame": `crown_cluster` three trees with overlapping crowns filling the canvas edge, trunks visible below · `canopy_gate` two trees arching into a doorway of leaves over a path, crowns exiting both side edges · `repoussoir_top` dark foreground foliage hanging down from the top edge, large leaves, near-silhouette · `repoussoir_bottom` dark foreground fern fronds rising up from the bottom edge
 
 **A4 · landmarks (batch tool ≤170, 4 slots, 1 job + 1 reroll ≈20)**
 `trailhead_gate` rustic timber village gate arch with a curved tile roof cap, a lantern on each post, a blank hanging signboard · `pho_stall` roadside noodle stall: wooden cart counter under a tin awning on bamboo poles, steaming aluminium broth pot, stacked bowls, hanging herb bunches and lime nets, blank menu board · `jetty_short` short wooden plank jetty on posts reaching into the water · `footbridge_small` small wooden footbridge over a stream
@@ -118,30 +124,38 @@ settled the fix: techniques T1–T5 in `style_lock.md`.  The world stays
 painted; this batch adds the layered family on top.  **H4's dome-tent
 re-author folds in here** — superseded by A-R4.
 
-**A-R1 · tree family (batch ≤170, ≈20)**
-4 canopy masters (`tree_pine_highland` · `tree_broadleaf_round` ·
-`tree_maple_copper` · `tree_feathery_droop`) + 4 trunk cut-outs —
-two separate gens per tree, composited by `tb_post` (T2).  Colour
-variants (deep-summer, dry-gold) are **`tb_variant` ramp-swaps — 0
-gens** (T1): the model would redraw a different silhouette every
-time; the ramp-swap preserves it exactly.
+**A-R1 · tree family (batch ≤170, 6 slots, 2 jobs ≈20)**
+3 canopy masters (`tree_broadleaf_round` · `tree_maple_copper` ·
+`tree_feathery_droop`) + 3 trunk cut-outs — two separate gens per
+tree, composited by `tb_post` (T2).  `tree_pine_highland` is dropped:
+the shipped `pine_tall_a/b` are already variant-able masters —
+`tb_variant` dry-run on them extracts a clean continuous ramp, so
+pine variants cost 0 gens (T1).  Colour variants on all species are
+`tb_variant` ramp-swaps — never re-gen'd: the model would redraw a
+different silhouette every time; the ramp-swap preserves it exactly.
 
 **A-R2 · bush + undergrowth family (batch ≤85, ≈10)**
 `bush_round_m` · `bush_white_flower_v` · `fern_bank` ·
 `grass_tussock` · `reed_shore` — masters only; variants derived.
 
 **A-R3 · pond edge + water (batch ≤85, ≈10)**
-`shore_ring_{n,ne,e,se,s,sw,w,nw}` mossy stone-ring shore edges in the
-Pinewatch palette (T4).  `water_shimmer_{f1,f2}` = noise pass on the
-water tile via `tb_dither` — 0 gens; runtime frame swap.
+`shore_ring_{n,ne,e,se,s,sw,w,nw}` — each line MUST name which edge
+the water sits on (e.g. `shore_ring_n` "mossy stone shore edge strip,
+water along the north side", `shore_ring_ne` "mossy stone shore
+corner, water to the north-east") or the model will draw whole ponds.
+`water_shimmer_{f1,f2}` = noise pass on the water tile via
+`tb_dither` — 0 gens; runtime frame swap.
 
-**A-R4 · modern camp props (batch ≤170, ≈30) — replaces the canvas set**
+**A-R4 · modern camp props (batch ≤170, 9 slots, 3 jobs ≈30) — replaces the canvas set**
 `dome_tent_{sage,amber,slate}` — one dome silhouette, three colours ·
 `cooler_box` · `folding_chair_pair` · `propane_stove` ·
-`solar_lantern` · `string_lights_seg` · `dry_bag` ·
-`camp_table_fold`.  Era spec applies (style_lock): clean surfaces,
-light wear only.  The shipped canvas A-frames, warden tent and tarp
-tent retire to `_superseded/` on landing.
+`solar_lantern` · `dry_bag` · `camp_table_fold`.  (`string_lights_seg`
+dropped — `props_large/string_lights` already ships.)  Era spec
+applies (style_lock): clean surfaces, light wear only.  The shipped
+canvas A-frames, warden tent and tarp tent retire to `_superseded/`
+on landing — **integration step:** `tent_green`/`tent_red` are
+referenced by `game/scripts/pinewatch_test.gd` (placement + TENTS
+const); rename to the dome ids on landing.
 
 **A-R5 · grounding decal family (batch ≤42, ≈10)**
 `tuft_grass_{a,b,c,d}` · `tuft_leaf_litter` · `tuft_moss_patch` —
@@ -239,8 +253,8 @@ Walks: `animate_character` template, south / north / east (west mirrored)
 
 - **H1 Warden's Hut stages** (`edit_image_pro_flash` from the restored `cottage_shed`, 128 px, palette correction on, 3 × 2 seeds ≈36): `hut_s0` ruined, collapsed roof, broken shutters, brambles and vines over the walls · `hut_s1` brambles cleared, roof open with bare rafters · `hut_s2` new roof tiles, shutters still broken · `hut_s3` = restored (existing)
 - **H2 overgrown pads** (batch ≤85, 16 slots, ≈10): `pad_overgrown_a..d` square of earth covered by tall weeds, brambles, a fallen branch and stones · `pad_clearing_a..b` patchy dirt with weed stubs · `pad_cleared_a..b` freshly cleared packed earth with a few pebbles
-- **H3 night/occupied states** (`create_object_state`, ≈5 each, ≈20): `tent_green_night`, `tent_red_night` warm lantern glow inside the modern dome tent, door half open · `cabin_night` warm light in the windows · `pallet_deck_occupied` bedroll and a small lantern on the deck
-- **H4 tent re-author** (batch ≤170, ≈15): the shipped canvas A-frame pad tents (`tent_green`, `tent_red`), the warden tent and the brown tarp tent regenerate as **modern dome tents** per the style_lock prop era spec — clean two-tone ripstop, door arc, one guyline; the era-spec neglect story lives in weeds/debris on the pad, not in aged canvas
+- **H3 night/occupied states** (`create_object_state`, ≈5 each, ≈20): `dome_tent_sage_night`, `dome_tent_amber_night` warm lantern glow inside the modern dome tent, door half open *(targets the A-R4 dome masters — the canvas `tent_green`/`tent_red` ids retire)* · `cabin_night` warm light in the windows · `pallet_deck_occupied` bedroll and a small lantern on the deck
+- **H4 tent re-author** — **folded into A-R4**: the shipped canvas A-frame pad tents (`tent_green`, `tent_red`), the warden tent and the brown tarp tent are replaced by `dome_tent_{sage,amber,slate}` per the style_lock prop era spec
 - Boathouse and Lantern Workshop stages: with their sites
 
 ### Batch I — events (§13.5)
@@ -254,17 +268,17 @@ Walks: `animate_character` template, south / north / east (west mirrored)
 
 | Batch | Est. gens | Note |
 |---|---|---|
-| A world | ≈143 | Vista panels are the costly line |
+| A world | ≈133 | Vista panels are the costly line; A3 slimmed to dressing pieces (trees moved to A-R1) |
 | B cast | ≈385 | 36 humans (13 named/regular + 17 persona sprites + 6 proposed) × 6, +30% rerolls ≈281; 3 dogs ≈23; grandpa 10; 7 portraits × 10 = 70 |
 | C fauna | ≈30 | Batch tool (C1 44 of 64 slots) |
 | D food | ≈30 | Batch tool (D1 48 of 64 slots) |
 | E decor | ≈30 | |
 | F cut-in | ≈27 | |
 | G animation | ≈220 | Walks: 39 walkers × 3 dirs = 117; ~85 custom anims × 1 (each sprite needs its own copy); prop loops ≈14 |
-| A-R refresh | ≈65 | Masters only — foliage variants + water shimmer are deterministic pipeline derivatives (tb_variant/tb_dither), 0 gens; net of H4's folded-in tent re-author |
+| A-R refresh | ≈80 | Masters only — foliage variants + water shimmer are deterministic pipeline derivatives (tb_variant/tb_dither), 0 gens; A3's tree species folded into A-R1 (canopy+trunk splits) and pine dropped (shipped pines are variant-able masters) |
 | H states | ≈66 | H4 dome-tent re-author moved to A-R4 |
 | I events | ≈55 | |
-| **Total** | **≈1,070** (+20% contingency ≈1,285) | vs ~475 in the old manifest — characters and animation were under-priced |
+| **Total** | **≈1,075** (+20% contingency ≈1,290) | vs ~475 in the old manifest — characters and animation were under-priced |
 
 Balance 1,633 now; the allowance refills to 2,000 on 2026-11-11 and
 each cycle after. Fits this cycle with ≈350 left after contingency.

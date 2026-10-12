@@ -148,7 +148,7 @@ Gens produce **subjects**; techniques run in the pipeline:
 
 | # | Technique | Rule | Mechanism |
 |---|---|---|---|
-| T1 | **Foliage variants are re-shaded, never hue-swapped** | Each palette variant gets its own highlight structure and dither (`resurrected_rpg/Plants.png` — autumn ≠ summer shifted) | **Derived, not gen'd** — `tools/tb_variant.py` (new, ~1 day): segment the foliage colour family in the master, remap its light/mid/shade ramp to the variant ramp (same machinery `tb_grade.py` palette-snaps with). Silhouette preserved *by construction*; 0 gens. Re-genning a variant would return a different silhouette AND a different shading — worse on both axes |
+| T1 | **Foliage variants are re-shaded, never hue-swapped** | Each palette variant gets its own highlight structure and dither (`resurrected_rpg/Plants.png` — autumn ≠ summer shifted) | **Derived, not gen'd** — `tools/tb_variant.py` (**built, `ac3e48d`**): segments the foliage colour family in the master, remaps its light/mid/shade ramp to the variant ramp (same machinery `tb_grade.py` palette-snaps with). Silhouette preserved *by construction*; 0 gens; works on shipped sprites too (verified on `pine_tall_a` + `flamboyant_tree`). Re-genning a variant would return a different silhouette AND a different shading — worse on both axes |
 | T2 | **Trees ship in three layers** | canopy · trunk · baked shadow (`fm32x32/Trees_seperated.png`) | Gen canopy and trunk as **two separate cut-out gens** (one canvas can't hold instructions), composite + shadow via `tb_post`. Variants land on the canopy only (T1) |
 | T3 | **Prop grounding is systematic** | Every placed prop gets a ground blend at its base rim (`resurrected_rpg/Props.png`: every statue/stone sits in tufts) — extends "decals at prop bases" from suggestion to rule | Layout pass stamps 1–3 tuft decals per prop; tuft family gen'd once per site palette; contact shadow from `tb_post` |
 | T4 | **Water gets a ring, not a flat fill** | Stone-ring edge band + low-frequency shimmer (`fm32x32/WaterTiles-6frames.png`) | Ring = real subject gen; shimmer f1/f2 = `tb_dither`-style noise pass on the water tile (0 gens); runtime frame swap |
@@ -612,16 +612,26 @@ staging.  This is also the craft-spec prompt block for hero art:
 | composition | storytelling clusters, asymmetric, imperfect |
 | UI | dense content, nested borders, paper texture, seals |
 
-Prompt block (append to hero-prop prompts):
+Prompt block (append to hero-prop prompts).  Two variants — pick by
+subject era; the wear words and the embedded clause are the only
+differences.  Never send the aged block to 2026 camping equipment
+(the rust/patch words pull it back to the canvas-tent look), and
+never send "embedded in ground" to a cut-out (it bakes grass into
+the sprite's base edge — embedding is `tb_post`'s job, T3):
 
-> painterly pixel art prop, 3/4 top-down straight-on front view —
-> FULL VALUE RANGE (deep near-black shadows to bright highlights),
-> hue-shifting colour ramps (warm lit side, cool shadow side),
-> 8+ colours, adaptive dark outline matching each surface colour,
-> weathered dithered surfaces (rust, wear, fabric, bark), handcrafted
-> asymmetric detail, small imperfections (lean, sag, patch), object
-> partially embedded in ground, sun upper-left, interior detail
-> density like a hand-painted miniature — not a clean icon
+> **modern (equipment/props):** painterly pixel art prop, 3/4
+> top-down straight-on front view — FULL VALUE RANGE (deep near-black
+> shadows to bright highlights), hue-shifting colour ramps (warm lit
+> side, cool shadow side), 8+ colours, thin adaptive dark outline
+> matching each surface colour, calm interior masses with detail
+> concentrated at the silhouette, clean new surfaces with light wear
+> only (a scuff, a dirt splash, a faded sticker), handcrafted
+> asymmetric detail, sun upper-left, interior detail density like a
+> hand-painted miniature — not a clean icon
+
+> **aged (keepsakes/ruins only):** same block but "weathered
+> dithered surfaces (rust, wear, fabric, bark), small imperfections
+> (lean, sag, patch)" in place of the clean-surfaces clause.
 
 Working principle: **generate a competent base -> craft it up.**
 Deterministic craft passes (form shading, embedding, clustering, UI
