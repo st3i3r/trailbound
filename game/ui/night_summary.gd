@@ -48,11 +48,14 @@ func _build(day: int, forecast: String) -> void:
 	custom_minimum_size = Vector2(W, H)
 	size = Vector2(W, H)
 	add_theme_stylebox_override("panel", UIKit.nine("panel_window_flat"))
-	# title rides the panel's left title-band area — the centre of the
-	# band is the frame's hanging emblem, so the text hugs the left
+	# title: inside the paper, centred under the frame's hanging emblem
+	# (INK — the emblem hangs into the parchment, so PAPER text would
+	# be invisible on the dark frame band where it used to sit)
 	var title := UIKit.label_for(tr("night_title") % day,
-		UITokens.TypeRole.HEAD, UITokens.PAPER)
-	title.position = Vector2(38, 11)
+		UITokens.TypeRole.HEAD, UITokens.INK)
+	title.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	title.offset_top = 56
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	add_child(title)
 	_build_reviews()
 	_build_totals(forecast)
@@ -64,8 +67,10 @@ func _build(day: int, forecast: String) -> void:
 func _build_reviews() -> void:
 	var scroll := ScrollContainer.new()
 	scroll.name = "Reviews"
-	scroll.position = Vector2(30, 30)
-	scroll.size = Vector2(W - 60, 164)
+	# content margin: the frame's rope corners reach ~34px in; all
+	# interior content shares the 36px column so nothing grazes art
+	scroll.position = Vector2(36, 80)
+	scroll.size = Vector2(W - 72, 110)
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(scroll)
@@ -159,8 +164,8 @@ func _term(icon: Texture2D, sign: String) -> Control:
 
 func _build_totals(forecast: String) -> void:
 	var box := VBoxContainer.new()
-	box.position = Vector2(30, 200)
-	box.size = Vector2(W - 60, 56)
+	box.position = Vector2(36, 196)
+	box.size = Vector2(W - 72, 52)
 	box.add_theme_constant_override("separation", 2)
 	add_child(box)
 	var fees := int(_rep.get("fees", 0))
@@ -185,7 +190,7 @@ func _build_totals(forecast: String) -> void:
 		var pl := UIKit.label_for(tr("night_page") % int(p),
 			UITokens.TypeRole.BODY, UITokens.GOLD_DEEP)
 		box.add_child(pl)
-	# forecast + income + coin tally on the last line
+	# forecast row: weather left, money pushed right — no floating numbers
 	var last := HBoxContainer.new()
 	last.add_theme_constant_override("separation", 6)
 	var wico := TextureRect.new()
@@ -197,9 +202,16 @@ func _build_totals(forecast: String) -> void:
 		"%s: %s" % [tr("night_tomorrow"),
 		tr("weather_" + forecast)],
 		UITokens.TypeRole.BODY, UITokens.INK))
-	var inc := UIKit.label_for("+%dc" % income,
-		UITokens.TypeRole.HEAD, UITokens.PLUS)
-	last.add_child(inc)
+	var push := Control.new()
+	push.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	last.add_child(push)
+	last.add_child(UIKit.label_for("+%dc" % income,
+		UITokens.TypeRole.HEAD, UITokens.PLUS))
+	var cico := TextureRect.new()
+	cico.texture = UIKit.icon("coin")
+	cico.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	cico.stretch_mode = TextureRect.STRETCH_KEEP
+	last.add_child(cico)
 	_coins_l = UIKit.label_for("%dc" % Game.coins,
 		UITokens.TypeRole.HEAD, UITokens.GOLD_DEEP)
 	last.add_child(_coins_l)
@@ -223,10 +235,11 @@ func run_count_up() -> void:
 func _build_buttons() -> void:
 	var tips := int(_rep.get("tips", 0))
 	if Ads.can_double_tips(Game.day) and tips > 0:
-		_double_b = UIKit.btn(self, Rect2(30, H - 46, 150, 40),
+		_double_b = UIKit.btn(self, Rect2(36, H - 56, 150, 40),
 			tr("night_double") % tips, "green")
 		_double_b.pressed.connect(_on_double)
-	var sleep := UIKit.btn(self, Rect2(W - 114, H - 46, 100, 40),
+	# Sleep tucks inside the frame's inner edge — 30px clear of the art
+	var sleep := UIKit.btn(self, Rect2(W - 140, H - 56, 104, 40),
 		tr("night_sleep"), "gold")
 	sleep.pressed.connect(func(): sleep_pressed.emit())
 

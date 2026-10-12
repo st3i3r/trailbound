@@ -166,7 +166,9 @@ static func pill(parent: Control, where: Variant, icon: String,
     _ensure()
     var tw := _f_body.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT,
         -1.0, type_size(UITokens.TypeRole.HEAD)).x
-    var need := (22.0 if icon != "" else 6.0) + tw + 14.0
+    # the banner's rope curl eats ~20px at the right end — keep text
+    # out of the decorative zone, not just inside the nine-slice inset
+    var need := (22.0 if icon != "" else 6.0) + tw + 20.0
     if where is Vector2 and need > where.x:
         where.x = need
     elif where is Rect2 and need > where.size.x:
@@ -204,7 +206,7 @@ static func pill_fit(l: Label) -> void:
     var f := l.get_theme_font("font")
     var tw: float = f.get_string_size(l.text, HORIZONTAL_ALIGNMENT_LEFT,
         -1.0, l.get_theme_font_size("font_size")).x
-    var need: float = l.position.x + tw + 14.0
+    var need: float = l.position.x + tw + 20.0
     p.size.x = maxf(need, p.size.x)
     p.custom_minimum_size.x = p.size.x
 
