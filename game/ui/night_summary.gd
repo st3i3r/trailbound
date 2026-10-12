@@ -51,7 +51,7 @@ func _build(day: int, forecast: String) -> void:
 	# title rides the panel's left title-band area — the centre of the
 	# band is the frame's hanging emblem, so the text hugs the left
 	var title := UIKit.label_for(tr("night_title") % day,
-		UITokens.TypeRole.HEAD, UITokens.INK)
+		UITokens.TypeRole.HEAD, UITokens.PAPER)
 	title.position = Vector2(38, 11)
 	add_child(title)
 	_build_reviews()
@@ -64,8 +64,8 @@ func _build(day: int, forecast: String) -> void:
 func _build_reviews() -> void:
 	var scroll := ScrollContainer.new()
 	scroll.name = "Reviews"
-	scroll.position = Vector2(24, 30)
-	scroll.size = Vector2(W - 48, 164)
+	scroll.position = Vector2(30, 30)
+	scroll.size = Vector2(W - 60, 164)
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(scroll)
@@ -76,7 +76,7 @@ func _build_reviews() -> void:
 	var results: Array = _rep.get("results", [])
 	if results.is_empty():
 		var none := UIKit.label_for(tr("night_none"),
-			UITokens.TypeRole.BODY, UITokens.DIM)
+			UITokens.TypeRole.BODY, UITokens.MUTE)
 		list.add_child(none)
 		return
 	var best_id: String = _rep.get("best", {}).get("id", "")
@@ -108,7 +108,7 @@ func _review_block(r: Dictionary, is_best: bool) -> Control:
 		top.add_child(s)
 	var pay := UIKit.label_for("+%dc" % (int(r.get("fee", 0))
 		+ int(round(r.get("tip", 0.0)))),
-		UITokens.TypeRole.HEAD, UITokens.GREEN)
+		UITokens.TypeRole.HEAD, UITokens.PLUS)
 	top.add_child(pay)
 	box.add_child(top)
 	# line 2: the breakdown — every signed term with its icon
@@ -130,7 +130,7 @@ func _review_block(r: Dictionary, is_best: bool) -> Control:
 	box.add_child(chips)
 	# line 3: the review quote
 	var c := UIKit.label_for("“%s”" % String(r.get("comment", "")),
-		UITokens.TypeRole.BODY, UITokens.DIM)
+		UITokens.TypeRole.BODY, UITokens.MUTE)
 	box.add_child(c)
 	return box
 
@@ -145,11 +145,11 @@ func _term(icon: Texture2D, sign: String) -> Control:
 	if sign == "·":
 		t.modulate = Color(1, 1, 1, 0.6)
 	row.add_child(t)
-	var color := UITokens.DIM
+	var color := UITokens.MUTE
 	if sign.begins_with("+"):
-		color = UITokens.GREEN
+		color = UITokens.PLUS
 	elif sign.begins_with("−"):
-		color = UITokens.RED
+		color = UITokens.MINUS
 	var l := UIKit.label_for(sign, UITokens.TypeRole.BODY, color)
 	row.add_child(l)
 	return row
@@ -159,8 +159,8 @@ func _term(icon: Texture2D, sign: String) -> Control:
 
 func _build_totals(forecast: String) -> void:
 	var box := VBoxContainer.new()
-	box.position = Vector2(24, 200)
-	box.size = Vector2(W - 48, 56)
+	box.position = Vector2(30, 200)
+	box.size = Vector2(W - 60, 56)
 	box.add_theme_constant_override("separation", 2)
 	add_child(box)
 	var fees := int(_rep.get("fees", 0))
@@ -183,7 +183,7 @@ func _build_totals(forecast: String) -> void:
 			UITokens.TypeRole.BODY, UITokens.INK))
 	for p in _rep.get("pages", []):
 		var pl := UIKit.label_for(tr("night_page") % int(p),
-			UITokens.TypeRole.BODY, UITokens.GOLD)
+			UITokens.TypeRole.BODY, UITokens.GOLD_DEEP)
 		box.add_child(pl)
 	# forecast + income + coin tally on the last line
 	var last := HBoxContainer.new()
@@ -198,10 +198,10 @@ func _build_totals(forecast: String) -> void:
 		tr("weather_" + forecast)],
 		UITokens.TypeRole.BODY, UITokens.INK))
 	var inc := UIKit.label_for("+%dc" % income,
-		UITokens.TypeRole.HEAD, UITokens.GREEN)
+		UITokens.TypeRole.HEAD, UITokens.PLUS)
 	last.add_child(inc)
 	_coins_l = UIKit.label_for("%dc" % Game.coins,
-		UITokens.TypeRole.HEAD, UITokens.GOLD)
+		UITokens.TypeRole.HEAD, UITokens.GOLD_DEEP)
 	last.add_child(_coins_l)
 	box.add_child(last)
 
@@ -223,7 +223,7 @@ func run_count_up() -> void:
 func _build_buttons() -> void:
 	var tips := int(_rep.get("tips", 0))
 	if Ads.can_double_tips(Game.day) and tips > 0:
-		_double_b = UIKit.btn(self, Rect2(24, H - 46, 150, 40),
+		_double_b = UIKit.btn(self, Rect2(30, H - 46, 150, 40),
 			tr("night_double") % tips, "green")
 		_double_b.pressed.connect(_on_double)
 	var sleep := UIKit.btn(self, Rect2(W - 114, H - 46, 100, 40),

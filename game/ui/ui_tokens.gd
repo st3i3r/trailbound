@@ -25,6 +25,12 @@ const GOLD := Color("ffcf7d")              # elite / rating accent
 const GREEN := Color("b8d7a8")             # ok / camp green
 const RED := Color("e0886c")               # aversion / penalty terms
 const DIM := Color("a59a72")               # muted text
+# On-PAPER variants — the accents above are tuned for dark chrome and
+# wash out on parchment; these deep variants carry the same meaning.
+const MUTE := Color("8f7a52")              # muted text on paper
+const PLUS := Color("5e8f4a")              # positive terms on paper
+const MINUS := Color("b8513d")             # negative terms on paper
+const GOLD_DEEP := Color("b3811f")         # accent / coin text on paper
 const DIMMER := Color(0.09, 0.06, 0.02, 0.4)
                                            # panel scrim, paper-dark ~40%
 

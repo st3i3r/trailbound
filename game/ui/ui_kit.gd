@@ -124,9 +124,10 @@ static func label(text: String, size := 9, font: Font = null,
     l.add_theme_font_override("font", font if font else _f_body)
     l.add_theme_font_size_override("font_size", size)
     l.add_theme_color_override("font_color", color)
-    # 1px shadow lifts light text off the ground; on dark-on-paper ink
-    # it just muddies the strokes (UI-002) — only light text gets it
-    if color != UITokens.INK:
+    # 1px shadow lifts light text off the ground; on ink-weight text
+    # (INK, MUTE, PLUS, MINUS, GOLD_DEEP) it just muddies strokes.
+    # Luminance threshold replaces the old INK-only check (UI-002).
+    if color.get_luminance() > 0.5:
         l.add_theme_color_override("font_shadow_color", UITokens.SHADOW)
         l.add_theme_constant_override("shadow_offset_x", 1)
         l.add_theme_constant_override("shadow_offset_y", 1)

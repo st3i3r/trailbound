@@ -179,10 +179,9 @@ func _card(req: Dictionary, sprite: Dictionary) -> Panel:
 	fav.modulate = UITokens.DIM
 	fav.position = Vector2(CARD_W - 15, 1)
 	c.add_child(fav)
-	var q := UIKit.label_for("?", UITokens.TypeRole.BODY)
+	var q := UIKit.label_for("?", UITokens.TypeRole.BODY, UITokens.DIM)
 	q.name = "FavQ"
 	q.position = Vector2(CARD_W - 7, 3)
-	q.add_theme_color_override("font_color", UITokens.DIM)
 	c.add_child(q)
 	# seated check + selection ring (toggled, both drawn last = on top)
 	var chk := TextureRect.new()
@@ -234,8 +233,8 @@ func show_guest_terms(guest: Dictionary, hint: String) -> void:
 	for tid in guest.get("traits", []):
 		chips.append({"icon": UIKit.trait_icon(String(tid)),
 			"name": _trait_names.get(tid, tid), "sign": "·",
-			"color": UITokens.DIM})
-	chips.append({"text": hint, "color": UITokens.DIM})
+			"color": UITokens.MUTE})
+	chips.append({"text": hint, "color": UITokens.MUTE})
 	_show(chips)
 
 
@@ -246,13 +245,13 @@ func show_preview(r: Dictionary) -> void:
 	var chips := []
 	for d in r.get("detail", []):
 		var sign := "·"
-		var color: Color = UITokens.DIM
+		var color: Color = UITokens.MUTE
 		if d.get("tripped", false):
 			sign = "−1"
-			color = UITokens.RED
+			color = UITokens.MINUS
 		elif d.get("met", false):
 			sign = "+1"
-			color = UITokens.GREEN
+			color = UITokens.PLUS
 		chips.append({"icon": UIKit.trait_icon(String(d.get("trait", ""))),
 			"name": _trait_names.get(d.get("trait", ""), ""),
 			"sign": sign, "color": color})
@@ -260,14 +259,14 @@ func show_preview(r: Dictionary) -> void:
 	chips.append({"icon": UIKit.icon("tent"),
 		"name": tr("tray_shelter"),
 		"sign": "+%d" % comfort if comfort > 0 else "·",
-		"color": UITokens.GREEN if comfort > 0 else UITokens.DIM})
+		"color": UITokens.PLUS if comfort > 0 else UITokens.MUTE})
 	if int(r.get("weather", 0)) != 0:
 		chips.append({"icon": UIKit.weather_icon("rain"),
 			"name": tr("tray_rain"), "sign": "−1",
-			"color": UITokens.RED})
+			"color": UITokens.MINUS})
 	chips.append({"icon": UIKit.icon("star_full"),
 		"name": "=", "sign": "%d" % int(r.get("stars", 0)),
-		"color": UITokens.GOLD})
+		"color": UITokens.GOLD_DEEP})
 	_show(chips)
 
 
@@ -291,15 +290,12 @@ func _show(chips: Array) -> void:
 			row.add_child(t)
 		var name := String(ch.get("name", ""))
 		if name != "":
-			var nl := UIKit.label_for(name, UITokens.TypeRole.BODY)
-			nl.add_theme_color_override("font_color", UITokens.DIM)
-			row.add_child(nl)
+			row.add_child(UIKit.label_for(name, UITokens.TypeRole.BODY,
+				UITokens.MUTE))
 		var sign := String(ch.get("sign", ch.get("text", "")))
 		if sign != "":
-			var sl := UIKit.label_for(sign, UITokens.TypeRole.HEAD)
-			sl.add_theme_color_override("font_color",
-				ch.get("color", UITokens.DIM))
-			row.add_child(sl)
+			row.add_child(UIKit.label_for(sign, UITokens.TypeRole.HEAD,
+				ch.get("color", UITokens.MUTE)))
 		strip_box.add_child(row)
 		w += int(row.get_combined_minimum_size().x) + UITokens.SP2
 	w += UITokens.SP3 - UITokens.SP2
