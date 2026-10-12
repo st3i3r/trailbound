@@ -78,7 +78,7 @@ func _build_main() -> void:
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override("separation", 8)
 	_v.add_child(head)
-	var t := UIKit.label_for(tr("jrnl_title"), UITokens.TypeRole.HEAD,
+	var t := UIKit.label_for(tr("jrnl_title"), UITokens.TypeRole.DISPLAY,
 		UITokens.PAPER)
 	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(t)

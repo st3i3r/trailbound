@@ -69,7 +69,7 @@ func _rebuild() -> void:
 
 func _build_main() -> void:
     var title := UIKit.label_for(tr("set_title"),
-        UITokens.TypeRole.HEAD, UITokens.PAPER)
+        UITokens.TypeRole.DISPLAY, UITokens.PAPER)
     title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
     _v.add_child(title)
 

@@ -44,8 +44,8 @@ static func theme() -> Theme:
     t.set_font_size("font_size", "Label",
         UIKit.type_size(UITokens.TypeRole.BODY))
     t.set_color("font_color", "Label", UITokens.PAPER)
-    t.set_color("font_shadow_color", "Label", UITokens.SHADOW)
-    t.set_constant("shadow_offset_x", "Label", 1)
-    t.set_constant("shadow_offset_y", "Label", 1)
+    # no global text shadow — flat surfaces read clean at these
+    # contrasts; UIKit.label() adds a 1px lift only for light text
+    # floating over the world (the one case that needs it)
     _theme = t
     return t

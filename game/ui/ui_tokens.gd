@@ -67,9 +67,12 @@ enum Tier { WORLD_FEEDBACK = 5, HUD = 10, PANEL = 20, MODAL = 30 }
 ## Sizes are 360p virtual px (the stretch scale re-renders them crisp
 ## on device).  UIKit.font_for() resolves a role to a Font.
 enum TypeRole { DISPLAY, HEAD, BODY, CAPTION, MONO }
+## Scale: 18 / 12 / 9 / 9 — ≥1.3× between levels (Eastward's ~2×
+## title:body). CAPTION stays at the 9px floor — VI stacked diacritics
+## don't survive 8px; its hierarchy is the DIM color, not size.
 const TYPE := {
-    TypeRole.DISPLAY: {"font": "semi", "size": 14},
-    TypeRole.HEAD:    {"font": "med",  "size": 10},
+    TypeRole.DISPLAY: {"font": "semi", "size": 18},
+    TypeRole.HEAD:    {"font": "med",  "size": 12},
     TypeRole.BODY:    {"font": "body", "size": 9},
     TypeRole.CAPTION: {"font": "body", "size": 9},
     TypeRole.MONO:    {"font": "body", "size": 9},

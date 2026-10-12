@@ -61,7 +61,7 @@ func _build(day: int, forecast: String) -> void:
 	v.add_theme_constant_override("separation", 5)
 	m.add_child(v)
 	var title := UIKit.label_for(tr("night_title") % day,
-		UITokens.TypeRole.HEAD, UITokens.PAPER)
+		UITokens.TypeRole.DISPLAY, UITokens.PAPER)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(title)
 	_build_reviews(v)

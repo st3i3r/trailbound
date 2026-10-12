@@ -66,21 +66,30 @@ func _build() -> void:
     add_child(scrim)
 
     # ------------------------------------------------ logotype block
+    # logo text floats over painterly art — it rides the same silver
+    # sheet treatment as every other surface (D-UI-6), not a text
+    # shadow: panels separate from art, glyphs don't
+    var card := PanelContainer.new()
+    card.name = "LogoCard"
+    card.add_theme_stylebox_override("panel", UIKit.flat("sheet"))
+    card.set_anchors_preset(Control.PRESET_CENTER_TOP)
+    card.offset_left = -150
+    card.offset_right = 150
+    card.offset_top = 34
+    card.offset_bottom = 110
+    add_child(card)
+
     var logo := VBoxContainer.new()
     logo.name = "Logo"
-    logo.set_anchors_preset(Control.PRESET_CENTER_TOP)
-    logo.offset_left = -160
-    logo.offset_right = 160
-    logo.offset_top = 46
-    logo.offset_bottom = 110
     logo.alignment = BoxContainer.ALIGNMENT_CENTER
     logo.add_theme_constant_override("separation", UITokens.SP1)
-    add_child(logo)
+    card.add_child(logo)
 
     var name_l := UIKit.label_for(tr("title").to_upper(),
         UITokens.TypeRole.DISPLAY, UITokens.PAPER)
     name_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    name_l.add_theme_constant_override("font_spacing", 4)
+    name_l.add_theme_font_size_override("font_size", 24)
+    name_l.add_theme_constant_override("font_spacing", 5)
     logo.add_child(name_l)
 
     var rule := ColorRect.new()

@@ -346,6 +346,7 @@ Batch A world art does not block any step and can run alongside.
 | D-UI-4 | **Batch F re-aimed at what reads as Eastward grade** — ≈27 gens (3 seeds × 9 at 256×128) for spectacle close-up art (cooking cut-in at the campfire: fire pit, pot/wok, steam — DNA #13). Icons cost 0 since D-UI-5 (glyphs drawn by us); sticker outlines on content icons by script; glass kit pieces procedural (UI-019); old paper ornaments dropped | Approved 2026-10-12 (user); icon share → 0 after D-UI-5 |
 | D-UI-5 | **Modern chrome icons: flat one-colour filled glyphs** (§2.1) — system glyphs from HackerNoon solid (MIT) + pixelarticons (MIT), Trailbound-object section glyphs drawn to match, state colour from the Theme; I1 painterly icons stay only as content icons | Decided 2026-10-12 (user request: modern, not journal style) |
 | D-UI-6 | **Sheet surface: silver panel, not dark glass.** Every player sheet, HUD pill, card and chip draws `GLASS #e8e5d8 @80%` translucent silver + graphite hairline + soft offset shadow — Eastward's dialogue-box read over the dimmed world. Text = warm ink (`PAPER #332e22`), accents deep-tuned ≥4.5 on the composited surface; vermilion stays primary. The lacquer spec (§8.1) and `glass_band` retire | Decided 2026-10-13 (user, ref: Eastward dialogue panel; "don't keep the original theme") |
+| D-UI-7 | **Type scale & shadow policy** — `TYPE` = DISPLAY 18 SemiBold (sheet titles) / HEAD 12 Medium (rows, buttons, pills) / BODY·CAPTION 9 Regular; ratio ≥1.3× between levels (Eastward ~2×). **No text shadow on surfaces** — the theme's global 1px offset was tuned for the retired dark glass and smeared ink on silver; `UIKit.label()` keeps a 1px lift only for light text over world art. The logotype gets a silver card, not a shadow | Decided 2026-10-13 (user: "the text shadow makes it very bad UI") |
 
 Retired by D-UI-1: the paper atlas pieces except `bubble_speech`,
 `bubble_tail` and `seal_red` (kept as the lacquer seal accent);
@@ -353,7 +354,15 @@ Retired by D-UI-1: the paper atlas pieces except `bubble_speech`,
 mock (kept in `reference/ui/` only as a before image).
 Retired by D-UI-6: the lacquer dark-glass palette (§8.1 table kept as
 history), `glass_band` (banded sheet texture — the flat `"sheet"`
-piece draws its surface now).
+piece draws its surface now), and the global Label text shadow —
+the theme shipped `font_shadow_color` + 1px offsets on every label,
+which smeared dark-ink-on-silver text once D-UI-6 landed. Hierarchy
+now comes from the type scale (D-UI-7): DISPLAY 18 SemiBold /
+HEAD 12 Medium / BODY·CAPTION 9 Regular; CAPTION stays 9 (VI
+diacritics floor) and differentiates by `DIM` colour, not size.
+Text shadows exist only inside `UIKit.label()` for light text
+floating over world art — never on surfaces. The title-screen
+logotype rides a `"sheet"` card (24px inline), not a glyph shadow.
 
 ### 8.1 Lacquer spec v0 — **superseded by D-UI-6** (kept as history)
 
