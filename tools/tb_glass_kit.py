@@ -86,14 +86,12 @@ def surface(w, h, top, bot, r=4, line=LINE):
 
 def button(w, h, top, bot, outer=LINE):
     """Button: the same single rounded hairline every surface uses —
-    intent reads via the frame's accent, not a stacked second line."""
+    intent reads via the frame's accent (no sheen — on a 24px control
+    it reads as a second stacked border)."""
     a = fill(h, w, top, bot)
     a[~rr_mask(h, w, 4)] = 0
     f = hairline(h, w, 4, outer)
     a[f[..., 3] > 0] = f[f[..., 3] > 0]
-    for x in range(4, w - 4):                    # sheen, inside frame
-        if a[2, x, 3] > 0:
-            a[2, x] = SHEEN
     return a
 
 

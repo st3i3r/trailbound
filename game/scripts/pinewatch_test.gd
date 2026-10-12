@@ -739,8 +739,11 @@ func _fire_near(on: bool) -> void:
 
 
 func _on_panels_changed() -> void:
+    # a modal sheet means the chrome is gone entirely — a 0.12 ghost
+    # still renders its frames through the 45% scrim (they read as
+    # stray lines stacked on the sheet's own chrome)
     if panel_mgr.top() != null:
-        _fade_chrome(0.12)
+        _fade_chrome(0.0)
     else:
         _wake_chrome()
 

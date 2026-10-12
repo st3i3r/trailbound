@@ -249,18 +249,12 @@ static func state_nine(piece: String, ins := {}, mod := 1.0) -> StyleBoxTexture:
     return sb
 
 
-static func focus_box() -> StyleBoxFlat:
-    ## 1px glow focus ring — drawn over the control when a gamepad /
-    ## keyboard owns it, invisible otherwise (mouse focus shows hover).
-    var sb := StyleBoxFlat.new()
-    sb.draw_center = false
-    sb.border_color = UITokens.GLOW
-    sb.set_border_width_all(1)
-    sb.corner_radius_top_left = 10
-    sb.corner_radius_top_right = 10
-    sb.corner_radius_bottom_left = 10
-    sb.corner_radius_bottom_right = 10
-    return sb
+static func focus_box() -> StyleBox:
+    ## No painted focus ring: touch-first UI, and a second border drawn
+    ## over the texture frame always reads as a stacked/inconsistent
+    ## line.  When gamepad nav ships it should use an outer halo
+    ## (sel_glow), never a second border inside the rect.
+    return StyleBoxEmpty.new()
 
 
 static func btn(parent: Control, where: Variant, text: String,

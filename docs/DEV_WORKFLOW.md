@@ -126,6 +126,10 @@ host):
 ```bat
 run_pinewatch.cmd                                      :: interactive, dev chrome on
 godot.cmd --path game --import                          :: after asset changes (also regenerates strings.*.translation)
+::   ⚠ required after ANY tools/tb_* regen — scene runs do NOT reimport,
+::   they render the cached .godot/imported/*.ctex; a stale ctex silently
+::   shows the OLD texture (cost us a full debug round: "stacked borders"
+::   was the v1 kit ctex). --editor --quit-after N is not a substitute.
 godot.cmd --path game res://scenes/pinewatch_test.tscn  :: interactive
 godot.cmd --path game res://scenes/pinewatch_test.tscn --dev-ui  :: interactive + dev labels
 godot.cmd --path game res://scenes/pinewatch_test.tscn --shot
