@@ -175,7 +175,7 @@ static func pill(parent: Control, where: Variant, icon: String,
     var p := Panel.new()
     var sz := _place(p, where, h_flag)
     p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    p.add_theme_stylebox_override("panel", nine("glass_pill"))
+    p.add_theme_stylebox_override("panel", flat("glass_pill"))
     parent.add_child(p)
     var xo := 8.0
     if icon != "":
@@ -215,7 +215,8 @@ static func panel(parent: Control, where: Variant, piece: String,
     var p := Panel.new()
     _place(p, where, h_flag)
     p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    p.add_theme_stylebox_override("panel", nine(piece, ins))
+    p.add_theme_stylebox_override("panel",
+        flat(piece) if piece in FLAT_PIECES else nine(piece, ins))
     parent.add_child(p)
     return p
 
@@ -257,12 +258,52 @@ static func focus_box() -> StyleBox:
     return StyleBoxEmpty.new()
 
 
+# ------------------------------------------------------------ flat chrome
+## StyleBoxFlat surfaces — radius/border/fill come straight from
+## UITokens, so every flat piece shares ONE border by construction
+## (no PNG, no import cache, no nine-slice insets to go stale).
+## Only the decorated few stay textures: glass_band, sel_glow,
+## seal_lacquer, halftone, bubble_*.
+const FLAT_PIECES := ["glass_panel", "glass_chip", "glass_pill",
+    "btn_pill", "btn_green", "btn_gold", "btn_disabled"]
+
+
+static func flat(piece: String, mod := 1.0, alpha := 1.0) -> StyleBoxFlat:
+    var bg: Color; var line: Color; var r := 4
+    match piece:
+        "glass_chip":    bg = UITokens.CHIP;     line = UITokens.LINE; r = 3
+        "glass_pill":    bg = UITokens.GLASS;    line = UITokens.LINE; r = 999
+        "btn_green":     bg = UITokens.GREEN_BG; line = UITokens.LINE
+        "btn_gold":      bg = UITokens.GLASS;    line = UITokens.VERMILION
+        "btn_disabled":  bg = UITokens.DIM_BG;   line = UITokens.LINE_DIM
+        _:               bg = UITokens.GLASS;    line = UITokens.LINE
+    if mod != 1.0:
+        bg = Color(bg.r * mod, bg.g * mod, bg.b * mod, bg.a)
+    bg.a *= alpha
+    line.a *= alpha
+    var sb := StyleBoxFlat.new()
+    sb.bg_color = bg
+    sb.border_color = line
+    sb.set_border_width_all(1)
+    sb.set_corner_radius_all(r)
+    sb.corner_detail = 6
+    sb.anti_aliasing = true
+    return sb
+
+
+static func chrome(piece: String, mod := 1.0, alpha := 1.0) -> StyleBox:
+    ## One entry point — flat pieces go StyleBoxFlat, decorated pieces
+    ## stay nine-slice textures.
+    if piece in FLAT_PIECES:
+        return flat(piece, mod, alpha)
+    return state_nine(piece, {}, mod)
+
+
 static func btn(parent: Control, where: Variant, text: String,
                 kind := "pill",
                 h_flag := Control.SIZE_SHRINK_BEGIN) -> Button:
     _ensure()
     var piece: String = BTN_KINDS.get(kind, kind)
-    var ins := {}
     var b := Button.new()
     _place(b, where, h_flag)
     b.text = text
@@ -276,10 +317,10 @@ static func btn(parent: Control, where: Variant, text: String,
               "font_focus_color"]:
         b.add_theme_color_override(c, UITokens.PAPER)
     b.add_theme_color_override("font_disabled_color", UITokens.DIM)
-    b.add_theme_stylebox_override("normal", nine(piece, ins))
-    b.add_theme_stylebox_override("hover", state_nine(piece, ins, 1.1))
-    b.add_theme_stylebox_override("pressed", state_nine(piece, ins, 0.8))
-    b.add_theme_stylebox_override("disabled", nine("btn_disabled"))
+    b.add_theme_stylebox_override("normal", chrome(piece))
+    b.add_theme_stylebox_override("hover", chrome(piece, 1.15))
+    b.add_theme_stylebox_override("pressed", chrome(piece, 0.82))
+    b.add_theme_stylebox_override("disabled", chrome("btn_disabled"))
     b.add_theme_stylebox_override("focus", focus_box())
     parent.add_child(b)
     return b

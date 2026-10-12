@@ -289,42 +289,6 @@
    "derived": "flatten_interior"
   }
  },
- "btn_green": {
-  "nine_slice": {
-   "l": 6,
-   "r": 6,
-   "t": 6,
-   "b": 6
-  },
-  "src": {
-   "file": "btn_green.png",
-   "derived": "tb_glass_kit v2"
-  }
- },
- "btn_gold": {
-  "nine_slice": {
-   "l": 6,
-   "r": 6,
-   "t": 6,
-   "b": 6
-  },
-  "src": {
-   "file": "btn_gold.png",
-   "derived": "tb_glass_kit v2"
-  }
- },
- "btn_disabled": {
-  "nine_slice": {
-   "l": 6,
-   "r": 6,
-   "t": 6,
-   "b": 6
-  },
-  "src": {
-   "file": "btn_disabled.png",
-   "derived": "tb_glass_kit v2"
-  }
- },
  "btn_round_gold": {
   "x": 89,
   "y": 416,
@@ -494,18 +458,6 @@
   "h": 514,
   "pad": 2
  },
- "glass_panel": {
-  "nine_slice": {
-   "l": 8,
-   "r": 8,
-   "t": 8,
-   "b": 8
-  },
-  "src": {
-   "file": "glass_panel.png",
-   "derived": "tb_glass_kit v2"
-  }
- },
  "glass_band": {
   "nine_slice": {
    "l": 8,
@@ -515,42 +467,6 @@
   },
   "src": {
    "file": "glass_band.png",
-   "derived": "tb_glass_kit v2"
-  }
- },
- "glass_chip": {
-  "nine_slice": {
-   "l": 6,
-   "r": 6,
-   "t": 6,
-   "b": 6
-  },
-  "src": {
-   "file": "glass_chip.png",
-   "derived": "tb_glass_kit v2"
-  }
- },
- "glass_pill": {
-  "nine_slice": {
-   "l": 10,
-   "r": 10,
-   "t": 9,
-   "b": 9
-  },
-  "src": {
-   "file": "glass_pill.png",
-   "derived": "tb_glass_kit v2"
-  }
- },
- "btn_pill": {
-  "nine_slice": {
-   "l": 6,
-   "r": 6,
-   "t": 6,
-   "b": 6
-  },
-  "src": {
-   "file": "btn_pill.png",
    "derived": "tb_glass_kit v2"
   }
  },

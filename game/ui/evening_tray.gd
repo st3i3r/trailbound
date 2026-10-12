@@ -46,10 +46,9 @@ func _ready() -> void:
 	strip.name = "BreakdownStrip"
 	strip.visible = false
 	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# glass_chip — same clean frame the cards use (lacquer kit)
-	var sb := UIKit.state_nine("glass_chip")
-	sb.modulate_color = Color(1, 1, 1, 0.92)
-	strip.add_theme_stylebox_override("panel", sb)
+	# glass_chip — same clean frame the cards use (flat chrome)
+	strip.add_theme_stylebox_override("panel",
+		UIKit.flat("glass_chip", 1.0, 0.92))
 	strip_box = HBoxContainer.new()
 	strip_box.set_anchors_preset(Control.PRESET_FULL_RECT)
 	strip_box.alignment = BoxContainer.ALIGNMENT_CENTER
@@ -118,7 +117,7 @@ func _card(req: Dictionary, sprite: Dictionary) -> Panel:
 	c.custom_minimum_size = Vector2(CARD_W, CARD_H)
 	c.size = Vector2(CARD_W, CARD_H)
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	c.add_theme_stylebox_override("panel", UIKit.state_nine("glass_chip"))
+	c.add_theme_stylebox_override("panel", UIKit.flat("glass_chip"))
 	# head-and-shoulders portrait: an integer 36px crop near the top of
 	# the bottom-anchored figure — reads as a portrait, keeps 1x pixels
 	var src: Texture2D = sprite.get("tex")

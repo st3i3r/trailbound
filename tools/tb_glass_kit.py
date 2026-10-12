@@ -149,18 +149,13 @@ def seal(s=20):
 
 
 # ---------------------------------------------------------------- pieces
+## The flat pieces (glass_panel, glass_chip, glass_pill, btn_*) retired
+## to code — UIKit.flat() draws them as StyleBoxFlat from the same
+## tokens, so borders are consistent by construction and nothing waits
+## on a PNG import.  What stays textured is only what StyleBoxFlat
+## can't draw: the banded sheet surface, the halo ring, the seal, the
+## dimmer halftone.
 pieces = {
-    "glass_panel": surface(48, 48, GLASS, GLASS_LO),
-    "glass_chip": surface(24, 24, (16, 24, 21, 232), (22, 30, 26, 232),
-                          3, LINE),
-    "glass_pill": capsule(40, 20, GLASS, GLASS_LO),
-    # buttons: one hairline on every surface — intent reads via the
-    # frame accent: sage neutral, green-fill safe, vermilion primary
-    "btn_pill": button(40, 24, GLASS, GLASS_LO),
-    "btn_green": button(40, 24, (20, 38, 28, 255), (14, 28, 21, 255)),
-    "btn_gold": button(40, 24, GLASS, GLASS_LO, VERM),
-    "btn_disabled": button(40, 24, (30, 34, 30, 220), (24, 27, 25, 220),
-                           LINE_DIM),
     "sel_glow": sel_glow(),
     "halftone_3": halftone(),
     "seal_lacquer": seal(),
@@ -175,14 +170,7 @@ pieces["glass_band"] = b
 # ---------------------------------------------------------------- writes
 meta = json.load(open(META)) if os.path.exists(META) else {}
 insets = {
-    "glass_panel": {"l": 8, "r": 8, "t": 8, "b": 8},
     "glass_band": {"l": 8, "r": 8, "t": 16, "b": 8},
-    "glass_chip": {"l": 6, "r": 6, "t": 6, "b": 6},
-    "glass_pill": {"l": 10, "r": 10, "t": 9, "b": 9},
-    "btn_pill": {"l": 6, "r": 6, "t": 6, "b": 6},
-    "btn_gold": {"l": 6, "r": 6, "t": 6, "b": 6},
-    "btn_green": {"l": 6, "r": 6, "t": 6, "b": 6},
-    "btn_disabled": {"l": 6, "r": 6, "t": 6, "b": 6},
     "sel_glow": {"l": 8, "r": 8, "t": 8, "b": 8},
     "seal_lacquer": {"l": 5, "r": 5, "t": 5, "b": 5},
 }

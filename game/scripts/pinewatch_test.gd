@@ -770,19 +770,34 @@ func _quit_dialog() -> Control:
     p.size = Vector2(188, 96)
     p.position = (vp - p.size) / 2.0
     p.add_theme_stylebox_override("panel",
-        UIKit.nine("glass_panel"))
+        UIKit.flat("glass_panel"))
+    var m := MarginContainer.new()
+    m.set_anchors_preset(Control.PRESET_FULL_RECT)
+    m.add_theme_constant_override("margin_top", 12)
+    m.add_theme_constant_override("margin_left", 12)
+    m.add_theme_constant_override("margin_right", 12)
+    m.add_theme_constant_override("margin_bottom", 10)
+    p.add_child(m)
+    var v := VBoxContainer.new()
+    v.add_theme_constant_override("separation", 10)
+    m.add_child(v)
     var l := UIKit.label_for(tr("quit_title"), UITokens.TypeRole.HEAD,
         UITokens.PAPER)
-    l.set_anchors_preset(Control.PRESET_TOP_WIDE)
-    l.offset_top = 18
     l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-    p.add_child(l)
-    var stay := UIKit.btn(p, Rect2(14, 48, 74, UITokens.MIN_TOUCH),
+    v.add_child(l)
+    var brow := HBoxContainer.new()
+    brow.add_theme_constant_override("separation", UITokens.SP2)
+    var stay := UIKit.btn(brow, Vector2(74, UITokens.MIN_TOUCH),
         tr("quit_stay"), "green")
     stay.pressed.connect(panel_mgr.close)
-    var leave := UIKit.btn(p, Rect2(100, 48, 74, UITokens.MIN_TOUCH),
+    var push := Control.new()
+    push.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+    push.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    brow.add_child(push)
+    var leave := UIKit.btn(brow, Vector2(74, UITokens.MIN_TOUCH),
         tr("quit_leave"))
     leave.pressed.connect(get_tree().quit)
+    v.add_child(brow)
     return p
 
 
@@ -1008,7 +1023,7 @@ func _fill_bubble(control: Control, detail: Array) -> void:
     var p := Panel.new()
     p.mouse_filter = Control.MOUSE_FILTER_IGNORE
     p.add_theme_stylebox_override("panel",
-        UIKit.state_nine("glass_chip", {}, 0.92))
+        UIKit.flat("glass_chip", 1.0, 0.92))
     p.position = Vector2(40 - w / 2.0, 0)        # centred on the anchor
     p.size = Vector2(w, 22)
     control.add_child(p)
@@ -1249,12 +1264,11 @@ func _advance_phase() -> void:
 ## object.  A "!" marker floats over the signpost until Head out.
 func _start_morning() -> void:
     evening_open = false
-    # "!" chip over the notice board — glass_chip (bubble_prompt's
-    # 18px tail inset eats the whole 22px chip); gold glyph on dark
+    # "!" chip over the notice board — flat glass chip; gold glyph
     var bub := Panel.new()
     bub.mouse_filter = Control.MOUSE_FILTER_IGNORE
     bub.add_theme_stylebox_override("panel",
-        UIKit.state_nine("glass_chip"))
+        UIKit.flat("glass_chip"))
     bub.size = Vector2(22, 22)
     var bang := UIKit.label_for("!", UITokens.TypeRole.DISPLAY,
         UITokens.GOLD)

@@ -63,12 +63,12 @@ func _section(parent: Control, title: String) -> VBoxContainer:
 
 
 func _chip(parent: Control, w: float, h: float,
-		piece := "glass_chip") -> Panel:
+		piece := "glass_chip", mod := 1.0) -> Panel:
 	var p := Panel.new()
 	p.custom_minimum_size = Vector2(w, h)
 	p.size = p.custom_minimum_size
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	p.add_theme_stylebox_override("panel", UIKit.state_nine(piece))
+	p.add_theme_stylebox_override("panel", UIKit.chrome(piece, mod))
 	parent.add_child(p)
 	return p
 
@@ -138,14 +138,13 @@ func _sec_pills_buttons(root: Control) -> void:
 	var dis := UIKit.btn(row, Vector2(72, UITokens.MIN_TOUCH),
 		"DISABLED", "gold")
 	dis.disabled = true
-	# state art variants (hover/pressed are stylebox mods — drawn as
-	# labelled swatches since states can't be forced without input)
-	for st in [{"n": "hover", "m": 1.1}, {"n": "press", "m": 0.8}]:
-		var p := _chip(row, 56, UITokens.MIN_TOUCH, "btn_gold")
-		(p.get_theme_stylebox("panel") as StyleBoxTexture) \
-			.modulate_color = Color(st["m"], st["m"], st["m"])
+	# state art variants (hover/pressed brighten/dim the fill —
+	# drawn as labelled swatches since states can't be forced)
+	for st in [{"n": "hover", "m": 1.15}, {"n": "press", "m": 0.82}]:
+		var p := _chip(row, 56, UITokens.MIN_TOUCH, "btn_gold",
+			st["m"])
 		var l := UIKit.label_for(st["n"], UITokens.TypeRole.CAPTION,
-			UITokens.INK)
+			UITokens.PAPER)
 		l.position = Vector2(6, 8)
 		p.add_child(l)
 

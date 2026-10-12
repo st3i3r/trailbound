@@ -41,6 +41,14 @@ const MINUS := Color("9a3a28")             # negative terms on paper
 const GOLD_DEEP := Color("7a5510")         # accent / coin text on paper
 const DIMMER := Color(0.05, 0.07, 0.06, 0.45)
                                            # panel scrim — cool pine dim
+# Glass surfaces (D-UI-1) — fills + hairline for StyleBoxFlat chrome.
+# Keep in sync with tools/tb_glass_kit.py for the textured pieces.
+const GLASS := Color(20.0/255, 29.0/255, 26.0/255, 232.0/255)
+const CHIP  := Color(16.0/255, 24.0/255, 21.0/255, 232.0/255)
+const LINE  := Color("b3b795")             # pale sage 1px hairline
+const LINE_DIM := Color("5f6652")          # recessed line — chips/disabled
+const GREEN_BG := Color(20.0/255, 38.0/255, 28.0/255)
+const DIM_BG := Color(30.0/255, 34.0/255, 30.0/255, 220.0/255)
 
 # ------------------------------------------------------------ elevation
 ## CanvasLayer tiers — lower draws first.  World content (tilemap,

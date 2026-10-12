@@ -23,12 +23,10 @@ static func theme() -> Theme:
     t.set_color("font_pressed_color", "Button", UITokens.PAPER)
     t.set_color("font_disabled_color", "Button", UITokens.DIM)
     t.set_color("font_focus_color", "Button", UITokens.PAPER)
-    t.set_stylebox("normal", "Button", UIKit.nine("btn_pill"))
-    t.set_stylebox("hover", "Button",
-        UIKit.state_nine("btn_pill", {}, 1.1))
-    t.set_stylebox("pressed", "Button",
-        UIKit.state_nine("btn_pill", {}, 0.8))
-    t.set_stylebox("disabled", "Button", UIKit.nine("btn_disabled"))
+    t.set_stylebox("normal", "Button", UIKit.flat("btn_pill"))
+    t.set_stylebox("hover", "Button", UIKit.flat("btn_pill", 1.15))
+    t.set_stylebox("pressed", "Button", UIKit.flat("btn_pill", 0.82))
+    t.set_stylebox("disabled", "Button", UIKit.flat("btn_disabled"))
     t.set_stylebox("focus", "Button", UIKit.focus_box())
     t.set_constant("h_separation", "Button", UITokens.SP1)
     # ---- Label: body defaults; INK-on-paper labels and role fonts

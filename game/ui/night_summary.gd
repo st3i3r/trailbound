@@ -48,30 +48,36 @@ func _build(day: int, forecast: String) -> void:
 	custom_minimum_size = Vector2(W, H)
 	size = Vector2(W, H)
 	add_theme_stylebox_override("panel", UIKit.nine("glass_band"))
-	# title: inside the lacquer band (eggshell on the dark band)
+	# container layout: one margin column — content can never reach
+	# the frame's decorated zone by construction
+	var m := MarginContainer.new()
+	m.set_anchors_preset(Control.PRESET_FULL_RECT)
+	m.add_theme_constant_override("margin_top", 5)
+	m.add_theme_constant_override("margin_left", 14)
+	m.add_theme_constant_override("margin_right", 14)
+	m.add_theme_constant_override("margin_bottom", 12)
+	add_child(m)
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", 5)
+	m.add_child(v)
 	var title := UIKit.label_for(tr("night_title") % day,
 		UITokens.TypeRole.HEAD, UITokens.PAPER)
-	title.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	title.offset_top = 4
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	add_child(title)
-	_build_reviews()
-	_build_totals(forecast)
-	_build_buttons()
+	v.add_child(title)
+	_build_reviews(v)
+	_build_totals(forecast, v)
+	_build_buttons(v)
 
 
 # ----------------------------------------------------------- reviews
 
-func _build_reviews() -> void:
+func _build_reviews(parent: Control) -> void:
 	var scroll := ScrollContainer.new()
 	scroll.name = "Reviews"
-	# content column: the 1px glass frame frees the parchment's 36px
-	# margins — 14px clears the corner notches with room to spare
-	scroll.position = Vector2(14, 26)
-	scroll.size = Vector2(W - 28, 170)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	add_child(scroll)
+	parent.add_child(scroll)
 	var list := VBoxContainer.new()
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", 8)
@@ -160,12 +166,10 @@ func _term(icon: Texture2D, sign: String) -> Control:
 
 # ------------------------------------------------------------ totals
 
-func _build_totals(forecast: String) -> void:
+func _build_totals(forecast: String, parent: Control) -> void:
 	var box := VBoxContainer.new()
-	box.position = Vector2(36, 196)
-	box.size = Vector2(W - 72, 52)
 	box.add_theme_constant_override("separation", 2)
-	add_child(box)
+	parent.add_child(box)
 	var fees := int(_rep.get("fees", 0))
 	var tips := int(_rep.get("tips", 0))
 	var sales := int(_rep.get("meal_sales", 0))
@@ -230,16 +234,22 @@ func run_count_up() -> void:
 
 # ------------------------------------------------------------ buttons
 
-func _build_buttons() -> void:
+func _build_buttons(parent: Control) -> void:
+	var brow := HBoxContainer.new()
+	brow.add_theme_constant_override("separation", UITokens.SP2)
 	var tips := int(_rep.get("tips", 0))
 	if Ads.can_double_tips(Game.day) and tips > 0:
-		_double_b = UIKit.btn(self, Rect2(36, H - 56, 150, 40),
+		_double_b = UIKit.btn(brow, Vector2(150, UITokens.MIN_TOUCH),
 			tr("night_double") % tips, "green")
 		_double_b.pressed.connect(_on_double)
-	# Sleep tucks inside the frame's inner edge — 30px clear of the art
-	var sleep := UIKit.btn(self, Rect2(W - 140, H - 56, 104, 40),
+	var push := Control.new()
+	push.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	push.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	brow.add_child(push)
+	var sleep := UIKit.btn(brow, Vector2(104, UITokens.MIN_TOUCH),
 		tr("night_sleep"), "gold")
 	sleep.pressed.connect(func(): sleep_pressed.emit())
+	parent.add_child(brow)
 
 
 func _on_double() -> void:
