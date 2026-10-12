@@ -1,0 +1,94 @@
+[
+  {
+    "job": "B5-T2",
+    "tool": "create_topdown_tileset",
+    "poll": "get_topdown_tileset:tileset_id",
+    "args": {
+      "mode": "pro",
+      "tile_size": {"width": 32, "height": 32},
+      "transition_size": 0.25,
+      "raggedness": 0.5,
+      "view": "high top-down",
+      "upper_description": "calm warm olive grass — large flat color wash, a few very soft large-scale tonal patches, a rare sparse dither pocket near edges ONLY; absolutely no flowers, no tufts, no speckles, no repeating texture — painterly soft pixel art, 3/4 top-down, bright daylight, sun upper-left, warm filmic cast, quiet clean ground reading as a calm wash — reference style: Eastward-like cozy RPG",
+      "lower_description": "muted grey-teal pond water, soft slow ripples as broad gentle bands (not speckle), a couple of lily pads near shore only — painterly soft pixel art, 3/4 top-down, bright daylight, sun upper-left, warm filmic cast, quiet clean ground reading as a calm wash — reference style: Eastward-like cozy RPG",
+      "transition_description": "soft grass bank with a few rounded grey stones, sparse reeds — painterly soft pixel art, 3/4 top-down, bright daylight, sun upper-left, warm filmic cast, quiet clean ground reading as a calm wash — reference style: Eastward-like cozy RPG"
+    },
+    "id": "ee4bc949-cc11-42bd-b8c6-32c948d59af0",
+    "files": [
+      "assets_src/gen/candidates/batch5/B5-T2/B5-T2_0.png",
+      "assets_src/gen/candidates/batch5/B5-T2/B5-T2_1.json",
+      "assets_src/gen/candidates/batch5/B5-T2/B5-T2_2.png",
+      "assets_src/gen/candidates/batch5/B5-T2/terrain_grass_water_pro_0.json",
+      "assets_src/gen/candidates/batch5/B5-T2/terrain_grass_water_pro_0.png"
+    ],
+    "sheet": "gen/candidates/batch5/B5-T2/terrain_grass_water_pro_0.png",
+    "base_tile_ids": {
+      "lower": "6f3ad63e-9c5d-4eda-9918-df16f2452611",
+      "upper": "0ce887f0-e127-46d4-8e05-d6c094774801"
+    },
+    "cost": "~15 (shared balance read at end of batch)",
+    "note": "B5-T2_0.png == spritesheet_url (metadata-consistent orientation). B5-T2_2.png is an alternate render served by the /image URL (upper/lower swapped vs metadata bounding boxes) — kept as candidate only."
+  },
+  {
+    "job": "B5-T3",
+    "tool": "create_topdown_tileset",
+    "poll": "get_topdown_tileset:tileset_id",
+    "args": {
+      "mode": "pro",
+      "tile_size": {"width": 32, "height": 32},
+      "transition_size": 0.25,
+      "raggedness": 0.5,
+      "view": "high top-down",
+      "upper_base_tile_id": "0ce887f0-e127-46d4-8e05-d6c094774801",
+      "upper_description": "calm warm olive grass — large flat color wash, a few very soft large-scale tonal patches, a rare sparse dither pocket near edges ONLY; absolutely no flowers, no tufts, no speckles, no repeating texture — painterly soft pixel art, 3/4 top-down, bright daylight, sun upper-left, warm filmic cast, quiet clean ground reading as a calm wash — reference style: Eastward-like cozy RPG",
+      "lower_description": "warm ochre forest floor — smooth packed earth with large soft tonal variation, a few scattered leaf-litter patches as clusters (not uniform dots), no regular bump pattern — painterly soft pixel art, 3/4 top-down, bright daylight, sun upper-left, warm filmic cast, quiet clean ground reading as a calm wash — reference style: Eastward-like cozy RPG",
+      "transition_description": "grass edge with fallen leaves drift, soft shadow under canopy edge — painterly soft pixel art, 3/4 top-down, bright daylight, sun upper-left, warm filmic cast, quiet clean ground reading as a calm wash — reference style: Eastward-like cozy RPG"
+    },
+    "id": "611b8037-1cd2-47c7-8b29-949512760023",
+    "files": [
+      "assets_src/gen/candidates/batch5/B5-T3/B5-T3_0.png",
+      "assets_src/gen/candidates/batch5/B5-T3/B5-T3_1.json",
+      "assets_src/gen/candidates/batch5/B5-T3/B5-T3_2.png",
+      "assets_src/gen/candidates/batch5/B5-T3/terrain_grass_forest_pro_0.json",
+      "assets_src/gen/candidates/batch5/B5-T3/terrain_grass_forest_pro_0.png"
+    ],
+    "sheet": "gen/candidates/batch5/B5-T3/terrain_grass_forest_pro_0.png",
+    "base_tile_ids": {
+      "lower": "072cdad1-3d46-4546-89e6-970efa650105",
+      "upper": "0ce887f0-e127-46d4-8e05-d6c094774801"
+    },
+    "cost": "~15",
+    "note": "Shares upper base tile 0ce887f0 (calm grass from B5-T2) — identical grass fill across all three B5 sheets."
+  },
+  {
+    "job": "B5-T4",
+    "tool": "create_topdown_tileset",
+    "poll": "get_topdown_tileset:tileset_id",
+    "args": {
+      "mode": "pro",
+      "tile_size": {"width": 32, "height": 32},
+      "transition_size": 0.25,
+      "raggedness": 0.5,
+      "view": "high top-down",
+      "upper_base_tile_id": "0ce887f0-e127-46d4-8e05-d6c094774801",
+      "upper_description": "calm warm olive grass — large flat color wash, a few very soft large-scale tonal patches, a rare sparse dither pocket near edges ONLY; absolutely no flowers, no tufts, no speckles, no repeating texture — painterly soft pixel art, 3/4 top-down, bright daylight, sun upper-left, warm filmic cast, quiet clean ground reading as a calm wash — reference style: Eastward-like cozy RPG",
+      "lower_description": "sandy-grey mossy flagstone path — large rounded cobbles with wide gaps, low contrast mortar, occasional small moss patch clustered in one corner region, calm and readable — painterly soft pixel art, 3/4 top-down, bright daylight, sun upper-left, warm filmic cast, quiet clean ground reading as a calm wash — reference style: Eastward-like cozy RPG",
+      "transition_description": "grass nibbling the cobble edge, a few stones half-buried in grass — painterly soft pixel art, 3/4 top-down, bright daylight, sun upper-left, warm filmic cast, quiet clean ground reading as a calm wash — reference style: Eastward-like cozy RPG"
+    },
+    "id": "4441daf1-8037-470f-b13a-c535aae44c3a",
+    "files": [
+      "assets_src/gen/candidates/batch5/B5-T4/B5-T4_0.png",
+      "assets_src/gen/candidates/batch5/B5-T4/B5-T4_1.json",
+      "assets_src/gen/candidates/batch5/B5-T4/B5-T4_2.png",
+      "assets_src/gen/candidates/batch5/B5-T4/terrain_grass_stone_pro_0.json",
+      "assets_src/gen/candidates/batch5/B5-T4/terrain_grass_stone_pro_0.png"
+    ],
+    "sheet": "gen/candidates/batch5/B5-T4/terrain_grass_stone_pro_0.png",
+    "base_tile_ids": {
+      "lower": "97c9cd61-a396-4fdf-a493-b3df87cca37b",
+      "upper": "0ce887f0-e127-46d4-8e05-d6c094774801"
+    },
+    "cost": "~15",
+    "note": "Shares upper base tile 0ce887f0 (calm grass from B5-T2)."
+  }
+]
