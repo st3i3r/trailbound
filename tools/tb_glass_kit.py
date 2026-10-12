@@ -84,25 +84,16 @@ def surface(w, h, top, bot, r=4, line=LINE):
     return a
 
 
-def button(w, h, top, bot, outer=LINE, inner=None):
-    """Button: rounded hairline outer + recessed inner line 2px in
-    (§2.1 double-line).  inner=None -> 40%-alpha of outer."""
+def button(w, h, top, bot, outer=LINE):
+    """Button: the same single rounded hairline every surface uses —
+    intent reads via the frame's accent, not a stacked second line."""
     a = fill(h, w, top, bot)
     a[~rr_mask(h, w, 4)] = 0
     f = hairline(h, w, 4, outer)
     a[f[..., 3] > 0] = f[f[..., 3] > 0]
-    icol = inner if inner else (outer[0], outer[1], outer[2], 102)
-    g = 3                                        # inner line at px 3
-    for x in range(g, w - g):
-        if a[g, x, 3] > 0:
-            a[g, x] = icol
-        if a[h - 1 - g, x, 3] > 0:
-            a[h - 1 - g, x] = icol
-    for y in range(g, h - g):
-        if a[y, g, 3] > 0:
-            a[y, g] = icol
-        if a[y, w - 1 - g, 3] > 0:
-            a[y, w - 1 - g] = icol
+    for x in range(4, w - 4):                    # sheen, inside frame
+        if a[2, x, 3] > 0:
+            a[2, x] = SHEEN
     return a
 
 
@@ -165,11 +156,11 @@ pieces = {
     "glass_chip": surface(24, 24, (16, 24, 21, 232), (22, 30, 26, 232),
                           3, LINE),
     "glass_pill": capsule(40, 20, GLASS, GLASS_LO),
-    # buttons: all dark glass — intent reads via the inner line only:
-    # neutral sage, safe green, primary vermilion.  No gold chrome.
+    # buttons: one hairline on every surface — intent reads via the
+    # frame accent: sage neutral, green-fill safe, vermilion primary
     "btn_pill": button(40, 24, GLASS, GLASS_LO),
     "btn_green": button(40, 24, (20, 38, 28, 255), (14, 28, 21, 255)),
-    "btn_gold": button(40, 24, GLASS, GLASS_LO, LINE, VERM),
+    "btn_gold": button(40, 24, GLASS, GLASS_LO, VERM),
     "btn_disabled": button(40, 24, (30, 34, 30, 220), (24, 27, 25, 220),
                            LINE_DIM),
     "sel_glow": sel_glow(),

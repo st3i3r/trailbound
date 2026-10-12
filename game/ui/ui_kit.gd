@@ -250,11 +250,11 @@ static func state_nine(piece: String, ins := {}, mod := 1.0) -> StyleBoxTexture:
 
 
 static func focus_box() -> StyleBoxFlat:
-    ## 1px gold focus ring — drawn over the control when a gamepad /
+    ## 1px glow focus ring — drawn over the control when a gamepad /
     ## keyboard owns it, invisible otherwise (mouse focus shows hover).
     var sb := StyleBoxFlat.new()
     sb.draw_center = false
-    sb.border_color = UITokens.GOLD
+    sb.border_color = UITokens.GLOW
     sb.set_border_width_all(1)
     sb.corner_radius_top_left = 10
     sb.corner_radius_top_right = 10
