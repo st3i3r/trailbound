@@ -177,7 +177,6 @@ var stage: Node2D                            # all world layers — centred on
 var scatter: Node2D
 var pads_node: Node2D
 var world: Node2D
-var tray: Node2D
 var marks: Node2D                            # hover + star previews above world
 var hover: Sprite2D
 var hud: HUD                                 # chrome root (fades when idle)
@@ -192,11 +191,14 @@ var _fire_tween: Tween
 var _quit: Control                           # quit-confirm panel (one at a time)
 
 var selected := ""                           # guest id being placed
-var guest_nodes := {}                        # gid -> Node2D
+var guest_nodes := {}                        # gid -> seated world Node2D
 var tent_nodes := {}                         # gid -> [Sprite2D]
 var star_labels := {}                        # pid -> preview Node2D
 var evening_open := true                     # Enter -> Goodnight
 var night_rating := ""
+var _press := {}                             # pending card press {gid, pos}
+var _drag_ghost: Sprite2D                    # sprite following a card drag
+var _trait_names := {}                       # tid -> name (lazy)
 
 var _tex_cache := {}
 
@@ -279,9 +281,6 @@ func _ready() -> void:
     stage.add_child(world)
     _build_props()
     _build_actors()
-    tray = Node2D.new()
-    tray.name = "Tray"
-    stage.add_child(tray)
     marks = Node2D.new()
     marks.name = "Marks"
     stage.add_child(marks)
@@ -309,7 +308,19 @@ func _ready() -> void:
         hud_layer.visible = false
         markers.visible = false
         pads_node.visible = false
-        tray.visible = false
+    # --pose: QA screenshot staging — selects the first guest and
+    # hovers its first open pad so the strip + previews are visible
+    if OS.get_cmdline_args().has("--pose"):
+        var st0: Dictionary = Game.site_state()
+        if not st0["board"].is_empty():
+            _select(st0["board"][0]["id"])
+            for pid0 in pad_cells:
+                if st0["pads"][pid0].get("open", false) \
+                        and not _pad_occupied(pid0):
+                    _update_strip(pad_cells[pid0].get_center())
+                    hover.position = pad_cells[pid0].position
+                    hover.visible = true
+                    break
     var shot_arg := ""
     for a in OS.get_cmdline_args():
         if a.begins_with("--shot="):
@@ -763,6 +774,33 @@ func _smoke() -> void:
     _fire_near(false)
     await _frames_until(func(): return not fire_bubble.visible)
     print("SMOKE fire bubble hidden:", not fire_bubble.visible)
+    # UI-020 tray: build -> select -> previews+strip -> seat -> unseat
+    var st: Dictionary = Game.site_state()
+    var board: Array = st["board"]
+    print("SMOKE tray cards:", hud.tray._cards.size(), "of",
+          board.size())
+    var g0: String = board[0]["id"]
+    _tap_card(g0)
+    await get_tree().process_frame
+    print("SMOKE select:", selected == g0,
+          " previews:", star_labels.size() > 0,
+          " strip:", hud.tray.strip.visible)
+    var pid0 := ""
+    for pid in pad_cells:
+        if st["pads"][pid].get("open", false) \
+                and not _pad_occupied(pid):
+            pid0 = pid
+            break
+    _try_seat(pid0)
+    print("SMOKE seat:", st["assignments"].has(g0),
+          " card dimmed:", hud.tray.is_seated(g0))
+    _do_unseat(g0)
+    print("SMOKE unseat:",
+          not Game.site_state()["assignments"].has(g0),
+          " card restored:", not hud.tray.is_seated(g0))
+    _tap_card(g0)
+    _tap_card(g0)
+    print("SMOKE toggle-deselect:", selected == "")
     get_tree().quit()
 
 
@@ -776,17 +814,26 @@ func _frames_until(cond: Callable, cap := 240) -> void:
 
 # ------------------------------------------------------------- guests
 
-func _trait_names(ids: Array) -> String:
-    var out := []
-    for t in ids:
+func _trait_map() -> Dictionary:
+    if _trait_names.is_empty():
         for row in Catalog.data.get("traits", []):
-            if row.get("id") == t:
-                out.append(row.get("name", t))
-    return " · ".join(out)
+            _trait_names[row.get("id", "")] = row.get("name", "?")
+    return _trait_names
 
 
-func _tray_pos(i: int) -> Vector2:
-    return Vector2(400 + i * 66, 292)
+## Placeholder until persona art exists: one warden sprite tinted the
+## way the old world-tray distinguished elite/loud guests.
+func _tint(req: Dictionary) -> Color:
+    if req.get("elite", false):
+        return Color("ffcf7d")
+    if req.get("loud", false):
+        return Color("b8d7a8")
+    return Color.WHITE
+
+
+func _card_sprite(req: Dictionary) -> Dictionary:
+    return {"tex": _tex("characters/warden/warden_south"),
+        "tint": _tint(req)}
 
 
 func _spawn_board() -> void:
@@ -798,22 +845,13 @@ func _spawn_board() -> void:
     guest_nodes = {}
     tent_nodes = {}
     var st: Dictionary = Game.site_state()
-    var i := 0
-    for req in st["board"]:
-        var g := Node2D.new()
-        g.name = req["id"]
-        var s := _anchored("characters/warden", "warden_south", Vector2.ZERO)
-        s.modulate = Color("ffcf7d") if req.get("elite") \
-            else Color("b8d7a8") if req.get("loud") else Color("ffffff")
-        g.add_child(s)
-        var l := UIKit.label("%s %dc\n%s" % [req.get("name", "?"),
-            req.get("fee", 0), _trait_names(req.get("traits", []))])
-        l.position = Vector2(-18, 4)
-        g.add_child(l)
-        g.position = _tray_pos(i)
-        tray.add_child(g)
-        guest_nodes[req["id"]] = g
-        i += 1
+    selected = ""
+    _press = {}
+    if _drag_ghost != null:
+        _drag_ghost.queue_free()
+        _drag_ghost = null
+    hud.tray.visible = true
+    hud.tray.build(st["board"], _trait_map(), _card_sprite)
     evening_open = true
     hud.set_report("")
     _sync_marks()
@@ -822,11 +860,16 @@ func _spawn_board() -> void:
 func _seat_visual(gid: String, pads: Array) -> void:
     var st: Dictionary = Game.site_state()
     var arch: String = st["guests"][gid].get("archetype", "")
-    var g: Node2D = guest_nodes[gid]
-    g.get_parent().remove_child(g)
-    world.add_child(g)                             # join the y-sort
-    # feet just under the pad's bottom edge — sorts in front of the tent
+    # a fresh world sprite joins the y-sort — feet just under the pad's
+    # bottom edge so it sorts in front of the tent
+    var g := Node2D.new()
+    g.name = "w_" + gid
+    var s := _anchored("characters/warden", "warden_south", Vector2.ZERO)
+    s.modulate = _tint(st["guests"][gid])
+    g.add_child(s)
     g.position = pad_cells[pads[0]].position + Vector2(12, CELL + 4)
+    world.add_child(g)
+    guest_nodes[gid] = g
     tent_nodes[gid] = []
     var idx := absi(hash(gid + arch) as int)
     for pid in pads:
@@ -837,18 +880,99 @@ func _seat_visual(gid: String, pads: Array) -> void:
         t.position = r.position + Vector2(CELL / 2.0, CELL)
         world.add_child(t)
         tent_nodes[gid].append(t)
+    hud.tray.mark_seated(gid)
     _sync_marks()
 
 
 func _unseat_visual(gid: String) -> void:
-    var g: Node2D = guest_nodes[gid]
+    if guest_nodes.has(gid):
+        guest_nodes[gid].queue_free()
+        guest_nodes.erase(gid)
     for t in tent_nodes.get(gid, []):
         t.queue_free()
     tent_nodes[gid] = []
-    g.get_parent().remove_child(g)
-    tray.add_child(g)
-    g.position = _tray_pos(guest_nodes.keys().find(gid))
+    hud.tray.mark_unseated(gid)
     _sync_marks()
+
+
+## Selection is the tap-tap path (UI-020): card tap -> previews +
+## neutral strip; tap again to put the guest back.
+func _select(gid: String) -> void:
+    selected = gid
+    hud.tray.set_selected(gid)
+    hud.tray.show_guest_terms(Game.site_state()["guests"][gid],
+        tr("tray_pick_pad"))
+    _show_previews(gid)
+
+
+func _deselect() -> void:
+    selected = ""
+    hud.tray.set_selected("")
+    hud.tray.hide_strip()
+    _clear_previews()
+
+
+func _tap_card(gid: String) -> void:
+    if Game.site_state()["assignments"].has(gid):
+        _do_unseat(gid)
+    elif gid == selected:
+        _deselect()
+    else:
+        _select(gid)
+
+
+func _try_seat(pid: String) -> void:
+    var st: Dictionary = Game.site_state()
+    var pick := _pads_for(selected, pid)
+    if pick.size() == int(st["guests"][selected].get("pads", 1)) \
+            and Game.seat(selected, pick):
+        _seat_visual(selected, pick)
+        _deselect()
+
+
+func _do_unseat(gid: String) -> void:
+    Game.unseat(gid)
+    _unseat_visual(gid)
+    _deselect()
+
+
+## Card press -> drag (UI-020): the guest sprite rides the pointer
+## until release; release over a pad seats exactly like a tap-tap.
+func _begin_drag(gid: String) -> void:
+    _select(gid)
+    _drag_ghost = _anchored("characters/warden", "warden_south",
+        Vector2.ZERO)
+    _drag_ghost.modulate = _tint(Game.site_state()["guests"][gid])
+    _drag_ghost.modulate.a = 0.8
+    marks.add_child(_drag_ghost)
+
+
+func _end_drag(px: Vector2) -> void:
+    if _drag_ghost == null:
+        return
+    _drag_ghost.queue_free()
+    _drag_ghost = null
+    var pid := _pad_at(px)
+    if pid != "" and selected != "":
+        _try_seat(pid)
+
+
+## Live strip: while a guest is selected, hovering an open pad shows
+## the full score breakdown; anywhere else it falls back to the
+## guest's neutral trait list.
+func _update_strip(px: Vector2) -> void:
+    var gid := selected
+    if gid == "":
+        return
+    var st: Dictionary = Game.site_state()
+    var pid := _pad_at(px)
+    if pid != "" and st["pads"].get(pid, {}).get("open", false) \
+            and not _pad_occupied(pid):
+        var pick := _pads_for(gid, pid)
+        if pick.size() == int(st["guests"][gid].get("pads", 1)):
+            hud.tray.show_preview(Game.preview(gid, pick))
+            return
+    hud.tray.show_guest_terms(st["guests"][gid], tr("tray_pick_pad"))
 
 
 ## Pad rings show on open pads with nobody seated — the tent itself
@@ -920,9 +1044,9 @@ func _pad_occupied(pid: String) -> bool:
 
 func _status() -> void:
     var st: Dictionary = Game.site_state()
-    hud.set_status(("day %d · site day %d · %s · %dc   " \
-        + "[click guest, then pad · Enter = Goodnight]") % [
-        Game.day, Game.site_day(), st["weather"].to_upper(), Game.coins])
+    hud.set_status(("day %d · site day %d · %s · %dc   [%s]") % [
+        Game.day, Game.site_day(), st["weather"].to_upper(), Game.coins,
+        tr("tray_hint")])
     hud.set_phase(tr("hud_evening").to_upper() if evening_open \
         else tr("hud_night").to_upper())
     hud.set_rating(night_rating if night_rating else "—")
@@ -950,7 +1074,9 @@ func _goodnight() -> void:
     night_rating = "%.1f" % rep["rating"]
     evening_open = false
     Game.set_phase(Game.Phase.NIGHT)
-    _clear_previews()
+    _deselect()
+    hud.tray.reset()
+    hud.tray.visible = false
     _status()
 
 
@@ -990,10 +1116,17 @@ func _unhandled_input(event: InputEvent) -> void:
     var st: Dictionary = Game.site_state()
     if event is InputEventMouseMotion:
         _wake_chrome()
+        var sp: Vector2 = event.position              # viewport px (cards)
         var px := get_global_mouse_position() - stage.position
         _fire_near(px.distance_to(FIRE_POS) <= 56.0)
         if not evening_open:
             return                                    # night: watch the fire
+        # a card press that travels >7px becomes a drag (UI-020)
+        if not _press.is_empty() and _drag_ghost == null \
+                and not hud.tray.is_seated(_press["gid"]) \
+                and sp.distance_to(_press["pos"]) > 7.0:
+            _begin_drag(_press["gid"])
+            _press = {}
         var pid := _pad_at(px)
         var ok: bool = pid != "" \
             and st["pads"].get(pid, {}).get("open", false) == true \
@@ -1001,33 +1134,39 @@ func _unhandled_input(event: InputEvent) -> void:
         hover.visible = ok
         if ok:
             hover.position = pad_cells[pid].position
+        if _drag_ghost != null:
+            _drag_ghost.position = px + Vector2(0, 4)
+        _update_strip(px)
         return
     if not evening_open and event is InputEventMouseButton:
         return                                        # night: watch the fire
-    if event is InputEventMouseButton and event.pressed \
+    if event is InputEventMouseButton \
             and event.button_index == MOUSE_BUTTON_LEFT:
+        var sp: Vector2 = event.position              # viewport px (cards)
         var mpx := get_global_mouse_position()
         var px := mpx - stage.position
         _fire_near(px.distance_to(FIRE_POS) <= 56.0)
-        var gid := _guest_at(mpx)
-        var pid := _pad_at(px)
-        if gid != "" and gid in st["guests"]:
-            if st["assignments"].has(gid):            # pull back to tray
-                Game.unseat(gid)
-                _unseat_visual(gid)
-                selected = ""
-                _clear_previews()
-            else:                                     # pick for seating
-                selected = gid
-                _show_previews(gid)
-            return
-        if pid != "" and selected != "":
-            var pick := _pads_for(selected, pid)
-            if pick.size() == int(st["guests"][selected].get("pads", 1)) \
-                    and Game.seat(selected, pick):
-                _seat_visual(selected, pick)
-                selected = ""
-                _clear_previews()
+        if event.pressed:
+            # card presses defer to release — they may become drags
+            var card_gid := hud.tray.card_at(sp)
+            if card_gid != "":
+                _press = {"gid": card_gid, "pos": sp}
+                return
+            var gid := _guest_at(mpx)
+            if gid != "" and st["assignments"].has(gid):
+                _do_unseat(gid)                       # tap seated guest = undo
+                return
+            var pid := _pad_at(px)
+            if pid != "" and selected != "":
+                _try_seat(pid)
+        else:
+            if _drag_ghost != null:
+                _end_drag(px)
+            elif not _press.is_empty():
+                var p: Dictionary = _press
+                _press = {}
+                if hud.tray.card_at(sp) == p["gid"]:
+                    _tap_card(p["gid"])
     elif event is InputEventKey and event.pressed:
         if event.keycode == KEY_ENTER:
             _advance_phase()

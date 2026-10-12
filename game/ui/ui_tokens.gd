@@ -23,6 +23,7 @@ const INK := Color("3e2814")               # dark ink on parchment pills
 const SHADOW := Color("1c2413")            # 1px text drop shadow
 const GOLD := Color("ffcf7d")              # elite / rating accent
 const GREEN := Color("b8d7a8")             # ok / camp green
+const RED := Color("e0886c")               # aversion / penalty terms
 const DIM := Color("a59a72")               # muted text
 const DIMMER := Color(0.09, 0.06, 0.02, 0.4)
                                            # panel scrim, paper-dark ~40%

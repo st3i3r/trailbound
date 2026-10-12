@@ -17,6 +17,7 @@ var coins_label: Label
 var day_label: Label
 var rating_label: Label
 var phase_button: Button
+var tray: EveningTray                      # UI-020 evening seating band
 var _tl: VBoxContainer
 var _tr: VBoxContainer
 # debug-gated (null when UITokens.debug_ui() is false)
@@ -60,6 +61,14 @@ func _apply_insets() -> void:
             + 10 + ins["b"])
         phase_button.offset_right = -(10 + ins["r"])
         phase_button.offset_bottom = -(10 + ins["b"])
+    if tray:
+        # the tray shares the bottom band with the phase button: it
+        # stops ~6px short of the button's left edge so they can never
+        # overlap at any aspect (cards scroll inside if they overflow)
+        tray.offset_left = UITokens.MARGIN + ins["l"]
+        tray.offset_top = -(EveningTray.CARD_H + 10 + ins["b"])
+        tray.offset_right = -(UITokens.MIN_TOUCH + 48 + 16 + ins["r"])
+        tray.offset_bottom = -(10 + ins["b"])
 
 
 func _build() -> void:
@@ -110,6 +119,19 @@ func _build() -> void:
     phase_button.offset_right = -10
     phase_button.offset_bottom = -10
     phase_button.pressed.connect(func(): phase_pressed.emit())
+
+    # ---------------- bottom-left/center: the evening tray (UI-020)
+    # Bottom-anchored band of guest cards; hidden while the board is
+    # closed (Night phase shows nothing).  Its breakdown strip rides
+    # just above it — see evening_tray.gd.
+    tray = EveningTray.new()
+    tray.name = "EveningTray"
+    tray.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+    tray.offset_top = -(EveningTray.CARD_H + 10)
+    tray.offset_right = -(UITokens.MIN_TOUCH + 48 + 16)
+    tray.offset_bottom = -10
+    tray.visible = false
+    add_child(tray)
 
     # --------------------------------------------- dev chrome (gated)
     if UITokens.debug_ui():

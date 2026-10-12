@@ -189,7 +189,7 @@ QA and the content lint remain open.*
 
 | ID | Item | Done when |
 |---|---|---|
-| UI-020 | **Evening tray**: guest cards (in-world sprite in a frame, persona name, fee, trait icons, favourite or ??), drag *and* tap-tap seating, live star preview on pads (Islanders pattern), breakdown strip listing every +/− term with its icon (Into the Breach pattern), undo until Goodnight | Phase 1 gate: testers explain their stars |
+| UI-020 ✓ | **Evening tray** — landed 2026-10-12: guest cards (sprite portrait crop, name, fee, trait icons, elite/loud badges, favourite `?`), tap-tap *and* hold-drag seating, per-pad star badges, live breakdown strip listing every +/− term with its icon (needs/aversions/comfort/rain → star total), tap seated guest or card to undo until Goodnight | Phase 1 gate: testers explain their stars — strip is live; portrait art + trait-state bubbles still placeholders |
 | UI-021 | Trait-state bubbles over seated guests (met/unmet icons) — replaces need-bubbles | Every trait shows a state icon, never colour alone |
 | UI-022 | Night summary: reviews with breakdowns, tips, walk-ins, coin count-up, page progress, forecast, Double tips slot | §17.2 contents present |
 | UI-023 | Booking board opened from the notice board (diegetic), Morning flow | Tap the board → sheet |

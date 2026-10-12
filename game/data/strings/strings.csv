@@ -17,3 +17,7 @@ quit_title,Leave the camp?,Rời khỏi trại?
 quit_stay,Stay,Ở lại
 quit_leave,Leave,Thoát
 hud_fire,Fire,Lửa
+tray_pick_pad,tap an open pad,chạm một ô trống
+tray_shelter,shelter,lều
+tray_rain,rain,mưa
+tray_hint,tap a card, then a pad · Goodnight ends the night,chạm thẻ rồi chạm ô · Goodnight kết thúc đêm
