@@ -1,23 +1,57 @@
 #!/usr/bin/env python3
 """Palette lock (GDD §16.2/§28): reduce a batch of sprites to one shared
-ramp. Median-cut on the pooled opaque-pixel histogram -> weighted ramp,
-then remap every sprite to its nearest ramp color (redmean distance).
+ramp. Two modes:
+
+  --ramp PATH   remap onto the flat "ramp" list of an existing palette
+                JSON (e.g. cleanup/site_palette.json); writes no palette
+                files.
+  (default)     median-cut on the pooled opaque-pixel histogram ->
+                weighted ramp, remap every sprite to its nearest ramp
+                color (redmean distance). Writes cleanup/auto_palette.*
+                or cleanup/batchN_palette.* with --batch — never
+                site_palette.* (that file is hand-authored).
 
 Usage:
-    python tools/palette_lock.py [--batch 0] [--colors 32] [files...]
+    python tools/palette_lock.py [--batch 0] [--colors 32] [--ramp P.json]
+                                 [files...]
+    python tools/palette_lock.py --swatch cleanup/site_palette.json
+                                 # one row per named ramp -> .png sibling
     --batch N   pull files of that batch from assets_src/manifest.json
     files...    explicit PNG paths (may be combined with --batch)
-Remaps each sprite in place (gen/ is the canonical location; originals
-live in git history) + writes cleanup/batch0_palette.{png,json}.
+Remaps each sprite in place (gen/ is the canonical location); the first
+in-place overwrite of a file copies the original to assets_src/raw/.
+Only fully opaque pixels are remapped — semi-transparent overlay pixels
+(contact shadows) are left untouched.
 Stdlib only (tools/png.py).
 """
-import argparse, json, math, os, sys
+import argparse, json, math, os, shutil, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import png as pngmod
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MANIFEST = os.path.join(ROOT, "assets_src", "manifest.json")
 OUT = os.path.join(ROOT, "assets_src", "cleanup")
+RAW = os.path.join(ROOT, "assets_src", "raw")
+
+
+def hex2rgb(h):
+    return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
+
+
+def load_ramp(path):
+    """Flat ramp list [(r,g,b),...] from a palette JSON — either a dict
+    with a "ramp" key of #rrggbb strings, or a bare list of them."""
+    d = json.load(open(path, encoding="utf-8"))
+    cols = d["ramp"] if isinstance(d, dict) else d
+    return [hex2rgb(c) for c in cols]
+
+
+def backup_raw(p):
+    """First in-place overwrite keeps the original in assets_src/raw/."""
+    dst = os.path.join(RAW, os.path.basename(p))
+    if not os.path.exists(dst):
+        os.makedirs(RAW, exist_ok=True)
+        shutil.copy2(p, dst)
 
 
 def histogram(paths):
@@ -92,7 +126,7 @@ def remap(rows, w, ramp):
     cache, used, far = {}, set(), 0
     for row in rows:
         for x in range(w):
-            if not row[x * 4 + 3]:
+            if row[x * 4 + 3] != 255:      # keep semi-transparent overlays
                 continue
             c = (row[x * 4], row[x * 4 + 1], row[x * 4 + 2])
             i = cache.get(c)
@@ -134,12 +168,39 @@ def swatch(ramp, cell=8):
     return cols * cell, cell, rows
 
 
+def named_swatch(ramps, cell=8, pad=2):
+    """One row per named ramp (dark -> light)."""
+    cols = max(len(r) for r in ramps.values())
+    w, h = cols * cell, len(ramps) * (cell + pad) - pad
+    rows = [bytearray(w * 4) for _ in range(h)]
+    for ri, (name, ramp) in enumerate(ramps.items()):
+        for i, hx in enumerate(ramp):
+            c = hex2rgb(hx)
+            for y in range(cell):
+                for x in range(cell):
+                    o = (i * cell + x) * 4
+                    rows[ri * (cell + pad) + y][o:o + 4] = (*c, 255)
+    return w, h, rows
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("files", nargs="*")
     ap.add_argument("--batch", type=int, help="files of this manifest batch")
     ap.add_argument("--colors", type=int, default=32)
+    ap.add_argument("--ramp", help="palette JSON with a flat 'ramp' list; "
+                    "remap onto it, write no palette files")
+    ap.add_argument("--swatch", help="palette JSON with named 'ramps'; "
+                    "write a one-row-per-ramp swatch PNG next to it")
     a = ap.parse_args()
+
+    if a.swatch:
+        d = json.load(open(a.swatch, encoding="utf-8"))
+        w, h, rows = named_swatch(d["ramps"])
+        out = os.path.splitext(a.swatch)[0] + ".png"
+        pngmod.write(out, w, h, rows)
+        print("->", os.path.relpath(out, ROOT))
+        return
 
     paths = list(a.files)
     if a.batch is not None:
@@ -157,13 +218,16 @@ def main():
 
     hist, images = histogram(paths)
     print(f"{len(paths)} files, {len(hist)} unique colors pooled")
-    ramp = median_cut(hist, a.colors)
-    ramp = sort_ramp(ramp)
-    print(f"ramp: {len(ramp)} colors")
+    if a.ramp:
+        ramp = load_ramp(a.ramp)
+        print(f"ramp: {len(ramp)} colors <- {a.ramp}")
+    else:
+        ramp = sort_ramp(median_cut(hist, a.colors))
+        print(f"ramp: {len(ramp)} colors (median-cut)")
 
-    os.makedirs(OUT, exist_ok=True)
     coverage, far_tot = set(), 0
     for p, w, h, rows in images:
+        backup_raw(p)
         uniq, used, far = remap(rows, w, ramp)
         coverage |= used
         far_tot += far
@@ -171,7 +235,13 @@ def main():
         print(f"  {os.path.basename(p):28s} {uniq:4d} uniq -> "
               f"{len(used):2d} ramp colors, {far} far-mapped")
 
-    name = f"batch{a.batch}_palette" if a.batch is not None else "site_palette"
+    if a.ramp:
+        print(f"coverage: {len(coverage)}/{len(ramp)} ramp colors used, "
+              f"{far_tot} far-mapped px")
+        return
+
+    os.makedirs(OUT, exist_ok=True)
+    name = f"batch{a.batch}_palette" if a.batch is not None else "auto_palette"
     w, h, rows = swatch(ramp)
     pngmod.write(os.path.join(OUT, name + ".png"), w, h, rows)
     json.dump({"batch": a.batch if a.batch is not None else "all",
