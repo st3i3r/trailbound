@@ -69,13 +69,24 @@ const VAR_N := 6
 # never anchored/large ones (van, cabin, trees).
 const PROPS := [
     # ------------------------------------------------- treeline + cabin
+    # T2 trees break the row: broadleaf between pads, copper maple
+    # over the (locked) p3, cherry framing the rest corner
     ["props_large",  "pine_tall_a",        74,  96],
     ["props_large",  "pine_tall_b",       156, 102],
+    ["props_large",  "tree_broadleaf",    210,  96],
     ["props_large",  "flamboyant_tree",   262,  94],
+    ["props_large",  "tree_maple",        484,  96],
     ["props_large",  "pine_tall_a",       540,  92],
     ["props_large",  "bamboo_clump",      606,  96],
+    ["props_large",  "tree_cherry",       616, 130],
     ["props_large",  "cabin",             428, 128],
     ["props_large",  "pennant_string",    345, 168],
+    # undergrowth at treeline feet — breaks the flat row
+    ["props_medium", "bush_round_m",      138, 136],
+    ["props_medium", "fern_bank",         350, 140],
+    ["props_medium", "bush_clover",       386, 148],
+    ["props_small",  "mushrooms_orange",  268, 138],
+    ["props_medium", "debris_brambles",   442, 134],
     # ---------------- outfitter camp (NW): van, stools, crates, signpost
     ["props_large",  "outfitter_van",     110, 178],
     ["props_medium", "prop_supply_crate_0", 206, 188],
@@ -85,6 +96,8 @@ const PROPS := [
     ["props_small",  "signpost",          222, 208, 2.5],
     ["props_small",  "stool_plastic_blue",148, 214],
     ["props_small",  "stool_plastic_red", 186, 214],
+    # unloading vignette: gear spilling out of the van's open back
+    ["props_small",  "duffel_bag",        152, 196],
     # ------- camp kitchen (centre): fire, tripod, bench, stump, lantern
     ["props_medium", "lantern_post",      356, 218, -3.0],
     ["props_medium", "dome_tent_sage",    212, 232],
@@ -95,6 +108,13 @@ const PROPS := [
     # A-R4 gear cluster by the sage dome: cooler + chair at its mouth
     ["props_small",  "cooler_box",        240, 246],
     ["props_small",  "folding_chair_pair", 200, 258, -4.0],
+    ["props_small",  "propane_stove",     300, 264],
+    # kitchen woodpile + old-fire story
+    ["props_medium", "debris_branch_pile",352, 272],
+    ["props_medium", "stump_burnt",       396, 262],
+    # L6 work items: firewood + chopping block beside the kitchen
+    ["props_small",  "firewood_bundle",   336, 276],
+    ["props_small",  "axe_on_log",        380, 272],
     # ---------- rest corner (E): hammock by the pine, picnic set below
     ["props_large",  "hammock",           566, 150],
     ["props_large",  "picnic_table",      516, 250],
@@ -105,12 +125,27 @@ const PROPS := [
     ["props_medium", "camp_table_fold",   232, 312],
     ["props_small",  "dry_bag",           168, 314],
     ["props_small",  "solar_lantern",     246, 322],
+    # third pitch on the south field — slate dome + gear vignette
+    ["props_medium", "dome_tent_slate",   400, 326],
+    ["props_small",  "duffel_bag",        356, 334],
+    ["props_small",  "camp_pillow",       366, 340, -3.0],
     # spare unlit fire pit near the rest corner (storytelling; the A1b
     # flame loop stays on the shipped ring at the kitchen fire)
     ["props_medium", "fire_ring_unlit_v2", 565, 294],
-    ["props_small",  "propane_stove",     300, 264],
+    ["props_medium", "bush_white_flower_v", 534, 300],
+    ["props_medium", "stump_mushroom",    596, 280],
     # A-R1 T2 composite: feathery canopy drooping over the pond west edge
     ["props_large",  "tree_feathery",     108, 272],
+    # pond dressing: reeds + shore edges + islet + lily pads
+    ["props_medium", "reed_shore",         58, 252],
+    ["props_medium", "reed_shore",        142, 334],
+    ["terrain",      "shore_edge_bank",   150, 268],
+    ["terrain",      "shore_edge_bank",   152, 306],
+    ["terrain",      "shore_islet",        95, 300],
+    ["decals",       "decal_lily_pad",     60, 290],
+    ["decals",       "decal_lily_pad",     90, 314],
+    ["decals",       "decal_lily_pad",     42, 268],
+    ["props_small",  "rock_mossy_s",      162, 250],
     # ------- work edge (NE/E): coop, herbs, broom, planter, spirit house
     # cottage_shed = shipped cabin reused as a small second structure in
     # the row-3 treeline gap, back-left of the coop/spirit_house pair
@@ -121,9 +156,16 @@ const PROPS := [
     ["props_small",  "chili_garlic_string", 518, 170],
     ["props_small",  "dried_fish_rack",   482, 166],
     ["props_small",  "S_15",              566, 178],
+    # wood-working vignette: fallen log, dead stump, gnarled root, sapling
+    ["props_medium", "debris_log_mossy",  505, 148],
+    ["props_medium", "stump_dead",        575, 152],
+    ["props_small",  "root_gnarled",      458, 152],
+    ["props_medium", "pine_sapling",      628, 158],
 ]
-# props that get NO foreground embed decal (it IS the ground)
-const EMBED_SKIP := ["dirt_patch"]
+# props that get NO foreground embed decal (it IS the ground, or it
+# sits in/at the water where a front tuft would float)
+const EMBED_SKIP := ["dirt_patch", "reed_shore", "shore_edge_bank",
+                     "shore_islet", "decal_lily_pad"]
 
 const FIRE_POS := Vector2(326, 246)          # A1b fire-loop anchor
 const WARDEN_POS := Vector2(348, 262)
@@ -173,11 +215,26 @@ const TREE_NEAR := Color(0.51, 0.55, 0.62)   # v2 ground so they don't
 const DECAL_CLUSTERS := [
     [212.0, 247.0, "tuft",   2, 16.0, 8.0, 0],   # dome_tent_sage base
     [192.0, 316.0, "dry",    2, 16.0, 8.0, 0],   # dome_tent_amber base
+    [400.0, 340.0, "tuft",   2, 18.0, 7.0, 0],   # dome_tent_slate base
     [256.0, 272.0, "pebble", 2, 12.0, 6.0, 0],   # log_bench feet
     [540.0, 174.0, "tuft",   1, 10.0, 6.0, 0],   # chicken_coop base
     [118.0, 192.0, "pebble", 1, 10.0, 6.0, 0],   # van wheel line
     [140.0, 300.0, "pebble", 2, 14.0, 24.0, 0],  # pond shoreline
+    [150.0, 288.0, "moss",   2, 14.0, 26.0, 0],  # pond bank damp
+    [110.0, 288.0, "moss",   1, 12.0, 10.0, 0],  # willow foot
     [238.0, 121.0, "litter", 2, 16.0, 5.0, 1],   # treeline floor W
+    [210.0, 116.0, "litter", 1, 14.0, 6.0, 1],   # broadleaf foot
+    [484.0, 112.0, "litter", 1, 14.0, 6.0, 1],   # maple foot
+    [616.0, 148.0, "flower", 1, 12.0, 6.0, 0],   # cherry foot
+    [565.0, 168.0, "dry",    1, 14.0, 7.0, 0],   # work-edge stump vignette
+    [505.0, 160.0, "litter", 1, 12.0, 6.0, 0],   # mossy log base
+    # pad fringes — break the flat-tan read on pitch edges
+    [ 96.0, 168.0, "pebble", 1, 20.0, 5.0, 0],   # p1/p4 fringe
+    [288.0, 172.0, "tuft",   1, 20.0, 5.0, 0],   # p2 south fringe
+    [480.0, 172.0, "pebble", 1, 20.0, 5.0, 0],   # p3 south fringe
+    [288.0, 282.0, "pebble", 1, 20.0, 5.0, 0],   # p7 north fringe
+    [480.0, 282.0, "tuft",   1, 20.0, 5.0, 0],   # p8 north fringe
+    [608.0, 230.0, "dry",    1, 14.0, 6.0, 0],   # p5 fringe / rest corner
     [486.0, 122.0, "litter", 2, 18.0, 5.0, 1],   # treeline floor E
     [408.0, 166.0, "flower", 1, 10.0, 6.0, 0],   # flower_box base
 ]

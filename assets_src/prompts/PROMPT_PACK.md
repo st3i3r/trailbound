@@ -338,10 +338,14 @@ instead of 7, west mirrored (already assumed).
 - `style_options.detail=false` exists **only on Pro Flash tools** —
   the batch tool has no style toggles; calm comes from the crop +
   prompt words.
-- **Canvas-vs-display ratio ≤1.8×** (verified 2026-10-13 — NEAREST
-  downscale at 1.5–1.8× tightens AI painterliness into pixel snap;
-  ≥2.5× destroys pixel clusters).  Gen canvas ≈ display × 1.2–1.8,
-  ship resize lives in `tb_post`.
+- **Native-resolution rule (hardened 2026-10-13): gen canvas ≈
+  CONTENT size, not display canvas.**  Content fills ~80% of a gen
+  canvas, so: ship 32–40 px → ≤42 job (exact, zero resize); ship
+  56–72 px → ≤85 job (~1.15×); ship 128–150 px → ≤170 job (~1.1×).
+  NEVER mix display-size classes in one job — a 40 px prop on a 160
+  canvas crushes 4× into speckle (verified: A-R4 stove/lantern/chair,
+  fixed by J8 re-gen at 85).  Post pipeline: crop to content bbox
+  (lossless) → resize at most ONCE ≤1.3×, or ship at cropped size.
 - **Ship resize is per-family** (verified 2026-10-13): organic/
   curve-dominant props (tents, canopies, bushes) → **LANCZOS**
   (smooth arcs, slight softening); hard-edged items (cooler, stove,

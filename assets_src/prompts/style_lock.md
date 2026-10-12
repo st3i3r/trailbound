@@ -352,6 +352,61 @@ read "big and empty" even with good anchors.
 - Small items: 1–3% frame width each, 4–6 per anchor's footprint
 - Pixel budget: every object carries internal detail per Craft spec
 
+#### Canonical object ratios (measured from Octopia 1080p refs,
+#### 2026-10-13 — char ≈115 px ≈11% frame)
+
+Every asset is pinned to **CHAR = 48 px** (the 12% figure). Ratios are
+height unless noted; these are *content* sizes, before anchors/shadow.
+
+| Class | ×CHAR | Ship px | Examples |
+|---|---|---|---|
+| Dome tent / pitch | 2.4 w / 1.7 h | ~112×82 | dome_tent_*, pitched tents |
+| Big structure | 2.5–4× | 120–200 | cabin, van, warden hut |
+| Forest tree (total) | 2.5–3× | 120–150 | pines, T2 composites |
+| Garden/farm tree | 1.5–1.8× | 72–86 | orchard/sapling scale |
+| Bush / shrub | 0.9–1.4× | 44–66 | bush_*, fern_bank |
+| Lamp post / signpost | 1.4–1.5× | 66–72 | lantern_post |
+| Picnic/camp table | 1.0–1.2× w | 48–58 w | camp_table_fold |
+| Chair / bench | 0.8–0.95× | 38–46 | folding_chair_pair |
+| Ice chest / crate | 0.5 h / 1.0 w | ~26×46 | cooler_box, crates |
+| Stove / grill | 0.45–0.6× | 24–32 | propane_stove |
+| Handheld lantern | 0.3–0.4× | 15–20 | solar_lantern |
+| Kettle / pot / radio | 0.4–0.6× | 20–28 | kettle, camp_radio |
+| Mug / rope / pillow | 0.25–0.45× | 12–22 | enamel_mug, rope_coil |
+| Rock / stump | 0.5–0.8× | 24–38 | rock_*, stump_* |
+| Ground decal | 0.3–0.6× | 15–30 | decal_*, tuft_* |
+| Fence segment | 0.5 h / 1.5 w | ~24×72 | fence runs (Batch A) |
+| Signboard | 0.6–0.9× | 30–44 | signpost, stall board |
+| Stall / food cart | 1.6–2.2× | 78–106 | pho_stall, outfitter lodge |
+| Vehicle | 2–3× w | 96–144 w | outfitter_van, moped row |
+| Dog (pet) | 0.5–0.7× | 24–34 | Bean/Bo |
+| Bird / critter | 0.15–0.3× | 8–15 | Field Notes species |
+| Fish (in hand/dock) | 0.3–0.5× | 15–24 | fishing vignettes |
+| Dish sprite | 0.2–0.35× | 10–17 | Batch D food icons |
+| Ingredient sprite | 0.15–0.3× | 8–15 | Batch D |
+| Portrait (UI) | n/a (UI layer) | 48–64 box | character portraits |
+| Keepsake item | 0.3–0.5× | 15–24 | Batch E |
+
+Rules: within ±15% is fine; >1.5× off reads wrong in-scene (verified:
+cooler+stove at ~0.85× read as furniture). True smalls (<40 px ship)
+belong in ≤42-px jobs — see PROMPT_PACK native-resolution rule.
+
+#### Canvas ↔ content mapping (PixelLab discrete canvases)
+
+Content fills ~80% of the gen canvas. Pick canvas by desired CONTENT:
+
+| Target ship | Canvas | Resize |
+|---|---|---|
+| 32–40 px | ≤42 | ~1:1 — ship at crop |
+| 56–72 px | ≤85 | ~1.1× max |
+| 96–150 px | ≤170 | ~1.1× max |
+| <32 px | ≤42 + "compact subject centred occupying about half the canvas" | ~1–1.3× |
+
+Pipeline: crop to content bbox (lossless) → ship at cropped size when
+within ±10% of ratio target → else ONE resize ≤1.3×. Never 2×+
+(spec verified: J8 smalls on 85 canvas would crush 2–3.5× → they
+re-gen in the ≤42 L6 job).
+
 *Mobile SOTA check (2026-10-12): base-res + character-share benchmarked
 against shipped peers — Eastward renders at 360p (Pixpil patch notes +
 Steam teardown), Stardew/Terraria ship 16px tiles with pinch/button

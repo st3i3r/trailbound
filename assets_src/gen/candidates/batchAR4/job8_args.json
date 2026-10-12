@@ -1,0 +1,27 @@
+{
+ "description": "painterly pixel art in the style of Eastward, 3/4 top-down view with fronts drawn straight-on (not isometric), sunlight from the upper left, full value range, hue-shifted colour ramps, adaptive dark coloured outlines (never pure black), chunky readable silhouette, calm interior masses with one or two accent details, contemporary 2026-era camping object, single object cut-out on transparent background, nothing cropped at the edges, no text or letters",
+ "view": "top-down",
+ "item_descriptions": [
+  "small rectangular two-burner camping stove, closed matte steel top with two round black burner rings and a row of small chrome knobs on the front face, short folded metal legs",
+  "closed hard-shell camping ice chest, teal body with white lid and a single dark latch, carry handle on top",
+  "low folding camping chair, olive-green fabric seat and back slung in a dark metal X-frame, slight recline",
+  "small roll-top camping table, aluminium slat top over a folding black frame",
+  "compact solar camping lantern, frosted white diffuser body on a dark cap with a small solar panel top, hanging loop",
+  "black enamel camping kettle with a curved spout and folding top handle",
+  "two enamel camping mugs side by side, one cream with a blue rim and one orange",
+  "handheld camping radio, rectangular body with speaker grille and short antenna, carrying strap",
+  "bundle of chopped firewood logs tied with a rope, cut ends facing the viewer",
+  "small chopping axe resting on a round log block, brown handle, dark steel head",
+  "coil of braided nylon rope, earth-orange, neatly wound",
+  "stainless thermos flask with a dark cap, khaki green body",
+  "compact first aid pouch, white with a simple red patch, small zip",
+  "inflatable camping pillow, soft sage rectangle with rounded corners",
+  "small folding lantern, warm glowing amber body with black cage top, short hanging chain",
+  "cast-iron camping pot with a small lid handle and wire bail, dark grey"
+ ],
+ "refs": [
+  "assets_src/refs/crops/octopia/camp_gear_85.png",
+  "assets_src/refs/crops/octopia/tent_ground_85.png",
+  "assets_src/refs/crops/bush/bush_green.png"
+ ]
+}

@@ -2409,14 +2409,14 @@
   ]
  },
  "props_medium/camp_table_fold.png": {
-  "anchor_x": 32,
-  "anchor_y": 47,
+  "anchor_x": 28,
+  "anchor_y": 51,
   "anchor": "bottom-center",
   "content": [
+   2,
    1,
-   1,
-   63,
-   47
+   54,
+   51
   ]
  },
  "props_medium/chicken_coop.png": {
@@ -3310,6 +3310,17 @@
    30
   ]
  },
+ "props_small/axe_on_log.png": {
+  "anchor_x": 17,
+  "anchor_y": 43,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   2,
+   33,
+   43
+  ]
+ },
  "props_small/bird_cage.png": {
   "anchor_x": 16,
   "anchor_y": 30,
@@ -3319,6 +3330,17 @@
    2,
    25,
    30
+  ]
+ },
+ "props_small/camp_pillow.png": {
+  "anchor_x": 19,
+  "anchor_y": 27,
+  "anchor": "bottom-center",
+  "content": [
+   2,
+   1,
+   36,
+   27
   ]
  },
  "props_small/campfire_small.png": {
@@ -3344,14 +3366,14 @@
   ]
  },
  "props_small/cooler_box.png": {
-  "anchor_x": 22,
-  "anchor_y": 39,
+  "anchor_x": 24,
+  "anchor_y": 51,
   "anchor": "bottom-center",
   "content": [
-   3,
    1,
-   41,
-   39
+   1,
+   47,
+   51
   ]
  },
  "props_small/dried_fish_rack.png": {
@@ -3387,15 +3409,26 @@
    47
   ]
  },
- "props_small/folding_chair_pair.png": {
-  "anchor_x": 24,
-  "anchor_y": 43,
+ "props_small/firewood_bundle.png": {
+  "anchor_x": 22,
+  "anchor_y": 37,
   "anchor": "bottom-center",
   "content": [
-   7,
    1,
-   40,
-   43
+   1,
+   43,
+   37
+  ]
+ },
+ "props_small/folding_chair_pair.png": {
+  "anchor_x": 22,
+  "anchor_y": 47,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   1,
+   43,
+   47
   ]
  },
  "props_small/grass_tussock.png": {
@@ -3454,14 +3487,14 @@
   ]
  },
  "props_small/propane_stove.png": {
-  "anchor_x": 22,
-  "anchor_y": 39,
+  "anchor_x": 24,
+  "anchor_y": 33,
   "anchor": "bottom-center",
   "content": [
-   3,
    1,
-   40,
-   39
+   3,
+   47,
+   33
   ]
  },
  "props_small/rock_mossy_s.png": {
