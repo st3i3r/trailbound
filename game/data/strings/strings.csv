@@ -34,3 +34,8 @@ night_double,Double tips +%dc,Nhân đôi tip +%dc
 night_doubled,Doubled +%dc,Đã nhân đôi +%dc
 night_sleep,Sleep,Ngủ
 night_none,No guests tonight.,Đêm nay không có khách.
+hud_headout,Head out,Lên đường
+board_title,BOOKINGS · TONIGHT,ĐẶT CHỖ · TỐI NAY
+board_forecast,Tonight: %s,Tối nay: %s
+board_demand,%d requests · %d pads open,%d yêu cầu · %d ô trống
+board_wait,extra parties wait at the trailhead,khách thừa chờ ở đầu đường mòn

@@ -119,6 +119,8 @@ const FIRE_POS := Vector2(326, 246)          # A1b fire-loop anchor
 const WARDEN_POS := Vector2(348, 262)
 const DOG_POS := Vector2(300, 306)
 const MAI_POS := Vector2(468, 254)
+const BOARD_POS := Vector2(222, 208)         # signpost = notice board (UI-023)
+const BOARD_RECT := Rect2(204, 160, 40, 52)  # its tap zone in stage px
 
 # scatter decal groups by visual family — a cluster commits to ONE so it
 # reads as a patch of something (tuft / flowers / dry grass / pebbles /
@@ -200,6 +202,8 @@ var _press := {}                             # pending card press {gid, pos}
 var _drag_ghost: Sprite2D                    # sprite following a card drag
 var _trait_names := {}                       # tid -> name (lazy)
 var guest_bubbles := {}                      # gid -> trait-state marker token
+var board_anchor: Node2D                     # notice-board prop anchor (UI-023)
+var _board_tok := 0                          # morning "!" marker token
 
 var _tex_cache := {}
 
@@ -334,6 +338,16 @@ func _ready() -> void:
         # --pose --night: run Goodnight so the summary sheet stages
         if OS.get_cmdline_args().has("--night"):
             _goodnight()
+        # --pose --morning: sleep through into the next Morning (the
+        # "!" board marker + HEAD OUT button stage); --board then opens
+        # the booking sheet for its own shot
+        if OS.get_cmdline_args().has("--morning"):
+            _goodnight()
+            var sh: Control = panel_mgr.top()
+            if sh is NightSummary:
+                sh.sleep_pressed.emit()
+        if OS.get_cmdline_args().has("--board"):
+            _open_booking()
     var shot_arg := ""
     for a in OS.get_cmdline_args():
         if a.begins_with("--shot="):
@@ -690,6 +704,9 @@ func _build_ui() -> void:
     var fire_anchor := Node2D.new()
     fire_anchor.position = FIRE_POS
     stage.add_child(fire_anchor)
+    board_anchor = Node2D.new()              # UI-023: notice-board anchor
+    board_anchor.position = BOARD_POS
+    stage.add_child(board_anchor)
     var tok := markers.marker(fire_anchor, Vector2(-61, -74))
     fire_bubble = UIKit.panel(markers.marker_control(tok),
         Rect2(0, 0, 122, 41), "bubble_prompt")
@@ -828,8 +845,19 @@ func _smoke() -> void:
         await get_tree().process_frame
         print("SMOKE sleep -> day:", Game.day == day_before + 1,
               " closed:", panel_mgr.top() == null,
-              " tray rebuilt:", hud.tray.visible,
-              " evening:", evening_open)
+              " morning:", Game.phase == Game.Phase.MORNING,
+              " board marker:", _board_tok != 0)
+        # UI-023: booking sheet opens -> close -> Head out -> evening
+        _open_booking()
+        await get_tree().process_frame
+        print("SMOKE booking sheet:", panel_mgr.top() is BookingBoard)
+        panel_mgr.close()
+        _advance_phase()
+        await get_tree().process_frame
+        print("SMOKE head out -> evening:",
+              Game.phase == Game.Phase.EVENING,
+              " tray:", hud.tray.visible,
+              " marker cleared:", _board_tok == 0)
     get_tree().quit()
 
 
@@ -1162,9 +1190,11 @@ func _status() -> void:
         Game.day, Game.site_day(), st["weather"].to_upper(), Game.coins,
         tr("tray_hint")])
     # the button is the phase action, not the phase name (§4 table:
-    # Evening -> Goodnight, Night -> Sleep)
+    # Evening -> Goodnight, Night -> Sleep, Morning -> Head out)
     hud.set_phase(tr("hud_goodnight").to_upper() if evening_open \
-        else tr("hud_sleep").to_upper())
+        else (tr("hud_headout").to_upper() \
+            if Game.phase == Game.Phase.MORNING \
+            else tr("hud_sleep").to_upper()))
     hud.set_rating(night_rating if night_rating else "—")
     hud.set_coins(tr("hud_coins_short") % Game.coins)
     hud.set_day("%s %d · %s" % [tr("hud_day").to_upper(), Game.day,
@@ -1204,14 +1234,54 @@ func _on_sleep() -> void:
 func _advance_phase() -> void:
     if evening_open:
         _goodnight()
-    else:
+    elif Game.phase == Game.Phase.MORNING:
+        _start_evening()                       # Head out
+    else:                                      # Night -> next Morning
         hud.set_report("")
-        Game.advance_day()
-        # the scene skips Morning/Prep interaction for now — the board
-        # spawns straight into Evening so the phase machine stays true
-        Game.set_phase(Game.Phase.EVENING)
-        _spawn_board()
-        _status()
+        Game.advance_day()                     # set_phase(MORNING) inside
+        _start_morning()
+
+
+## UI-023 Morning: camp is quiet — the notice board is the interactive
+## object.  A "!" marker floats over the signpost until Head out.
+func _start_morning() -> void:
+    evening_open = false
+    # "!" chip over the notice board — slot_dark (bubble_prompt's
+    # 18px tail inset eats the whole 22px chip); gold glyph on dark
+    var bub := Panel.new()
+    bub.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    bub.add_theme_stylebox_override("panel",
+        UIKit.state_nine("slot_dark"))
+    bub.size = Vector2(22, 22)
+    var bang := UIKit.label_for("!", UITokens.TypeRole.DISPLAY,
+        UITokens.GOLD)
+    bang.position = Vector2(8, -1)
+    bub.add_child(bang)
+    # offset places the chip just over the signpost's visible head —
+    # the prop is mostly occluded by the chest + warden tent
+    _board_tok = markers.marker(board_anchor, Vector2(-11, -42))
+    markers.marker_control(_board_tok).add_child(bub)
+    _status()
+
+
+func _start_evening() -> void:
+    if _board_tok:
+        markers.release(_board_tok)
+        _board_tok = 0
+    Game.set_phase(Game.Phase.EVENING)
+    _spawn_board()
+    _status()
+
+
+## The notice board sheet (§17.2): tonight's requests + the forecast.
+func _open_booking() -> void:
+    var st: Dictionary = Game.site_state()
+    var open_n := 0
+    for pid in st["pads"]:
+        if st["pads"][pid].get("open", false):
+            open_n += 1
+    panel_mgr.open(BookingBoard.make(st["board"],
+        String(st["weather"]), open_n, _card_sprite, _trait_map()))
 
 
 # ------------------------------------------------------------- input
@@ -1258,6 +1328,13 @@ func _unhandled_input(event: InputEvent) -> void:
         if _drag_ghost != null:
             _drag_ghost.position = px + Vector2(0, 4)
         _update_strip(px)
+        return
+    if event is InputEventMouseButton and event.pressed \
+            and Game.phase == Game.Phase.MORNING:
+        # morning: the notice board is the one interactive object
+        var mpx0 := get_global_mouse_position()
+        if BOARD_RECT.has_point(mpx0 - stage.position):
+            _open_booking()
         return
     if not evening_open and event is InputEventMouseButton:
         return                                        # night: watch the fire
