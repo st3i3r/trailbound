@@ -1,1 +1,26 @@
-[]
+[
+  {"id": "jay", "name": "Eurasian Jay", "site": "pinewatch",
+   "note": "Scolds the whole camp, then buries an acorn and forgets where."},
+  {"id": "woodpecker", "name": "Great Spotted Woodpecker", "site": "pinewatch",
+   "note": "Drums on the dead pine like it owes him rent."},
+  {"id": "bulbul", "name": "Red-whiskered Bulbul", "site": "pinewatch",
+   "note": "Sings from the berry bush all morning. Chào mào, grandfather called it."},
+  {"id": "tawny_owl", "name": "Tawny Owl", "site": "pinewatch",
+   "note": "Only ever heard, never seen. The camp sleeps better for it."},
+  {"id": "kingfisher", "name": "Common Kingfisher", "site": "whisper_river",
+   "note": "A spark of blue down the bank. Gone before the ripples land."},
+  {"id": "heron", "name": "Grey Heron", "site": "whisper_river",
+   "note": "Stands in the shallows, patient as the river itself."},
+  {"id": "wagtail", "name": "Grey Wagtail", "site": "whisper_river",
+   "note": "Bobs along the rocks between casts, tail never still."},
+  {"id": "dipper", "name": "White-throated Dipper", "site": "whisper_river",
+   "note": "Walks straight into the current underwater. Nobody told it birds can't."},
+  {"id": "skylark", "name": "Eurasian Skylark", "site": "lantern_valley",
+   "note": "A dot in the sky raining song on the terraces."},
+  {"id": "bee_eater", "name": "European Bee-eater", "site": "lantern_valley",
+   "note": "Snatches bees mid-air over the meadow, jewel-bright."},
+  {"id": "hoopoe", "name": "Eurasian Hoopoe", "site": "lantern_valley",
+   "note": "Raises its crest at the path like a little emperor."},
+  {"id": "kestrel", "name": "Common Kestrel", "site": "lantern_valley",
+   "note": "Hangs motionless on the wind above the terraces, watching."}
+]

@@ -25,6 +25,7 @@ var site_id: StringName = &"pinewatch"
 var sites_visited: Dictionary = {}          # site_id -> first in-game day
 var letters_read: Array = []                # letter ids (§8.2 journal)
 var vignettes_seen: Array = []              # §13.4 unseen plays first
+var field_notes: Array = []                 # §7.3 logged bird ids
 var dog := {"name": "Bean", "bond": 0, "met": false,
 	"pet_today": false}                       # §9 companion
 var crew: Dictionary = {}                   # §22 save shape, see _crew_reset()
@@ -380,6 +381,7 @@ func _fresh_site(site: StringName) -> Dictionary:
 		"seats": 0, "reviews": [], "weather": "clear",
 		"board": [], "guests": {}, "assignments": {},
 		"blogger_bonus": false, "forage_nodes": [], "fish_taken": {},
+		"spot_day": -1,
 		"pages_done": [], "letters_delivered": [],
 		"vignette_restored": "",
 		"counters": {"guests_welcomed": 0, "families": 0,
@@ -1000,6 +1002,52 @@ func fish_catch(spot: String) -> String:
 	return pick
 
 
+## §7.3: the lookout, once per site day, needs the Binoculars —
+## logs one bird not yet in Field Notes and reveals a bonus forage
+## node. All birds logged → the node still appears.
+func can_spot() -> bool:
+	return "binoculars" in gear \
+		and site_state()["spot_day"] != site_day()
+
+
+func spot() -> Dictionary:
+	if not can_spot():
+		return {}
+	var st := site_state()
+	st["spot_day"] = site_day()
+	var rng := _rng_for("bird")
+	var unlogged: Array = Catalog.data.get("birds", []).filter(
+		func(b): return b.get("site") == site_id \
+			and b["id"] not in field_notes)
+	var bird := {}
+	if not unlogged.is_empty():
+		bird = unlogged[rng.randi() % unlogged.size()]
+		field_notes.append(bird["id"])
+	var fpx: Array = site_row().get("errand_spots", {}).get(
+		"forage", [96, 72])
+	var pool := _ingredients_of_kind("forage")
+	var items := []
+	for i in 2:
+		items.append(_pick_weighted(pool, rng,
+			func(i2): return i2.get("rare", false)))
+	st["forage_nodes"].append({"id": "fb", "items": items,
+		"bonus": true,
+		"px": [fpx[0] + rng.randi_range(-72, 72),
+			fpx[1] + rng.randi_range(-28, 28)]})
+	return {"bird": bird,
+		"all_logged": _site_bird_count() <= field_notes.filter(
+			func(b): return _bird_site(b) == site_id).size()}
+
+
+func _bird_site(bird_id: String) -> String:
+	return String(_row("birds", bird_id).get("site", ""))
+
+
+func _site_bird_count() -> int:
+	return Catalog.data.get("birds", []).filter(
+		func(b): return b.get("site") == site_id).size()
+
+
 ## Recipes a guest could plausibly crave at this site (§5.2 card):
 ## every ingredient obtainable here, oven recipes only once Lantern
 ## Valley makes them possible.
@@ -1285,6 +1333,7 @@ func state_dict() -> Dictionary:
 		"journal": {"vignettes_seen": vignettes_seen.duplicate()},
 		"daily": daily_state.duplicate(),
 		"dog": dog.duplicate(),
+		"field_notes": field_notes.duplicate(),
 		"sites": _sites_to_json()}
 
 
@@ -1341,6 +1390,7 @@ func load_state(state: Dictionary) -> void:
 		"vignettes_seen", vignettes_seen)
 	daily_state = state.get("daily", daily_state)
 	dog = state.get("dog", dog)
+	field_notes = state.get("field_notes", field_notes)
 	if state.has("sites"):
 		sites = _sites_from_json(state["sites"])
 	var saved: Dictionary = state.get("crew", {})
