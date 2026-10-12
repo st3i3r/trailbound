@@ -109,6 +109,8 @@ A day has four phases. The player ends each phase with one button; nothing in a 
 
 - The camp is a grid of 64×64 px cells (2×2 tiles of 32 px).
 - Each site has 8 pad spots. Pinewatch opens with 2, the other sites with 3. Locked spots look overgrown, and the player chooses which one to open next (prices §6.7).
+- Pad states: **open → overgrown → clearing → pad**. Opening a spot is two steps: pay the price, then **Clear** it — tap/hold the overgrown pad and weeds, stones and debris pull away in a short transform (overgrown → dirt → pad). Clearing is free after the price and takes ~2 s; the act is the reward, not the cost. The first pad cleared by hand is day-1 onboarding (§14). Overgrown spots still block bookings until cleared.
+- The Clear fantasy is the game's core promise made kinesthetic: you don't buy a camp, you *reclaim* one. Debris art is an overlay set (weed tufts, stones, fallen branches, old crates) — no terrain change needed underneath.
 - A pad fills 1 cell. Tent, platform and cabin art may overhang upward.
 - Decor fills 1 cell, except four 2×1 items: Picnic Table, String Lights, Flower Arch and Swing.
 - The camp core (pads, campfire and decor cells) is at most 10×4 cells, so the whole puzzle fits above the booking tray in a 640-px-wide view. Validate in Phase 1.
@@ -209,6 +211,7 @@ stars = clamp(2 + comfort + meal + traits + weather, 1, 5)
 - Site rating = mean of the last 15 reviews at that site (of all reviews while there are fewer than 15), shown to one decimal. Turning guests away never lowers it.
 - Walk-ins per night = min(Seats, max(0, ⌊rating⌋ − 2)). Each buys one leftover meal at its menu price (§6.5), most valuable first; with no leftover there is no sale. Walk-ins don't review.
 - A Food Blogger's 5★ stay adds one walk-in at that site the next night, still capped by Seats.
+- **Demand is visible:** when the booking board has more requests than open pads, the turned-away parties are seen waiting at the trailhead during Evening, then walking off — never hidden numbers. The queue at the gate is the pressure to expand (§5.1 Clear). Cosmetic only; turning guests away still never lowers the rating.
 
 ### 5.7 Weather
 
@@ -324,6 +327,15 @@ The sim assumes an average walk-in meal of 18 at Pinewatch, 25 at Whisper River 
 | Platform | 100 | 125 | 150 | P2 | Pad comfort +1 |
 | Cabin | — | 275 | 325 | W arrival | Upgrades a Platform: comfort +2, always covered |
 | Stone Fire Pit | 300 | 300 | 300 | P5 | Campfire Warmth r2 → r3; once per site |
+
+**Camp tier-ups** (silhouette upgrades — the camp visibly tiers up; priced into the next sim pass, §C):
+
+| Tier chain | From | Effect |
+|---|---|---|
+| Signpost → **Trail Gate** | P3 | Landmark entrance; cosmetic + the queue reads here (§5.6) |
+| Campfire → Stone Fire Pit → **Cook Shelter** | W2 | Sheltered kitchen; rain no longer cancels dinner prep (tiny QoL, no scoring) |
+| Outfitter → **Outfitter Lodge** | W4 | Mai's van stops become a stall; staples shop gets a facade |
+| Booking post → **Reception Board** | P4 | Board moves from abstract UI to a diegetic board prop |
 
 **Decor** (same price at every site):
 
@@ -443,6 +455,8 @@ The crew (§8.4) is the game's only real-time system. Its times live here with t
 | 12 h | 2 h | 6 h |
 
 **Pacing check:** a player who plays once a day for about 20 minutes collects about one stage a day, so the crew's 9 stages take about 9 real days. That is about as long as the arc takes at that rate (34 in-game days of 4–6 minutes, about 8.5 real days). Phase 3 playtests and closed-test data replace this estimate (Q12).
+
+**Staff/service layer** (v1.1 candidate): a cook's helper or camp hand hired per site — serves dinner, tidies, small passive tip bonus. Deliberately absent from v1: the solo-warden fantasy is the point ("just you, the dog and the journal"); helpers fit the Volume II scale-up, not the quiet start.
 
 ### 6.11 Volume II (v1.1, draft)
 
@@ -603,8 +617,9 @@ Each site has five pages, completed in any order. A page pays its gift (§6.6), 
 | Keepsakes | 9 (3 per site) | Collecting a crew stage (§8.4) |
 | Letters | 25 | Reading |
 | Days log | One line per day | Each night: site, weather, guests, best review, coins |
+| Then/Now | 1 per site | Auto-photo of the camp on day 1 vs current — the before/after payoff |
 
-The cover shows completion as a percentage of the 72 collectible entries (Chapters, Guestbook, Field Notes, Recipes, Keepsakes).
+The cover shows completion as a percentage of the 72 collectible entries (Chapters, Guestbook, Field Notes, Recipes, Keepsakes). The Then/Now photo pair sits inside the cover, not the count.
 
 ### 8.4 The crew and grandpa's structures
 
@@ -636,6 +651,7 @@ On day 2, Ranger Mai's van drops off a small volunteer crew. At each site they r
 - Bond (4 levels) grows from a daily pet and from leftovers. Each level unlocks a cosmetic trick; the last is chasing the đá cầu shuttlecock (§15).
 - It has no needs, causes no penalties and can't be lost.
 - The Dog effect on guests comes only from the Dog Bed, never from where the dog wanders, so scoring stays deterministic.
+- Guest pets (cosmetic only): some parties may arrive with a pet — a van-lifer's border collie, a family corgi, a cat in a basket. Pure visual variety and charm; no scoring effect, no systems. Bean stays the only dog with a story.
 
 ## 10. Trail Daily [S]
 
@@ -772,6 +788,35 @@ Single-pad archetype mix by site:
 - Unseen vignettes play first. Among the eligible ones, the trigger with the most matching guests wins.
 - A restoration vignette plays on the first night the player spends at that site after the structure is restored, ahead of any other unseen vignette.
 
+### 13.5 Festivals and camp events
+
+Three event models, deliberately different scopes:
+
+| Model | Mechanic | v1 scope |
+|---|---|---|
+| In-game festival nights | Fixed arc dates become festival nights: decor overlay + themed guests + one limited dish + a vignette | 2: **Tết** at one site, **Mid-Autumn (Trung Thu)** at Lantern Valley |
+| Purchasable night events | Spend coins to host an event for the night (hire musicians, karaoke, đá cầu tournament, lantern release) | 1 type: **Music Night** |
+| Real-date seasonal events | Device date drives dressing, limited items, themed guests | v1.1+, under §33.6 live-ops rules |
+
+**Festival nights.** Mid-Autumn is locked to Lantern Valley — the
+lantern festival IS the site's identity (star lanterns, procession,
+mooncakes, lion dance). Tết brings đào/mai blossoms, the cây nêu
+pole, red lanterns, lì xì envelopes and a lion-dance vignette;
+guests arrive "home for Tết" — it is a story beat, not just
+dressing. Each festival adds one limited dish to the recipe book.
+
+**Music Night (the purchasable event).** An Evening purchase
+(~150 coins): a small band plays at the fire for the night —
+crowd gathers, Music effect reaches every pad, +tips bonus.
+Crucially it is a real DECISION, not free value: Music Lovers
+cheer, Light Sleepers next to the fire lose a star — spend when
+the night's roster suits it (the puzzle extends to events).
+
+**Assets:** Tết pack (đào/mai trees, cây nêu, lanterns, lì xì,
+lion-dance frames), Mid-Autumn pack (star lanterns, procession,
+mooncakes), band sprites + instruments, karaoke speaker alt.
+~40 gens. Live-ops seasonal packs are a v1.1 pipeline, not v1.
+
 ## 14. Onboarding
 
 **Rule:** one new idea per day, and the scene is the tutorial. No popups or walls of text.
@@ -782,6 +827,7 @@ Single-pad archetype mix by site:
 |---|---|---|
 | Cold open | First launch skips the title screen and opens on the overgrown clearing at golden hour. The journal's first page reads "Finish the book for me" | Mood, the journal |
 | The fire | Ranger Mai: "Help me get this fire going." Tap the fire ring; P1 is stamped | Tapping objects, pages |
+| First clearing | Mai: "Weeds first." Tap/hold the first overgrown pad spot — weeds and debris pull away into dirt. Free, scripted, ~2 s | The Clear action; the reclaim fantasy (§5.1) |
 | Supper | Gather from two forage nodes, then cook Trail Stew twice. The Ranger teaches the recipe and adds a spare portion | Forage, cooking |
 | Guests | "Light the lanterns": two travelers with one trait each. Drag them onto pads; one sentence explains the stars | Seating, the preview |
 | Night | "Goodnight": a vignette, then reviews and coins | The night |

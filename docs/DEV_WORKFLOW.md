@@ -116,6 +116,67 @@ rating set · page complete · letter trigger · Daily seed override ·
 Remove Ads toggle · ad test mode (fill / no fill) · ad pacing reset ·
 consent reset (UMP debug geography) · save wipe/migrate-test.
 
+### Pinewatch live test scene
+
+`game/scenes/pinewatch_test.tscn` runs the real hosting loop
+(`Game.advance_day` → board → seat → Goodnight → next day) on the
+canonical Pinewatch art. Commands (from repo root; `godot.cmd` on this
+host):
+
+```bat
+run_pinewatch.cmd                                      :: interactive
+godot.cmd --path game --import                          :: after asset changes
+godot.cmd --path game res://scenes/pinewatch_test.tscn  :: interactive
+godot.cmd --path game res://scenes/pinewatch_test.tscn --shot
+```
+
+`--shot` captures the viewport after two frames and writes
+`assets_src/cleanup/pinewatch_engine_graded.png` (test-scene only flag,
+handled in `pinewatch_test.gd`). Compare against
+`assets_src/cleanup/pinewatch_comp_v3.png` — the scene's layout
+authority is `tools/scene_comp_v2.py`.
+
+Art pipeline (style-locked — `assets_src/prompts/style_lock.md`):
+`generate → tools/tb_grade.py --site X → palette-snap (dE>30) → stage →
+integrate`. The wang sheets are HSV-graded in place by
+`tools/tb_grade.py` (canonical `pinewatch` preset; not idempotent —
+re-grade from pristine). After grading, `tools/tb_calm.py` runs the
+de-noise pass (masked local-mean pull: grass freckles ×0.40, dirt
+waffle ×0.65, water specks ×0.80 — the "soft wash" look); a
+`--from-pristine` re-grade wipes it, so always re-run
+`tb_grade.py --from-pristine && python tools/tb_calm.py` as a pair.
+Pass
+`cleanup/pinewatch_engine_graded.png` (or a scene crop) as the PixelLab
+style reference for future generations so candidates land pre-graded —
+don't use raw eastward.jpg anymore.
+
+Terrain: `python tools/make_tileset.py` regenerates
+`game/resources/pinewatch_terrain.tres` from the wang-sheet JSONs in
+`game/assets/pinewatch/terrain/` (3 atlas sources × 16 tiles, corner
+peering bits, terrain sets water/forest/stone vs grass). Re-run
+`godot.cmd --path game --import` afterwards.
+
+HUD notes: pills/buttons use nine-slice insets from
+`ui/ui_atlas_meta.json`; chrome fades to 20 % after ~3 s idle (mouse
+motion wakes it); F1 toggles the dev-only Vietnamese diacritics label.
+Fonts: F1 (display) → Be Vietnam Pro (body) → engine fallback. Neither
+bundled font has ★/→ glyphs — star previews draw the gold `I1_4` icon
+plus a number instead.
+
+#### Canonical assets
+
+`game/assets/pinewatch/` now mirrors `assets_src/out/` (+ a few `gen/`
+keepers; full map in `assets_src/README.md`):
+
+`terrain/` (3 wang sheets + JSON) · `decals/` (XS_*) · `props_small/`
+`props_medium/` `props_large/` (named props incl. gen/ keepers
+prop_boulder_0, prop_supply_crate_0) · `characters/{warden,ranger_mai,
+camp_dog}/` (8-dir turnarounds + A2/A3 anim frames) · `fx/` (A1b fire
+loop, A1 ignite) · `ui/` (pieces + ui_atlas.png/meta) · `icons/` (I1_*)
+· `fonts/` (F1_1.ttf, BeVietnamPro-Regular.ttf, OFL license) ·
+`anchors.json` · legacy `pad_*.png`. `*.import` files are
+engine-generated — never copy them.
+
 ---
 
 ## 4. Phase plan — what gets built in what order
@@ -171,7 +232,12 @@ no art is generated. Art never leads gameplay.
 - AdMob app and ad unit IDs and the Firebase config are identifiers, not
   secrets: committed. Debug builds use test ad units; production IDs only in
   release exports
-- Art pipeline: PixelLab → `assets_src/` → QA gates (GDD §16.4) → `game/assets/` → manifest maps it
+- Art pipeline: PixelLab → `assets_src/` → `tools/tb_grade.py --site X`
+  (HSV grade, canonical = `--site pinewatch`) → palette-snap (dE>30) →
+  QA gates (GDD §16.4) → `game/assets/` → manifest maps it. Pinewatch
+  art is canonical & engine-verified; future gens use
+  `assets_src/cleanup/pinewatch_engine_graded.png` as the style ref
+  (see `assets_src/prompts/style_lock.md`)
 - Save everything through `ResourceSaver`/JSON — never binary blobs in repo
 
 ---
