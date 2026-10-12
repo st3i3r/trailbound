@@ -161,11 +161,96 @@ const PROPS := [
     ["props_medium", "stump_dead",        575, 152],
     ["props_small",  "root_gnarled",      458, 152],
     ["props_medium", "pine_sapling",      628, 158],
+    # ============ J9 L6 functional layer ============
+    # kitchen fire cluster — cooking gear around the ring
+    ["props_small",  "camp_kettle",       314, 252],
+    ["props_small",  "dutch_oven",        344, 256],
+    ["props_small",  "cook_pot",          288, 246],
+    ["props_small",  "metal_bucket",      332, 272],
+    ["props_small",  "marshmallow_skewer",358, 250, -4.0],
+    ["props_small",  "camp_radio",        372, 250],   # on the radio stump
+    ["props_small",  "enamel_mug",        262, 268],   # on the log bench
+    ["props_small",  "trash_bag",         424, 280],
+    # served food on the rest-corner picnic table
+    ["props_small",  "pho_bowl",          524, 256],
+    ["props_small",  "banh_mi",           502, 260],
+    ["props_small",  "coconut_drink",     510, 254],
+    ["props_small",  "log_stool",         498, 270],
+    # tea table vignette — game + journal + cards
+    ["props_small",  "co_tuong_set",      478, 270],
+    ["props_small",  "journal_pencil",    466, 274, 3.0],
+    ["props_small",  "playing_cards",     488, 274],
+    ["props_small",  "guitar",            528, 264, -3.0],
+    # camp-table spread by the amber dome (table at 232,312)
+    ["props_small",  "phin_coffee",       234, 306],
+    ["props_small",  "tea_cup",           246, 310],
+    ["props_small",  "jam_jar",           222, 312],
+    ["props_small",  "bread_board",       210, 314],
+    ["props_small",  "folded_map",        240, 320],
+    ["props_small",  "brass_compass",     218, 322],
+    ["props_small",  "egg_tray",          232, 328],
+    ["props_small",  "banana_bunch",      250, 322],
+    # tent-mouth dressing
+    ["props_small",  "lantern_mini",      226, 234],
+    ["props_small",  "hiking_boots",      234, 246],
+    ["props_small",  "headlamp",          206, 250],
+    ["props_small",  "sandals",           202, 314],
+    ["props_small",  "insect_spray",      214, 318],
+    ["props_small",  "rope_coil",         172, 324],
+    ["props_small",  "umbrella",          158, 318, -4.0],
+    ["props_small",  "thermos",           250, 332],
+    ["props_small",  "sleeping_pad",      394, 338],
+    ["props_small",  "folded_blanket",    414, 340],
+    # van / trailhead unloading
+    ["props_small",  "trekking_poles",    148, 200, -5.0],
+    ["props_small",  "first_aid_pouch",   196, 198],
+    ["props_small",  "rice_sack",         214, 192],
+    ["props_small",  "crab_basket",       198, 194],
+    ["props_small",  "water_jug",         224, 194],
+    ["props_small",  "clothesline",        42, 234],
+    # pond bank — fishing vignette
+    ["props_small",  "fishing_rod",       170, 262, -6.0],
+    ["props_small",  "tackle_box",        156, 260],
+    ["props_small",  "landing_net",       176, 274, 5.0],
+    ["props_small",  "hanging_fish",      182, 268],
+    ["props_small",  "stone_wall_row",    130, 258],
+    ["props_small",  "stone_wall_row",     50, 250],
+    # pond->camp informal crossing
+    ["decals",       "step_stone_a",      196, 302],
+    ["decals",       "step_stone_b",      220, 308],
+    ["decals",       "step_stone_c",      244, 314],
+    # herb garden / work edge
+    ["props_small",  "trowel",            414, 170, -4.0],
+    ["props_small",  "watering_can",      428, 166],
+    ["props_small",  "potted_herb",       444, 168],
+    ["props_small",  "seed_packet",       458, 168, 3.0],
+    ["props_small",  "garlic_braid",      490, 168],
+    ["props_small",  "herb_bundle",       374, 242],
+    # boundary vocabulary
+    ["props_small",  "fence_wood",        592, 232],
+    ["props_small",  "fence_rope",        548, 212],
+    ["props_small",  "fence_bamboo",      484, 152],
+    ["props_small",  "birdhouse",         250, 142],
+    ["props_small",  "signpost_arrow",    240, 296],
+    ["props_small",  "kite",              560, 330],
 ]
 # props that get NO foreground embed decal (it IS the ground, or it
 # sits in/at the water where a front tuft would float)
 const EMBED_SKIP := ["dirt_patch", "reed_shore", "shore_edge_bank",
-                     "shore_islet", "decal_lily_pad"]
+                     "shore_islet", "decal_lily_pad",
+                     # flat-lying or on-furniture/hanging items — a base
+                     # tuft would read as grass on the table or under air
+                     "enamel_mug", "pho_bowl", "banh_mi", "phin_coffee",
+                     "tea_cup", "jam_jar", "bread_board", "egg_tray",
+                     "banana_bunch", "coconut_drink", "folded_map",
+                     "brass_compass", "journal_pencil", "playing_cards",
+                     "co_tuong_set", "camp_radio", "first_aid_pouch",
+                     "headlamp", "insect_spray", "hanging_fish",
+                     "garlic_braid", "herb_bundle", "seed_packet",
+                     "kite", "sleeping_pad", "folded_blanket", "sandals",
+                     "hiking_boots", "rope_coil", "folded_towel",
+                     "step_stone_a", "step_stone_b", "step_stone_c",
+                     "clothesline"]
 
 const FIRE_POS := Vector2(326, 246)          # A1b fire-loop anchor
 const WARDEN_POS := Vector2(348, 262)
