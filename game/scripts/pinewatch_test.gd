@@ -153,6 +153,8 @@ const TENTS := ["dome_tent_sage", "dome_tent_amber", "dome_tent_slate"]
 
 # ------------------------------------------------------------- grade pass
 const WARM_MUL := Color("fbf4e4")            # sunny filmic multiply —
+const STORM_MUL := Color(0.38, 0.40, 0.48)   # desaturated slate — storm
+const STORM_FLASH := Color(1.3, 1.3, 1.45)   # overexposed glare (lightning)
                                              # #f4ead3 over-darkened the
                                              # scene (2026-10-12 review);
                                              # kept near-white so the day
@@ -211,6 +213,12 @@ const FADE_ALPHA := 0.35
 const FADE_SPEED := 2.6                      # ~0.25s ramp — their spec
 var fade_zones := []                         # [{s: Sprite2D, r: Rect2}]
 var actor_nodes := []                        # walking sprites to protect
+var _grade: CanvasModulate                   # filmic grade — storm target
+var _ripple: ColorRect                       # ground-only screen warp
+var _rain: GPUParticles2D                    # slanted 2.5D downpour
+var _storm_on := false
+var _storm_tween: Tween
+var _lightning_cd := 0.0                     # presenter rng, unseeded
 var marks: Node2D                            # hover + star previews above world
 var hover: Sprite2D
 var hud: HUD                                 # chrome root (fades when idle)
@@ -290,10 +298,10 @@ func _ready() -> void:
     var rng := RandomNumberGenerator.new()
     rng.seed = 7
 
-    var grade := CanvasModulate.new()        # warm sunny filmic multiply;
-    grade.name = "WarmGrade"                 # HUD sits in its own
-    grade.color = WARM_MUL                   # CanvasLayer, unaffected
-    add_child(grade)
+    _grade = CanvasModulate.new()            # warm sunny filmic multiply;
+    _grade.name = "WarmGrade"                # HUD sits in its own
+    _grade.color = WARM_MUL                  # CanvasLayer, unaffected
+    add_child(_grade)
 
     stage = Node2D.new()                     # every world layer lives under
     stage.name = "Stage"                     # Stage so _fit_stage() can centre
@@ -319,10 +327,43 @@ func _ready() -> void:
     shadows = Node2D.new()                   # canopy/contact shadow
     shadows.name = "Shadows"                 # pools — drawn UNDER world
     stage.add_child(shadows)
+    _ripple = ColorRect.new()                # screen-space ground warp:
+    _ripple.name = "RippleOverlay"           # reads pixels drawn BELOW it
+    _ripple.position = Vector2.ZERO          # (ground+tint+shadows), so
+    _ripple.size = Vector2(GW * T, GH * T)   # rain ripples on terrain
+    _ripple.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    var rmat := ShaderMaterial.new()         # while y-sorted props and
+    rmat.shader = load(                      # actors stay crisp on top
+        "res://shaders/rain_ripples.gdshader")
+    rmat.set_shader_parameter("storm_intensity", 0.0)
+    _ripple.material = rmat
+    stage.add_child(_ripple)
     world = Node2D.new()
     world.name = "World"
     world.y_sort_enabled = true
     stage.add_child(world)
+    _rain = GPUParticles2D.new()             # slanted downpour ABOVE the
+    _rain.name = "ScreenRain"                # y-sorted world, UNDER the
+    _rain.amount = 1400                      # canopy crowns (added to
+    _rain.lifetime = 1.0                     # stage after world)
+    _rain.emitting = false
+    var pm := ParticleProcessMaterial.new()
+    pm.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+    pm.emission_box_extents = Vector3(700, 30, 1)
+    pm.direction = Vector3(-0.35, 1.0, 0.0)  # wind slant, near-parallel
+    pm.spread = 2.0                          # (high spread reads confetti)
+    pm.initial_velocity_min = 520.0
+    pm.initial_velocity_max = 680.0
+    pm.gravity = Vector3.ZERO
+    pm.scale_min = 1.0
+    pm.scale_max = 1.5
+    pm.set_particle_flag(
+        ParticleProcessMaterial.PARTICLE_FLAG_ALIGN_Y_TO_VELOCITY,
+        true)                                # streaks along travel dir
+    _rain.process_material = pm
+    _rain.texture = _rain_tex()
+    _rain.position = Vector2(GW * T * 0.5 + 160, -30)
+    stage.add_child(_rain)
     _build_props()
     _build_actors()
     # Phase 5.6 — canopy crowns hanging INTO the frame top: the
@@ -365,6 +406,12 @@ func _ready() -> void:
         hud_layer.visible = false
         markers.visible = false
         pads_node.visible = false
+    # --storm: presenter-only weather QA — tint, rain, ground ripples.
+    # st["weather"] == "storm" will drive the same hook when the
+    # scenario matrix lands (cast picks the row, presenter reads it)
+    if OS.get_cmdline_args().has("--storm") \
+            or Game.site_state().get("weather") == "storm":
+        _set_storm(true, 0.0)                # instant for --shot QA
     # --pose: QA screenshot staging — seats the first guest (trait
     # bubble visible), selects the second and hovers a pad (strip +
     # star previews visible)
@@ -441,11 +488,54 @@ func _process(delta: float) -> void:
         if not is_equal_approx(s.modulate.a, target):
             s.modulate.a = move_toward(s.modulate.a, target,
                 delta * FADE_SPEED)
+    if _storm_on:                             # lightning: snap the grade
+        _lightning_cd -= delta                # to an overexposed glare,
+        if _lightning_cd <= 0.0:              # then let the grade tween
+            _lightning_cd = randf_range(2.5, 7.0)   # settle back
+            _grade.color = STORM_FLASH
+            var ft := create_tween()
+            ft.tween_property(_grade, "color", STORM_MUL, 0.15)
     if hud == null:
         return
     idle_ms += delta
     if idle_ms > 3.0 and hud.modulate.a > 0.21:
         _fade_chrome(0.2)
+
+
+## Storm presenter — visual only, no sim involvement. The warm-grade
+## CanvasModulate slides to a desaturated slate; GPU rain slants across
+## the map; the ripple shader warps ground pixels. Driven by --storm /
+## st["weather"] today; the scenario cast will own the trigger later.
+func _set_storm(on: bool, dur := 4.0) -> void:
+    _storm_on = on
+    _lightning_cd = randf_range(1.5, 4.0)
+    if _storm_tween and _storm_tween.is_running():
+        _storm_tween.kill()
+    var m := _ripple.material as ShaderMaterial
+    if dur <= 0.05:                            # QA shots: no ramp to wait on
+        _grade.color = STORM_MUL if on else WARM_MUL
+        m.set_shader_parameter("storm_intensity",
+            1.0 if on else 0.0)
+        _rain.emitting = on
+        return
+    _storm_tween = create_tween().set_parallel(true)
+    _storm_tween.tween_property(_grade, "color",
+        STORM_MUL if on else WARM_MUL, dur)\
+        .set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+    _storm_tween.tween_property(m, "shader_parameter/storm_intensity",
+        1.0 if on else 0.0, dur)
+    _rain.emitting = on
+
+
+func _rain_tex() -> Texture2D:
+    ## 2x16 streak — bright leading tip fading toward the tail; the
+    ## particle flag aligns it to velocity so it draws as a rain line
+    var img := Image.create(2, 16, false, Image.FORMAT_RGBA8)
+    for y in 16:
+        var a := lerpf(0.55, 0.05, y / 15.0)
+        img.set_pixel(0, y, Color(1, 1, 1, a))
+        img.set_pixel(1, y, Color(1, 1, 1, a))
+    return ImageTexture.create_from_image(img)
 
 
 func _fade_chrome(a: float) -> void:

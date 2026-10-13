@@ -190,6 +190,18 @@ archetypes + placed items → entity programs. v1 casts a minimal
 in-code table (guest idle at pad, dog patrol, angler→bank); the
 full archetype/weather/item scenario matrix is a data file later.
 
+**Events are casts, not managers.** There is no `EventManager`
+autoload mutating state mid-night — `st["event"]`/`st["weather"]`
+are seeded at day roll, persisted, and the Director reads them at
+cast time to pick scenario rows (storm cast: tent-huddle programs,
+no bank visits; Tết cast: festive archetypes + lantern decor
+state). A mid-night "storm arrival" is a *scheduled beat* in the
+cast (thunder percept → campers retreat — deterministic). Rain,
+dimming, lanterns are presenter layers reading the same key.
+Incidents obey the cozy contract: a lừa-đảo guest is *denied
+upside* (tips less, one guest's night sours, tap-to-shoo or the
+warden handles him) — never owned-resource loss.
+
 ### Entropy (actor-scale verdicts, applied)
 
 At ~10-15 actors the crowd-sim playbook mostly doesn't apply:
@@ -305,7 +317,7 @@ ticks at fixed dt accumulated from it.
 | `emote` comp | icon bubble (","!"","♥") + squish-stretch on the sprite |
 | `percept` new entry | head-turn emote toward stimulus pos |
 | cue `bark`/`alarm` | soft sfx + bark bubble |
-| `ctx.weather` | audio mixer: rain low-pass + woodwinds; actor sprite state variants (umbrella/tarp idle) |
+| `ctx.weather` | **Built (visual half):** `--storm`/`st["weather"]` drives `_set_storm` — grade → desaturated slate (4s SINE), GPU slanted rain (box strip, `ALIGN_Y_TO_VELOCITY`), screen-space ground ripples (shader below y-sorted world), periodic lightning grade-flash. Remaining: rain low-pass audio bed, umbrella/tarp idle variants, HUD exempt from grade (`light_mode=unshaded`), fire/window warm-cut (PointLight2D or painted glow) |
 | `anim` name | frame set; `flee`/`wary`/`pet` are authored loops |
 | coincidental sprite overlap | deterministic render offset from world rng + back-sprite alpha dip — residual fix only; real prevention is socket claiming below |
 | actor behind tall prop | **walk-behind fade shipped** (pinewatch_test): `FADEABLE` props get a zone over their upper art; actor footing inside lerps alpha to 0.35. Verified — dog behind the van shows through |
