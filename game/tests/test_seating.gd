@@ -196,8 +196,13 @@ func _ready() -> void:
 	check("2x1 needs a pair", not Game.buy_decor("picnic_table",
 		[Vector2i(7, 3)]))
 	# --- build verbs: move / store / return (§6.1, §5.8) ------------
-	check("move to legal cell", Game.move_decor(0, [Vector2i(2, 2)])
-		and Game.site_state()["decor"][0]["cells"][0] == Vector2i(2, 2))
+	check("move to legal cell", Game.move_decor(0, [Vector2i(4, 4)])
+		and Game.site_state()["decor"][0]["cells"][0] == Vector2i(4, 4))
+	# (2,2) is the only doorway into the {(0,2),(0,3),(1,2)} pocket
+	# holding pad p8 — sealing it must be rejected.
+	check("stranding move rejected",
+		not Game.move_decor(0, [Vector2i(2, 2)])
+		and Game.site_state()["decor"][0]["cells"][0] == Vector2i(4, 4))
 	check("move to blocked cell fails",
 		not Game.move_decor(0, [Vector2i(3, 2)]))
 	check("buy stools", Game.buy_decor("stools", [Vector2i(6, 2)])
@@ -212,6 +217,16 @@ func _ready() -> void:
 		and Game.site_state()["decor"].size() == 1)
 	check("gone from today list",
 		not "stools" in Game.bought_today)
+	# --- placement deadlock guard: a drop must not strand cells ------
+	# corridor (0,0)-(2,0) with a pocket hanging off (1,0): sealing the
+	# corridor strands the pocket + far end; capping an end is fine.
+	var corridor := {Vector2i(0, 0): true, Vector2i(1, 0): true,
+		Vector2i(2, 0): true, Vector2i(1, 1): true,
+		Vector2i(1, 2): true}
+	check("sealing corridor rejected",
+		Game._strands_any(corridor, [Vector2i(1, 0)]))
+	check("capping corridor end ok",
+		not Game._strands_any(corridor, [Vector2i(0, 0)]))
 	check("fire pit r3", Game.buy_decor("stone_fire_pit", [])
 		and Game.coins == 430
 		and Game.site_state()["campfire"]["radius"] == 3)
@@ -237,7 +252,7 @@ func _ready() -> void:
 		and back["pads"]["p4"]["open"]
 		and back["campfire"]["radius"] == 3
 		and back["decor"].size() == 1
-		and back["decor"][0]["cells"][0] == Vector2i(2, 2)
+		and back["decor"][0]["cells"][0] == Vector2i(4, 4)
 		and back["pages_done"].has(1)
 		and back["counters"]["guests_welcomed"] == 20
 		and Game.coins == 230)

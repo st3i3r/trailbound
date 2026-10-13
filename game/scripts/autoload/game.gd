@@ -1111,6 +1111,53 @@ func _decor_blocked(ignore := -1) -> Dictionary:
 	return out
 
 
+## Walkable cells = core grid minus nav.blocked; pads are
+## soft-passable so they never wall a path.
+func _walk_cells(layout: Dictionary) -> Dictionary:
+	var out := {}
+	var core: Array = layout.get("camp_core_max_cells", [0, 0])
+	var nav := {}
+	for c in layout.get("nav", {}).get("blocked", []):
+		nav[Vector2i(int(c[0]), int(c[1]))] = true
+	for y in int(core[1]):
+		for x in int(core[0]):
+			var c := Vector2i(x, y)
+			if not nav.has(c):
+				out[c] = true
+	return out
+
+
+func _reachable_set(cells: Dictionary) -> Dictionary:
+	if cells.is_empty():
+		return {}
+	var seed: Vector2i = cells.keys()[0]
+	var seen := {seed: true}
+	var queue := [seed]
+	while not queue.is_empty():
+		var c: Vector2i = queue.pop_back()
+		for d in [Vector2i(1, 0), Vector2i(-1, 0),
+				Vector2i(0, 1), Vector2i(0, -1)]:
+			var n: Vector2i = c + d
+			if cells.has(n) and not seen.has(n):
+				seen[n] = true
+				queue.append(n)
+	return seen
+
+
+## Placement deadlock guard: dropping pts must not strand any
+## previously-reachable walkable cell.
+func _strands_any(free: Dictionary, pts: Array) -> bool:
+	var base := _reachable_set(free)
+	var left := free.duplicate()
+	for c in pts:
+		left.erase(c)
+	var after := _reachable_set(left)
+	for c in base:
+		if not pts.has(c) and not after.has(c):
+			return true
+	return false
+
+
 func _footprint_ok(row: Dictionary, cells: Array, ignore := -1) -> bool:
 	var size := String(row.get("size", "1x1"))
 	if size == "campfire":
@@ -1129,7 +1176,20 @@ func _footprint_ok(row: Dictionary, cells: Array, ignore := -1) -> bool:
 		pts.append(v)
 	if want == 2 and abs(pts[1].x - pts[0].x) != 1:
 		return false                             # 2x1 = horizontal pair
-	return true
+	var occ := {}
+	for i in site_state()["decor"].size():
+		if i == ignore:
+			continue
+		for c in site_state()["decor"][i]["cells"]:
+			occ[c] = true
+	var free := {}
+	for c in _walk_cells(_layout()):
+		if not occ.has(c):
+			free[c] = true
+	for c in pts:
+		if not free.has(c):
+			return false                     # decor can't sit on water/solid
+	return not _strands_any(free, pts)
 
 
 func buy_decor(item_id: String, cells: Array) -> bool:
