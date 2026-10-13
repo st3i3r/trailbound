@@ -193,7 +193,7 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 		seed: int) -> SimWorld:
 	var w := SimWorld.new(seed)
 	var spots: Dictionary = layout.get("pads", {}).get("spots", {})
-	var bank := _bank(layout)
+	var bank: Variant = _bank(layout)
 	# cast context for select/if branches: which items exist and
 	# where — placement changes the night (AC-style item binding)
 	var items: Array = []
@@ -220,20 +220,25 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 		var steps: Array
 		var extra := {}
 		match arch:
-			"angler" if bank != null:
-				steps = [{"op": "anim", "name": "walk"}]
-				steps.append_array(_goto_legs(layout, home,
-					bank, 40.0))
-				steps.append_array([
-					{"op": "anim", "name": "fish"},
-					{"op": "wait", "t": 8.0},
-					{"op": "anim", "name": "walk"}])
-				steps.append_array(_goto_legs(layout, bank,
-					home, 40.0))
-				steps.append_array([
-					{"op": "anim", "name": "sit"},
-					{"op": "wait", "t": 6.0},
-					{"op": "jump", "to": 0}])
+			"angler":
+				if bank != null:
+					steps = [{"op": "anim", "name": "walk"}]
+					steps.append_array(_goto_legs(layout,
+						home, bank, 40.0))
+					steps.append_array([
+						{"op": "anim", "name": "fish"},
+						{"op": "wait", "t": 8.0},
+						{"op": "anim", "name": "walk"}])
+					steps.append_array(_goto_legs(layout,
+						bank, home, 40.0))
+					steps.append_array([
+						{"op": "anim", "name": "sit"},
+						{"op": "wait", "t": 6.0},
+						{"op": "jump", "to": 0}])
+				else:
+					steps = [{"op": "anim", "name": "idle"},
+						{"op": "wait", "t": 4.0},
+						{"op": "jump", "to": 0}]
 			"kids", "family":
 				# the swing the player placed changes the cast;
 				# the dog's proximity scores their reaction

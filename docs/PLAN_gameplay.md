@@ -334,6 +334,7 @@ crossfaded, not switched.
 | Content lint | decor_cells hand-authored, neighbours hand-authored | CI validator: decor_cells ⊆ core & unblocked; neighbours symmetric; errand spots on ground; r-reach ≤ ~3 pads |
 | Save/migration | `state_dict`+`_migrate` works | Actors excluded by design; add migration matrix to tests when schema bumps |
 | Pathfinding | **Cast-time static cost routing** — the map dictates the path, not the actor: `nav.blocked` cells (water/fire/treeline) + soft pad cost in layout JSON; LOS fast path else A* on the cell grid, emitted as `goto` chains. Deterministic, pure-data, no runtime navmesh/physics | Done — `_route`/`_goto_legs` in SimDirector; dynamic targets (flee home, goto tag/percept) stay straight-line, noted limitation |
+| Site portability | Engine layer is site-agnostic: no Pinewatch refs in `sim/`. Site = layout JSON contract (`pads.spots`, `errand_spots`, `nav`, `decor_cells`) + scenario table. `cast_night` is hand-authored Pinewatch content pending the scenario matrix | Done — `_bank` returns null without `errand_spots.pond` (angler falls back to idle); remaining site data is the planned JSON matrix |
 | Staff AI | Not in v1 | If staffing lands: per-agent task queue, not a job-board system |
 
 ## The cozy UX contract (cross-cutting, applies to every phase)
