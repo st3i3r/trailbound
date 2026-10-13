@@ -1,41 +1,145 @@
 {
   "site_id": "pinewatch",
-  "camp_core_max_cells": [10, 4],
-  "camp_core_origin_px": [0, 96],
+  "camp_core_max_cells": [
+    9,
+    6
+  ],
+  "camp_core_origin_px": [
+    0,
+    0
+  ],
   "pads": {
     "total": 8,
     "start_open": 2,
     "spots": {
-      "p1": [1, 0], "p2": [4, 0], "p3": [7, 0],
-      "p4": [0, 1], "p5": [9, 1],
-      "p6": [1, 2],
-      "p7": [4, 3], "p8": [7, 3]
+      "p1": [
+        0,
+        1
+      ],
+      "p2": [
+        2,
+        1
+      ],
+      "p3": [
+        5,
+        1
+      ],
+      "p4": [
+        8,
+        2
+      ],
+      "p5": [
+        8,
+        3
+      ],
+      "p6": [
+        7,
+        4
+      ],
+      "p7": [
+        3,
+        5
+      ],
+      "p8": [
+        0,
+        2
+      ]
     },
-    "open": ["p1", "p2"],
+    "open": [
+      "p1",
+      "p2"
+    ],
     "neighbours": {
-      "p1": ["p2", "p4"],
-      "p2": ["p1", "p3", "p7"],
-      "p3": ["p2", "p5"],
-      "p4": ["p1", "p6"],
-      "p5": ["p3", "p8"],
-      "p6": ["p4", "p7"],
-      "p7": ["p6", "p8", "p2"],
-      "p8": ["p5", "p7"]
+      "p1": [
+        "p2",
+        "p8"
+      ],
+      "p2": [
+        "p1",
+        "p3"
+      ],
+      "p3": [
+        "p2",
+        "p4"
+      ],
+      "p4": [
+        "p3",
+        "p5"
+      ],
+      "p5": [
+        "p4",
+        "p6"
+      ],
+      "p6": [
+        "p5",
+        "p7"
+      ],
+      "p7": [
+        "p6",
+        "p8"
+      ],
+      "p8": [
+        "p7",
+        "p1"
+      ]
     },
     "tags": {}
   },
-  "campfire": {"cell": [4, 2], "radius": 2},
+  "campfire": {
+    "cell": [
+      5,
+      3
+    ],
+    "radius": 2
+  },
   "bank_cells": [],
   "errand_spots": {
-    "forage": [96, 72],
-    "pond": [64, 296],
-    "lookout": [600, 88]
+    "forage": [
+      120,
+      76
+    ],
+    "pond": [
+      168,
+      290
+    ],
+    "lookout": [
+      560,
+      88
+    ]
   },
-  "lookout": [600, 88],
-  "crew_plots": [
-    {"id": "crew_structure", "structure": "wardens_hut", "kind": "structure", "cells": [], "px": [96, 40]},
-    {"id": "vol2_plot_a", "kind": "reserved_overgrown", "cells": [], "px": [440, 40]},
-    {"id": "vol2_plot_b", "kind": "reserved_overgrown", "cells": [], "px": [560, 40]}
+  "lookout": [
+    560,
+    88
   ],
-  "note": "8 pads in the 10x4 core (cell = 64x64 px, origin y=96 below the tree line); 2-3 hand-authored neighbours per pad (§5.1); Pinewatch pads carry no tags (§11); fire circle sits between the north and south pad rows; pond errand marks the bank at px 64,296"
+  "crew_plots": [
+    {
+      "id": "crew_structure",
+      "structure": "wardens_hut",
+      "kind": "structure",
+      "cells": [],
+      "px": [
+        520,
+        110
+      ]
+    },
+    {
+      "id": "vol2_plot_a",
+      "kind": "reserved_overgrown",
+      "cells": [],
+      "px": [
+        200,
+        32
+      ]
+    },
+    {
+      "id": "vol2_plot_b",
+      "kind": "reserved_overgrown",
+      "cells": [],
+      "px": [
+        340,
+        32
+      ]
+    }
+  ],
+  "note": "Painted-map redesign (2026-10-13): 8 pads ring the central fire yard in a loose horseshoe (cell = 64x64 px, origin 0,0); dirt zones painted \u00e2\u20ac\u201d forest band y0-1, fire yard x8-15 y5-9, spine to the bottom exit, hut yard x15-18 y2-3, pond x0-4 y7-11; pond errand marks the grass bank x~168"
 }

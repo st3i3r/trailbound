@@ -22,41 +22,28 @@ const T := 32                                # tile px
 const CELL := 64                             # pad cell px
 const GW := 20                               # ground width  (tiles)
 const GH := 12                               # ground height (tiles)
-const UUUU := Vector2i(0, 3)                 # atlas coords of the all-upper
-                                             # wang tile in every pro sheet
-
 # ---------------------------------------------------------------- terrain
-# masks copied from tools/scene_comp_v2.py — the layout authority.
-const PATH := [Vector2i(10, 11), Vector2i(10, 10), Vector2i(9, 10),
-               Vector2i(9, 9), Vector2i(9, 8), Vector2i(9, 7),
-               Vector2i(10, 7), Vector2i(11, 7), Vector2i(12, 7),
-               Vector2i(13, 7)]
-const FOREST_ROW3_GAPS := [4, 5, 11, 12, 17]
-
-# ------------------------------------------------------ macro ground zones
-# Tile-swap zones are FORBIDDEN (style lock, 2026-10-12): macro variation
-# comes from fx/ground_tintmap.png — one baked 640x360 RGBA overlay drawn
-# as the GroundTint sprite above Ground+Scatter, below World (soft
-# warm/cool fields + sun pools + treeline shade, alpha 10-30%).
-# What stays on the tilemap: tracked-down-to-dirt wear (the T3
-# forest-floor tile) — under each tent, at the fire ring's front lip,
-# the path-top junction — 3 cells each.  Ground tells a story.
-const LLLL := Vector2i(2, 1)                 # all-lower tile = solid
-                                             # forest floor (T3 sheet)
-const WEAR_CELLS := [Vector2i(6, 7), Vector2i(7, 7), Vector2i(6, 8),
-                     Vector2i(5, 9), Vector2i(6, 9), Vector2i(7, 9),
-                     Vector2i(10, 8), Vector2i(11, 8), Vector2i(10, 9),
-                     Vector2i(13, 6), Vector2i(12, 6), Vector2i(14, 7)]
-
-# --------------------------------------------------------- fill variants
-# The two pure fills per sheet (UUUU grass / LLLL lower) stamped one
-# identical tile over ~100 cells — the strongest tiling tell.  The
-# tileset carries 36 one-tile variant sources after the 3 wang sheets
-# (tools/make_tileset.py): source = 3 + sheet*12 + fill*6 + variant,
-# same peering bits as the base tile.  Pure-fill cells get re-seated on
-# a hash-picked variant below; transition tiles keep their edge config.
-const VAR_SRC0 := 3
-const VAR_N := 6
+# Painted ground (PixelLab map render, dressed by tools/tb_ground_dress.py
+# --light): terrain/ground_painted.png is drawn as ONE sprite — zones are
+# painted art, no wang tilemap at runtime.  MASK mirrors the painted
+# zones for gameplay/scatter logic only; macro colour still comes from
+# the fx/ground_tintmap.png overlay (tile-swap zones stay forbidden).
+#   D = golden dirt (forest band, fire yard, spine, hut yard)
+#   G = fresh grass   W = pond water
+const MASK := [
+    "GGGGGGGGGGGGGGGDDDDG",
+    "GGGGGGGGGGGGGGGDDDDG",
+    "GGGGGGGGGGGGGGGDDDDG",
+    "GGGGGGGGGGGGGGGDDDDG",
+    "GGGGGGGGGDDDDDGGGGGG",
+    "GGGGGGGGDDDDDDDGGGGG",
+    "GGGGGGGGDDDDDDDGGGGG",
+    "WWWGGGGGDDDDDDDDGGGG",
+    "WWWGGGGGGDDDDDDDGGGG",
+    "WWWGGGGGGGGGDDGGGGGG",
+    "WWWGGGGGGGGGDDGGGGGG",
+    "WWWGGGGGGGGGDDGGGGGG",
+]
 
 # ------------------------------------------------------------- prop comp
 # [category dir, file stem, anchor x, anchor y, lean deg?] — mirrors the
@@ -68,174 +55,54 @@ const VAR_N := 6
 # leans the prop ±2-4° about its base — loose freestanding props only,
 # never anchored/large ones (van, cabin, trees).
 const PROPS := [
-    # ------------------------------------------------- treeline + cabin
-    # T2 trees break the row: broadleaf between pads, copper maple
-    # over the (locked) p3, cherry framing the rest corner
-    ["props_large",  "pine_tall_a",        74,  96],
-    ["props_large",  "pine_tall_b",       156, 102],
-    ["props_large",  "tree_broadleaf",    210,  96],
-    ["props_large",  "flamboyant_tree",   262,  94],
-    ["props_large",  "tree_maple",        484,  96],
-    ["props_large",  "pine_tall_a",       540,  92],
-    ["props_large",  "bamboo_clump",      606,  96],
-    ["props_large",  "tree_cherry",       616, 130],
-    ["props_large",  "cabin",             428, 128],
-    ["props_large",  "pennant_string",    345, 168],
-    # undergrowth at treeline feet — breaks the flat row
-    ["props_medium", "bush_round_m",      138, 136],
-    ["props_medium", "fern_bank",         350, 140],
-    ["props_medium", "bush_clover",       386, 148],
-    ["props_small",  "mushrooms_orange",  268, 138],
-    ["props_medium", "debris_brambles",   442, 134],
-    # ---------------- outfitter camp (NW): van, stools, crates, signpost
-    ["props_large",  "outfitter_van",     110, 178],
-    ["props_medium", "prop_supply_crate_0", 206, 188],
-    ["props_small",  "non_la_hat",        209, 196],
-    ["props_medium", "stool_pair",        172, 200],
-    ["props_medium", "moped_cub",          78, 208],
-    ["props_small",  "signpost",          222, 208, 2.5],
-    ["props_small",  "stool_plastic_blue",148, 214],
-    ["props_small",  "stool_plastic_red", 186, 214],
-    # unloading vignette: gear spilling out of the van's open back
-    ["props_small",  "duffel_bag",        152, 196],
-    # ------- camp kitchen (centre): fire, tripod, bench, stump, lantern
-    ["props_medium", "lantern_post",      356, 218, -3.0],
-    ["props_medium", "dome_tent_sage",    212, 232],
-    ["props_medium", "tripod_cauldron",   302, 238],
-    ["props_medium", "dirt_patch",        326, 250],
-    ["props_medium", "radio_stump",       370, 258],
-    ["props_medium", "log_bench",         256, 262],
-    # A-R4 gear cluster by the sage dome: cooler + chair at its mouth
-    ["props_small",  "cooler_box",        240, 246],
-    ["props_small",  "folding_chair_pair", 200, 258, -4.0],
-    ["props_small",  "propane_stove",     300, 264],
-    # kitchen woodpile + old-fire story
-    ["props_medium", "debris_branch_pile",352, 272],
-    ["props_medium", "stump_burnt",       396, 262],
-    # L6 work items: firewood + chopping block beside the kitchen
-    ["props_small",  "firewood_bundle",   336, 276],
-    ["props_small",  "axe_on_log",        380, 272],
-    # ---------- rest corner (E): hammock by the pine, picnic set below
-    ["props_large",  "hammock",           566, 150],
-    ["props_large",  "picnic_table",      516, 250],
-    ["props_medium", "picnic_basket",     498, 266],
-    ["props_medium", "tea_table",         472, 276],
-    ["props_medium", "dome_tent_amber",   192, 300, -2.5],
-    # A-R4 gear cluster by the amber dome: table + bags + lantern
-    ["props_medium", "camp_table_fold",   232, 312],
-    ["props_small",  "dry_bag",           168, 314],
-    ["props_small",  "solar_lantern",     246, 322],
-    # third pitch on the south field — slate dome + gear vignette
-    ["props_medium", "dome_tent_slate",   400, 326],
-    ["props_small",  "duffel_bag",        356, 334],
-    ["props_small",  "camp_pillow",       366, 340, -3.0],
-    # spare unlit fire pit near the rest corner (storytelling; the A1b
-    # flame loop stays on the shipped ring at the kitchen fire)
-    ["props_medium", "fire_ring_unlit_v2", 565, 294],
-    ["props_medium", "bush_white_flower_v", 534, 300],
-    ["props_medium", "stump_mushroom",    596, 280],
-    # A-R1 T2 composite: feathery canopy drooping over the pond west edge
-    ["props_large",  "tree_feathery",     108, 272],
-    # pond dressing: reeds + shore edges + islet + lily pads
-    ["props_medium", "reed_shore",         58, 252],
-    ["props_medium", "reed_shore",        142, 334],
-    ["terrain",      "shore_edge_bank",   150, 268],
-    ["terrain",      "shore_edge_bank",   152, 306],
-    ["terrain",      "shore_islet",        95, 300],
-    ["decals",       "decal_lily_pad",     60, 290],
-    ["decals",       "decal_lily_pad",     90, 314],
-    ["decals",       "decal_lily_pad",     42, 268],
-    ["props_small",  "rock_mossy_s",      162, 250],
-    # ------- work edge (NE/E): coop, herbs, broom, planter, spirit house
-    # cottage_shed = shipped cabin reused as a small second structure in
-    # the row-3 treeline gap, back-left of the coop/spirit_house pair
-    ["props_large",  "cottage_shed",      566, 110],
-    ["props_small",  "spirit_house",      596, 130],
-    ["props_medium", "flower_box",        408, 158],
-    ["props_medium", "chicken_coop",      540, 164],
-    ["props_small",  "chili_garlic_string", 518, 170],
-    ["props_small",  "dried_fish_rack",   482, 166],
-    ["props_small",  "S_15",              566, 178],
-    # wood-working vignette: fallen log, dead stump, gnarled root, sapling
-    ["props_medium", "debris_log_mossy",  505, 148],
-    ["props_medium", "stump_dead",        575, 152],
-    ["props_small",  "root_gnarled",      458, 152],
-    ["props_medium", "pine_sapling",      628, 158],
-    # ============ J9 L6 functional layer ============
-    # kitchen fire cluster — cooking gear around the ring
-    ["props_small",  "camp_kettle",       314, 252],
-    ["props_small",  "dutch_oven",        344, 256],
-    ["props_small",  "cook_pot",          288, 246],
-    ["props_small",  "metal_bucket",      332, 272],
-    ["props_small",  "marshmallow_skewer",358, 250, -4.0],
-    ["props_small",  "camp_radio",        372, 250],   # on the radio stump
-    ["props_small",  "enamel_mug",        262, 268],   # on the log bench
-    ["props_small",  "trash_bag",         424, 280],
-    # served food on the rest-corner picnic table
-    ["props_small",  "pho_bowl",          524, 256],
-    ["props_small",  "banh_mi",           502, 260],
-    ["props_small",  "coconut_drink",     510, 254],
-    ["props_small",  "log_stool",         498, 270],
-    # tea table vignette — game + journal + cards
-    ["props_small",  "co_tuong_set",      478, 270],
-    ["props_small",  "journal_pencil",    466, 274, 3.0],
-    ["props_small",  "playing_cards",     488, 274],
-    ["props_small",  "guitar",            528, 264, -3.0],
-    # camp-table spread by the amber dome (table at 232,312)
-    ["props_small",  "phin_coffee",       234, 306],
-    ["props_small",  "tea_cup",           246, 310],
-    ["props_small",  "jam_jar",           222, 312],
-    ["props_small",  "bread_board",       210, 314],
-    ["props_small",  "folded_map",        240, 320],
-    ["props_small",  "brass_compass",     218, 322],
-    ["props_small",  "egg_tray",          232, 328],
-    ["props_small",  "banana_bunch",      250, 322],
-    # tent-mouth dressing
-    ["props_small",  "lantern_mini",      226, 234],
-    ["props_small",  "hiking_boots",      234, 246],
-    ["props_small",  "headlamp",          206, 250],
-    ["props_small",  "sandals",           202, 314],
-    ["props_small",  "insect_spray",      214, 318],
-    ["props_small",  "rope_coil",         172, 324],
-    ["props_small",  "umbrella",          158, 318, -4.0],
-    ["props_small",  "thermos",           250, 332],
-    ["props_small",  "sleeping_pad",      394, 338],
-    ["props_small",  "folded_blanket",    414, 340],
-    # van / trailhead unloading
-    ["props_small",  "trekking_poles",    148, 200, -5.0],
-    ["props_small",  "first_aid_pouch",   196, 198],
-    ["props_small",  "rice_sack",         214, 192],
-    ["props_small",  "crab_basket",       198, 194],
-    ["props_small",  "water_jug",         224, 194],
-    ["props_small",  "clothesline",        42, 234],
-    # pond bank — fishing vignette
-    ["props_small",  "fishing_rod",       170, 262, -6.0],
-    ["props_small",  "tackle_box",        156, 260],
-    ["props_small",  "landing_net",       176, 274, 5.0],
-    ["props_small",  "hanging_fish",      182, 268],
-    ["props_small",  "stone_wall_row",    130, 258],
-    ["props_small",  "stone_wall_row",     50, 250],
-    # pond->camp informal crossing
-    ["decals",       "step_stone_a",      196, 302],
-    ["decals",       "step_stone_b",      220, 308],
-    ["decals",       "step_stone_c",      244, 314],
-    # herb garden / work edge
-    ["props_small",  "trowel",            414, 170, -4.0],
-    ["props_small",  "watering_can",      428, 166],
-    ["props_small",  "potted_herb",       444, 168],
-    ["props_small",  "seed_packet",       458, 168, 3.0],
-    ["props_small",  "garlic_braid",      490, 168],
-    ["props_small",  "herb_bundle",       374, 242],
-    # boundary vocabulary
-    ["props_small",  "fence_wood",        592, 232],
-    ["props_small",  "fence_rope",        548, 212],
-    ["props_small",  "fence_bamboo",      484, 152],
-    ["props_small",  "birdhouse",         250, 142],
-    ["props_small",  "signpost_arrow",    240, 296],
-    ["props_small",  "kite",              560, 330],
+    # ===== TREELINE — rounded broadleaf wall on GRASS (ref style),
+    # one species repeated, single flamboyant accent =====
+    ["props_large",  "tree_broadleaf",     40,  76, 0.0, 0.56],
+    ["props_large",  "tree_broadleaf",    112,  70, 0.0, 0.63],
+    ["props_large",  "tree_broadleaf",    210,  78, 0.0, 0.52],
+    ["props_large",  "tree_broadleaf",    296,  68, 0.0, 0.60],
+    ["props_large",  "flamboyant_tree",   252,  76, 0.0, 0.58],  # accent
+    ["props_large",  "tree_broadleaf",    406,  78, 0.0, 0.58],
+    ["props_large",  "tree_broadleaf",    466,  70, 0.0, 0.52],
+    ["props_large",  "tree_broadleaf",    614,  76, 0.0, 0.60],
+    # ===== HUT YARD — homestead in the dirt pocket (top-right) =====
+    ["props_large",  "cabin",             530, 112, 0.0, 1.05],
+    ["props_small",  "spirit_house",      612, 116, 0.0, 1.05],
+    ["props_medium", "chicken_coop",      578, 132, 0.0, 0.95],
+    ["props_small",  "clothesline",       494, 140, 0.0, 1.10],
+    # ===== NW — amber tent pitch =====
+    ["props_medium", "dome_tent_amber",   108, 152, 0.0, 1.12],
+    ["props_small",  "duffel_bag",         96, 170],
+    # ===== W — sage tent + tea corner =====
+    ["props_medium", "dome_tent_sage",    148, 218, 0.0, 1.12],
+    ["props_medium", "tea_table",         205, 232, 0.0, 0.95],
+    ["props_medium", "picnic_basket",     188, 246],
+    # ===== CAMPFIRE HUB — animated fire at FIRE_POS(368,236) =====
+    ["props_medium", "tripod_cauldron",   368, 208],
+    ["props_small",  "log_stool",         306, 250],
+    ["props_small",  "log_stool",         316, 262],
+    ["props_small",  "log_stool",         416, 258],
+    ["props_medium", "lantern_post",      308, 204, -3.0, 1.10],
+    ["props_small",  "axe_on_log",        400, 244],
+    ["props_small",  "firewood_bundle",   392, 248, 0.0, 0.62],
+    # ===== POND — smaller pond, willow + fishing vignette =====
+    ["props_large",  "tree_feathery",      98, 288, 0.0, 0.80],
+    ["terrain",      "shore_islet",        48, 300],
+    ["decals",       "decal_lily_pad",     36, 258],
+    ["decals",       "decal_lily_pad",     70, 322],
+    ["terrain",      "shore_edge_bank",   104, 330],
+    ["props_small",  "fishing_rod",       118, 296, -6.0],
+    ["props_small",  "tackle_box",        128, 306],
+    # ===== TRAILHEAD — van unloading at spine exit =====
+    ["props_large",  "outfitter_van",     440, 348, 0.0, 1.35],
+    ["props_small",  "signpost",          394, 342],
+    ["props_medium", "moped_cub",         404, 360, 0.0, 1.10],
+    # ===== E — rest corner on the dirt arm =====
+    ["props_large",  "picnic_table",      510, 268, 0.0, 0.62],
+    ["props_medium", "picnic_basket",     516, 258],
+    ["props_small",  "thermos",           505, 260],
+    # ===== BOUNDARY marks =====
 ]
-# props that get NO foreground embed decal (it IS the ground, or it
-# sits in/at the water where a front tuft would float)
 const EMBED_SKIP := ["dirt_patch", "reed_shore", "shore_edge_bank",
                      "shore_islet", "decal_lily_pad",
                      # flat-lying or on-furniture/hanging items — a base
@@ -252,12 +119,16 @@ const EMBED_SKIP := ["dirt_patch", "reed_shore", "shore_edge_bank",
                      "step_stone_a", "step_stone_b", "step_stone_c",
                      "clothesline"]
 
-const FIRE_POS := Vector2(326, 246)          # A1b fire-loop anchor
-const WARDEN_POS := Vector2(348, 262)
-const DOG_POS := Vector2(300, 306)
-const MAI_POS := Vector2(468, 254)
-const BOARD_POS := Vector2(222, 208)         # signpost = notice board (UI-023)
-const BOARD_RECT := Rect2(204, 160, 40, 52)  # its tap zone in stage px
+const WORLD_SCALE := 0.80              # Eastward ratio pass: all
+                                        # world props x0.8 so the
+                                        # frame shows more world
+const FIRE_POS := Vector2(368, 236)          # A1b fire-loop anchor —
+                                             # centre of the dirt hub
+const WARDEN_POS := Vector2(392, 258)
+const DOG_POS := Vector2(420, 322)           # lounging by the van
+const MAI_POS := Vector2(512, 274)           # tea corner, east field
+const BOARD_POS := Vector2(396, 322)         # signpost = notice board (UI-023)
+const BOARD_RECT := Rect2(384, 296, 36, 52)  # its tap zone in stage px
 
 # scatter decal groups by visual family — a cluster commits to ONE so it
 # reads as a patch of something (tuft / flowers / dry grass / pebbles /
@@ -286,9 +157,9 @@ const WARM_MUL := Color("fbf4e4")            # sunny filmic multiply —
                                              # scene (2026-10-12 review);
                                              # kept near-white so the day
                                              # reads bright/sunny
-const SKY_TOP := Color("e8dcc0")             # backdrop sky (pale warm)
-const SKY_BOT := Color("b9a888")             # backdrop horizon -> dirt
-const SKY_H := 118.0                         # gradient band height px
+const SKY_TOP := Color("f2ecd6")             # sky sliver peeking above
+const SKY_BOT := Color("d6dcbe")             # the far canopy (pale haze)
+const SKY_H := 50.0                          # sliver height px
 const TREE_FAR := Color(0.62, 0.66, 0.72)    # shadowed treeline tints —
 const TREE_MID := Color(0.57, 0.61, 0.68)    # lightened ~10% vs the fresh
 const TREE_NEAR := Color(0.51, 0.55, 0.62)   # v2 ground so they don't
@@ -298,30 +169,30 @@ const TREE_NEAR := Color(0.51, 0.55, 0.62)   # v2 ground so they don't
 # Open-field interior stays EMPTY; the tint map carries macro variation.
 # [centre x, centre y, family, count, radius x, radius y, terrain want]
 const DECAL_CLUSTERS := [
-    [212.0, 247.0, "tuft",   2, 16.0, 8.0, 0],   # dome_tent_sage base
-    [192.0, 316.0, "dry",    2, 16.0, 8.0, 0],   # dome_tent_amber base
-    [400.0, 340.0, "tuft",   2, 18.0, 7.0, 0],   # dome_tent_slate base
-    [256.0, 272.0, "pebble", 2, 12.0, 6.0, 0],   # log_bench feet
-    [540.0, 174.0, "tuft",   1, 10.0, 6.0, 0],   # chicken_coop base
-    [118.0, 192.0, "pebble", 1, 10.0, 6.0, 0],   # van wheel line
-    [140.0, 300.0, "pebble", 2, 14.0, 24.0, 0],  # pond shoreline
-    [150.0, 288.0, "moss",   2, 14.0, 26.0, 0],  # pond bank damp
-    [110.0, 288.0, "moss",   1, 12.0, 10.0, 0],  # willow foot
-    [238.0, 121.0, "litter", 2, 16.0, 5.0, 1],   # treeline floor W
-    [210.0, 116.0, "litter", 1, 14.0, 6.0, 1],   # broadleaf foot
-    [484.0, 112.0, "litter", 1, 14.0, 6.0, 1],   # maple foot
-    [616.0, 148.0, "flower", 1, 12.0, 6.0, 0],   # cherry foot
-    [565.0, 168.0, "dry",    1, 14.0, 7.0, 0],   # work-edge stump vignette
-    [505.0, 160.0, "litter", 1, 12.0, 6.0, 0],   # mossy log base
-    # pad fringes — break the flat-tan read on pitch edges
-    [ 96.0, 168.0, "pebble", 1, 20.0, 5.0, 0],   # p1/p4 fringe
-    [288.0, 172.0, "tuft",   1, 20.0, 5.0, 0],   # p2 south fringe
-    [480.0, 172.0, "pebble", 1, 20.0, 5.0, 0],   # p3 south fringe
-    [288.0, 282.0, "pebble", 1, 20.0, 5.0, 0],   # p7 north fringe
-    [480.0, 282.0, "tuft",   1, 20.0, 5.0, 0],   # p8 north fringe
-    [608.0, 230.0, "dry",    1, 14.0, 6.0, 0],   # p5 fringe / rest corner
-    [486.0, 122.0, "litter", 2, 18.0, 5.0, 1],   # treeline floor E
-    [408.0, 166.0, "flower", 1, 10.0, 6.0, 0],   # flower_box base
+    # prop bases — a little wear where things sit
+    [150.0, 232.0, "tuft",   2, 16.0, 8.0, 0],   # dome_tent_sage base
+    [110.0, 166.0, "dry",    2, 16.0, 8.0, 0],   # dome_tent_amber base
+    [312.0, 262.0, "pebble", 2, 12.0, 6.0, 1],   # stool feet (yard)
+    [578.0, 140.0, "tuft",   1, 10.0, 6.0, 0],   # chicken_coop base
+    [440.0, 358.0, "pebble", 1, 12.0, 6.0, 1],   # van wheel line (dirt)
+    # pond bank — damp moss + pebbles on the grass shore (col 3)
+    [120.0, 250.0, "moss",   2, 10.0, 14.0, 0],
+    [130.0, 300.0, "pebble", 2, 10.0, 12.0, 0],
+    [118.0, 345.0, "moss",   1, 10.0, 10.0, 0],
+    # treeline feet — grass tufts at trunk bases (wall is on grass)
+    [ 60.0, 84.0,  "tuft",   2, 16.0, 5.0, 0],
+    [230.0, 82.0,  "tuft",   2, 16.0, 5.0, 0],
+    [420.0, 82.0,  "tuft",   2, 16.0, 5.0, 0],
+    [580.0, 86.0,  "tuft",   1, 12.0, 5.0, 0],
+    # pad fringes — soft wear at pitch edges (new ring)
+    [ 34.0, 130.0, "tuft",   1, 18.0, 5.0, 0],   # p1
+    [160.0, 130.0, "tuft",   1, 18.0, 5.0, 0],   # p2
+    [352.0, 130.0, "tuft",   1, 18.0, 5.0, 0],   # p3
+    [542.0, 194.0, "tuft",   1, 14.0, 6.0, 0],   # p4
+    [542.0, 258.0, "dry",    1, 14.0, 6.0, 0],   # p5 / rest corner
+    [480.0, 258.0, "tuft",   1, 16.0, 5.0, 0],   # p6 east field
+    [224.0, 352.0, "moss",   1, 16.0, 5.0, 0],   # p7 pond-side
+    [ 34.0, 194.0, "tuft",   1, 14.0, 6.0, 0],   # p8
 ]
 const DECAL_GROUND := Color(1.0, 1.0, 1.0, 0.85)
                                              # sink decals INTO the wash
@@ -331,11 +202,13 @@ var origin: Vector2
 var anchors := {}                            # "cat/name.png" -> {anchor_x,y}
 var pad_cells := {}                          # pid -> Rect2 (px)
 
-var ground: TileMapLayer
+var ground: Sprite2D
 var stage: Node2D                            # all world layers — centred on
                                              # wide viewports (aspect=expand)
 var scatter: Node2D
 var pads_node: Node2D
+var shadows: Node2D                          # Phase 5.0 light model —
+var _shadow_tex: Texture2D                   # shared radial pool texture
 var world: Node2D
 var marks: Node2D                            # hover + star previews above world
 var hover: Sprite2D
@@ -376,6 +249,9 @@ func _tex(rel: String) -> Texture2D:
 func _anchored(cat: String, n: String, pos: Vector2) -> Sprite2D:
     var s := Sprite2D.new()
     s.texture = _tex(cat + "/" + n)
+    # Phase 5.1 interim — nearest keeps pixel edges hard under
+    # fractional scale until assets are rebaked at native size
+    s.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
     var e: Dictionary = anchors.get(cat + "/" + n + ".png", {})
     var ax: float = e.get("anchor_x", s.texture.get_width() / 2.0)
     var ay: float = e.get("anchor_y", float(s.texture.get_height()))
@@ -394,6 +270,7 @@ func _anchored_frames(prefix: String, names: Array, fps: float,
         frames.add_frame("main", _tex(n))
     var a := AnimatedSprite2D.new()
     a.sprite_frames = frames
+    a.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
     a.centered = false
     var sz: Vector2 = frames.get_frame_texture("main", 0).get_size()
     var an := anchor if anchor.x >= 0.0 else Vector2(sz.x / 2.0, sz.y)
@@ -438,12 +315,25 @@ func _ready() -> void:
     pads_node.name = "Pads"
     stage.add_child(pads_node)
     _build_pads(rng)
+    shadows = Node2D.new()                   # canopy/contact shadow
+    shadows.name = "Shadows"                 # pools — drawn UNDER world
+    stage.add_child(shadows)
     world = Node2D.new()
     world.name = "World"
     world.y_sort_enabled = true
     stage.add_child(world)
     _build_props()
     _build_actors()
+    # Phase 5.6 — canopy crowns hanging INTO the frame top: the
+    # forest reads as continuing past the camera (Eastward edge cue)
+    var front := Node2D.new()
+    front.name = "FrontCanopy"
+    stage.add_child(front)
+    for fp in [[34.0, 84.0, 1.45], [342.0, 74.0, 1.30]]:
+        var cr := _anchored("props_large", "tree_broadleaf",
+                            Vector2(fp[0], fp[1]))
+        cr.scale = Vector2(fp[2], fp[2])
+        front.add_child(cr)
     marks = Node2D.new()
     marks.name = "Marks"
     stage.add_child(marks)
@@ -580,82 +470,25 @@ func _fit_stage() -> void:
 # ------------------------------------------------------------- scenery
 
 func _cell_mask(c: Vector2i) -> int:
-    ## 0 grass 1 forest 2 water 3 stone — one terrain wins per cell,
-    ## same priority order as the comp (forest < water < stone paint).
-    if c in PATH:
-        return 3
-    if (c.x <= 3 and c.y >= 8) or (c.x == 4 and c.y >= 10):
-        return 2
-    if c.y <= 2 or (c.y == 3 and not FOREST_ROW3_GAPS.has(c.x)):
-        return 1
-    return 0
-
-
-func _blob(mask_cells: Array, source_id: int, set_id: int) -> void:
-    ## Paint a lower-terrain blob: pre-seed the mask + its one-cell ring
-    ## with this set's all-upper tile so connect() can carve transitions
-    ## into it, then terrain-connect the mask itself.
-    var zone := {}
-    for c in mask_cells:
-        for dy in [-1, 0, 1]:
-            for dx in [-1, 0, 1]:
-                var n: Vector2i = c + Vector2i(dx, dy)
-                if n.x >= 0 and n.x < GW and n.y >= 0 and n.y < GH:
-                    zone[n] = true
-    for n in zone:
-        ground.set_cell(n, source_id, UUUU)
-    ground.set_cells_terrain_connect(mask_cells, set_id, 0)
+    ## 0 grass 1 dirt 2 water — logical mirror of the painted ground
+    ## (MASK above), used by scatter guards + pad placement only.
+    if c.x < 0 or c.x >= GW or c.y < 0 or c.y >= GH:
+        return 0
+    match MASK[c.y][c.x]:
+        "D": return 1
+        "W": return 2
+        _:   return 0
 
 
 func _build_ground() -> void:
-    ground = TileMapLayer.new()
+    ## The whole painted map render as one sprite — zones, transitions
+    ## and shore rims are baked art; gameplay reads MASK instead.
+    ground = Sprite2D.new()
     ground.name = "Ground"
-    ground.tile_set = load("res://resources/pinewatch_terrain.tres")
+    ground.texture = _tex("terrain/ground_painted")
+    ground.centered = false
     stage.add_child(ground)
-    var forest_cells: Array[Vector2i] = []
-    var pond_cells: Array[Vector2i] = []
-    var path_cells: Array[Vector2i] = []
-    for ty in GH:
-        for tx in GW:
-            var c := Vector2i(tx, ty)
-            ground.set_cell(c, 0, UUUU)      # grass base = water-set UUUU
-            match _cell_mask(c):
-                1: forest_cells.append(c)
-                2: pond_cells.append(c)
-                3: path_cells.append(c)
-    _blob(forest_cells, 1, 1)                # forest first (comp order)
-    _blob(pond_cells, 0, 0)
-    _blob(path_cells, 2, 2)
-    # wear: solid forest-floor tile where feet/gear have killed the grass
-    # (under each tent, the fire ring's front lip, the path junction)
-    var worn := 0
-    for c in WEAR_CELLS:
-        if _cell_mask(c) == 0:
-            ground.set_cell(c, 1, LLLL)
-            worn += 1
-    # variant pass: every cell still sitting on a pure fill tile (UUUU
-    # or LLLL in any of the 3 wang sheets) is re-seated on a hash-picked
-    # variant source — deterministic (tx*31+ty*17+src)%6 so the comp
-    # mirrors it exactly.  Transition tiles vary by edge config already.
-    var swapped := 0
-    for ty in GH:
-        for tx in GW:
-            var c := Vector2i(tx, ty)
-            var src := ground.get_cell_source_id(c)
-            var at := ground.get_cell_atlas_coords(c)
-            var fill := -1
-            if at == UUUU:
-                fill = 0
-            elif at == LLLL:
-                fill = 1
-            if src < 0 or src > 2 or fill < 0:
-                continue
-            var vi: int = (tx * 31 + ty * 17 + src) % VAR_N
-            ground.set_cell(c, VAR_SRC0 + src * 12 + fill * 6 + vi,
-                            Vector2i(0, 0))
-            swapped += 1
-    print("ground: %d wear cells, %d fill-variant cells, tint map "
-          % [worn, swapped] + "carries macro variation")
+    print("ground: painted map sprite (terrain/ground_painted)")
 
 
 func _open_cell(px: float, py: float, want: int) -> bool:
@@ -682,7 +515,8 @@ func _build_backdrop() -> void:
     var bd := Node2D.new()
     bd.name = "Backdrop"
     stage.add_child(bd)
-    # sky -> dirt fill first; trees land on top of it
+    # thin sky sliver first — Eastward forest edges are CANOPY, not
+    # open sky; only a pale line peeks above the far tree mass
     var sky := Polygon2D.new()
     sky.polygon = PackedVector2Array([
         Vector2(0, 0), Vector2(GW * T, 0),
@@ -690,25 +524,24 @@ func _build_backdrop() -> void:
     sky.vertex_colors = PackedColorArray(
         [SKY_TOP, SKY_TOP, SKY_BOT, SKY_BOT])
     bd.add_child(sky)
-    # shadowed treeline — rows shrink with distance so the pale sky
-    # reads above the far canopy tops; near rows darker, all cool
+    # far canopy wall — dense overlapping broadleaf silhouettes in
+    # 3 depth rows (cool dark tints); crowns overlap into a mass so
+    # the top band reads as deep forest, never flat ground
     var rows: Array = [
-        {"y": 78.0,  "dx": 118.0, "x0": -34.0, "tint": TREE_FAR,  "s": 0.62},
-        {"y": 98.0,  "dx": 128.0, "x0": 22.0,  "tint": TREE_MID,  "s": 0.80},
-        {"y": 118.0, "dx": 190.0, "x0": 170.0, "tint": TREE_NEAR, "s": 1.00},
+        {"y": 46.0,  "dx": 52.0,  "x0": -30.0, "tint": TREE_FAR,  "s": 0.42},
+        {"y": 58.0,  "dx": 60.0,  "x0": 8.0,   "tint": TREE_MID,  "s": 0.50},
+        {"y": 70.0,  "dx": 66.0,  "x0": -14.0, "tint": TREE_NEAR, "s": 0.58},
     ]
     var k := 0
     for r in rows:
         var x: float = r["x0"]
         while x < GW * T + 40.0:
-            var n := "pine_tall_a" if k % 2 else "pine_tall_b"
-            if r["y"] == 98.0 and k % 4 == 3:
-                n = "flamboyant_tree"               # silhouette variety
-            var t := _anchored("props_large", n, Vector2(x, r["y"]))
+            var t := _anchored("props_large", "tree_broadleaf",
+                               Vector2(x, r["y"]))
             t.scale = Vector2(r["s"], r["s"])
             t.modulate = r["tint"]
             bd.add_child(t)
-            x += r["dx"]
+            x += r["dx"] * (0.85 + 0.3 * ((k * 7) % 3) / 2.0)
             k += 1
 
 
@@ -776,8 +609,66 @@ func _build_props() -> void:
         var spr := _anchored(p[0], p[1], Vector2(p[2], p[3]))
         if p.size() > 4:               # organic lean on loose props
             spr.rotation_degrees = p[4]
+        var sc: float = (p[5] if p.size() > 5 else 1.0) * WORLD_SCALE
+        spr.scale = Vector2(sc, sc)
         world.add_child(spr)
         _embed_base(p, erng)
+        _add_shadow(p)
+
+
+## Phase 5.0+5.3 — canopy/contact shadow pools. Green-brown radial
+## pools centred on each prop's footprint, sun upper-left so the
+## pool reads centred with a slight +X bias. Water/ground items
+## and flat-lying pieces get none.
+const SHADOW_SKIP := ["shore_islet", "decal_lily_pad", "reed_shore",
+                      "shore_edge_bank", "dirt_patch", "fishing_rod",
+                      "step_stone_a", "step_stone_b", "step_stone_c"]
+
+func _shadow_texture() -> Texture2D:
+    if _shadow_tex == null:
+        var g := Gradient.new()
+        g.set_color(0, Color(0.20, 0.32, 0.18, 0.36))
+        g.set_color(1, Color(0.20, 0.32, 0.18, 0.0))   # ends first —
+        g.add_point(0.66, Color(0.20, 0.32, 0.18, 0.20))  # insert shifts
+                                                        # indices!
+        var t := GradientTexture2D.new()
+        t.gradient = g
+        t.width = 128
+        t.height = 64
+        t.fill = GradientTexture2D.FILL_RADIAL
+        t.fill_from = Vector2(0.5, 0.5)
+        t.fill_to = Vector2(1.0, 0.5)
+        _shadow_tex = t
+    return _shadow_tex
+
+
+func _add_shadow(p: Array) -> void:
+    if p[0] in ["terrain", "decals"] or p[1] in SHADOW_SKIP:
+        return
+    var e: Dictionary = anchors.get(p[0] + "/" + p[1] + ".png", {})
+    var tex: Texture2D = _tex(p[0] + "/" + p[1])
+    var c: Array = e.get("content",
+        [0, 0, tex.get_width(), tex.get_height()])
+    var sc: float = (p[5] if p.size() > 5 else 1.0) * WORLD_SCALE
+    var ax: float = e.get("anchor_x", tex.get_width() / 2.0)
+    var fw: float = (c[2] - c[0]) * sc * 1.15
+    var fh: float = clamp(fw * 0.30, 8.0, 36.0)
+    var cx: float = p[2] - ax * sc + (c[0] + c[2]) * 0.5 * sc
+    var s := Sprite2D.new()
+    s.texture = _shadow_texture()
+    s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+    s.scale = Vector2(fw / 128.0, fh / 64.0)
+    s.position = Vector2(cx + 3.0, p[3] - 2.0)
+    shadows.add_child(s)
+
+
+func _char_shadow(pos: Vector2, w: float) -> void:
+    var s := Sprite2D.new()
+    s.texture = _shadow_texture()
+    s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+    s.scale = Vector2(w / 128.0, w * 0.32 / 64.0)
+    s.position = pos + Vector2(2.0, -1.0)
+    shadows.add_child(s)
 
 
 ## Phase 0.1 embed pass — kill the sticker look: 1-3 small decals
@@ -794,10 +685,11 @@ func _embed_base(p: Array, rng: RandomNumberGenerator) -> void:
     var ay: float = e.get("anchor_y", float(tex.get_height()))
     var c: Array = e.get("content",
         [0, 0, tex.get_width(), tex.get_height()])
+    var sc: float = (p[5] if p.size() > 5 else 1.0) * WORLD_SCALE
     # prop footprint in world px (content box, not the whole canvas)
-    var fx0: float = p[2] - ax + c[0]
-    var fx1: float = p[2] - ax + c[2]
-    var ch: float = c[3] - c[1]
+    var fx0: float = p[2] - ax * sc + c[0] * sc
+    var fx1: float = p[2] - ax * sc + c[2] * sc
+    var ch: float = (c[3] - c[1]) * sc
     var overlap: float = clamp(ch * 0.11, 3.0, 7.0)
     for i in 1 + rng.randi() % 3:
         var pos := Vector2(
@@ -824,18 +716,24 @@ func _embed_base(p: Array, rng: RandomNumberGenerator) -> void:
 
 
 func _build_actors() -> void:
+    var ch := WORLD_SCALE * 1.12    # ~0.9 — chars shrink slightly less
+                                  # than props so they stay readable
     # fire loop — A1b cycle, frames 1..6 (frame 0 is the ignite lead-in)
-    world.add_child(_anchored_frames("fx",
+    var fire := _anchored_frames("fx",
         ["fx/A1b_1", "fx/A1b_2", "fx/A1b_3", "fx/A1b_4", "fx/A1b_5",
-         "fx/A1b_6"], 6.0, FIRE_POS))
+         "fx/A1b_6"], 6.0, FIRE_POS)
+    fire.scale = Vector2(ch, ch)
+    world.add_child(fire)
     # warden idle-south (A2, 4f breathing) beside the fire
-    world.add_child(_anchored_frames("chars",
+    var warden := _anchored_frames("chars",
         ["characters/warden/A2_idle_south_0",
          "characters/warden/A2_idle_south_1",
          "characters/warden/A2_idle_south_2",
-         "characters/warden/A2_idle_south_3"], 4.0, WARDEN_POS))
+         "characters/warden/A2_idle_south_3"], 4.0, WARDEN_POS)
+    warden.scale = Vector2(ch, ch)
+    world.add_child(warden)
     # camp dog idle (A3, 8f)
-    world.add_child(_anchored_frames("chars",
+    var dog := _anchored_frames("chars",
         ["characters/camp_dog/A3_idle_south_0",
          "characters/camp_dog/A3_idle_south_1",
          "characters/camp_dog/A3_idle_south_2",
@@ -843,10 +741,17 @@ func _build_actors() -> void:
          "characters/camp_dog/A3_idle_south_4",
          "characters/camp_dog/A3_idle_south_5",
          "characters/camp_dog/A3_idle_south_6",
-         "characters/camp_dog/A3_idle_south_7"], 5.0, DOG_POS))
+         "characters/camp_dog/A3_idle_south_7"], 5.0, DOG_POS)
+    dog.scale = Vector2(ch, ch)
+    world.add_child(dog)
     # ranger Mai keeps watch by the path bend
-    world.add_child(_anchored("characters/ranger_mai",
-                              "ranger_mai_south", MAI_POS))
+    var mai := _anchored("characters/ranger_mai",
+                         "ranger_mai_south", MAI_POS)
+    mai.scale = Vector2(ch, ch)
+    world.add_child(mai)
+    _char_shadow(WARDEN_POS, 34.0)
+    _char_shadow(DOG_POS, 26.0)
+    _char_shadow(MAI_POS, 34.0)
 
 
 # ----------------------------------------------------------------- UI

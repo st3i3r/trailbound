@@ -188,3 +188,117 @@ backdrop (create_map, approved uses per policy), trail-map art,
 gate, pho stall w/ merchandise, signage, water dressing, critters,
 building inpaint. Spec: style_lock Scene composition recipe (all
 four specs) + create_map usage policy.
+
+## Phase 5 — SOTA polish pass (2026-10-12, side-by-side verdict)
+
+Gap analysis vs `assets_src/refs/images.jpg` (739×415, char ~44px) —
+ratios are now correct; the remaining gap is RENDERING TECHNIQUE,
+not scale. Reviewed 2026-10-12: order changed, lighting + ambient
+life + palette discipline added — they were the bigger levers.
+
+### 5.0 Lighting model — THE Eastward signature (was missing)
+
+The ref's look is driven by directional light, not texture:
+- **Sun pools:** warm bright patches on grass (we have these —
+  keep, reduce amplitude to ±4-6%).
+- **Canopy shadow pools:** large soft dark pools under EVERY tree
+  canopy edge and the treeline base — the single most visible
+  light cue. Procedural: flattened ellipse decals, green-brown
+  (~#3a5a34 @ ~25-35% alpha), blurred, offset slightly +X/-Y from
+  canopy base (sun upper-left). Also pool under cabin stilts + van.
+- **Dappled light:** a few small bright flecks INSIDE shadow pools
+  (light leaking through leaves) — 1-3px, sparse.
+- **Prop shading split:** warm-lit left/top faces, cool shadow
+  right/bottom — mostly baked in our generated assets already;
+  reinforce with the warm multiply + a cool-tint overlay on the
+  scene's shadow-side half only if needed.
+- **Shadow direction rule:** all cast elements fall down-right,
+  consistent ~30-45° — never contradict this anywhere.
+
+### 5.1 Native-resolution rendering — enforced
+
+**Finding:** every sprite runtime-scaled 0.5-1.35× with filtered
+resampling → blurry vs Eastward's crisp native pixels.
+
+**Interim (now, 0 cost):** world sprites `texture_filter=nearest`
+— stair-stepping beats blur for pixel art. Ships until rebake.
+
+**SOTA strategies surveyed:**
+- Integer scaling (÷2,÷3) — only lossless downscale
+- Sharp-bilinear — best arbitrary ratio, needs shader
+- Nearest arbitrary — crisp but moiré
+- LANCZOS ≤1.3× — acceptable single offline bake
+- **Canvas-matched generation** — target-size content, lossless
+  crop, the proven rule (≤42/≤85/≤170 canvases)
+
+**Policy:**
+1. Canvas picked so shipped content needs ≤1.3× resize, ideal 1.0.
+2. All scaling baked at staging (tb_stage_ar/post); PROPS p[5]
+   column is eventually REMOVED — scale lives in the asset.
+3. Note: our gen style is painterly-pixel (like Eastward), not
+   strict-cluster pixel art — crispness comes from native res +
+   palette discipline, not hard 1px clusters.
+
+### 5.2 Ground grain — frequency AND contrast (corrected)
+
+Correction: Eastward grass DOES carry mid-scale patches (8-16px
+leaf shapes). The real rule: **any frequency is fine if contrast
+stays ±3-5% and edges stay painterly-soft.** Our failure was
+high-contrast hard-edged blobs, not frequency alone.
+
+- Layer A — macro tonal field, wavelength ~80-140px, ±4-6%
+- Layer B — mid patches 8-16px, LOW contrast ±3-4%, soft edges
+- Layer C — micro 1-4px specks ~1% coverage, edges/bases only
+
+### 5.3 Contact shadows — three-tier (Eastward uses all three)
+
+- **Tier 1 — baked AO rim:** ~40% dark ellipse under footprint,
+  staged per-asset (~110% width × 25-30% height, fades upward)
+- **Tier 2 — runtime blob:** shared blurred-ellipse texture under
+  anchor, ~30% alpha, offset -Y 2px +X 1-2px
+- **Tier 3 — cast shadow (heroes only):** cabin/van/trees/tents,
+  down-right polygon ~30-50% object height, ~20% alpha, ~30-45°
+  skew — same direction as 5.0 pools
+- Colour: green-brown shadow tones (#3a5a34 family), NEVER grey —
+  shadow pools sit on grass/dirt and take their hue.
+
+### 5.4 Ambient life — scenes breathe (was missing)
+
+Ref scenes have 3-5 subtle loops; ours has only the fire:
+- Water: 2-3px edge glint/shimmer strip on the pond shore, 6-8f
+- Sway: clothesline + a grass tuft or two + flamboyant canopy,
+  slow ±2px skew, 8-10f — reuse existing anim pipeline
+- Smoke: thin wisps off the fire, drifting up-left → up
+- Birds: rare crossing silhouette (A-R has birds in Batch C vocab)
+- All loops deterministic-seeded, ≤8 frames, alpha-light
+
+### 5.5 Palette discipline — hue budget (was missing)
+
+Ref palette: green/gold/teal/brown + ONE warm accent per zone.
+Ours scatters hue. Rules:
+- ONE accent color per vignette (flamboyant red IS the site's
+  accent — do not add more warm-saturated objects near it)
+- Props harmonized to site families; clashing hues get palette-
+  snapped at grade time (site_palette ramps, not free hue)
+- Distant/backdrop elements desaturate + lighten (atmospheric —
+  already done for backdrop rows, extend to far props)
+
+### 5.6 Vertical layering / occlusion
+
+1. **Top-edge overhang:** `FrontCanopy` layer above world, 2-3
+   crown tops entering from y<0 — world continues past camera
+2. **Back-row heroes:** tall bare trunks/birches between pines —
+   cheap depth cue behind the prop line
+3. **Foreground occluders:** reeds/rocks overlapping pond front
+   bank; 8-16px grass blades crossing prop feet (embed pass ext)
+4. **Y-sort integrity:** anchors at base survive scaling ✓
+
+### 5.7 Terrain edges — organic border dressing
+
+Hard cut + dither line vs ref's rock/reed ring: shoreline boulder
+props + reed clumps breaking the border every ~40-80px + foam
+flecks. Needs a small shore-rock/reed gen (Phase 5 tail).
+
+**Plan order:** 5.1-interim filter → 5.0 lighting → 5.3 shadows →
+5.2 grain → 5.6 layering → 5.1 full asset rebake → 5.4 ambient →
+5.5 palette audit → 5.7 shore ring (small gen spend, last).

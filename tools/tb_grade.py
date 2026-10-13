@@ -81,18 +81,18 @@ PRESETS = {
                   "grey": (0.12, 38.0, 0.07)},
         "prop":  {"toward": (40.0, 5.0), "s": 0.95, "v": 0.98},
     },
-    # Pinewatch v2 (2026-10-12 colour-direction correction): v1 over-muted
-    # the scene ("horror movie").  Eastward is high-key — bright sunlit
-    # yellow-green grass, deep cool shade, saturated teal water; it mutes
-    # mid-value clutter, never the light.  Grass keeps the olive hue
-    # family but pushes value way up (sheet base lands ~(192,201,121),
-    # reading ~(190,193,109) after the lightened #fbf4e4 CanvasModulate);
-    # water keeps its teal hue with most of its source saturation back.
+    # Pinewatch v2 (2026-10-13 palette correction): the earlier "olive"
+    # direction under-read Eastward — the canonical refs (ew_saiga) run
+    # FRESH spring-green grass (#add565 mid / #dcf078 hi), saturated and
+    # high-key.  Grass is pushed FRESH (old gens described it olive —
+    # dh+4 + sat lift moves khaki toward spring-green); dirt keeps its
+    # golden-ochre pull; water keeps FULL saturation.  Re-grade affected
+    # assets from pristine sources — this preset is non-idempotent.
     "pinewatch_v2": {
-        "grass": {"dh": -2.0, "s": 0.80, "v": 1.21},
+        "grass": {"dh": 4.0, "s": 1.12, "v": 1.06},
         "dirt":  {"pull": (38.0, 0.60), "pull_min": 0.12,
                   "s": 0.90, "v": 1.11},
-        "water": {"dh": 0.0, "s": 0.80, "v": 1.04},
+        "water": {"dh": 0.0, "s": 1.0, "v": 1.0},
         "stone": {"dh": 8.0, "s": 0.90, "v": 1.0,
                   "grey": (0.12, 38.0, 0.07)},
         "prop":  {"toward": (40.0, 5.0), "s": 0.95, "v": 0.98},
