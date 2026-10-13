@@ -289,13 +289,40 @@ count from it (cumulative metrics), analytics mirrors it, the
 Then/Now photo + share moments capture from it. Replaces
 scattered counters — the audit trail IS the progression data.
 
-## Actor view presenter (when actor art lands)
+## Actor view presenter + juice map (when actor art lands)
 
 Thin node mirroring SimWorld — the only Node touching the sim:
 `spawn sprite on new eid / lerp display position / anim comp →
 frame / despawn`. Zero decisions in the presenter; all behavior
 lives in sim comps. Presenter ticks from `_process`; the world
 ticks at fixed dt accumulated from it.
+
+### The juice map — sim signal -> presentation response
+
+| Sim signal | Juice |
+|---|---|
+| `mover` velocity | secondary motion: lean/hop on accel; grass-squish decal underfoot; fading paw prints on dirt after rain |
+| `emote` comp | icon bubble (","!"","♥") + squish-stretch on the sprite |
+| `percept` new entry | head-turn emote toward stimulus pos |
+| cue `bark`/`alarm` | soft sfx + bark bubble |
+| `ctx.weather` | audio mixer: rain low-pass + woodwinds; actor sprite state variants (umbrella/tarp idle) |
+| `anim` name | frame set; `flee`/`wary`/`pet` are authored loops |
+| night summary payment | physical coin pickups: spawn → bounce → magnet to wallet |
+
+### Adjacency visual variants (build-mode delight)
+
+Placement context changes the item's *look*, not just its
+effect — same signals as the puzzle: stool+table pair renders
+merged, lantern beside a tent gets a lit variant, tarp over a
+pad shows the shelter drape, swing with kids nearby gains a
+gentle sway at rest. Pure presentation; driven by the same
+decor/neighbour data the solver uses.
+
+### Ambient audio beds
+
+`audio.gd` becomes a stem mixer: base loop + phase layers
+(evening guitars) + weather layers (rain patter + low-pass) —
+crossfaded, not switched.
 
 ## Broader architecture analysis (same pass)
 
