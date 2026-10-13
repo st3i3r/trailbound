@@ -80,28 +80,34 @@ def bake():
     cool_a = np.clip(-f, 0.0, 1.0) * FIELD_A_COOL * sky
 
     # ---- 2. treeline shade + under-canopy pools ----------------------
-    band = np.exp(-((y - 172.0) / 46.0) ** 2)             # row-5 grass band
+    # v16 layout: broadleaf wall feet at y~68-80 -> shade band hugs the
+    # wall base and dies into the field by ~y140
+    band = np.exp(-((y - 100.0) / 42.0) ** 2)             # treeline foot band
     band *= 0.75 + 0.25 * smooth_noise(rng, 60)  # ragged edge
     shade = band * 0.85
-    for cx, cy, r, sx, sy in ((74, 150, 78, 1.0, 0.8),    # pine W
-                              (156, 150, 70, 1.0, 0.8),   # pine W2
-                              (540, 145, 80, 1.0, 0.8),   # pine E
-                              (610, 170, 70, 1.0, 0.9),   # bamboo/spirit E
-                              (470, 145, 62, 1.1, 0.85),  # cabin NE side
-                              (270, 168, 66, 1.2, 0.8)):  # flamboyant S
+    for cx, cy, r, sx, sy in ((44, 92, 70, 1.0, 0.8),     # tree W1
+                              (116, 88, 66, 1.0, 0.8),    # tree W2
+                              (214, 94, 62, 1.0, 0.8),    # tree W3
+                              (300, 86, 64, 1.0, 0.8),    # tree W4
+                              (255, 92, 60, 1.1, 0.8),    # flamboyant
+                              (410, 94, 62, 1.0, 0.8),    # tree W5
+                              (470, 88, 58, 1.0, 0.8),    # tree W6
+                              (618, 92, 66, 1.0, 0.8),    # tree E
+                              (545, 140, 72, 1.1, 0.85),  # cabin NE side
+                              (630, 240, 58, 0.8, 1.0)):  # right-edge tree
         shade = np.maximum(shade, blob(x, y, cx, cy, r, sx, sy))
     cool_a = np.maximum(cool_a, shade * SHADE_A)
 
     # ---- 3. dry-warm drifts ------------------------------------------
-    dry = np.maximum(blob(x, y, 390, 340, 60, 1.3, 0.8),  # path mouth
-                     blob(x, y, 300, 258, 78, 1.4, 0.9))  # tent/fire flat
+    dry = np.maximum(blob(x, y, 400, 360, 60, 1.3, 0.8),  # path mouth
+                     blob(x, y, 368, 250, 82, 1.4, 0.9))  # fire hub flat
     dry_a = dry * DRY_A
 
     # ---- 4. sun pools -------------------------------------------------
     sun = np.zeros((H, W))
-    for cx, cy, r in ((185, 292, 105),                    # open field W
-                      (445, 300, 96),                     # picnic side
-                      (112, 228, 74)):                    # van clearing
+    for cx, cy, r in ((210, 260, 95),                     # open field W
+                      (505, 285, 88),                     # van/rest side
+                      (330, 175, 70)):                    # centre field
         sun = np.maximum(sun, blob(x, y, cx, cy, r))
     sun_a = sun * SUN_A
 

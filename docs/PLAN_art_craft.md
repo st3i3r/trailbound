@@ -302,3 +302,22 @@ flecks. Needs a small shore-rock/reed gen (Phase 5 tail).
 **Plan order:** 5.1-interim filter → 5.0 lighting → 5.3 shadows →
 5.2 grain → 5.6 layering → 5.1 full asset rebake → 5.4 ambient →
 5.5 palette audit → 5.7 shore ring (small gen spend, last).
+
+### 5.8 Layout-authoring workflow — decision (2026-10-13)
+
+Composition is currently authored in data space (PROPS coords →
+render → eyeball → nudge). That took ~8 blind rounds on v16 —
+fine for ≤1 map, wrong at scale. SOTA for painted-bg games:
+**author in image space, decompose into data.** Options:
+
+| Approach | When it wins |
+|---|---|
+| Paintover spec (paint the frame, measure pixel pos, emit data) | One-off scenes; what art directors do |
+| **Godot .tscn as the composer** (drag sprites live, y-sort/shadows visible) | **This project** — the editor IS the tool; PROPS was scaffolding while assets churned |
+| Custom drag composer emitting JSON | ~10+ maps |
+
+Decision: keep PROPS while the asset set still churns; once the
+re-bake (5.1) lands and scales are frozen, migrate layout authoring
+into a Godot-editable scene so positions are edited visually, not
+numerically. Pinewatch v16+ fixes (wedge removal, tintmap re-bake,
+cluster attachment) were still cheap enough as monkey-patches.

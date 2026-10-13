@@ -57,8 +57,8 @@ const MASK := [
 const PROPS := [
     # ===== TREELINE — rounded broadleaf wall on GRASS (ref style),
     # one species repeated, single flamboyant accent =====
-    ["props_large",  "tree_broadleaf",     40,  76, 0.0, 0.56],
-    ["props_large",  "tree_broadleaf",    112,  70, 0.0, 0.63],
+    ["props_large",  "tree_broadleaf",     40,  76, 0.0, 0.50],
+    ["props_large",  "tree_broadleaf",    112,  70, 0.0, 0.56],
     ["props_large",  "tree_broadleaf",    210,  78, 0.0, 0.52],
     ["props_large",  "tree_broadleaf",    296,  68, 0.0, 0.60],
     ["props_large",  "flamboyant_tree",   252,  76, 0.0, 0.58],  # accent
@@ -66,6 +66,7 @@ const PROPS := [
     ["props_large",  "tree_broadleaf",    466,  70, 0.0, 0.52],
     ["props_large",  "tree_broadleaf",    614,  76, 0.0, 0.60],
     ["props_large",  "tree_broadleaf",    632, 200, 0.0, 0.70],
+    ["props_large",  "tree_broadleaf",    628, 300, 0.0, 0.55],
     # ===== HUT YARD — homestead in the dirt pocket (top-right) =====
     ["props_large",  "cabin",             530, 112, 0.0, 1.05],
     ["props_small",  "spirit_house",      612, 116, 0.0, 1.05],
@@ -79,7 +80,7 @@ const PROPS := [
     ["props_medium", "tea_table",         205, 232, 0.0, 0.95],
     ["props_medium", "picnic_basket",     188, 246],
     # ===== CAMPFIRE HUB — animated fire at FIRE_POS(368,236) =====
-    ["props_medium", "tripod_cauldron",   368, 216],
+    ["props_medium", "tripod_cauldron",   368, 228],
     ["props_small",  "log_stool",         312, 252],
     ["props_small",  "log_stool",         332, 264],
     ["props_small",  "log_stool",         416, 258],
@@ -88,20 +89,18 @@ const PROPS := [
     ["props_small",  "firewood_bundle",   392, 248, 0.0, 0.62],
     # ===== POND — smaller pond, willow + fishing vignette =====
     ["props_large",  "tree_feathery",     134, 288, 0.0, 0.80],
-    ["terrain",      "shore_islet",        56, 300],
     ["decals",       "decal_lily_pad",     36, 258],
     ["decals",       "decal_lily_pad",     88, 322],
-    ["terrain",      "shore_edge_bank",   136, 330],
-    ["props_small",  "fishing_rod",       136, 298, -6.0],
-    ["props_small",  "tackle_box",        144, 306],
+    ["props_small",  "fishing_rod",       144, 300, -6.0],
+    ["props_small",  "tackle_box",        152, 310],
     # ===== TRAILHEAD — van unloading at spine exit =====
     ["props_large",  "outfitter_van",     440, 348, 0.0, 1.35],
     ["props_small",  "signpost",          394, 342],
     ["props_medium", "moped_cub",         404, 360, 0.0, 1.10],
-    # ===== E — rest corner on the dirt arm =====
-    ["props_large",  "picnic_table",      556, 236, 0.0, 0.62],
-    ["props_medium", "picnic_basket",     560, 224],
-    ["props_small",  "thermos",           550, 230],
+    # ===== E — rest corner attached to the van cluster =====
+    ["props_large",  "picnic_table",      522, 306, 0.0, 0.62],
+    ["props_medium", "picnic_basket",     528, 294],
+    ["props_small",  "thermos",           514, 298],
     # ===== BOUNDARY marks =====
 ]
 const EMBED_SKIP := ["dirt_patch", "reed_shore", "shore_edge_bank",
