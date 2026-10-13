@@ -308,6 +308,7 @@ ticks at fixed dt accumulated from it.
 | `ctx.weather` | audio mixer: rain low-pass + woodwinds; actor sprite state variants (umbrella/tarp idle) |
 | `anim` name | frame set; `flee`/`wary`/`pet` are authored loops |
 | coincidental sprite overlap | deterministic render offset from world rng + back-sprite alpha dip — residual fix only; real prevention is socket claiming below |
+| actor behind tall prop | **walk-behind fade shipped** (pinewatch_test): `FADEABLE` props get a zone over their upper art; actor footing inside lerps alpha to 0.35. Verified — dog behind the van shows through |
 | night summary payment | physical coin pickups: spawn → bounce → magnet to wallet |
 
 ### Adjacency visual variants (build-mode delight)

@@ -201,6 +201,16 @@ var pads_node: Node2D
 var shadows: Node2D                          # Phase 5.0 light model —
 var _shadow_tex: Texture2D                   # shared radial pool texture
 var world: Node2D
+# walk-behind fading: fadeable tall props get a zone over their
+# upper art — an actor footing inside lerps the sprite alpha down
+# so campers never vanish behind roofs/canopies (position rect,
+# no physics). Actors register in _build_actors.
+const FADEABLE := ["tree_feathery", "tree_broadleaf",
+                   "outfitter_van", "cabin"]
+const FADE_ALPHA := 0.35
+const FADE_SPEED := 5.0
+var fade_zones := []                         # [{s: Sprite2D, r: Rect2}]
+var actor_nodes := []                        # walking sprites to protect
 var marks: Node2D                            # hover + star previews above world
 var hover: Sprite2D
 var hud: HUD                                 # chrome root (fades when idle)
@@ -420,6 +430,17 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+    for z in fade_zones:                      # walk-behind fades
+        var s: Sprite2D = z["s"]
+        var occluded := false
+        for a in actor_nodes:
+            if z["r"].has_point(a.position):
+                occluded = true
+                break
+        var target := FADE_ALPHA if occluded else 1.0
+        if not is_equal_approx(s.modulate.a, target):
+            s.modulate.a = move_toward(s.modulate.a, target,
+                delta * FADE_SPEED)
     if hud == null:
         return
     idle_ms += delta
@@ -603,6 +624,13 @@ func _build_props() -> void:
         var sc: float = (p[5] if p.size() > 5 else 1.0) * WORLD_SCALE
         spr.scale = Vector2(sc, sc)
         world.add_child(spr)
+        if p[1] in FADEABLE:
+            # fade zone = the tall art minus its footing strip —
+            # an actor whose anchor lands inside is behind the prop
+            var sz: Vector2 = spr.texture.get_size() * sc
+            fade_zones.append({"s": spr, "r": Rect2(
+                Vector2(p[2] - sz.x / 2.0, p[3] - sz.y),
+                Vector2(sz.x, sz.y - 14.0))})
         _embed_base(p, erng)
         _add_shadow(p)
 
@@ -743,6 +771,7 @@ func _build_actors() -> void:
     _char_shadow(WARDEN_POS, 34.0)
     _char_shadow(DOG_POS, 26.0)
     _char_shadow(MAI_POS, 34.0)
+    actor_nodes = [warden, dog, mai]         # walk-behind fade set
 
 
 # ----------------------------------------------------------------- UI
