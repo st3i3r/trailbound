@@ -301,3 +301,29 @@ ticks at fixed dt accumulated from it.
 | Save/migration | `state_dict`+`_migrate` works | Actors excluded by design; add migration matrix to tests when schema bumps |
 | Pathfinding | Not needed — open field, waypoint tweens | Revisit only if obstacles dense; authored routes cover it |
 | Staff AI | Not in v1 | If staffing lands: per-agent task queue, not a job-board system |
+
+## The cozy UX contract (cross-cutting, applies to every phase)
+
+Player drive in this genre: stress-free autonomy, sensory
+satisfaction, gentle nurture. These are the rules that translate
+the backend above into that feeling — with honest status:
+
+| Rule | Our form | Status |
+|---|---|---|
+| Progression never moves backward | Bad night = fewer tips; walk-ins leave quietly; nothing the player built is ever lost or downgraded | Structural (GDD "no fail") — encode as test invariants: floor ≥ 0, resolve never removes |
+| Time freezes during edit | Batch phases — there is no realtime shop clock to pause; sim clock pauses with panels (three clocks rule) | Guaranteed by architecture |
+| Spectating is the reward | The night cast IS the ant-farm — watching kids at the swing and the dog's rounds is the payoff, not a chore-skip | Built (D4) — presenter + scenario data remaining |
+| Opt-in tactility | Errands stay manual and tactile (forage/fish are rolls with feel, not menu clicks); nothing is auto-played | Needs the tactile pass when errands land (D2.2) |
+| Juice comes from sim signals | `emote`/`heard`/`percept` transitions drive presenter juice: squish-stretch on flee, "!" bubble on flinch, soft sfx on bark; coins in the night summary are physical pickups, not ledger deltas | Sim signals exist; presenter maps them (D4 view) |
+
+Micro/meso/macro rhythm (already staggered, keep it that way):
+
+- **Micro (seconds):** pet the dog, watch a flinch, collect a
+  crew bubble, the Clear transform's ~2 s reveal
+- **Meso (minutes):** the day loop itself — prep errands,
+  cook, seat, watch the night resolve
+- **Macro (hours):** pad expansion, journal pages, site
+  unlocks, real-time crew restorations
+
+The checklist adapted: no bankruptcy ✓ / edit freezes time ✓ /
+manual chores tactile (in progress) / spectate a living world ✓.
