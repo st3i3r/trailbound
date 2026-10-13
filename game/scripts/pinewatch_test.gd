@@ -208,7 +208,7 @@ var world: Node2D
 const FADEABLE := ["tree_feathery", "tree_broadleaf",
                    "outfitter_van", "cabin"]
 const FADE_ALPHA := 0.35
-const FADE_SPEED := 5.0
+const FADE_SPEED := 2.6                      # ~0.25s ramp — their spec
 var fade_zones := []                         # [{s: Sprite2D, r: Rect2}]
 var actor_nodes := []                        # walking sprites to protect
 var marks: Node2D                            # hover + star previews above world
