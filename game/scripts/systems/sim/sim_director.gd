@@ -13,10 +13,9 @@ static func _cell_pt(c: Array, dy := 48.0) -> Vector2:
 	return Vector2(c[0] * CELL + CELL / 2.0, c[1] * CELL + dy)
 
 
-static func _bank(layout: Dictionary) -> Vector2:
-	var p: Array = layout.get("errand_spots", {}) \
-		.get("pond", [168, 290])
-	return Vector2(p[0], p[1])
+static func _bank(layout: Dictionary) -> Variant:
+	var p: Variant = layout.get("errand_spots", {}).get("pond")
+	return null if p == null else Vector2(p[0], p[1])
 
 
 static func _px_cell(p: Vector2) -> Vector2i:
@@ -221,7 +220,7 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 		var steps: Array
 		var extra := {}
 		match arch:
-			"angler":
+			"angler" if bank != null:
 				steps = [{"op": "anim", "name": "walk"}]
 				steps.append_array(_goto_legs(layout, home,
 					bank, 40.0))
