@@ -53,7 +53,7 @@
   "daily": "G_daily", "guestbook": "G_guestbook",
   "field_notes": "G_field_notes", "recipes": "G_pot",
   "keepsakes": "G_keepsakes", "letters": "G_letters",
-  "settings": "G_gear", "camp": "G_tent"
+  "settings": "G_gear", "camp": "G_tent", "decor": "G_lantern"
  },
  "objects": {
   "comment": "painterly CONTENT icons (I1 batch) — items/dishes/fauna; keep colour, sticker-outline pass pending (UI-019 tail)",

@@ -9,7 +9,9 @@ extends RefCounted
 const CELL := SimGrid.CELL
 
 
-static func _cell_pt(c: Array, dy := 48.0) -> Vector2:
+static func _cell_pt(c: Variant, dy := 48.0) -> Vector2:
+	if c is Vector2i:
+		return SimGrid.cell_pt(c, dy)
 	return SimGrid.cell_pt(Vector2i(int(c[0]), int(c[1])), dy)
 
 

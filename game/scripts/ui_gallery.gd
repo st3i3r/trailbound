@@ -122,7 +122,7 @@ func _sec_panels(root: Control) -> void:
 	row.add_theme_constant_override("separation", UITokens.SP2)
 	box.add_child(row)
 	for piece in ["sheet", "glass_panel", "glass_chip",
-			"glass_pill", "sel_glow", "seal_lacquer",
+			"glass_pill", "focus", "bubble",
 			"bubble_speech_flat"]:
 		var p := _chip(row, 84, 40, piece)
 		var l := UIKit.label_for(piece, UITokens.TypeRole.CAPTION,

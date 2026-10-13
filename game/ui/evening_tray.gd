@@ -281,7 +281,7 @@ func _card(req: Dictionary, sprite: Dictionary) -> Panel:
 	ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# sel_glow — the lacquer kit's notched selection ring
 	ring.add_theme_stylebox_override("panel",
-		UIKit.state_nine("sel_glow"))
+		UIKit.flat("focus"))
 	ring.visible = false
 	c.add_child(ring)
 	return c
@@ -342,7 +342,7 @@ func _meal_chip(m: Dictionary, idx: int) -> Panel:
 	ring.name = "Sel"
 	ring.set_anchors_preset(Control.PRESET_FULL_RECT)
 	ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	ring.add_theme_stylebox_override("panel", UIKit.state_nine("sel_glow"))
+	ring.add_theme_stylebox_override("panel", UIKit.flat("focus"))
 	ring.visible = false
 	c.add_child(ring)
 	return c

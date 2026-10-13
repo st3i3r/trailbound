@@ -86,7 +86,7 @@ func icon_chip(anchor: Node2D, content: Control, offset: Vector2,
 func bubble(content: Control, piece := "bubble_prompt") -> Panel:
     var p := Panel.new()
     p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    p.add_theme_stylebox_override("panel", UIKit.nine(piece))
+    p.add_theme_stylebox_override("panel", UIKit.chrome(piece))
     p.add_child(content)
     return p
 

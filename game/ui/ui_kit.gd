@@ -35,8 +35,9 @@ static func _ensure() -> void:
     _f_body.fallbacks.append(ThemeDB.fallback_font)
     _f_head.fallbacks.append(_f_body)
     _f_disp.fallbacks.append(_f_head)
-    _ui_meta = JSON.parse_string(FileAccess.get_file_as_string(
-        UITokens.ASSETS + "ui/ui_atlas_meta.json"))
+    var meta_txt := FileAccess.get_file_as_string(
+        UITokens.ASSETS + "ui/ui_atlas_meta.json")
+    _ui_meta = JSON.parse_string(meta_txt) if meta_txt != "" else {}
     # semantic icon registry (data/icons.json): flatten the category
     # tables into name -> file id; raw "I1_n" names still pass through
     var reg: Dictionary = JSON.parse_string(
@@ -139,10 +140,15 @@ static func type_size(role: UITokens.TypeRole) -> int:
 
 static func tex(rel: String) -> Texture2D:
     ## Shared texture cache; rel is relative to assets/pinewatch/, no ext.
-    ## A missing asset is NOT cached — one bad path shouldn't stay
-    ## invisible for the rest of the run.
+    ## A missing asset warns once and caches null — ResourceLoader.exists
+    ## keeps the "file not found" ERROR off the log for retired pieces.
     if not _tex_cache.has(rel):
-        var t: Texture2D = load(UITokens.ASSETS + rel + ".png")
+        var p := UITokens.ASSETS + rel + ".png"
+        if not ResourceLoader.exists(p):
+            push_warning("UIKit.tex: missing " + rel)
+            _tex_cache[rel] = null
+            return null
+        var t: Texture2D = load(p)
         if t == null:
             push_warning("UIKit.tex: missing " + rel)
             return null
@@ -330,7 +336,8 @@ static func focus_box() -> StyleBox:
     ## UIFeel.nav_input is armed (keys/joypad): kit buttons release
     ## focus on pointer press, so touch never leaves a ring behind.
     ## Never a second border inside the rect — a halo, not a line.
-    return state_nine("sel_glow")
+    ## Code-drawn vermilion ring (the sel_glow texture is retired).
+    return flat("focus")
 
 
 ## One wiring for every pressable control: haptic + sfx on `pressed`,
@@ -351,10 +358,12 @@ static func pressable(b: Button, squash := true) -> Button:
 ## StyleBoxFlat surfaces — radius/border/fill come straight from
 ## UITokens, so every flat piece shares ONE border by construction
 ## (no PNG, no import cache, no nine-slice insets to go stale).
-## Only the decorated few stay textures: sel_glow, seal_lacquer,
-## halftone, bubble_*.  "sheet" is the silver floating-panel surface.
+## Retired texture names ("bubble_*", "sel_glow") map into flat() so
+## old callers keep working.  "sheet" is the silver floating-panel
+## surface; "focus"/"sel_glow" is the nav-mode vermilion halo ring.
 const FLAT_PIECES := ["sheet", "glass_panel", "glass_chip", "glass_pill",
-    "btn_pill", "btn_green", "btn_gold", "btn_disabled"]
+    "btn_pill", "btn_green", "btn_gold", "btn_disabled",
+    "bubble", "bubble_prompt", "bubble_speech_flat", "focus", "sel_glow"]
 
 
 static func flat(piece: String, mod := 1.0, alpha := 1.0) -> StyleBoxFlat:
@@ -366,6 +375,11 @@ static func flat(piece: String, mod := 1.0, alpha := 1.0) -> StyleBoxFlat:
         "btn_green":     bg = UITokens.GREEN_BG; line = UITokens.LINE
         "btn_gold":      bg = UITokens.GLASS;    line = UITokens.VERMILION
         "btn_disabled":  bg = UITokens.DIM_BG;   line = UITokens.LINE_DIM
+        # retired texture pieces route here too — the names stay valid
+        "bubble", "bubble_prompt", "bubble_speech_flat":
+                         bg = UITokens.GLASS;    line = UITokens.LINE; r = 4
+        "focus", "sel_glow":
+                         bg = Color(0, 0, 0, 0); line = UITokens.VERMILION; r = 5
         _:               bg = UITokens.GLASS;    line = UITokens.LINE
     if mod != 1.0:
         bg = Color(bg.r * mod, bg.g * mod, bg.b * mod, bg.a)
@@ -374,16 +388,16 @@ static func flat(piece: String, mod := 1.0, alpha := 1.0) -> StyleBoxFlat:
     var sb := StyleBoxFlat.new()
     sb.bg_color = bg
     sb.border_color = line
-    sb.set_border_width_all(1)
+    sb.set_border_width_all(2 if piece == "focus" or piece == "sel_glow" else 1)
     sb.set_corner_radius_all(r)
     sb.corner_detail = 6
     sb.anti_aliasing = true
-    if piece == "sheet":
+    if piece == "sheet" or piece.begins_with("bubble"):
         # the floating shadow sells "panel over world" (the Eastward
         # dialogue-box read); StyleBoxFlat draws it offset under the rect
         sb.shadow_color = UITokens.SHADOW_SOFT
-        sb.shadow_size = 8
-        sb.shadow_offset = Vector2(0, 3)
+        sb.shadow_size = 8 if piece == "sheet" else 4
+        sb.shadow_offset = Vector2(0, 3 if piece == "sheet" else 2)
     return sb
 
 
