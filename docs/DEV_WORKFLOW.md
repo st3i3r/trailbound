@@ -196,6 +196,14 @@ godot.cmd --headless --path game res://tests/daily_check.tscn
 main loop: it *looks* like a hang and produces nothing (bit us once —
 the LINT lines live on the gallery).
 
+⚠ `--smoke` does NOT self-exit. The scene prints its `SMOKE …`
+asserts and then stays alive in the headless main loop forever —
+there is no "smoke finished" sentinel and no clean exit. Treat the
+last expected SMOKE line as done and KILL the process; do not wait
+for exit, and do not keep polling a still-running headless scene.
+The verdict is in the output you already have (`:false` = failure;
+none printed = pass).
+
 ⚠ Headless hygiene on Windows: a killed/timed-out shell orphans the
 `godot.exe` child, which then blocks forever writing to a dead stdout
 pipe — the next run appears hung too. Wrap headless calls in
