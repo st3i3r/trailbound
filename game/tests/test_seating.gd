@@ -314,17 +314,21 @@ func _ready() -> void:
 	Game.pantry = {}
 	Game.meals = []
 	var nodes: Array = Game.site_state()["forage_nodes"]
-	check("6 seeded forage nodes", nodes.size() == 6
+	check("6+ seeded forage nodes", nodes.size() >= 6
 		and nodes.all(func(n): return n["items"].size() == 2))
 	var first_items: Array = nodes[0]["items"].duplicate()
-	var got := Game.gather("f0")
+	var nid: String = nodes[0]["id"]
+	var got := Game.gather(nid)
 	check("gather moves items to pantry",
 		got.size() == 2 and Game.pantry_count() == 2
 		and got == first_items, "got %s" % [got])
+	check("cleaned node fades",
+		not Game.site_state()["forage_nodes"].any(
+			func(n): return n["id"] == nid))
 	# Pantry capacity: fill to the brim, node keeps its leftovers.
 	for i in 18:
 		Game.pantry_add("berries", 1)
-	var left := Game.gather("f1")
+	var left := Game.gather(nodes[1]["id"])
 	check("full pantry keeps node items", left.is_empty()
 		and Game.pantry_count() == 20)
 

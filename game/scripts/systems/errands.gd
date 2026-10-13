@@ -31,7 +31,8 @@ func roll_forage() -> Array:
 				func(i2): return i2.get("rare", false)))
 		if goldcap_day and i == goldcap_slot:
 			items[0] = "goldcap"
-		nodes.append({"id": "f%d" % i, "items": items,
+		nodes.append({"id": "f%d_d%d" % [i, g.site_day()],
+			"items": items,
 			"px": [fpx[0] + rng.randi_range(-72, 72),
 				fpx[1] + rng.randi_range(-28, 28)]})
 	return nodes
@@ -68,6 +69,8 @@ func gather(node_id: String) -> Array:
 			else:
 				left.append(item)
 		node["items"] = left
+		if left.is_empty():                  # cleaned out — husk fades
+			st["forage_nodes"].erase(node)
 	return got
 
 
@@ -125,7 +128,8 @@ func spot() -> Dictionary:
 		for i in 2:
 			items.append(_pick_weighted(pool, rng,
 				func(i2): return i2.get("rare", false)))
-		st["forage_nodes"].append({"id": "fb", "items": items,
+		st["forage_nodes"].append({"id": "fb%d" % g.site_day(),
+			"items": items,
 			"bonus": true,
 			"px": [fpx[0] + rng.randi_range(-72, 72),
 				fpx[1] + rng.randi_range(-28, 28)]})

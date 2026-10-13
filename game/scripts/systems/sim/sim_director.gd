@@ -31,11 +31,11 @@ static func _px_cell(p: Vector2) -> Vector2i:
 static func _route(layout: Dictionary, a: Vector2,
 		b: Vector2) -> Array:
 	var nav: Dictionary = layout.get("nav", {})
-	var cells := SimGrid.blocked(layout)
-	if cells.is_empty():
+	var bcells := SimGrid.blocked(layout)
+	if bcells.is_empty():
 		return [b]
 	var blocked := {}
-	for c in cells:
+	for c in bcells:
 		blocked["%d,%d" % [c.x, c.y]] = true
 	var ca := _px_cell(a)
 	var cb := _px_cell(b)

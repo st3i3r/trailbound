@@ -376,6 +376,7 @@ the backend above into that feeling — with honest status:
 | Challenge ceiling | "Meaningful interactions, never too much challenge" — the seat puzzle is cleverness *rewarded*, not competence *tested*; a wrong layout is still a fine night, just less rich | Structural (no-fail floor) — keep as the D2 tuning rule |
 | Attachment cadence | Retention = missing the place: **every day ends with one small visible growth AND one anticipated tomorrow** (a regular returning, a letter waiting, a restoration finishing) | Vehicles exist (bookings/arcs/letters/crew) — make it a day-generator invariant |
 | Abundance, not scarcity | The site always feels *provided* — pantry stocked enough to cook, guests always arriving; pressure is arrangement, never survival | Economy watch-item: coins may floor at 0 for pacing but nothing should read as deprivation |
+| Nothing is "missed" | Daily systems are **offers, not expirations** — ungathered forage nodes persist (capped 12, husks fade); fish resets are restock caps; letters wait in the journal | **Fixed** — forage wipe at day-end was the one true FOMO in the game |
 
 Micro/meso/macro rhythm (already staggered, keep it that way):
 

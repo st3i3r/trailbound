@@ -644,7 +644,12 @@ func new_day() -> void:
 	st["guests"] = {}
 	st["fish_taken"] = {}
 	bought_today = []
-	st["forage_nodes"] = errands.roll_forage()
+	# No-pressure rule: ungathered nodes persist — the forest keeps
+	# offering; only a cap trims the oldest (wildlife fiction).
+	st["forage_nodes"] = st.get("forage_nodes", []) \
+		+ errands.roll_forage()
+	if st["forage_nodes"].size() > 12:
+		st["forage_nodes"] = st["forage_nodes"].slice(-12)
 	dog_sys.morning()                              # §9: pet reset + dig
 	if site_id == &"pinewatch" and site_day() == 1:
 		journal_event("fire_lit")                # §8.1 P1: day-1 tutorial
