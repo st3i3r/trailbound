@@ -71,19 +71,19 @@ const PROPS := [
     ["props_medium", "chicken_coop",      578, 132, 0.0, 0.95],
     ["props_small",  "clothesline",       494, 140, 0.0, 1.10],
     # ===== NW — amber tent pitch =====
-    ["props_medium", "dome_tent_amber",   108, 152, 0.0, 1.12],
-    ["props_small",  "duffel_bag",         96, 170],
+    ["props_medium", "dome_tent_amber",    44, 150, 0.0, 1.12],
+    ["props_small",  "duffel_bag",         20, 168],
     # ===== W — sage tent + tea corner =====
     ["props_medium", "dome_tent_sage",    148, 218, 0.0, 1.12],
     ["props_medium", "tea_table",         205, 232, 0.0, 0.95],
     ["props_medium", "picnic_basket",     188, 246],
     # ===== CAMPFIRE HUB — animated fire at FIRE_POS(368,236) =====
-    ["props_medium", "tripod_cauldron",   368, 208],
+    ["props_medium", "tripod_cauldron",   368, 216],
     ["props_small",  "log_stool",         306, 250],
     ["props_small",  "log_stool",         316, 262],
     ["props_small",  "log_stool",         416, 258],
     ["props_medium", "lantern_post",      308, 204, -3.0, 1.10],
-    ["props_small",  "axe_on_log",        400, 244],
+    ["props_small",  "axe_on_log",        402, 246],
     ["props_small",  "firewood_bundle",   392, 248, 0.0, 0.62],
     # ===== POND — smaller pond, willow + fishing vignette =====
     ["props_large",  "tree_feathery",      98, 288, 0.0, 0.80],
@@ -91,8 +91,8 @@ const PROPS := [
     ["decals",       "decal_lily_pad",     36, 258],
     ["decals",       "decal_lily_pad",     70, 322],
     ["terrain",      "shore_edge_bank",   104, 330],
-    ["props_small",  "fishing_rod",       118, 296, -6.0],
-    ["props_small",  "tackle_box",        128, 306],
+    ["props_small",  "fishing_rod",       104, 298, -6.0],
+    ["props_small",  "tackle_box",        112, 306],
     # ===== TRAILHEAD — van unloading at spine exit =====
     ["props_large",  "outfitter_van",     440, 348, 0.0, 1.35],
     ["props_small",  "signpost",          394, 342],
@@ -184,15 +184,6 @@ const DECAL_CLUSTERS := [
     [230.0, 82.0,  "tuft",   2, 16.0, 5.0, 0],
     [420.0, 82.0,  "tuft",   2, 16.0, 5.0, 0],
     [580.0, 86.0,  "tuft",   1, 12.0, 5.0, 0],
-    # pad fringes — soft wear at pitch edges (new ring)
-    [ 34.0, 130.0, "tuft",   1, 18.0, 5.0, 0],   # p1
-    [160.0, 130.0, "tuft",   1, 18.0, 5.0, 0],   # p2
-    [352.0, 130.0, "tuft",   1, 18.0, 5.0, 0],   # p3
-    [542.0, 194.0, "tuft",   1, 14.0, 6.0, 0],   # p4
-    [542.0, 258.0, "dry",    1, 14.0, 6.0, 0],   # p5 / rest corner
-    [480.0, 258.0, "tuft",   1, 16.0, 5.0, 0],   # p6 east field
-    [224.0, 352.0, "moss",   1, 16.0, 5.0, 0],   # p7 pond-side
-    [ 34.0, 194.0, "tuft",   1, 14.0, 6.0, 0],   # p8
 ]
 const DECAL_GROUND := Color(1.0, 1.0, 1.0, 0.85)
                                              # sink decals INTO the wash
