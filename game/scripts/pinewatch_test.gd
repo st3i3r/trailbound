@@ -407,11 +407,13 @@ func _ready() -> void:
         markers.visible = false
         pads_node.visible = false
     # --storm: presenter-only weather QA — tint, rain, ground ripples.
-    # st["weather"] == "storm" will drive the same hook when the
-    # scenario matrix lands (cast picks the row, presenter reads it)
-    if OS.get_cmdline_args().has("--storm") \
-            or Game.site_state().get("weather") == "storm":
-        _set_storm(true, 0.0)                # instant for --shot QA
+    # st["weather"] drives the same hook once the scenario matrix
+    # lands (cast picks the row, presenter reads it); any profile key
+    var wkey: String = Game.site_state().get("weather", "")
+    if OS.get_cmdline_args().has("--storm"):
+        wkey = "storm"
+    if WEATHER_PROFILES.has(wkey):
+        _set_weather(wkey, 0.0)              # instant for --shot QA
     # --pose: QA screenshot staging — seats the first guest (trait
     # bubble visible), selects the second and hovers a pad (strip +
     # star previews visible)
@@ -502,29 +504,44 @@ func _process(delta: float) -> void:
         _fade_chrome(0.2)
 
 
-## Storm presenter — visual only, no sim involvement. The warm-grade
-## CanvasModulate slides to a desaturated slate; GPU rain slants across
-## the map; the ripple shader warps ground pixels. Driven by --storm /
-## st["weather"] today; the scenario cast will own the trigger later.
-func _set_storm(on: bool, dur := 4.0) -> void:
-    _storm_on = on
+## Weather presenter — visual only, no sim involvement. Profile data
+## (grade tint, ripple strength, rain toggle, lightning flag) drives a
+## single tween; adding a state is a table row + optional shader, not
+## new plumbing. Driven by --storm / st["weather"] today; the scenario
+## cast owns the trigger when the matrix lands.
+const WEATHER_PROFILES := {
+    "sunny": {"color": WARM_MUL, "ripple": 0.0,
+              "rain": false, "lightning": false},
+    "storm": {"color": STORM_MUL, "ripple": 1.0,
+              "rain": true,  "lightning": true},
+    # future rows (each = grade color + optional overlay shader):
+    # "fog":      milky grade + fractal-noise ColorRect; cast clusters
+    #             campers near the fire. Never particles — too heavy.
+    # "heatwave": overexposed gold grade (values >1.0) + sine-warp
+    #             haze shader; cast weights pond/shade spots.
+    # "wind":     cool-gray grade + VERTEX-sway material on tall
+    #             props (roots stay pinned) + leaf-debris emitter.
+}
+
+
+func _set_weather(state: String, dur := 4.0) -> void:
+    var p: Dictionary = WEATHER_PROFILES[state]
+    _storm_on = p["lightning"]
     _lightning_cd = randf_range(1.5, 4.0)
     if _storm_tween and _storm_tween.is_running():
         _storm_tween.kill()
     var m := _ripple.material as ShaderMaterial
     if dur <= 0.05:                            # QA shots: no ramp to wait on
-        _grade.color = STORM_MUL if on else WARM_MUL
-        m.set_shader_parameter("storm_intensity",
-            1.0 if on else 0.0)
-        _rain.emitting = on
+        _grade.color = p["color"]
+        m.set_shader_parameter("storm_intensity", p["ripple"])
+        _rain.emitting = p["rain"]
         return
     _storm_tween = create_tween().set_parallel(true)
-    _storm_tween.tween_property(_grade, "color",
-        STORM_MUL if on else WARM_MUL, dur)\
+    _storm_tween.tween_property(_grade, "color", p["color"], dur)\
         .set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
     _storm_tween.tween_property(m, "shader_parameter/storm_intensity",
-        1.0 if on else 0.0, dur)
-    _rain.emitting = on
+        p["ripple"], dur)
+    _rain.emitting = p["rain"]
 
 
 func _rain_tex() -> Texture2D:
