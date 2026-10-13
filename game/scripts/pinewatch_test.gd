@@ -213,9 +213,14 @@ const FADE_ALPHA := 0.35
 const FADE_SPEED := 2.6                      # ~0.25s ramp — their spec
 var fade_zones := []                         # [{s: Sprite2D, r: Rect2}]
 var actor_nodes := []                        # walking sprites to protect
-var _grade: CanvasModulate                   # filmic grade — storm target
-var _ripple: ColorRect                       # ground-only screen warp
+var _grade: CanvasModulate                   # filmic grade — weather tint
+var _warp: ColorRect                         # ground-only screen warp
+                                           # (ripples / gust distortion)
+var _veil: ColorRect                         # full-scene post overlay
+                                           # (sun rays / rolling fog)
 var _rain: GPUParticles2D                    # slanted 2.5D downpour
+var _leaves: GPUParticles2D                  # làn gió debris stream
+var _noise_cache := {}                       # seed -> FastNoiseLite tex
 var _storm_on := false
 var _storm_tween: Tween
 var _lightning_cd := 0.0                     # presenter rng, unseeded
@@ -327,17 +332,15 @@ func _ready() -> void:
     shadows = Node2D.new()                   # canopy/contact shadow
     shadows.name = "Shadows"                 # pools — drawn UNDER world
     stage.add_child(shadows)
-    _ripple = ColorRect.new()                # screen-space ground warp:
-    _ripple.name = "RippleOverlay"           # reads pixels drawn BELOW it
-    _ripple.position = Vector2.ZERO          # (ground+tint+shadows), so
-    _ripple.size = Vector2(GW * T, GH * T)   # rain ripples on terrain
-    _ripple.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    var rmat := ShaderMaterial.new()         # while y-sorted props and
-    rmat.shader = load(                      # actors stay crisp on top
-        "res://shaders/rain_ripples.gdshader")
-    rmat.set_shader_parameter("storm_intensity", 0.0)
-    _ripple.material = rmat
-    stage.add_child(_ripple)
+    _warp = ColorRect.new()                  # screen-space ground warp:
+    _warp.name = "WarpOverlay"               # reads pixels drawn BELOW
+    _warp.position = Vector2.ZERO            # it (ground+tint+shadows),
+    _warp.size = Vector2(GW * T, GH * T)     # so weather warps terrain
+    _warp.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    _warp.material = ShaderMaterial.new()    # while y-sorted props and
+    _warp.visible = false                    # actors stay crisp; the
+    stage.add_child(_warp)                   # profile picks the shader
+                                           # (ripples / gusts)
     world = Node2D.new()
     world.name = "World"
     world.y_sort_enabled = true
@@ -364,6 +367,25 @@ func _ready() -> void:
     _rain.texture = _rain_tex()
     _rain.position = Vector2(GW * T * 0.5 + 160, -30)
     stage.add_child(_rain)
+    _leaves = GPUParticles2D.new()           # làn gió debris — leaves
+    _leaves.name = "LeafDebris"              # sweeping sideways on wind
+    _leaves.amount = 120                     # days; sparse, tumbling
+    _leaves.lifetime = 1.6
+    _leaves.emitting = false
+    var lm := ParticleProcessMaterial.new()
+    lm.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+    lm.emission_box_extents = Vector3(30, 400, 1)   # left-edge strip
+    lm.direction = Vector3(1.0, 0.15, 0.0)   # hard rightward, slight dip
+    lm.spread = 6.0
+    lm.initial_velocity_min = 400.0
+    lm.initial_velocity_max = 650.0
+    lm.gravity = Vector3(0, 60, 0)           # gentle settling arc
+    lm.angular_velocity_min = -220.0
+    lm.angular_velocity_max = 220.0          # tumble as they zip past
+    _leaves.process_material = lm
+    _leaves.texture = _leaf_tex()
+    _leaves.position = Vector2(-20, GH * T * 0.4)
+    stage.add_child(_leaves)
     _build_props()
     _build_actors()
     # Phase 5.6 — canopy crowns hanging INTO the frame top: the
@@ -376,6 +398,14 @@ func _ready() -> void:
                             Vector2(fp[0], fp[1]))
         cr.scale = Vector2(fp[2], fp[2])
         front.add_child(cr)
+    _veil = ColorRect.new()                  # post overlay over the WHOLE
+    _veil.name = "VeilOverlay"               # map incl. actors — rays and
+    _veil.position = Vector2.ZERO            # fog live here; HUD is on its
+    _veil.size = Vector2(GW * T, GH * T)     # own layer, untouched
+    _veil.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    _veil.material = ShaderMaterial.new()
+    _veil.visible = false
+    stage.add_child(_veil)
     marks = Node2D.new()
     marks.name = "Marks"
     stage.add_child(marks)
@@ -406,14 +436,19 @@ func _ready() -> void:
         hud_layer.visible = false
         markers.visible = false
         pads_node.visible = false
-    # --storm: presenter-only weather QA — tint, rain, ground ripples.
-    # st["weather"] drives the same hook once the scenario matrix
-    # lands (cast picks the row, presenter reads it); any profile key
+    # weather presenter QA: --weather=fog|wind|storm picks a profile;
+    # --storm is shorthand. st["weather"] drives the same hook once
+    # the scenario matrix lands; absent a key, the sunny profile still
+    # applies at boot so the vệt nắng rays stay on as ambient polish
     var wkey: String = Game.site_state().get("weather", "")
+    for a in OS.get_cmdline_args():
+        if a.begins_with("--weather="):
+            wkey = a.get_slice("=", 1)
     if OS.get_cmdline_args().has("--storm"):
         wkey = "storm"
-    if WEATHER_PROFILES.has(wkey):
-        _set_weather(wkey, 0.0)              # instant for --shot QA
+    if not WEATHER_PROFILES.has(wkey):
+        wkey = "sunny"
+    _set_weather(wkey, 0.0)                  # instant at boot
     # --pose: QA screenshot staging — seats the first guest (trait
     # bubble visible), selects the second and hovers a pad (strip +
     # star previews visible)
@@ -504,50 +539,129 @@ func _process(delta: float) -> void:
         _fade_chrome(0.2)
 
 
-## Weather presenter — visual only, no sim involvement. Profile data
-## (grade tint, ripple strength, rain toggle, lightning flag) drives a
-## single tween; adding a state is a table row + optional shader, not
-## new plumbing. Driven by --storm / st["weather"] today; the scenario
-## cast owns the trigger when the matrix lands.
+## Weather presenter — visual only, no sim involvement. A profile row
+## (grade tint + veil overlay + warp overlay + emitters + lightning)
+## drives one parallel tween; a new state is a table row + optional
+## shader, not new plumbing. Driven by --weather= / st["weather"]
+## today; the scenario cast owns the trigger when the matrix lands.
 const WEATHER_PROFILES := {
-    "sunny": {"color": WARM_MUL, "ripple": 0.0,
-              "rain": false, "lightning": false},
-    "storm": {"color": STORM_MUL, "ripple": 1.0,
-              "rain": true,  "lightning": true},
-    # future rows (each = grade color + optional overlay shader):
-    # "fog":      milky grade + fractal-noise ColorRect; cast clusters
-    #             campers near the fire. Never particles — too heavy.
-    # "heatwave": overexposed gold grade (values >1.0) + sine-warp
-    #             haze shader; cast weights pond/shade spots.
-    # "wind":     cool-gray grade + VERTEX-sway material on tall
-    #             props (roots stay pinned) + leaf-debris emitter.
-    #             Drive via RenderingServer.global_shader_parameter_set
-    #             ("global_wind_speed") — one call, every swaying
-    #             material reads it; phase from world-x, not uniforms.
-    #             Sway factor needs anchors.json anchor_y (offset puts
-    #             VERTEX.y ∈ [-ay, h-ay] — only base-anchored props get
-    #             the write-up's neat [-h,0] range).
+    # "veil" = post overlay over the whole map (rays, fog);
+    # "warp" = ground-only distortion below the y-sorted world
+    "sunny": {"color": WARM_MUL,
+              "veil": {"shader": "res://shaders/sun_rays.gdshader",
+                       "val": 0.45},           # vệt nắng ambient shafts
+              "warp": null,
+              "rain": false, "leaves": false, "lightning": false},
+    "storm": {"color": STORM_MUL,
+              "veil": null,
+              "warp": {"shader": "res://shaders/rain_ripples.gdshader",
+                       "val": 1.0},
+              "rain": true, "leaves": false, "lightning": true},
+    "fog":   {"color": Color(0.65, 0.7, 0.75), # milky isolation
+              "veil": {"shader": "res://shaders/layered_fog.gdshader",
+                       "val": 0.7},            # sương mù banks
+              "warp": null,
+              "rain": false, "leaves": false, "lightning": false},
+    "wind":  {"color": Color(0.85, 0.9, 0.85), # cool overcast
+              "veil": null,
+              "warp": {"shader": "res://shaders/wind_gusts.gdshader",
+                       "val": 0.035},          # làn gió ground shimmer
+              "rain": false, "leaves": true, "lightning": false},
+    # "heatwave": overexposed gold grade (values >1.0) + sine-warp haze
+    #             veil; cast weights pond/shade spots — shade-as-data.
+    # Foliage sway (when it lands) is a MATERIAL on tall props, not a
+    # weather row: VERTEX.x bend ∝ height above anchor_y, driven by
+    # RenderingServer.global_shader_parameter_set("global_wind_speed")
+    # — one call, every swaying material reads it; phase from world-x.
+    # Not binary: calm days keep ~0.8 ambient sway, WINDY gusts ~4/5.
+    # anchor_y caveat: VERTEX.y ∈ [-ay, h-ay] — only base-anchored
+    # props get the neat [-h, 0] range the write-ups assume.
 }
 
 
 func _set_weather(state: String, dur := 4.0) -> void:
     var p: Dictionary = WEATHER_PROFILES[state]
-    _storm_on = p["lightning"]
+    _storm_on = p.get("lightning", false)
     _lightning_cd = randf_range(1.5, 4.0)
     if _storm_tween and _storm_tween.is_running():
         _storm_tween.kill()
-    var m := _ripple.material as ShaderMaterial
-    if dur <= 0.05:                            # QA shots: no ramp to wait on
+    var instant := dur <= 0.05
+    if instant:                                # QA shots / boot resolve
         _grade.color = p["color"]
-        m.set_shader_parameter("storm_intensity", p["ripple"])
-        _rain.emitting = p["rain"]
-        return
-    _storm_tween = create_tween().set_parallel(true)
-    _storm_tween.tween_property(_grade, "color", p["color"], dur)\
-        .set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-    _storm_tween.tween_property(m, "shader_parameter/storm_intensity",
-        p["ripple"], dur)
-    _rain.emitting = p["rain"]
+    else:
+        _storm_tween = create_tween().set_parallel(true)
+        _storm_tween.tween_property(_grade, "color", p["color"], dur)\
+            .set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+    _apply_overlay(_warp, p.get("warp"), dur, instant)
+    _apply_overlay(_veil, p.get("veil"), dur, instant)
+    _rain.emitting = p.get("rain", false)
+    _leaves.emitting = p.get("leaves", false)
+
+
+## spec = {"shader": path, "val": target intensity} or null. Every
+## overlay shader exposes `uniform float intensity` so the profile
+## row never names uniforms.
+func _apply_overlay(rect: ColorRect, spec: Variant,
+                    dur: float, instant: bool) -> void:
+    var m := rect.material as ShaderMaterial
+    if spec != null:
+        if m.shader == null \
+                or m.shader.resource_path != spec["shader"]:
+            m.shader = load(spec["shader"])
+            _bind_noise(m, spec["shader"])
+        rect.visible = true
+        if instant:
+            m.set_shader_parameter("intensity", spec["val"])
+        else:
+            m.set_shader_parameter("intensity", 0.0)
+            _storm_tween.tween_property(m,
+                "shader_parameter/intensity", spec["val"], dur)
+    elif instant:
+        rect.visible = false
+    elif m.shader != null:                     # fade out, then hide
+        _storm_tween.tween_property(m,
+            "shader_parameter/intensity", 0.0, dur)
+        _storm_tween.tween_callback(func(): rect.visible = false)
+
+
+func _bind_noise(m: ShaderMaterial, path: String) -> void:
+    ## Procedural FastNoiseLite fields — no binary noise assets
+    match path:
+        "res://shaders/sun_rays.gdshader":
+            m.set_shader_parameter("noise_tex", _noise_tex(11))
+        "res://shaders/layered_fog.gdshader":
+            m.set_shader_parameter("fog_noise_1", _noise_tex(11))
+            m.set_shader_parameter("fog_noise_2", _noise_tex(47))
+        "res://shaders/wind_gusts.gdshader":
+            m.set_shader_parameter("noise_tex", _noise_tex(23))
+
+
+func _noise_tex(nseed: int) -> Texture2D:
+    if not _noise_cache.has(nseed):
+        var n := FastNoiseLite.new()
+        n.seed = nseed
+        n.frequency = 0.035
+        n.fractal_octaves = 3
+        var img := Image.create(256, 256, false, Image.FORMAT_L8)
+        for y in 256:
+            for x in 256:
+                var v := clampf(n.get_noise_2d(x, y) * 0.5 + 0.5,
+                                0.0, 1.0)
+                img.set_pixel(x, y, Color(v, v, v))
+        _noise_cache[nseed] = ImageTexture.create_from_image(img)
+    return _noise_cache[nseed]
+
+
+func _leaf_tex() -> Texture2D:
+    ## 8x8 autumn leaf pixel-blob; angular_velocity tumbles it
+    var img := Image.create(8, 8, false, Image.FORMAT_RGBA8)
+    img.fill(Color(0, 0, 0, 0))
+    for y in range(2, 6):
+        for x in range(2, 6):
+            img.set_pixel(x, y, Color(0.75, 0.45, 0.18, 0.9))
+    img.set_pixel(1, 3, Color(0.75, 0.45, 0.18, 0.9))
+    img.set_pixel(6, 3, Color(0.9, 0.6, 0.25, 0.9))
+    return ImageTexture.create_from_image(img)
 
 
 func _rain_tex() -> Texture2D:

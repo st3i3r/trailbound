@@ -11,7 +11,7 @@ uniform float ripple_density : hint_range(0.1, 50.0) = 15.0;
 uniform float ripple_speed : hint_range(0.5, 10.0) = 3.5;
 uniform float ripple_size : hint_range(0.01, 0.2) = 0.05;
 uniform float ripple_strength : hint_range(0.001, 0.05) = 0.008;
-uniform float storm_intensity : hint_range(0.0, 1.0) = 0.0;
+uniform float intensity : hint_range(0.0, 1.0) = 0.0;
 
 vec2 hash(vec2 p) {
 	p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
@@ -19,7 +19,7 @@ vec2 hash(vec2 p) {
 }
 
 void fragment() {
-	if (storm_intensity <= 0.001) {
+	if (intensity <= 0.001) {
 		COLOR = texture(screen_texture, SCREEN_UV);
 	} else {
 		vec2 uv = SCREEN_UV;
@@ -43,7 +43,7 @@ void fragment() {
 						* smoothstep(current_wave_front, current_wave_front - ripple_size, d)
 						* (1.0 - birth_time);
 					ripple_offset += (dist_vec / max(d, 0.001))
-						* wave * fade * ripple_strength * storm_intensity;
+						* wave * fade * ripple_strength * intensity;
 				}
 			}
 		}
