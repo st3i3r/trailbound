@@ -372,6 +372,20 @@ by chrome, so hero gens stay unframed art. Selection = thin corner
 brackets (chrome), not a fill — our vermilion focus ring already reads
 equivalent.
 
+**Resolution spec (measured 2026-10-15):** refs at ~3× of 360p —
+Eastward row icons ~24-28 game px in ~30px rows; result-card dish
+~37px inside its medallion; icon:text ≈ 2.3× (generous, not garnish).
+Model fills ~90% of any canvas — canvas size IS the size control:
+
+| Asset | Canvas | Figure target | Displays at |
+|---|---|---|---|
+| D1 icon | 32×32, fill ~80% (~26px figure) — icons keep 2-3px margin, they never touch the cell | 24-28px | rows/chips 1:1 |
+| D2 hero | 64×64, fill ~85% (~54-58px figure) | ~56px zone | result card, Field Notes, medallion frame is chrome |
+
+Dense 12-16px slots keep `G_*` code glyphs — painterly icons never
+get runtime-downscaled into a dense slot (same law as the `_16`/`_12`
+glyph size variants).
+
 - **D1 (≤42, 64 slots, ≈10):** 22 dishes + 17 ingredients + 9 keepsakes at 32 px
 - **D2 (≤85, 16 slots, 2 jobs ≈20):** 22 dish heroes + 9 keepsake heroes at 64 px (result card, journal)
 
