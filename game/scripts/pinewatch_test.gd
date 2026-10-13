@@ -215,9 +215,13 @@ var fade_zones := []                         # [{s: Sprite2D, r: Rect2}]
 var actor_nodes := []                        # walking sprites to protect
 var _grade: CanvasModulate                   # filmic grade — weather tint
 var _warp: ColorRect                         # ground-only screen warp
-                                           # (ripples / gust distortion)
+var _warp2: ColorRect                        #   double-buffered twin —
+var _warp_chan := []                         #   [A, B] crossfade slots
 var _veil: ColorRect                         # full-scene post overlay
-                                           # (sun rays / rolling fog)
+var _veil2: ColorRect                        #   same pairing —
+var _veil_chan := []                         #   outgoing fades on one
+                                           #   while incoming rolls in
+                                           #   on the other
 var _rain: GPUParticles2D                    # slanted 2.5D downpour
 var _leaves: GPUParticles2D                  # làn gió debris stream
 var _noise_cache := {}                       # seed -> FastNoiseLite tex
@@ -340,7 +344,11 @@ func _ready() -> void:
     _warp.material = ShaderMaterial.new()    # while y-sorted props and
     _warp.visible = false                    # actors stay crisp; the
     stage.add_child(_warp)                   # profile picks the shader
-                                           # (ripples / gusts)
+    _warp2 = _warp.duplicate()               # crossfade twin — needs its
+    _warp2.name = "WarpOverlayB"             # OWN material: duplicate()
+    _warp2.material = ShaderMaterial.new()   # shares the resource
+    stage.add_child(_warp2)
+    _warp_chan = [_warp, _warp2]             # (ripples / gusts)
     world = Node2D.new()
     world.name = "World"
     world.y_sort_enabled = true
@@ -406,6 +414,11 @@ func _ready() -> void:
     _veil.material = ShaderMaterial.new()
     _veil.visible = false
     stage.add_child(_veil)
+    _veil2 = _veil.duplicate()               # crossfade twin — needs its
+    _veil2.name = "VeilOverlayB"             # OWN material: duplicate()
+    _veil2.material = ShaderMaterial.new()   # shares the resource
+    stage.add_child(_veil2)
+    _veil_chan = [_veil, _veil2]
     marks = Node2D.new()
     marks.name = "Marks"
     stage.add_child(marks)
@@ -592,36 +605,66 @@ func _set_weather(state: String, dur := 4.0) -> void:
         _storm_tween = create_tween().set_parallel(true)
         _storm_tween.tween_property(_grade, "color", p["color"], dur)\
             .set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-    _apply_overlay(_warp, p.get("warp"), dur, instant)
-    _apply_overlay(_veil, p.get("veil"), dur, instant)
+    _apply_overlay(_warp_chan, p.get("warp"), dur, instant)
+    _apply_overlay(_veil_chan, p.get("veil"), dur, instant)
     _rain.emitting = p.get("rain", false)
     _leaves.emitting = p.get("leaves", false)
 
 
 ## spec = {"shader": path, "val": target intensity} or null. Every
 ## overlay shader exposes `uniform float intensity` so the profile
-## row never names uniforms.
-func _apply_overlay(rect: ColorRect, spec: Variant,
+## row never names uniforms. `chan` is a [primary, twin] pair — a
+## new effect rolls in on the free slot while the outgoing one dies
+## on its own shader, so transitions crossfade instead of popping.
+func _apply_overlay(chan: Array, spec: Variant,
                     dur: float, instant: bool) -> void:
-    var m := rect.material as ShaderMaterial
-    if spec != null:
-        if m.shader == null \
-                or m.shader.resource_path != spec["shader"]:
-            m.shader = load(spec["shader"])
-            _bind_noise(m, spec["shader"])
-        rect.visible = true
-        if instant:
-            m.set_shader_parameter("intensity", spec["val"])
+    var showing: ColorRect = null
+    var free: ColorRect = null
+    for r in chan:
+        if r.visible and showing == null:
+            showing = r
+        elif free == null:
+            free = r
+    if free == null:                           # both busy mid-fade —
+        free = chan[1]                         # overwrite the twin
+    if spec == null:
+        if showing != null:
+            _fade_out(showing, dur, instant)
+        return
+    var sm := (showing.material as ShaderMaterial) if showing else null
+    if sm != null and sm.shader != null \
+            and sm.shader.resource_path == spec["shader"]:
+        if instant:                            # same effect: retarget
+            sm.set_shader_parameter("intensity", spec["val"])
         else:
-            m.set_shader_parameter("intensity", 0.0)
-            _storm_tween.tween_property(m,
+            _storm_tween.tween_property(sm,
                 "shader_parameter/intensity", spec["val"], dur)
-    elif instant:
+        return
+    var fm := free.material as ShaderMaterial  # different effect —
+    fm.shader = load(spec["shader"])           # incoming rolls in on
+    _bind_noise(fm, spec["shader"])            # the free slot while
+    free.visible = true                        # the old one dies fast
+    if instant:
+        fm.set_shader_parameter("intensity", spec["val"])
+        if showing != null:
+            showing.visible = false
+    else:
+        fm.set_shader_parameter("intensity", 0.0)
+        _storm_tween.tween_property(fm,
+            "shader_parameter/intensity", spec["val"], dur)
+        if showing != null:
+            _fade_out(showing, dur * 0.5, instant)
+
+
+func _fade_out(rect: ColorRect, dur: float, instant: bool) -> void:
+    var m := rect.material as ShaderMaterial
+    if m.shader == null or instant:
         rect.visible = false
-    elif m.shader != null:                     # fade out, then hide
-        _storm_tween.tween_property(m,
-            "shader_parameter/intensity", 0.0, dur)
-        _storm_tween.tween_callback(func(): rect.visible = false)
+        return
+    var ft := create_tween()                   # own tween: callback on
+    ft.tween_property(m,                       # a parallel tween has
+        "shader_parameter/intensity", 0.0, dur)   # fuzzy step timing
+    ft.tween_callback(func(): rect.visible = false)
 
 
 func _bind_noise(m: ShaderMaterial, path: String) -> void:
