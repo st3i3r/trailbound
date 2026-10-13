@@ -389,6 +389,27 @@ glyph size variants).
 - **D1 (≤42, 64 slots, ≈10):** 22 dishes + 17 ingredients + 9 keepsakes at 32 px
 - **D2 (≤85, 16 slots, 2 jobs ≈20):** 22 dish heroes + 9 keepsake heroes at 64 px (result card, journal)
 
+**D1 shipped (2026-10-16):** all 48 generated via
+`create_object_pro_flash` (`n_directions:1`, 32×32, `view:low
+top-down`, style_image = the 28×32 fisher crop). Driver:
+`tools/batch_d1_items.py` (pilot → fire → poll → finish). Pipeline:
+download → `_normalize` (nearest-fit figure into a 30px box → ≥1px
+margin) → alpha-bbox gate (23-30px figure) → `tb_grade --kind char`
+→ **pooled** `palette_lock --colors 48` (one median-cut ramp across
+the whole set — icons share colour depth, unlike per-persona char
+ramps) → stage `game/assets/pinewatch/icons/{dish_|ing_|}<id>.png` +
+auto-wire `icons.json.objects`. Gate result: 48/48 pass, 23-30px
+figures, 81 far-mapped px total. IDs match `recipes.json` /
+`ingredients.json` / `crew.json` keepsake ids exactly (keepsake file
+names use the catalog id — `grandpas_thermos.png`, not
+`keepsake_thermos.png`). UI: `UIKit.icon_rect(id, null, 32)` renders
+1:1 untinted — `icon_rect` only tints `G_*` glyph masks by default;
+`UIKit.icon_exists` is the fallback check. Slots wired: pantry
+ingredient chips (3-col, 94×40), pantry meal strip (dish chips),
+evening-tray meal chip (84px, dish art left), journal recipe +
+keepsake rows (`_row` gained `icon_size`; content art at 32px,
+undiscovered rows keep the glyph).
+
 Dishes (`recipes.json`): `camp_mash` lumpy grey-brown mash in a dented tin bowl with a spoon · `trail_stew` hearty vegetable stew in an enamel camp pot, steam · `mushroom_skewers` grilled mushroom skewers on bamboo sticks · `herb_tea` green herbal tea in a small clay cup with a mint sprig · `berry_tea` pink berry tea in a glass with floating berries · `smores` toasted marshmallow s'mores on a tin plate · `trail_sandwich` crusty baguette sandwich with pickled carrot, cucumber and herbs · `goldcap_skillet` golden mushrooms sizzling in a small cast-iron skillet · `grilled_fish` whole grilled fish on a banana leaf with lime · `noodle_soup` beef noodle soup in a big white bowl with herbs, lime and chili · `iced_coffee` iced coffee with condensed milk, drip filter on top of the glass · `com_nam` triangle rice balls with sesame salt on a banana leaf · `goi_cuon` fresh spring rolls in translucent rice paper with shrimp and herbs, dipping sauce · `che` layered sweet bean dessert in a tall glass with coconut cream · `sinh_to` mango-avocado smoothie in a glass with a straw · `ca_phe_trung` egg coffee in a small cup standing in a bowl of hot water, foamy top · `tra_mat_ong` honey tea in a glass mug with a lemon slice · `ca_kho` caramelised braised fish in a small clay pot, glossy dark sauce · `mi_quang` turmeric-yellow noodles in a shallow bowl with shrimp, peanuts and a rice cracker · `berry_pie` lattice berry pie slice on a tin plate · `honey_cakes` stack of small honey cakes drizzled with honey · `caramel_custard` caramel custard with dark caramel on a small plate
 
 Ingredients (`ingredients.json`): `mushroom` brown wild mushrooms · `herb` tied herb bundle · `berries` handful of red berries · `goldcap` golden mushroom · `honey` honey jar with a wooden dipper · `perch` small perch · `carp` carp · `trout` speckled trout · `catfish` catfish · `bread` baguette · `rice` bowl of uncooked rice · `eggs` three brown eggs · `tea` tin of tea leaves · `marshmallow` bag of marshmallows · `noodles` bundle of dried rice noodles · `coffee` bag of coffee beans · `sweet_milk` condensed milk tin

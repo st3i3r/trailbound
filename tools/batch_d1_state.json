@@ -1,0 +1,194 @@
+{
+ "noodle_soup": {
+  "object_id": "b1bd8e2e-8938-4258-8ac0-8952263a2d51",
+  "kind": "dish"
+ },
+ "trail_stew": {
+  "object_id": "e2a47306-1c6c-4e98-9022-bbabad02f400",
+  "kind": "dish"
+ },
+ "camp_mash": {
+  "object_id": "e239dc3c-8bf4-4066-a1c2-c7e1961349d0",
+  "kind": "dish"
+ },
+ "mushroom_skewers": {
+  "object_id": "ce0d0a6d-c8bb-447d-82c1-4c6cfb7c9d36",
+  "kind": "dish"
+ },
+ "herb_tea": {
+  "object_id": "cb178cac-1f1c-4e07-a52a-b9ac0971edf8",
+  "kind": "dish"
+ },
+ "berry_tea": {
+  "object_id": "3913f90b-909d-41f7-a11b-5df47ff10cd0",
+  "kind": "dish"
+ },
+ "smores": {
+  "object_id": "9bdb8cb2-88fd-4728-8c68-baea16fb78f1",
+  "kind": "dish"
+ },
+ "trail_sandwich": {
+  "object_id": "0a8983aa-3592-4170-b1f2-8bfd6b3e0370",
+  "kind": "dish"
+ },
+ "goldcap_skillet": {
+  "object_id": "e8eb750f-c63a-4a93-8246-299c2061aac8",
+  "kind": "dish"
+ },
+ "grilled_fish": {
+  "object_id": "0f2518c7-36c0-4c86-8e3f-d3451069bf98",
+  "kind": "dish"
+ },
+ "iced_coffee": {
+  "object_id": "fb87efc8-35c7-49f7-9136-ad9032be246a",
+  "kind": "dish"
+ },
+ "com_nam": {
+  "object_id": "86a9914e-0fe5-44e8-91e6-f41ad253a223",
+  "kind": "dish"
+ },
+ "goi_cuon": {
+  "object_id": "38769cc2-e1a8-40d6-958c-b5db46cf0bc0",
+  "kind": "dish"
+ },
+ "che": {
+  "object_id": "741f59da-af91-4a43-8022-d36cad07920c",
+  "kind": "dish"
+ },
+ "sinh_to": {
+  "object_id": "54854535-5966-48a3-b966-897e3379f3dc",
+  "kind": "dish"
+ },
+ "ca_phe_trung": {
+  "object_id": "cd0c69dd-8b3e-4fa9-9473-27becf1ddb7c",
+  "kind": "dish"
+ },
+ "tra_mat_ong": {
+  "object_id": "ecc36bce-f7e0-4691-a6a1-10d5b7e8d3a7",
+  "kind": "dish"
+ },
+ "ca_kho": {
+  "object_id": "80ed761e-9c22-43c0-9698-80879dd4be64",
+  "kind": "dish"
+ },
+ "mi_quang": {
+  "object_id": "7d9311ea-bef2-4849-bac8-72fef11e21a9",
+  "kind": "dish"
+ },
+ "berry_pie": {
+  "object_id": "0108c45e-c54d-4a63-90e8-8c0b2e22478a",
+  "kind": "dish"
+ },
+ "honey_cakes": {
+  "object_id": "66c01083-5563-403c-8c7f-e70ded5befe0",
+  "kind": "dish"
+ },
+ "caramel_custard": {
+  "object_id": "5cbe9b25-4790-44d7-adc4-3f1d78fa6a68",
+  "kind": "dish"
+ },
+ "mushroom": {
+  "object_id": "e006138f-0509-45ef-9a60-1fb03c40a66c",
+  "kind": "ing"
+ },
+ "herb": {
+  "object_id": "a0c9614b-59bf-4d00-9a9b-4457b0112a27",
+  "kind": "ing"
+ },
+ "berries": {
+  "object_id": "daa59367-6733-43c1-9ada-c7c6eacc3e9c",
+  "kind": "ing"
+ },
+ "goldcap": {
+  "object_id": "4e004e50-f69e-44d9-9981-9d7223a73499",
+  "kind": "ing"
+ },
+ "honey": {
+  "object_id": "641dac2c-bd5f-4668-9684-238c6230cd38",
+  "kind": "ing"
+ },
+ "perch": {
+  "object_id": "74e62156-8b3a-4e17-baaa-fb9e7647732b",
+  "kind": "ing"
+ },
+ "carp": {
+  "object_id": "d78f1496-0812-47e9-a2fc-cef00237035a",
+  "kind": "ing"
+ },
+ "trout": {
+  "object_id": "10dc79c4-bd95-4bf1-834e-81d84b71a2bd",
+  "kind": "ing"
+ },
+ "catfish": {
+  "object_id": "1d35e916-7d92-4d51-8ecf-5c2f86776836",
+  "kind": "ing"
+ },
+ "bread": {
+  "object_id": "7e0aca92-6b95-489d-9ef2-08edb6e5e61b",
+  "kind": "ing"
+ },
+ "rice": {
+  "object_id": "0ae7c5b7-6f25-4144-bcb7-6e056a34162b",
+  "kind": "ing"
+ },
+ "eggs": {
+  "object_id": "6799f13d-f526-4a55-85db-2afaa3dbec94",
+  "kind": "ing"
+ },
+ "tea": {
+  "object_id": "086dedec-d909-4c9d-8136-aa2624353c69",
+  "kind": "ing"
+ },
+ "marshmallow": {
+  "object_id": "ac62f348-6506-4d2b-a02c-5c8a9c2e4718",
+  "kind": "ing"
+ },
+ "noodles": {
+  "object_id": "0bd36e10-ea69-4d00-bc65-a183986b87a1",
+  "kind": "ing"
+ },
+ "coffee": {
+  "object_id": "674de887-c298-4b80-b9d5-04d84cce660e",
+  "kind": "ing"
+ },
+ "sweet_milk": {
+  "object_id": "2a5d7d31-e2d8-4ee2-90ff-28338a9587b1",
+  "kind": "ing"
+ },
+ "grandpas_thermos": {
+  "object_id": "aa12c20f-939f-4514-83ab-88b64cce8152",
+  "kind": "keep"
+ },
+ "old_trail_register": {
+  "object_id": "081817c2-97d5-4bdf-afbd-8e6417aa85d1",
+  "kind": "keep"
+ },
+ "photo_on_the_porch": {
+  "object_id": "23f76d46-2cc8-468f-bb70-069236da6ea9",
+  "kind": "keep"
+ },
+ "carved_oar": {
+  "object_id": "8d4fc58e-cddc-4d0b-8a6c-b16dffa9dd00",
+  "kind": "keep"
+ },
+ "river_chart": {
+  "object_id": "6d1efe74-c06e-4640-bc9a-6aa087f9a62d",
+  "kind": "keep"
+ },
+ "old_bas_boat": {
+  "object_id": "6e6db5ac-8a33-48f1-9b1c-f1f52e2dbcc7",
+  "kind": "keep"
+ },
+ "bamboo_frames": {
+  "object_id": "67801fb7-90fb-4ade-812a-4883130ed82f",
+  "kind": "keep"
+ },
+ "pattern_book": {
+  "object_id": "b4c7adda-9c86-4b9b-98ed-5d406b4df360",
+  "kind": "keep"
+ },
+ "unfinished_lantern": {
+  "object_id": "dcc85030-3e5c-43ed-975e-29ce7ba2231f",
+  "kind": "keep"
+ }
+}

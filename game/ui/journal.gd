@@ -167,13 +167,17 @@ func _cap(parent: Control, text: String) -> void:
 ## One list row: left glyph, body text (optionally two lines), right
 ## glyph cluster. `dim` renders the locked/undiscovered look.
 func _row(parent: Control, icon: String, text: String,
-		right_icon := "", dim := false, sub := "") -> void:
+		right_icon := "", dim := false, sub := "",
+		icon_size := 16) -> void:
 	var h := HBoxContainer.new()
-	h.custom_minimum_size = Vector2(0, 22)
+	h.custom_minimum_size = Vector2(0, max(22, icon_size + 4))
 	h.alignment = BoxContainer.ALIGNMENT_CENTER
 	h.add_theme_constant_override("separation", 8)
 	var col := UITokens.DIM if dim else UITokens.PAPER
-	h.add_child(UIKit.icon_rect(icon, col))
+	# content icons (dishes, keepsakes) render untinted at native
+	# 32px; glyphs keep the semantic column tint at 16
+	var icon_tint: Variant = col if icon_size <= 16 else null
+	h.add_child(UIKit.icon_rect(icon, icon_tint, icon_size))
 	var mid := VBoxContainer.new()
 	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	mid.add_theme_constant_override("separation", 0)
@@ -262,9 +266,12 @@ func _rows_recipes(list: Control) -> void:
 	for r in Catalog.data.get("recipes", []):
 		var cooked: bool = r["id"] in Game.recipes_cooked
 		any = any or cooked
-		_row(list, "cook", r["name"] if cooked else "? ? ?",
+		var has_art := cooked and UIKit.icon_exists(r["id"])
+		_row(list, r["id"] if has_art else "cook",
+			r["name"] if cooked else "? ? ?",
 			"check" if cooked else "", not cooked,
-			"" if cooked else tr("jrnl_not_cooked"))
+			"" if cooked else tr("jrnl_not_cooked"),
+			32 if has_art else 16)
 	if not any:
 		_empty(list, "jrnl_empty_recipes", "recipes")
 
@@ -280,9 +287,13 @@ func _rows_keepsakes(list: Control) -> void:
 				continue
 			var has: bool = k["id"] in got
 			any = any or has
-			_row(list, "keepsakes", k["label"] if has else "? ? ?",
+			var has_art := has and UIKit.icon_exists(k["id"])
+			_row(list,
+				k["id"] if has_art else "keepsakes",
+				k["label"] if has else "? ? ?",
 				"check" if has else "", not has,
-				tr(k["note_key"]) if has else "")
+				tr(k["note_key"]) if has else "",
+				32 if has_art else 16)
 	if "the_second_volume" in got:
 		_row(list, "keepsakes", tr("jrnl_vol2"), "check")
 	if not any and "the_second_volume" not in got:

@@ -178,11 +178,16 @@ func _sec_icons(root: Control) -> void:
 		for k in table:
 			if k == "comment":
 				continue
-			# glyph masks get semantic tints; painterly objects render raw
-			var t := UIKit.icon_rect(k) \
-				if String(table[k]).begins_with("G_") \
-				else UIKit.icon_rect(k, Color.WHITE)
-			flow.add_child(t)
+			# glyph masks get semantic tints; painterly objects render
+			# raw at native size (I1_* are 16px, D1 dishes/ingredients/
+			# keepsakes are 32px)
+			var fid := String(table[k])
+			if fid.begins_with("G_"):
+				flow.add_child(UIKit.icon_rect(k))
+			elif fid.begins_with("I1_"):
+				flow.add_child(UIKit.icon_rect(k, Color.WHITE))
+			else:
+				flow.add_child(UIKit.icon_rect(k, Color.WHITE, 32))
 
 
 func _sec_chips(root: Control) -> void:

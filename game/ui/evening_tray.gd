@@ -310,32 +310,36 @@ func _badge(card: Control, icon_name: String, pos: Vector2,
 func _meal_chip(m: Dictionary, idx: int) -> Panel:
 	var c := Panel.new()
 	c.name = "meal_%d" % idx
-	c.custom_minimum_size = Vector2(64, CARD_H)
-	c.size = Vector2(64, CARD_H)
+	c.custom_minimum_size = Vector2(84, CARD_H)
+	c.size = Vector2(84, CARD_H)
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c.add_theme_stylebox_override("panel", UIKit.flat("glass_chip"))
-	var b := UIKit.icon_rect("bowl")
-	b.position = Vector2(4, 4)
+	var dish_id := String(m.get("id", ""))
+	var b := UIKit.icon_rect(dish_id, null, 32) \
+		if UIKit.icon_exists(dish_id) \
+		else UIKit.icon_rect("bowl", UITokens.DIM, 16)
+	b.position = Vector2(3, 7) if b.custom_minimum_size.x >= 32 \
+		else Vector2(10, 5)
 	c.add_child(b)
 	var nm := UIKit.label_for(String(_meal_names.get(
-		String(m.get("id", "")), String(m.get("id", "?")))),
+		dish_id, dish_id)),
 		UITokens.TypeRole.CAPTION)
-	nm.position = Vector2(20, 4)
-	nm.size = Vector2(42, 10)
+	nm.position = Vector2(38, 4)
+	nm.size = Vector2(44, 22)
 	nm.clip_text = true
 	c.add_child(nm)
 	var coin := UIKit.icon_rect("coin")
-	coin.position = Vector2(4, 30)
+	coin.position = Vector2(38, 30)
 	c.add_child(coin)
 	var pr := UIKit.label_for("%d" % int(m.get("price", 0)),
 		UITokens.TypeRole.BODY)
-	pr.position = Vector2(19, 30)
-	pr.size = Vector2(30, 10)
+	pr.position = Vector2(53, 30)
+	pr.size = Vector2(18, 10)
 	pr.clip_text = true
 	c.add_child(pr)
 	var chk := UIKit.icon_rect("check", UITokens.GREEN)
 	chk.name = "Served"
-	chk.position = Vector2(48, 30)
+	chk.position = Vector2(68, 30)
 	chk.visible = false
 	c.add_child(chk)
 	var ring := Panel.new()

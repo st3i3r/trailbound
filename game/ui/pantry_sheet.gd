@@ -82,7 +82,7 @@ func _build_main() -> void:
 		UIKit.empty(_v, "pantry", tr("pan_empty"))
 	else:
 		var grid := GridContainer.new()
-		grid.columns = 4
+		grid.columns = 3
 		grid.add_theme_constant_override("h_separation", 4)
 		grid.add_theme_constant_override("v_separation", 4)
 		_v.add_child(grid)
@@ -138,7 +138,7 @@ func _ing_chip(item_id: String, count: int) -> Control:
 			dname = r.get("name", item_id)
 			break
 	var b := Button.new()
-	b.custom_minimum_size = Vector2(68, 40)
+	b.custom_minimum_size = Vector2(94, 40)
 	b.add_theme_stylebox_override("normal", UIKit.flat("glass_chip"))
 	b.add_theme_stylebox_override("hover",
 		UIKit.flat("glass_chip", 1.08))
@@ -155,8 +155,11 @@ func _ing_chip(item_id: String, count: int) -> Control:
 	h.alignment = BoxContainer.ALIGNMENT_CENTER
 	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h.add_theme_constant_override("separation", 3)
-	h.add_child(UIKit.icon_rect(
-		KIND_ICON.get(kind, "box"), UITokens.DIM, 16))
+	if UIKit.icon_exists(item_id):
+		h.add_child(UIKit.icon_rect(item_id, null, 32))
+	else:
+		h.add_child(UIKit.icon_rect(
+			KIND_ICON.get(kind, "box"), UITokens.DIM, 16))
 	var nl := UIKit.label_for("%s ×%d" % [dname, count],
 		UITokens.TypeRole.CAPTION, UITokens.PAPER)
 	nl.clip_text = true
@@ -251,18 +254,34 @@ func _meal_strip() -> Control:
 		none.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		box.add_child(none)
 		return box
-	# group by dish: "Trail Stew ×2"
+	# group by dish: one chip per dish — 32px icon + "name ×n"
 	var counts := {}
 	for meal in Game.meals:
 		counts[meal["id"]] = int(counts.get(meal["id"], 0)) + 1
 	var names := {}
 	for r in Catalog.data.get("recipes", []):
 		names[r["id"]] = r.get("name", r["id"])
-	var parts := []
+	var chips := HFlowContainer.new()
+	chips.add_theme_constant_override("h_separation", 4)
+	chips.add_theme_constant_override("v_separation", 2)
+	box.add_child(chips)
 	for rid in counts:
-		parts.append("%s ×%d" % [names.get(rid, rid), counts[rid]])
-	var l := UIKit.label_for("  ·  ".join(parts),
-		UITokens.TypeRole.BODY, UITokens.PAPER)
-	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(l)
+		var c := PanelContainer.new()
+		c.add_theme_stylebox_override("panel",
+			UIKit.flat("glass_chip"))
+		var h := HBoxContainer.new()
+		h.alignment = BoxContainer.ALIGNMENT_CENTER
+		h.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		h.add_theme_constant_override("separation", 4)
+		if UIKit.icon_exists(rid):
+			h.add_child(UIKit.icon_rect(rid, null, 32))
+		else:
+			h.add_child(UIKit.icon_rect("cook", UITokens.DIM, 16))
+		var nl := UIKit.label_for("%s ×%d" % [
+			names.get(rid, rid), counts[rid]],
+			UITokens.TypeRole.CAPTION, UITokens.PAPER)
+		nl.clip_text = true
+		h.add_child(nl)
+		c.add_child(h)
+		chips.add_child(c)
 	return box

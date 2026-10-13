@@ -95,9 +95,20 @@ static func icon_rect(name: String, tint: Variant = null,
     t.stretch_mode = TextureRect.STRETCH_KEEP
     t.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
     t.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    t.modulate = GLYPH_TINT.get(name, UITokens.PAPER) \
-        if tint == null else tint
+    # painterly content sprites carry their own colour — only G_*
+    # glyph masks take a tint by default
+    var default_tint: Color = GLYPH_TINT.get(name, UITokens.PAPER) \
+        if id.begins_with("G_") else Color.WHITE
+    t.modulate = default_tint if tint == null else tint
     return t
+
+
+## Does `name` resolve to a real icon file? Lets callers fall back
+## to a semantic glyph when content art isn't generated yet.
+static func icon_exists(name: String) -> bool:
+    _ensure()
+    return ResourceLoader.exists(
+        UITokens.ASSETS + "icons/" + icon_name(name) + ".png")
 
 
 ## trait id -> its registry icon (falls back to the trait name itself
