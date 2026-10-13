@@ -18,14 +18,22 @@ extends Control
 ## from Game.preview() so players can explain their stars before they
 ## commit (§5.3/§5.4).
 
-const CARD_W := 84
+const CARD_W := 100
 const CARD_H := 46
 const STRIP_H := 24
+## Name row usable width: card minus the left badge column minus the
+## favourite-heart zone at the right edge.  _lint_names enforces it.
+const NAME_W := CARD_W - 27
 
 var cards: HBoxContainer
 var strip: Panel
 var strip_box: HBoxContainer
+var meal_lane: HBoxContainer           # tonight's menu, lead of the row
+var meal_sep: VSeparator
 var _cards := {}                       # gid -> card Panel
+var _meals := {}                       # meal instance idx -> chip Panel
+var _meal_names := {}                  # recipe id -> display name
+var _cooked := {}                      # recipe id -> true (fav reveal)
 var _trait_names := {}                 # tid -> display name
 
 
@@ -42,6 +50,17 @@ func _ready() -> void:
 	cards.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	cards.add_theme_constant_override("separation", UITokens.SP1)
 	scroll.add_child(cards)
+	# dinner lane sits ahead of the guest cards — both scroll together
+	meal_lane = HBoxContainer.new()
+	meal_lane.name = "MealLane"
+	meal_lane.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	meal_lane.add_theme_constant_override("separation", UITokens.SP1)
+	meal_lane.visible = false
+	cards.add_child(meal_lane)
+	meal_sep = VSeparator.new()
+	meal_sep.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	meal_sep.visible = false
+	cards.add_child(meal_sep)
 	strip = Panel.new()
 	strip.name = "BreakdownStrip"
 	strip.visible = false
@@ -59,16 +78,73 @@ func _ready() -> void:
 
 ## Rebuild the card row from the evening board (§5.2).  trait_names
 ## maps trait id -> display name; sprite_cb(req) returns
-## {"tex": Texture2D, "tint": Color} for the portrait.
+## {"tex": Texture2D, "tint": Color} for the portrait.  cooked =
+## recipe ids the camp has cooked (favourites reveal once the dish is
+## known, §5.2); meal_names maps recipe id -> display name for the
+## dinner lane + armed-meal strip.
 func build(board: Array, trait_names: Dictionary,
-		sprite_cb: Callable) -> void:
+		sprite_cb: Callable, cooked := {}, meal_names := {}) -> void:
 	reset()
 	_trait_names = trait_names
+	_cooked = cooked
+	_meal_names = meal_names
+	if board.is_empty():
+		var e := UIKit.empty(cards, "users", tr("tray_empty"))
+		e.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	for req in board:
 		var card := _card(req, sprite_cb.call(req))
 		cards.add_child(card)
 		_cards[req["id"]] = card
 	hide_strip()
+
+
+## §5.5: tonight's menu — one chip per cooked meal instance, ahead of
+## the guest cards.  Tap arms it; the scene serves on a guest tap.
+func set_meals(list: Array) -> void:
+	for c in _meals.values():
+		c.queue_free()
+	_meals = {}
+	meal_lane.visible = not list.is_empty()
+	meal_sep.visible = meal_lane.visible
+	for i in list.size():
+		_meals[i] = _meal_chip(list[i], i)
+		meal_lane.add_child(_meals[i])
+
+
+## Meal instance index under viewport point p (-1 when none).
+func meal_at(p: Vector2) -> int:
+	for i in _meals:
+		if _meals[i].get_global_rect().has_point(p):
+			return int(i)
+	return -1
+
+
+func set_meal_selected(idx: int) -> void:
+	for i in _meals:
+		_meals[i].get_node("Sel").visible = int(i) == idx
+
+
+## Re-mark chips from sim state: the first unmarked chips per served id
+## take the plate look — dupes are real instances, same as the sim.
+func sync_served(served: Dictionary, list: Array) -> void:
+	var want := {}
+	for gid in served:
+		var mid := String(served[gid])
+		want[mid] = int(want.get(mid, 0)) + 1
+	for i in _meals:
+		var m: Control = _meals[i]
+		var mid := String(list[int(i)].get("id", ""))
+		var on := int(want.get(mid, 0)) > 0
+		if on:
+			want[mid] -= 1
+		m.get_node("Served").visible = on
+		m.modulate = Color(1, 1, 1, 0.55) if on else Color.WHITE
+
+
+## Armed-meal strip line: "{name} — tap a seated guest to serve".
+func show_meal(meal_name: String) -> void:
+	_show([{"icon": "bowl", "name": meal_name, "sign": "",
+		"color": UITokens.GOLD}, {"text": tr("tray_serve")}])
 
 
 ## gid whose card is under viewport point p ("" when none).
@@ -103,6 +179,15 @@ func is_seated(gid: String) -> bool:
 	return c != null and c.get_node("Seated").visible
 
 
+## Refused action read: the card itself wobbles (UIFeel.shake handles
+## pivot + reduced-motion), so the rejection lands on the thing the
+## player tried to move — pair with the warn haptic/sfx at call sites.
+func shake_card(gid: String) -> void:
+	var c: Control = _cards.get(gid)
+	if c:
+		UIFeel.shake(c)
+
+
 func reset() -> void:
 	for c in _cards.values():
 		c.queue_free()
@@ -118,60 +203,71 @@ func _card(req: Dictionary, sprite: Dictionary) -> Panel:
 	c.size = Vector2(CARD_W, CARD_H)
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c.add_theme_stylebox_override("panel", UIKit.flat("glass_chip"))
+	# name banner across the top (Eastward card anatomy): the full row
+	# is text space, clear of the portrait below and the heart at right
+	var name_l := UIKit.label_for(_card_name(req),
+		UITokens.TypeRole.CAPTION)
+	name_l.name = "Name"
+	name_l.position = Vector2(4, 2)
+	name_l.size = Vector2(NAME_W, 10)
+	name_l.clip_text = true
+	c.add_child(name_l)
 	# head-and-shoulders portrait: an integer 36px crop near the top of
 	# the bottom-anchored figure — reads as a portrait, keeps 1x pixels
 	var src: Texture2D = sprite.get("tex")
 	if src:
 		var at := AtlasTexture.new()
 		at.atlas = src
-		at.region = Rect2((src.get_width() - 36) / 2.0, 6, 36, 34)
+		at.region = Rect2((src.get_width() - 36) / 2.0, 8, 36, 32)
 		var port := TextureRect.new()
 		port.name = "Portrait"
 		port.texture = at
 		port.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		port.stretch_mode = TextureRect.STRETCH_KEEP
-		port.position = Vector2(4, 6)
+		port.position = Vector2(4, 12)
 		port.modulate = sprite.get("tint", Color.WHITE)
 		c.add_child(port)
-	var name_l := UIKit.label_for(_card_name(req),
-		UITokens.TypeRole.CAPTION)
-	name_l.name = "Name"
-	name_l.position = Vector2(41, 3)
-	name_l.size = Vector2(CARD_W - 43, 10)
-	c.add_child(name_l)
-	# fee: coin icon + amount
+	# fee: coin icon + amount (right column, beside the portrait)
 	var coin := UIKit.icon_rect("coin")
 	coin.name = "FeeIcon"
-	coin.position = Vector2(41, 14)
+	coin.position = Vector2(44, 15)
 	c.add_child(coin)
 	var fee_l := UIKit.label_for("%dc" % int(req.get("fee", 0)),
 		UITokens.TypeRole.BODY)
 	fee_l.name = "Fee"
-	fee_l.position = Vector2(58, 17)
-	fee_l.size = Vector2(24, 10)
+	fee_l.position = Vector2(61, 18)
+	fee_l.size = Vector2(30, 10)
+	fee_l.clip_text = true
 	c.add_child(fee_l)
-	# trait icons: up to 3, 16px at 13px stride so three fit the column
-	var tx := 41
+	# trait icons: up to 3, 16px at 13px stride, bottom-right column
+	var tx := 44
 	for tid in req.get("traits", []).slice(0, 3):
 		var t := UIKit.icon_rect(String(tid))
-		t.position = Vector2(tx, 29)
+		t.position = Vector2(tx, 28)
 		c.add_child(t)
 		tx += 13
-	# badges: elite star top-left, loud megaphone under it, favourite
-	# heart+? top-right (undiscovered favourites show the placeholder)
-	var by := 1
+	# badges ride the portrait corners: elite star top-left, loud
+	# megaphone under it; favourite heart+? top-right of the card
+	# (undiscovered favourites show the placeholder)
+	var by := 13
 	if req.get("elite", false):
-		_badge(c, "star_full", Vector2(1, by), UITokens.GOLD)
+		_badge(c, "star_full", Vector2(2, by), UITokens.GOLD)
 		by += 13
 	if req.get("loud", false):
-		_badge(c, "megaphone", Vector2(1, by), Color.WHITE)
-	var fav := UIKit.icon_rect("heart", UITokens.DIM)
-	fav.name = "Fav"
-	fav.position = Vector2(CARD_W - 15, 1)
-	c.add_child(fav)
+		_badge(c, "megaphone", Vector2(2, by), Color.WHITE)
+	# favourite: heart + "?" until the recipe has been cooked (§5.2) —
+	# then the heart goes gold; select the card for the dish's name
+	var fav := String(req.get("favourite", ""))
+	var known := fav != "" and _cooked.has(fav)
+	var fh := UIKit.icon_rect("heart",
+		UITokens.GOLD if known else UITokens.DIM)
+	fh.name = "Fav"
+	fh.position = Vector2(CARD_W - 17, 2)
+	c.add_child(fh)
 	var q := UIKit.label_for("?", UITokens.TypeRole.BODY, UITokens.DIM)
 	q.name = "FavQ"
-	q.position = Vector2(CARD_W - 7, 3)
+	q.position = Vector2(CARD_W - 8, 4)
+	q.visible = not known
 	c.add_child(q)
 	# seated check + selection ring (toggled, both drawn last = on top)
 	var chk := UIKit.icon_rect("check")
@@ -192,7 +288,11 @@ func _card(req: Dictionary, sprite: Dictionary) -> Panel:
 
 
 func _card_name(req: Dictionary) -> String:
-	var n: String = req.get("name", "?")
+	# card_name is the short card form (data may omit → full name);
+	# journal/sheets still show the long one
+	var n: String = req.get("card_name", "")
+	if n == "":
+		n = req.get("name", "?")
 	if int(req.get("pads", 1)) > 1:
 		n += " ×%d" % int(req["pads"])
 	return n
@@ -205,6 +305,49 @@ func _badge(card: Control, icon_name: String, pos: Vector2,
 	card.add_child(b)
 
 
+## One dinner chip per meal instance: bowl + clipped name + price, a
+## served check, and the same selection ring the guest cards wear.
+func _meal_chip(m: Dictionary, idx: int) -> Panel:
+	var c := Panel.new()
+	c.name = "meal_%d" % idx
+	c.custom_minimum_size = Vector2(64, CARD_H)
+	c.size = Vector2(64, CARD_H)
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.add_theme_stylebox_override("panel", UIKit.flat("glass_chip"))
+	var b := UIKit.icon_rect("bowl")
+	b.position = Vector2(4, 4)
+	c.add_child(b)
+	var nm := UIKit.label_for(String(_meal_names.get(
+		String(m.get("id", "")), String(m.get("id", "?")))),
+		UITokens.TypeRole.CAPTION)
+	nm.position = Vector2(20, 4)
+	nm.size = Vector2(42, 10)
+	nm.clip_text = true
+	c.add_child(nm)
+	var coin := UIKit.icon_rect("coin")
+	coin.position = Vector2(4, 30)
+	c.add_child(coin)
+	var pr := UIKit.label_for("%d" % int(m.get("price", 0)),
+		UITokens.TypeRole.BODY)
+	pr.position = Vector2(19, 30)
+	pr.size = Vector2(30, 10)
+	pr.clip_text = true
+	c.add_child(pr)
+	var chk := UIKit.icon_rect("check", UITokens.GREEN)
+	chk.name = "Served"
+	chk.position = Vector2(48, 30)
+	chk.visible = false
+	c.add_child(chk)
+	var ring := Panel.new()
+	ring.name = "Sel"
+	ring.set_anchors_preset(Control.PRESET_FULL_RECT)
+	ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ring.add_theme_stylebox_override("panel", UIKit.state_nine("sel_glow"))
+	ring.visible = false
+	c.add_child(ring)
+	return c
+
+
 # ---------------------------------------------------- breakdown strip
 
 ## Neutral trait list for a selected guest (no pad under the pointer
@@ -215,6 +358,13 @@ func show_guest_terms(guest: Dictionary, hint: String) -> void:
 		chips.append({"icon": String(tid),
 			"name": _trait_names.get(tid, tid), "sign": "·",
 			"color": UITokens.DIM})
+	var fav := String(guest.get("favourite", ""))
+	if fav != "" and _cooked.has(fav):
+		# the known favourite reads as part of their wants — steering
+		# for both seating and tonight's menu
+		chips.append({"icon": "heart",
+			"name": _meal_names.get(fav, fav), "sign": "",
+			"color": UITokens.GOLD})
 	chips.append({"text": hint, "color": UITokens.DIM})
 	_show(chips)
 

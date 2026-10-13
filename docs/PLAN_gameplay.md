@@ -14,19 +14,23 @@ backend-complete but has no interaction surface yet.
 | Reviews/tips/rating/walk-ins | `econ.gd`,`goodnight()` | NightSummary sheet | none |
 | Bookings board | `Seating.board` | BookingBoard sheet | none |
 | Journal/letters/crew/restore | `game.gd`, systems/* | journal, markers | mostly wired |
-| **Build mode** (place/move/store/return) | `buy_decor`,`move_decor`,`store_decor`,`return_decor`,`place_stored` + `decor_cells` | **nothing** | **the whole interaction** |
-| **Outfitter** (buy gear/staples/decor) | `buy_*` verbs + catalog | **nothing** | shop sheet + flow |
-| **Pad opening** (unlock→Clear) | `unlock_pad`,`clear_pad` | locked pads render, no tap | clear UI + transform anim |
-| **Prep phase** (forage/fish/cook) | `gather`,`fish_catch`,`pantry_*`,`cook` | **skipped entirely** (MORNING→EVENING) | phase + errand spots + cook sheet |
-| **Dinner** (meal→guest) | `allocate_meals` | **nothing** | evening tray extension |
-| Errand spots | `errand_spots` in layouts | props only, not tappable | tap→roll wiring |
-| Trail map / site travel | `travel_to`, `site_reachable` | **nothing** | map sheet |
-| Dog | `dog.gd` | **nothing** | pet + adoption flow |
-| Crew bubbles | `crew_*` | structure prop only | bubble→crew sheet |
+| **Build mode** (place/move/store/return) | `buy_decor`,`move_decor`,`store_decor`,`return_decor`,`place_stored` + `decor_cells` | **live** — PREP tool: HUD hammer, ghost snaps to cells, real-rule tint, piece context row, decor renders in-world | trail-map polish + actor layer |
+| **Outfitter** (buy gear/staples) | `buy_gear`,`buy_staple` + catalog | **live** — HUD sheet, gear/staples tabs, lock+own+full states | decor rows land with build mode |
+| **Pad opening** (unlock→Clear) | `unlock_pad`,`clear_pad`,`upgrade_pad` | **live** — PREP tap→context row, lock/hand afford chips, scatter transform, shelter overlays | none |
+| **Prep phase** (forage/fish/cook) | `gather`,`fish_catch`,`pantry_*`,`cook` | **live** — MORNING→PREP→EVENING, day-scoped errand layer | cook sheet ✓ |
+| **Dinner** (meal→guest) | `serve_meal`,`unserve` + `allocate_meals` fallback | **live** — menu lane in the tray, arm→tap seated guest, plate chip, fav reveal on cards/board | drag-serve polish w/ actor layer |
+| Errand spots | `errand_spots` in layouts | **tappable in PREP** — forage decals + pond/lookout anchors, gear-locked hint chips | outfitter wires the gear |
+| Trail map / site travel | `travel_to`, `site_reachable` | **live** — HUD map sheet, lock→road rows, morning travel → scene rebuild; scene parameterised per site | painted grounds + full dressing for river/valley |
+| Dog | `dog.gd` | pet tap live in PREP (once/day chip) | adoption vignette + rounds |
+| Crew bubbles | `crew_*` | **live** — hut dresses per stage (ruin debris→undim→porch light), "!" afford chip → crew sheet | art_states still composed dressing |
 
-The single structural fact: **`_advance_phase` jumps MORNING→EVENING** —
-the Prep half of the day doesn't exist in the scene. Until it does, the
-player can only seat guests; the camp never changes.
+**Update 2026-10-14**: the phase gap is closed — `_advance_phase` now
+runs MORNING→PREP→EVENING with a day-scoped errand layer (forage
+decals, pond/lookout anchors, the stray's daily pet, gear-locked hint
+chips).  Remaining in D2: outfitter, build mode, pad clearing, dinner.
+
+The remaining structural gap: build/outfitter/map still have no
+interaction surface — the camp can be *prepped* but not yet *changed*.
 
 ## Phase D1 — backend close-out (DONE 2026-10-13)
 
@@ -63,12 +67,23 @@ player can only seat guests; the camp never changes.
 6. **Dinner**: evening tray gains a meal column — drag a cooked
    meal onto a seated guest (favourite match → +1).
 
-## Phase D3 — supporting casts
+## Phase D3 — supporting casts  *(done)*
 
-- Crew bubble on the hut structure → crew sheet (collect/speed-up)
-- Trail map sheet (site travel after chapter 1)
-- Dog adoption vignette + rounds
-- Trail Daily entry
+- ~~Crew bubble on the hut structure → crew sheet (collect/speed-up)~~ —
+  the cabin prop is the hut: stage-dressed (brambles → dim → porch
+  light), `!` chip while a stage is ready, tap opens `CrewSheet`
+- ~~Trail map sheet (site travel after chapter 1)~~ — HUD map button →
+  `TrailMapSheet` rows via `Game.site_card()`; `travel_to` gated by
+  `site_reachable`, Morning-only, blocked with live assignments; the
+  scene is site-parameterized (layout/MASK/PROPS/anchors by `site_id`,
+  procedural ground fallback for unpainted sites)
+- ~~Dog adoption vignette + rounds~~ — `adopted` flag + `adopt_dog`
+  verb; Friend bond opens `AdoptSheet` (localized default name);
+  `he_stayed` vignette on trigger `{"dog": 2}`; view-only waypoint
+  rounds with directional stills (reduced-motion pins the dog)
+- ~~Trail Daily entry~~ — pinned card atop the journal days tab
+  (locked names its road; unlocked shows today's #n + score state)
+  → `DailySheet` with the seeded board preview + share copy
 
 ## Phase D4 — Actor layer: SOTA sim-first ECS (core first)
 
@@ -189,6 +204,22 @@ property, and it is already live.
 archetypes + placed items → entity programs. v1 casts a minimal
 in-code table (guest idle at pad, dog patrol, angler→bank); the
 full archetype/weather/item scenario matrix is a data file later.
+That file also carries **rare-beat rows** — the 1%-night-swim
+principle: low-weight scenario picks rolled from `w.rng` at cast
+time, so outlier behaviour stays inside the determinism contract
+(spec 004 item D).
+
+**Authored beats ride the same machinery** (spec 005): vignette
+rows gain a `cue` light term (`track_emit` on play, untrack on
+dismiss — the interim surface is a night-summary card since
+`rep["vignette"]` currently goes unpresented), ceremonies get a
+`kind → {col, w}` cue map, and `dialogue.json` gains `when` blocks
+evaluated against `days_log.back()` — morning-after barks that
+react to last night's stars/weather/favourites before plain
+`day` rows. `_vignette_weight` takes new trigger keys (`shelter`,
+`stars_min`, `letter`, `first_night`, `dog`) as data-only rows.
+Two "emit"s stay distinct in docs: schedule-op `emit` = *percept
+cue*; `track_emit` = *light term*.
 
 **Events are casts, not managers.** There is no `EventManager`
 autoload mutating state mid-night — `st["event"]`/`st["weather"]`
@@ -207,6 +238,15 @@ Weather also shapes the *offer*, not the books: a demand matrix
 storm days roll fewer bookings and heavier cocoa/firewood demand,
 heatwaves push pond seats and cold drinks. Multipliers tune what
 arrives and what sells; they never touch coins already earned.
+Sister rule, shipped 2026-10-14: **placed decor shapes the offer
+too** (build→attract, spec `specs/004` item C). Every placed piece
+adds its `attract` tag as bonus weight — trait tags into
+`trait_pool`, archetype tags into `archetype_mix` — capped at half
+each base table so site identity and weather stay louder. Stored
+pieces don't pull; the Stone Fire Pit counts via `campfire.radius`.
+Tags are per-item semantic (Neko Atsume / lot-traits form), never a
+headcount bump — `open_pads+1` stays the quantity law. Shop/card
+label legibility rides with UI-032.
 
 ### Entropy (actor-scale verdicts, applied)
 
@@ -215,7 +255,7 @@ At ~10-15 actors the crowd-sim playbook mostly doesn't apply:
 | Technique | Verdict | Where |
 |---|---|---|
 | Phase jitter | **Adopted** — Director bakes seed-drawn offsets into wait steps + a 0-1.5s start delay at cast time | `_jitter()`; sim stays pure, replay deterministic |
-| Anchor slot claims | Adopt later — swing seats 2 kids, fire 4, bank 1: a capacity dict on anchors, not token pools | scenario tables |
+| Anchor slot claims | Adopt later — swing seats 2 kids, fire 4, bank 1: a capacity dict on anchors, not token pools | scenario tables; spec `specs/003` |
 | Per-eid anim frame offset | Adopt in presenter — `(t + eid*0.17) % dur`, the free DOTS/VAT analog | view presenter |
 | Time-sliced brains, ORCA, VAT, GOAP | Rejected — scale is 10-15 sprites on an open field | — |
 | Utility AI | Rejected at tick level (breaks determinism) — **already exists at cast level**: `_vignette_weight` is utility scoring over vignette candidates | `game.gd` |
@@ -313,7 +353,8 @@ Thin node mirroring SimWorld — the only Node touching the sim:
 `spawn sprite on new eid / lerp display position / anim comp →
 frame / despawn`. Zero decisions in the presenter; all behavior
 lives in sim comps. Presenter ticks from `_process`; the world
-ticks at fixed dt accumulated from it.
+ticks at fixed dt accumulated from it (the determinism contract —
+D-ARCH-7, spec `specs/003` Dependency).
 
 ### The juice map — sim signal -> presentation response
 
@@ -348,8 +389,10 @@ kids get swing-A + ground-B, four campers get fire seats
 1-4. This replaces the vague "anchor capacity" TODO and is
 the real answer to sprite stacking (visual offsets are only
 the residual fix). Data shape: `sockets` block per item —
-`{id, px_offset, facing}` — anchors bind to a socket, not
-just an item.
+`{id, kind, px_offset, facing}` (`kind` types the slot —
+seat/surface/hang; spec 004 item B) — anchors bind to a
+socket, not just an item. **First consumer beyond pads: the
+`bench` decor (sit-spot cast) — spec `specs/003-sit-spots.md`.**
 
 ### Ambient audio beds
 

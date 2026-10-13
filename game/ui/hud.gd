@@ -14,6 +14,11 @@ extends Control
 signal phase_pressed
 signal settings_pressed
 signal journal_pressed
+signal cook_pressed
+signal shop_pressed
+signal build_pressed
+signal crew_pressed
+signal map_pressed
 
 var coins_label: Label
 var day_label: Label
@@ -22,6 +27,9 @@ var phase_button: Button
 var tray: EveningTray                      # UI-020 evening seating band
 var journal_btn: Button
 var journal_badge: Label
+var crew_btn: Button
+var build_btn: Button
+var crew_badge: Label
 var _tl: VBoxContainer
 var _tr: VBoxContainer
 # debug-gated (null when UITokens.debug_ui() is false)
@@ -67,6 +75,19 @@ func _apply_insets() -> void:
 func set_journal_badge(n: int) -> void:
     if journal_badge:
         journal_badge.text = str(n) if n > 0 else ""
+
+
+## §8.4 crew badge: "!" while a stage sits ready to collect — same
+## badge-must-mean-something rule, hidden otherwise.
+func set_crew_badge(ready: bool) -> void:
+    if crew_badge:
+        crew_badge.visible = ready
+
+
+## UI-033: the hammer glows while build mode owns the camp taps.
+func set_build_active(on: bool) -> void:
+    if build_btn:
+        build_btn.modulate = UITokens.GOLD if on else Color.WHITE
 
 
 ## §17.4 left-handed layout (UI-036): the action side mirrors — phase
@@ -141,6 +162,26 @@ func _build() -> void:
     # settings gear — the §17.4 sheet (UI-036); full MIN_TOUCH target
     var gear := UIKit.icon_btn(jrow, "gear")
     gear.pressed.connect(func(): settings_pressed.emit())
+    # cook pot (UI-031) + outfitter (UI-032) + trail map (UI-034) +
+    # crew clock (UI-035) sheets; crew wears a "!" badge when a stage
+    # sits ready to collect
+    var cook := UIKit.icon_btn(jrow, "cook")
+    cook.pressed.connect(func(): cook_pressed.emit())
+    var shop := UIKit.icon_btn(jrow, "outfitter")
+    shop.pressed.connect(func(): shop_pressed.emit())
+    var map := UIKit.icon_btn(jrow, "trail_map")
+    map.pressed.connect(func(): map_pressed.emit())
+    build_btn = UIKit.icon_btn(jrow, "build")
+    build_btn.pressed.connect(func(): build_pressed.emit())
+    crew_btn = UIKit.icon_btn(jrow, "crew")
+    crew_btn.pressed.connect(func(): crew_pressed.emit())
+    crew_badge = UIKit.label_for("!", UITokens.TypeRole.CAPTION,
+        UITokens.GOLD)
+    crew_badge.position = Vector2(
+        UITokens.MIN_TOUCH - 10, UITokens.MIN_TOUCH - 16)
+    crew_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    crew_badge.visible = false
+    crew_btn.add_child(crew_badge)
     # journal button + unread-letters badge (UI-030 §8.3)
     journal_btn = UIKit.icon_btn(jrow, "journal")
     journal_btn.pressed.connect(func(): journal_pressed.emit())

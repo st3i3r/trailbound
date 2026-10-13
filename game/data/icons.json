@@ -7,6 +7,7 @@
  },
  "weather": {
   "clear": "G_sun", "cloud": "G_cloud", "rain": "G_rain",
+  "storm": "G_rain",
   "night": "G_moon", "sunrise": "G_sunrise"
  },
  "chrome": {

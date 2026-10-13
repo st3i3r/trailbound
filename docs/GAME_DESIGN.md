@@ -964,7 +964,7 @@ The identity stays subtle (D-07, confirmed; Q2 resolved).
 |---|---|
 | `reference/eastward.jpg` | Primary: fixed 3/4 top-down view (flat ground, object fronts), painterly soft-dithered pixel art, bright lush daylight |
 | `reference/example.png` | Prop density and the ember-lit dusk mood, which comes from lighting rather than baked-in art |
-| `reference/ui/` | UI: Eastward glass menus with a Vietnamese lacquer tint, cream speech bubbles, flat one-colour glyphs (D-UI-1/5, `docs/UI_PRODUCTION.md`) |
+| `reference/ui_stale/` | STALE — mislabeled editorial grabs (2026-10-15: the "Eastward" menu shots are a different game's blue tablet UI); kept only `ours_panel_mock` as a before image. UI grammar lives in code (D-UI-1/5, `docs/UI_PRODUCTION.md`) |
 
 ### 16.2 Technical rules
 

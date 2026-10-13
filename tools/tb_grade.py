@@ -80,6 +80,12 @@ PRESETS = {
         "stone": {"dh": 8.0, "s": 0.90, "v": 1.0,
                   "grey": (0.12, 38.0, 0.07)},
         "prop":  {"toward": (40.0, 5.0), "s": 0.95, "v": 0.98},
+        # Characters: site-neutral (PROMPT_PACK B2) — only a whisper
+        # warm so they sit in the house light; own palette kept, no
+        # brighten (chars share the veil grade, they must not glow).
+        # NEVER let the terrain classify touch a char sprite: skin
+        # reads as "dirt" and would be pulled +11% brighter.
+        "char":  {"toward": (35.0, 3.0), "s": 0.98, "v": 1.00},
     },
     # Pinewatch v2 (2026-10-13 palette correction): the earlier "olive"
     # direction under-read Eastward — the canonical refs (ew_saiga) run
@@ -96,6 +102,7 @@ PRESETS = {
         "stone": {"dh": 8.0, "s": 0.90, "v": 1.0,
                   "grey": (0.12, 38.0, 0.07)},
         "prop":  {"toward": (40.0, 5.0), "s": 0.95, "v": 0.98},
+        "char":  {"toward": (35.0, 3.0), "s": 0.98, "v": 1.00},
     },
     # Whisper River — TUNE-ME placeholder: cooler grass, blue-dominant
     # water, bamboo greens.  Not yet engine-verified.
@@ -107,6 +114,7 @@ PRESETS = {
         "stone": {"dh": 4.0, "s": 0.85, "v": 1.0,
                   "grey": (0.12, 205.0, 0.05)},
         "prop":  {"toward": (130.0, 4.0), "s": 0.94, "v": 0.98},
+        "char":  {"toward": (35.0, 3.0), "s": 0.98, "v": 1.00},
     },
     # Valley — TUNE-ME placeholder: golden meadow + dusk violet.
     # Not yet engine-verified.
@@ -118,6 +126,7 @@ PRESETS = {
         "stone": {"dh": -6.0, "s": 0.88, "v": 1.0,
                   "grey": (0.12, 280.0, 0.06)},
         "prop":  {"toward": (35.0, 6.0), "s": 0.96, "v": 0.99},
+        "char":  {"toward": (35.0, 3.0), "s": 0.98, "v": 1.00},
     },
 }
 
@@ -158,7 +167,7 @@ def classify(r, g, b, sheet_kind=None):
     return "prop"
 
 
-def grade_rows(rows, w, h, sheet_kind, preset):
+def grade_rows(rows, w, h, sheet_kind, preset, force=False):
     counts = {}
     for y in range(h):
         row = rows[y]
@@ -167,7 +176,7 @@ def grade_rows(rows, w, h, sheet_kind, preset):
             if row[i + 3] < 128:                      # fully transparent
                 continue
             r, g, b = row[i], row[i + 1], row[i + 2]
-            kind = classify(r, g, b, sheet_kind)
+            kind = sheet_kind if force else classify(r, g, b, sheet_kind)
             hh, ss, vv = colorsys.rgb_to_hsv(r / 255.0, g / 255.0, b / 255.0)
             hh, ss, vv = apply_rule(preset[kind], hh * 360.0, ss, vv)
             r2, g2, b2 = colorsys.hsv_to_rgb((hh % 360.0) / 360.0,
@@ -191,6 +200,10 @@ def main():
                          "sheet kind, other art classifies per-pixel "
                          "(grass/water/dirt) with the mild 'prop' "
                          "fallback. Replaces the default terrain dirs.")
+    ap.add_argument("--kind", choices=["char"],
+                    help="force every pixel in --target to one kind "
+                         "(char = site-neutral harmonize; skips the "
+                         "terrain classify that would read skin as dirt)")
     ap.add_argument("--from-pristine", action="store_true",
                     help="copy the pristine batch3 candidate sheets over "
                          "the pipeline dirs before grading — avoids "
@@ -231,8 +244,9 @@ def main():
                 first_path = p
             if args.check and p == first_path:
                 before[p] = [bytearray(r) for r in rows]
-            kind = KIND.get(name)      # None -> prop-mode classification
-            counts = grade_rows(rows, w, h, kind, preset)
+            kind = args.kind or KIND.get(name)   # None -> prop-mode
+            counts = grade_rows(rows, w, h, kind, preset,
+                                force=bool(args.kind))
             png.write(p, w, h, rows)
             print("graded %-52s %dx%d %s" % (p, w, h, counts))
     if args.check:

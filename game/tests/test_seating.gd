@@ -43,6 +43,45 @@ func _ready() -> void:
 			ok_conflicts = false
 	check("day≥6 conflict pair", ok_conflicts)
 
+	# spec 004 C — decor→demand: placed `attract` tags fold into the
+	# board tables; trait tags can introduce absent traits, archetype
+	# tags weight the mix, and the bonus caps at half the base table.
+	st["decor"] = [{"id": "telescope", "effect": "stars",
+		"reach": 1, "cells": [Vector2i(0, 0)]}]
+	var arow := Game._attract_row(Game.site_row(), st)
+	check("attract introduces absent trait",
+		int(arow["trait_pool"].get("stargazer", 0)) > 0,
+		"pool: %s" % [arow["trait_pool"]])
+	check("attract doesn't touch base row",
+		int(Game.site_row()["trait_pool"].get("stargazer", -1)) == -1)
+	st["decor"] = [{"id": "scout_pennant", "effect": "",
+		"reach": 1, "cells": [Vector2i(0, 0)]}]
+	arow = Game._attract_row(Game.site_row(), st)
+	check("attract archetype +10",
+		int(arow["archetype_mix"].get("scout", 0))
+			== int(Game.site_row()["archetype_mix"]["scout"]) + 10,
+		"mix: %s" % [arow["archetype_mix"]])
+	st["decor"] = []
+	for i in 30:
+		st["decor"].append({"id": "lantern", "effect": "light",
+			"reach": 1, "cells": [Vector2i(0, 0)]})
+	arow = Game._attract_row(Game.site_row(), st)
+	var pbase := 0
+	for v in Game.site_row()["trait_pool"].values():
+		pbase += int(v)
+	var pb := int(arow["trait_pool"].get("night_owl", 0)) \
+		- int(Game.site_row()["trait_pool"].get("night_owl", 0))
+	check("attract bonus capped at half base",
+		pb <= int(pbase * Game.ATTRACT_CAP) + 1,
+		"bonus %d cap %d" % [pb, int(pbase * Game.ATTRACT_CAP)])
+	st["decor"] = []
+	st["campfire"]["radius"] = 3
+	arow = Game._attract_row(Game.site_row(), st)
+	check("stone fire pit draws chilly",
+		int(arow["trait_pool"].get("chilly", 0))
+			> int(Game.site_row()["trait_pool"]["chilly"]))
+	st["campfire"]["radius"] = 2
+
 	# --- §5.4 worked examples ----------------------------------------
 	# Fire sits at cell (5,3) r2; p7 = (3,5) is inside its reach.
 	st["weather"] = "clear"
@@ -141,6 +180,12 @@ func _ready() -> void:
 	st["assignments"]["g_solo"] = ["p7"]
 	Game.meals = [{"id": "stew", "price": 18},
 		{"id": "fish", "price": 25}]
+	# Verb guards: unsettled evening work blocks the day rollover;
+	# settling is an evening act.
+	var day0 := Game.day
+	Game.advance_day()
+	check("advance_day blocked while seated", Game.day == day0)
+	Game.set_phase(Game.Phase.EVENING)
 	var rep := Game.goodnight()
 	check("favourite found, term +1",
 		rep["results"][0]["meal"] == 1
@@ -283,6 +328,14 @@ func _ready() -> void:
 	check("fire pit r3", Game.buy_decor("stone_fire_pit", [])
 		and Game.coins == 430
 		and Game.site_state()["campfire"]["radius"] == 3)
+	# §6.1: today's buys refund by id — the pit never enters decor[],
+	# so the indexed return can't reach it; return_bought does.
+	check("fire pit refunds by id", Game.return_bought("stone_fire_pit")
+		and Game.coins == 730
+		and Game.site_state()["campfire"]["radius"] == 2)
+	check("fire pit re-buys clean", Game.buy_decor("stone_fire_pit", [])
+		and Game.coins == 430
+		and Game.site_state()["campfire"]["radius"] == 3)
 	# two-step pad opening (§5.1): unlock pays but stays overgrown —
 	# it still blocks bookings; the Clear step is free.
 	check("unlock p4 pays only", Game.unlock_pad("p4")
@@ -423,7 +476,16 @@ func _ready() -> void:
 	check("pennant unlocks on story", Game._is_unlocked("S:hung")
 		and Game.buy_decor("scout_pennant", [Vector2i(6, 2)]))
 
+	# The D-UI-8 engagement gate held morning mail until a guest
+	# stayed (welcomed ≥ 1 since §5.4). Flush the pending queue now —
+	# p04–p06 must land before p10's chapter_done event exists. Day
+	# advances too: site_day = day − visited, so p06 needs day ≥ 6.
+	for i in 3:
+		Game.day += 1
+		Game._deliver_letter(Game.site_state(&"pinewatch"))
+
 	# Travel gates on chapter completion; W/L need all 5 pages done.
+	Game.set_phase(Game.Phase.MORNING)
 	check("W locked before chapter", not Game.travel_to(&"whisper_river"))
 	Game.site_state()["pages_done"] = [1, 2, 3, 4, 5]
 	check("travel to W", Game.travel_to(&"whisper_river")
@@ -441,6 +503,7 @@ func _ready() -> void:
 	for i in 3:
 		Game.site_state()["guests"]["reg_old_ba"] = old_ba
 		Game.site_state()["assignments"] = {"reg_old_ba": ["p6"]}
+		Game.set_phase(Game.Phase.EVENING)
 		Game.goodnight()
 		Game.day += 1
 	var wcnt: Dictionary = Game.site_state()["counters"]
@@ -482,6 +545,7 @@ func _ready() -> void:
 	Game.site_state()["weather"] = "clear"
 	Game.site_state()["guests"]["reg_old_ba"] = old_ba
 	Game.site_state()["assignments"] = {"reg_old_ba": ["p6"]}
+	Game.set_phase(Game.Phase.EVENING)
 	var rep3 := Game.goodnight()
 	check("Old Ba's story vignette", rep3["vignette"] == "old_ba_story",
 		"got %s" % rep3["vignette"])
@@ -489,6 +553,7 @@ func _ready() -> void:
 	Game.site_state()["vignette_restored"] = "boathouse"
 	Game.site_state()["guests"]["reg_old_ba"] = old_ba
 	Game.site_state()["assignments"] = {"reg_old_ba": ["p6"]}
+	Game.set_phase(Game.Phase.EVENING)
 	var rep4 := Game.goodnight()
 	check("restoration preempts",
 		rep4["vignette"] == "boat_on_the_river"
@@ -498,5 +563,34 @@ func _ready() -> void:
 		and Game.state_dict()["journal"].has("vignettes_seen"))
 	# p06 delivered during the run → the Daily unlocks here too.
 	check("daily unlocks with p06", Game.daily_unlocked())
+
+	# Morning-after color (spec-005 B): dialogue_when_ok reads
+	# days_log.back() — whisper_river's night just logged above.
+	var dlg: Dictionary = Game.days_log.back()
+	check("days_log carries fav+regulars",
+		dlg.has("fav_served") and dlg.has("regulars"),
+		"keys: %s" % [dlg.keys()])
+	check("regulars logged honestly",
+		"old_ba" in dlg["regulars"], "got %s" % [dlg["regulars"]])
+	Game.days_log.back()["best"] = 5
+	check("when: stars_min matches",
+		Game.dialogue_when_ok({"last_stars_min": 5}))
+	check("when: stars_min misses",
+		not Game.dialogue_when_ok({"last_stars_min": 6}))
+	check("when: weather matches",
+		Game.dialogue_when_ok({"last_weather": "clear"}))
+	check("when: weather misses",
+		not Game.dialogue_when_ok({"last_weather": "rain"}))
+	check("when: first_night false (2nd WR night)",
+		not Game.dialogue_when_ok({"first_night": true}))
+	Game.days_log.back()["fav_served"] = true
+	check("when: favourite served",
+		Game.dialogue_when_ok({"served_favourite": true}))
+	check("when: regular visit",
+		Game.dialogue_when_ok({"regular_visit": "old_ba"}))
+	check("when: unknown key fails closed",
+		not Game.dialogue_when_ok({"nonsense": true}))
+	check("when: empty passes",
+		Game.dialogue_when_ok({}))
 
 	finish()

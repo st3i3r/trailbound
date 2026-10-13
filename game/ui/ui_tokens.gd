@@ -107,7 +107,9 @@ const MIN_TOUCH := 40
 ## "fade" survives at a snappier time, "scale" collapses to ~instant
 ## (position/shape changes are the nauseating ones, opacity is not).
 const MOTION := {
-    "panel_in":   {"d": 0.16, "trans": Tween.TRANS_CUBIC,
+    # TRANS_BACK ease-out overshoots the target — the Eastward menu
+    # pop (grow past 1.0, settle tight) in a single tween.
+    "panel_in":   {"d": 0.20, "trans": Tween.TRANS_BACK,
                    "ease": Tween.EASE_OUT,     "kind": "scale"},
     "panel_out":  {"d": 0.12, "trans": Tween.TRANS_CUBIC,
                    "ease": Tween.EASE_IN,      "kind": "scale"},
@@ -123,6 +125,20 @@ const MOTION := {
                    "ease": Tween.EASE_OUT,     "kind": "fade"},
     "marker":     {"d": 0.50, "trans": Tween.TRANS_SINE,
                    "ease": Tween.EASE_IN_OUT,  "kind": "scale"},
+    # squash on press / pickup; BACK lands it back at 1.0 with a hug
+    "pop":        {"d": 0.13, "trans": Tween.TRANS_BACK,
+                   "ease": Tween.EASE_OUT,     "kind": "scale"},
+    # refused action: rotation wobble (UIFeel.shake drives the phases)
+    "shake":      {"d": 0.20, "trans": Tween.TRANS_SINE,
+                   "ease": Tween.EASE_IN_OUT,  "kind": "scale"},
+    "veil_out":   {"d": 0.22, "trans": Tween.TRANS_SINE,
+                   "ease": Tween.EASE_IN_OUT,  "kind": "fade"},
+    "veil_in":    {"d": 0.30, "trans": Tween.TRANS_SINE,
+                   "ease": Tween.EASE_IN_OUT,  "kind": "fade"},
+    # typewriter reveal: per-character seconds (≈45 cps — a quick
+    # storyteller hand, fast enough that letters never drag)
+    "type":       {"d": 0.022, "trans": Tween.TRANS_LINEAR,
+                   "ease": Tween.EASE_IN_OUT,  "kind": "fade"},
 }
 
 # --------------------------------------------------------------- debug

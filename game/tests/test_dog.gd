@@ -17,6 +17,7 @@ func _ready() -> void:
 	Game.new_day()
 	Game.site_state()["seats"] = 0
 	Game.meals = [{"id": "stew", "price": 18}, {"id": "tea", "price": 8}]
+	Game.set_phase(Game.Phase.EVENING)
 	Game.goodnight()
 	check("stray meets night 1", Game.dog["met"])
 	check("leftovers feed bond", Game.dog["bond"] == 2,

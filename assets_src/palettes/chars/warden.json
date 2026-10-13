@@ -1,0 +1,30 @@
+{
+ "persona": "warden",
+ "ramps": [
+  "skin_light",
+  "hair_brown",
+  "cloth_forest",
+  "gear_leather"
+ ],
+ "ramp": [
+  "#f5cf9f",
+  "#eeb98a",
+  "#d69a68",
+  "#8a5a3a",
+  "#b87c50",
+  "#a06844",
+  "#6b4428",
+  "#3a2418",
+  "#8fce6e",
+  "#5da854",
+  "#3f8340",
+  "#2d5e30",
+  "#d09a68",
+  "#b8845a",
+  "#93603c",
+  "#251e24",
+  "#273828",
+  "#432f2a",
+  "#4e492b"
+ ]
+}

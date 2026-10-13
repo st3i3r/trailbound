@@ -1,0 +1,25 @@
+{
+ "persona": "aodai_woman",
+ "ramps": [
+  "skin_light",
+  "hair_black",
+  "cloth_cream"
+ ],
+ "ramp": [
+  "#f5cf9f",
+  "#eeb98a",
+  "#d69a68",
+  "#8a5a3a",
+  "#554a4a",
+  "#403838",
+  "#fff8e0",
+  "#f0e8c8",
+  "#d8cfa8",
+  "#b0a884",
+  "#6b6550",
+  "#251e24",
+  "#273828",
+  "#432f2a",
+  "#4e492b"
+ ]
+}

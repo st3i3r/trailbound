@@ -1,0 +1,36 @@
+{
+  "group_id": "7fe30a88-9391-4f2a-bb92-25c0c3ac88d5",
+  "states": [
+    {
+      "character": {
+        "id": "0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19f",
+        "name": "Idle",
+        "prompt": "border collie camp dog, black and white fur, white chest blaze and muzzle, alert ears; pixel art, transparent background, no shadow, no ground patch",
+        "size": {
+          "width": 52,
+          "height": 52
+        },
+        "template_id": "dog",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-13T17:46:26.600398+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-13T17:49:27.862360"
+}

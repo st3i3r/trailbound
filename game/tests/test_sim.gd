@@ -71,6 +71,25 @@ func _ready() -> void:
 		float(w1.getc(1, "pos")["x"]) < 200.0 or
 		String(w1.getc(1, "anim")["name"]) == "fish")
 
+	# --- persona pick: seeded draw from actors.json pools ----------------
+	var actors := {"archetypes": {"angler": ["angler_uncle", "bird_uncle"],
+			"dog": ["bean"]},
+		"fallback": {"sprite": "fb", "tint": "fff"}}
+	var p1 := SimDirector.cast_night(st, layout, 42, actors)
+	var p2 := SimDirector.cast_night(st, layout, 42, actors)
+	check("persona drawn from pool",
+		String(p1.getc(1, "persona").get("persona", "")) in
+			["angler_uncle", "bird_uncle"])
+	check("persona deterministic",
+		p1.getc(1, "persona") == p2.getc(1, "persona"))
+	check("persona sprite path",
+		String(p1.getc(1, "persona")["sprite"]).begins_with(
+			"characters/"))
+	check("persona fallback for unmapped archetype",
+		String(p1.getc(2, "persona")["sprite"]) == "fb")
+	check("dog persona from dog pool",
+		String(p1.getc(3, "persona").get("persona", "")) == "bean")
+
 	# --- select: item-bound branch ---------------------------------------
 	var w3 := SimWorld.new(3)
 	w3.ctx = {"items": ["tarp"]}

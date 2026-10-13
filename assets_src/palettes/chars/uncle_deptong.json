@@ -1,0 +1,29 @@
+{
+ "persona": "uncle_deptong",
+ "ramps": [
+  "skin_mid",
+  "hair_black",
+  "cloth_cream",
+  "cloth_charcoal"
+ ],
+ "ramp": [
+  "#e8b07e",
+  "#cf9060",
+  "#a86a44",
+  "#634734",
+  "#554a4a",
+  "#403838",
+  "#fff8e0",
+  "#f0e8c8",
+  "#d8cfa8",
+  "#b0a884",
+  "#6b6550",
+  "#8a8a90",
+  "#5c5660",
+  "#3f3b44",
+  "#251e24",
+  "#273828",
+  "#432f2a",
+  "#4e492b"
+ ]
+}

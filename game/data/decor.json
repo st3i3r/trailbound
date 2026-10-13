@@ -6,7 +6,10 @@
   "effect": "seats",
   "seats": 1,
   "size": "1x1",
-  "unlock": "P1"
+  "unlock": "P1",
+  "attract": {
+   "trait": "social"
+  }
  },
  {
   "id": "bench",
@@ -15,7 +18,10 @@
   "effect": "seats",
   "seats": 1,
   "size": "1x1",
-  "unlock": "P2"
+  "unlock": "P2",
+  "attract": {
+   "trait": "social"
+  }
  },
  {
   "id": "picnic_table",
@@ -24,7 +30,10 @@
   "effect": "seats",
   "seats": 2,
   "size": "2x1",
-  "unlock": "P3"
+  "unlock": "P3",
+  "attract": {
+   "trait": "social"
+  }
  },
  {
   "id": "lantern",
@@ -33,7 +42,10 @@
   "effect": "light",
   "reach": 1,
   "size": "1x1",
-  "unlock": "P1"
+  "unlock": "P1",
+  "attract": {
+   "trait": "night_owl"
+  }
  },
  {
   "id": "string_lights",
@@ -42,7 +54,10 @@
   "effect": "light",
   "reach": 2,
   "size": "2x1",
-  "unlock": "P4"
+  "unlock": "P4",
+  "attract": {
+   "trait": "night_owl"
+  }
  },
  {
   "id": "silk_lantern",
@@ -51,7 +66,10 @@
   "effect": "light",
   "reach": 2,
   "size": "1x1",
-  "unlock": "W2"
+  "unlock": "W2",
+  "attract": {
+   "trait": "night_owl"
+  }
  },
  {
   "id": "planter",
@@ -60,7 +78,10 @@
   "effect": "nature",
   "reach": 1,
   "size": "1x1",
-  "unlock": "P1"
+  "unlock": "P1",
+  "attract": {
+   "trait": "nature_lover"
+  }
  },
  {
   "id": "lotus",
@@ -69,7 +90,10 @@
   "effect": "nature",
   "reach": 1,
   "size": "1x1",
-  "unlock": "W0"
+  "unlock": "W0",
+  "attract": {
+   "trait": "nature_lover"
+  }
  },
  {
   "id": "flower_arch",
@@ -78,7 +102,10 @@
   "effect": "nature",
   "reach": 2,
   "size": "2x1",
-  "unlock": "L0"
+  "unlock": "L0",
+  "attract": {
+   "trait": "nature_lover"
+  }
  },
  {
   "id": "tarp",
@@ -87,7 +114,10 @@
   "effect": "cover",
   "reach": 1,
   "size": "1x1",
-  "unlock": "P1"
+  "unlock": "P1",
+  "attract": {
+   "trait": "light_sleeper"
+  }
  },
  {
   "id": "hedge",
@@ -96,7 +126,10 @@
   "effect": "privacy",
   "reach": 1,
   "size": "1x1",
-  "unlock": "P1"
+  "unlock": "P1",
+  "attract": {
+   "trait": "introvert"
+  }
  },
  {
   "id": "reed_screen",
@@ -105,7 +138,10 @@
   "effect": "privacy",
   "reach": 1,
   "size": "1x1",
-  "unlock": "W0"
+  "unlock": "W0",
+  "attract": {
+   "trait": "introvert"
+  }
  },
  {
   "id": "dog_bed",
@@ -114,7 +150,10 @@
   "effect": "dog",
   "reach": 2,
   "size": "1x1",
-  "unlock": "P1"
+  "unlock": "P1",
+  "attract": {
+   "trait": "dog_lover"
+  }
  },
  {
   "id": "guitar_stump",
@@ -123,7 +162,10 @@
   "effect": "music",
   "reach": 2,
   "size": "1x1",
-  "unlock": "P2"
+  "unlock": "P2",
+  "attract": {
+   "trait": "music_lover"
+  }
  },
  {
   "id": "wind_chime",
@@ -132,7 +174,10 @@
   "effect": "music",
   "reach": 1,
   "size": "1x1",
-  "unlock": "W0"
+  "unlock": "W0",
+  "attract": {
+   "trait": "music_lover"
+  }
  },
  {
   "id": "radio",
@@ -141,7 +186,10 @@
   "effect": "music",
   "reach": 2,
   "size": "1x1",
-  "unlock": "W1"
+  "unlock": "W1",
+  "attract": {
+   "trait": "music_lover"
+  }
  },
  {
   "id": "swing",
@@ -150,7 +198,10 @@
   "effect": "play",
   "reach": 2,
   "size": "2x1",
-  "unlock": "P4"
+  "unlock": "P4",
+  "attract": {
+   "trait": "social"
+  }
  },
  {
   "id": "kite",
@@ -159,7 +210,10 @@
   "effect": "play",
   "reach": 1,
   "size": "1x1",
-  "unlock": "L0"
+  "unlock": "L0",
+  "attract": {
+   "trait": "social"
+  }
  },
  {
   "id": "telescope",
@@ -168,7 +222,10 @@
   "effect": "stars",
   "reach": 1,
   "size": "1x1",
-  "unlock": "L0"
+  "unlock": "L0",
+  "attract": {
+   "trait": "stargazer"
+  }
  },
  {
   "id": "stone_fire_pit",
@@ -176,7 +233,10 @@
   "price": 300,
   "effect": "warmth_upgrade",
   "size": "campfire",
-  "unlock": "P5"
+  "unlock": "P5",
+  "attract": {
+   "trait": "chilly"
+  }
  },
  {
   "id": "scout_pennant",
@@ -186,7 +246,10 @@
   "price": 0,
   "effect": "none",
   "reach": 0,
-  "unlock": "S:hung"
+  "unlock": "S:hung",
+  "attract": {
+   "archetype": "scout"
+  }
  },
  {
   "id": "koi_pond",
@@ -196,7 +259,10 @@
   "price": 120,
   "effect": "none",
   "reach": 0,
-  "unlock": "W4"
+  "unlock": "W4",
+  "attract": {
+   "trait": "shutterbug"
+  }
  },
  {
   "id": "photo_wall",
@@ -206,6 +272,9 @@
   "price": 0,
   "effect": "none",
   "reach": 0,
-  "unlock": "L4"
+  "unlock": "L4",
+  "attract": {
+   "trait": "shutterbug"
+  }
  }
 ]

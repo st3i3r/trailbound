@@ -20,9 +20,12 @@ func _ready() -> void:
     # on its own (unlike CanvasLayer children, which size manually)
     Game.set_phase(Game.Phase.TITLE)
     Platform.back_pressed.connect(get_tree().quit)
+    Platform.close_requested.connect(get_tree().quit)
+    Audio.play_music(&"title")
     _build()
     Transition.reveal()
-    _first_button.grab_focus()
+    if UIFeel.nav_input:                # ring only under keys/joypad
+        _first_button.grab_focus()
     if OS.get_cmdline_args().has("--smoke"):
         Transition.snap_reveal()
         await get_tree().process_frame

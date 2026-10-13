@@ -23,6 +23,7 @@ const CARD_H := 44
 
 var _board: Array = []
 var _trait_names := {}
+var _cooked := {}                       # recipe ids cooked — fav reveal
 
 
 func _ready() -> void:
@@ -30,10 +31,12 @@ func _ready() -> void:
 
 
 static func make(board: Array, weather: String, open_pads: int,
-		sprite_cb: Callable, trait_names: Dictionary) -> BookingBoard:
+		sprite_cb: Callable, trait_names: Dictionary,
+		cooked := {}) -> BookingBoard:
 	var s := BookingBoard.new()
 	s._board = board
 	s._trait_names = trait_names
+	s._cooked = cooked
 	s._build(weather, open_pads, sprite_cb)
 	return s
 
@@ -78,14 +81,19 @@ func _build(weather: String, open_pads: int,
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", 4)
 	scroll.add_child(list)
+	if _board.is_empty():
+		UIKit.empty(list, "trail_map", tr("board_empty"),
+			tr("board_empty_hint"))
 	for req in _board:
 		list.add_child(_card(req, sprite_cb))
 
 	# demand line (§5.6): requests vs open pads, overflow waits outside
 	var demand := VBoxContainer.new()
 	demand.add_theme_constant_override("separation", 2)
+	# named placeholders — translators can reorder {n}/{p} freely
 	demand.add_child(UIKit.label_for(
-		tr("board_demand") % [_board.size(), open_pads],
+		tr("board_demand").format(
+			{"n": _board.size(), "p": open_pads}),
 		UITokens.TypeRole.BODY, UITokens.PAPER))
 	if _board.size() > open_pads:
 		demand.add_child(UIKit.label_for(tr("board_wait"),
@@ -115,12 +123,15 @@ func _card(req: Dictionary, sprite_cb: Callable) -> Panel:
 		port.position = Vector2(4, 5)
 		port.modulate = sprite.get("tint", Color.WHITE)
 		c.add_child(port)
-	var n: String = req.get("name", "?")
+	var n: String = req.get("card_name", "")
+	if n == "":
+		n = req.get("name", "?")
 	if int(req.get("pads", 1)) > 1:
 		n += " ×%d" % int(req["pads"])
 	var name_l := UIKit.label_for(n, UITokens.TypeRole.CAPTION)
 	name_l.position = Vector2(44, 4)
 	name_l.size = Vector2(W - 32 - 46, 10)
+	name_l.clip_text = true
 	c.add_child(name_l)
 	var coin := UIKit.icon_rect("coin")
 	coin.position = Vector2(44, 16)
@@ -128,6 +139,7 @@ func _card(req: Dictionary, sprite_cb: Callable) -> Panel:
 	var fee_l := UIKit.label_for("%dc" % int(req.get("fee", 0)),
 		UITokens.TypeRole.BODY)
 	fee_l.position = Vector2(61, 19)
+	fee_l.clip_text = true
 	c.add_child(fee_l)
 	# icons only — names don't fit a 44px card; the evening strip
 	# explains the same trait vocabulary live while seating
@@ -137,12 +149,17 @@ func _card(req: Dictionary, sprite_cb: Callable) -> Panel:
 		t.position = Vector2(tx, 28)
 		c.add_child(t)
 		tx += 18
-	# favourite: heart + "?" until the recipe is cooked (§5.2)
-	var fav := UIKit.icon_rect("heart", UITokens.DIM)
-	fav.position = Vector2(W - 32 - 40, 4)
-	c.add_child(fav)
+	# favourite: heart + "?" until the recipe is cooked (§5.2) — then
+	# the heart goes gold; the tray strip names the dish on select
+	var fav := String(req.get("favourite", ""))
+	var known := fav != "" and _cooked.has(fav)
+	var fh := UIKit.icon_rect("heart",
+		UITokens.GOLD if known else UITokens.DIM)
+	fh.position = Vector2(W - 32 - 40, 4)
+	c.add_child(fh)
 	var q := UIKit.label_for("?", UITokens.TypeRole.BODY, UITokens.DIM)
 	q.position = Vector2(W - 32 - 26, 6)
+	q.visible = not known
 	c.add_child(q)
 	# regulars arrive on ribboned cards (§5.2) — gold star badge
 	if req.get("regular", false):

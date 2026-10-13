@@ -116,6 +116,7 @@
  {
   "id": "photographer",
   "name": "Photographer",
+  "card_name": "Photog",
   "pads": 1,
   "fees": {
    "whisper_river": 70,
@@ -151,6 +152,7 @@
  {
   "id": "food_blogger",
   "name": "Food Blogger",
+  "card_name": "Foodie",
   "pads": 1,
   "fees": {
    "pinewatch": 150,

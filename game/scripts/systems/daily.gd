@@ -109,13 +109,15 @@ func score(puzzle: Dictionary, assignments: Dictionary,
 			world, int(plan["terms"].get(s["guest"]["id"], -1)))
 		results.append(rr)
 		total += rr["stars"]
+	var share_text := share(puzzle, results)
 	if submit and puzzle.get("date") == date() \
 			and g.daily_state["date"] != puzzle.get("date"):
-		g.daily_state = {"date": puzzle["date"], "score": total}
+		g.daily_state = {"date": puzzle["date"], "score": total,
+			"share": share_text}
 		if puzzle["date"] not in g.passport_stamps:   # §33.5 stamp
 			g.passport_stamps.append(puzzle["date"])
 	return {"score": total, "results": results,
-		"share": share(puzzle, results)}
+		"share": share_text}
 
 
 func share(puzzle: Dictionary, results: Array) -> String:

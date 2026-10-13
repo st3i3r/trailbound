@@ -1,0 +1,32 @@
+{
+ "persona": "student_bucket",
+ "ramps": [
+  "skin_light",
+  "hair_brown",
+  "cloth_cream",
+  "cloth_denim"
+ ],
+ "ramp": [
+  "#f5cf9f",
+  "#eeb98a",
+  "#d69a68",
+  "#8a5a3a",
+  "#b87c50",
+  "#a06844",
+  "#6b4428",
+  "#3a2418",
+  "#fff8e0",
+  "#f0e8c8",
+  "#d8cfa8",
+  "#b0a884",
+  "#6b6550",
+  "#88a0b8",
+  "#5d7a94",
+  "#405a74",
+  "#2c3c50",
+  "#251e24",
+  "#273828",
+  "#432f2a",
+  "#4e492b"
+ ]
+}

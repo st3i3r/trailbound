@@ -61,10 +61,16 @@ func _close() -> void:
 
 func _rebuild() -> void:
     ## text size / language changes redraw the whole sheet in place —
-    ## other surfaces pick them up on their next build.
+    ## other surfaces pick them up on their next build.  Keep the
+    ## scroll position so a mid-list toggle doesn't jump to the top.
+    var scroll: ScrollContainer = _v.get_node_or_null("Rows")
+    var pos: int = scroll.scroll_vertical if scroll else 0
     for c in _v.get_children():
         c.queue_free()
     _build_main()
+    var s2: ScrollContainer = _v.get_node_or_null("Rows")
+    if s2 and pos > 0:
+        (func(): s2.scroll_vertical = pos).call_deferred()
 
 
 func _build_main() -> void:
@@ -138,7 +144,7 @@ func _row(parent: Control, label_key: String, icon: String) -> Button:
     b.add_theme_stylebox_override("pressed",
         UIKit.flat("glass_chip", 0.82))
     b.add_theme_stylebox_override("focus", UIKit.focus_box())
-    b.pressed.connect(UIFeel.haptic.bind("press"))
+    UIKit.pressable(b, false)            # row-wide buttons: no squash
     var h := HBoxContainer.new()
     h.set_anchors_preset(Control.PRESET_FULL_RECT)
     h.mouse_filter = Control.MOUSE_FILTER_IGNORE

@@ -321,3 +321,119 @@ re-bake (5.1) lands and scales are frozen, migrate layout authoring
 into a Godot-editable scene so positions are edited visually, not
 numerically. Pinewatch v16+ fixes (wedge removal, tintmap re-bake,
 cluster attachment) were still cheap enough as monkey-patches.
+
+### 5.9 External rendering audit — tmp.txt + pixel.txt (2026-10-13)
+
+Two external pixel-UI guides reviewed against the codebase and SOTA
+references. Verdict: **~30% applicable** — most was already shipped or
+already specified here with more precision; the rest would regress
+documented decisions.
+
+**Adopted (this pass):**
+- **Texel phase at rest** — world sprites now snap positions to whole
+  virtual px: `_anchored`, `_anchored_frames`, the drag ghost
+  (per-frame round — it has no spring to settle, so rounding IS the
+  snap), and `origin` at load so the pad grid (guests/marks/hover)
+  inherits the phase. Fixes phase coherence: every sprite stair-steps
+  identically under nearest instead of drifting sub-px. Scale-ratio
+  moiré (WORLD_SCALE 0.8 × per-prop 0.62–1.35) remains §5.1's rebake.
+
+**Still open (real gaps the audit confirmed):**
+1. **Texel/AA lint at the import gate** — GAME_DESIGN §16.4 specifies
+   "uniform pixel size" but nothing enforces it. AI output is
+   pixel-*styled*, not texel-locked: mixed cluster sizes and AA edges
+   inside one image. The bake needs a density check beside
+   `tb_grade.py`'s palette pass (see also §5.1 rebake).
+2. **`Tier.DRAG` above `MODAL`** — parked until UI-032 outfitter adds
+   inventory-grid drags. Our seat-drag ghost is world-space on purpose
+   (drops on pads); a UI-layer ghost is only right for grid→grid.
+3. **GPU budget tier** — four fullscreen shader layers cost fill-rate
+   on low-end Android (`gl_compatibility`). A settings quality step is
+   the honest fix if perf complaints land; not yet warranted.
+
+**Already shipped / already specified (rejected as new work):**
+- 640×360 base + `default_texture_filter=0` + per-sprite nearest.
+- `canvas_items` + `expand` + integer `scale_mode` — deliberately NOT
+  viewport+keep: viewport-stretch would rasterize VI body text at
+  360p, `keep` letterboxes on Android aspects. Ours is the SOTA hybrid
+  for a text-heavy localized mobile game: integer world texels +
+  device-crisp text.
+- Y-sort, footprint collision, roof/foliage fade-on-footing.
+- Shader atmosphere (layered_fog, rain_ripples, sun_rays, wind_gusts)
+  + scalar WorldFX — the correct adaptation of Eastward's lighting,
+  since we can't hand-paint per-asset bump maps (see corrections).
+- Juice: MOTION tokens + UIFeel shake/pop/wobble.
+- Pixel-density law: GAME_DESIGN §16.2 "one pixel density everywhere"
+  + §16.4 import lint — specified before these guides existed.
+
+**Rejected (would regress shipped decisions):**
+- Charcoal `#1a1a1a` panels — D-UI-1 silver-lacquer chrome is the
+  shipped direction and is closer to Eastward's own light parchment
+  dialogue chrome than the guide's dark panels.
+- Pixel body font (m5x7/Silver) — Latin-only; VI stacked diacritics
+  don't survive pixel sizes (our 9px caption floor exists for exactly
+  this). F1 already retired for charset coverage; the entire text
+  stack is Be Vietnam Pro + fallbacks. SOTA localized-pixel games
+  make the same call (LanaPixel — the only ~19k-glyph pixel font —
+  itself warns CJK is "nearly illegible" at small sizes).
+- "Generate at exact 32×32" as the quality rule — canvas-matched
+  generation + normalize-at-bake (§5.1) is the real rule; raw canvas
+  size doesn't fix in-image texel drift.
+
+**SOTA corrections to the source docs:**
+- Eastward is *"a 3D game with a 2D perspective"* — hand-drawn
+  Aseprite sprites split per-asset, hand-painted bump maps, deferred
+  shading in the custom Gii/MOAI engine (Pixpil/Gamasutra interviews).
+  Its atmosphere is per-asset lit, not "fullscreen post-processing."
+  Our scalar-shader WorldFX is the right equivalent for an AI-art
+  pipeline — bump maps aren't available to us.
+- "CPU overhead zero" for shader FX is false — cost moves to GPU
+  fill-rate; on low-end Android fullscreen layers are a real budget.
+- Eastward does not render at a locked 270p viewport; its gradients
+  and LUT-graded lighting need higher internal res. The retro-canvas
+  lock is a valid *NES-purist* setup, not what Eastward does.
+
+### 5.10 External rendering audit — mobile.txt (2026-10-13)
+
+Mobile viewport + touch-FSM + campfire doc reviewed. Verdict:
+**one real adoption** (hearth flicker/sputter); the rest is already
+shipped, not applicable to a fixed-board game, or actively worse.
+
+**Adopted (this pass):**
+- **Emit-row `jitter`** — `track_emit(..., jitter)` adds a relative
+  organic flicker (three clashing sines, per-row phase so lights
+  never hive-mind). `_process` re-applies only jittered rows —
+  scalar-driven, no event bus. Amplitude AND speed scale with
+  `front`, so the hearth sputters under storm instead of burning
+  through it untouched; `UIFeel.can_pulse()` flattens it under
+  reduced flashing. Fire row: `0.06` (pinewatch_test.gd:1167).
+
+**Not applicable (rejected):**
+- **TouchInputManager camera FSM** — there is no Camera2D; the board
+  is a fixed one-screen stage (UI-043 decision; pinch parked for
+  future larger sites). Pan/inertia arbitration solves a problem we
+  don't have. Source code also carries cross-project contamination
+  (`EventManager.SCAMMER`, `CozyClock`, `MapNavigationManager`) and
+  API bugs (`event.get_modifier_state()` doesn't exist on
+  InputEventScreenDrag — the field is `event.velocity`).
+- **576×324 viewport** — worse than shipped on its own terms:
+  324/32 = 10.125 (not tile-divisible) and divides NO common screen
+  (1080/324 = 3.33); our 640×360 divides 720p–4K evenly. Their
+  `viewport` stretch was already rejected in §5.9.
+- **Physics-raycast prop picking** — our props are painted, not
+  bodies; hit tests are data rects (`_pad_at`, `_guest_at`).
+
+**Already shipped (rejected as new work):**
+- `expand` aspect revealing more room on wide phones (:863 comment).
+- Ember light arriving "only once real dark falls" — the scalar
+  curve does continuously what their `CozyClock` tween does in steps.
+- mouse_filter STOP/IGNORE discipline + PanelManager dimmer — the
+  "button press leaks to the world" trap is handled architecturally.
+- Warm amber hearth pool `Color(1.0, 0.60, 0.32)` ≈ their #ff8d21.
+
+**Parked:**
+- **Finger-occlusion lift** — their drag puts the prop under the
+  finger; mobile SOTA lifts the preview ~40-60px above it. Note for
+  UI-033 build mode (our guest ghost already offsets +4px; decor
+  placement wants more). Touch slop already equivalent
+  (7 virtual px ≈ 21 device px @3×).

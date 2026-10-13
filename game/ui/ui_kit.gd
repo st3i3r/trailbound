@@ -139,8 +139,14 @@ static func type_size(role: UITokens.TypeRole) -> int:
 
 static func tex(rel: String) -> Texture2D:
     ## Shared texture cache; rel is relative to assets/pinewatch/, no ext.
+    ## A missing asset is NOT cached — one bad path shouldn't stay
+    ## invisible for the rest of the run.
     if not _tex_cache.has(rel):
-        _tex_cache[rel] = load(UITokens.ASSETS + rel + ".png")
+        var t: Texture2D = load(UITokens.ASSETS + rel + ".png")
+        if t == null:
+            push_warning("UIKit.tex: missing " + rel)
+            return null
+        _tex_cache[rel] = t
     return _tex_cache[rel]
 
 
@@ -274,6 +280,31 @@ static func spacer(parent: Control, w: float, h := 0.0) -> Control:
     return s
 
 
+## Designed empty state (UI-041): dim icon + centered caption, so a
+## blank list reads as intentional space, not a broken render.
+static func empty(parent: Control, icon_name_: String, text: String,
+                  hint := "") -> Control:
+    var box := VBoxContainer.new()
+    box.alignment = BoxContainer.ALIGNMENT_CENTER
+    box.add_theme_constant_override("separation", UITokens.SP1)
+    box.custom_minimum_size = Vector2(0, 56)
+    var i := icon_rect(icon_name_, UITokens.DIM, 16)
+    i.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+    box.add_child(i)
+    var l := label_for(text, UITokens.TypeRole.BODY, UITokens.DIM)
+    l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+    l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+    box.add_child(l)
+    if hint != "":
+        var h := label_for(hint, UITokens.TypeRole.CAPTION,
+            UITokens.DIM)
+        h.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+        h.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+        box.add_child(h)
+    parent.add_child(box)
+    return box
+
+
 # ------------------------------------------------------------- buttons
 ## Real Button nodes with the five interactive states (UI-008) on the
 ## lacquer glass kit (D-UI-1): btn_pill neutral, btn_green safe/ok,
@@ -295,11 +326,25 @@ static func state_nine(piece: String, ins := {}, mod := 1.0) -> StyleBoxTexture:
 
 
 static func focus_box() -> StyleBox:
-    ## No painted focus ring: touch-first UI, and a second border drawn
-    ## over the texture frame always reads as a stacked/inconsistent
-    ## line.  When gamepad nav ships it should use an outer halo
-    ## (sel_glow), never a second border inside the rect.
-    return StyleBoxEmpty.new()
+    ## The sel_glow halo IS the focus ring — it only ever shows when
+    ## UIFeel.nav_input is armed (keys/joypad): kit buttons release
+    ## focus on pointer press, so touch never leaves a ring behind.
+    ## Never a second border inside the rect — a halo, not a line.
+    return state_nine("sel_glow")
+
+
+## One wiring for every pressable control: haptic + sfx on `pressed`,
+## squash on `button_down`, and pointer presses hand focus back so the
+## sel_glow ring is a nav-mode read, not a touch leftover.
+static func pressable(b: Button, squash := true) -> Button:
+    b.pressed.connect(func() -> void:
+        UIFeel.haptic("press")
+        UIFeel.sfx("press")
+        if not UIFeel.nav_input:
+            b.release_focus())
+    if squash:
+        b.button_down.connect(UIFeel.pop.bind(b, Vector2(0.90, 0.90)))
+    return b
 
 
 # ------------------------------------------------------------ flat chrome
@@ -373,7 +418,7 @@ static func btn(parent: Control, where: Variant, text: String,
     b.add_theme_stylebox_override("pressed", chrome(piece, 0.82))
     b.add_theme_stylebox_override("disabled", chrome("btn_disabled"))
     b.add_theme_stylebox_override("focus", focus_box())
-    b.pressed.connect(UIFeel.haptic.bind("press"))
+    pressable(b)
     parent.add_child(b)
     return b
 
@@ -393,7 +438,7 @@ static func icon_btn(parent: Control, icon_name: String,
     b.add_theme_stylebox_override("pressed", chrome("glass_chip", 0.82))
     b.add_theme_stylebox_override("disabled", chrome("btn_disabled"))
     b.add_theme_stylebox_override("focus", focus_box())
-    b.pressed.connect(UIFeel.haptic.bind("press"))
+    pressable(b)
     var t := icon_rect(icon_name, tint, 16)
     # absolute centering — anchors raced the unset size; the button's
     # rect is fixed MIN_TOUCH so a literal offset is the honest answer

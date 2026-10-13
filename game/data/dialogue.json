@@ -1,0 +1,77 @@
+[
+  {
+    "id": "mai_d1",
+    "site": "pinewatch",
+    "day": 1,
+    "anchor": "mai",
+    "who": "Mai",
+    "lines": [
+      "Morning, cháu. Pinewatch is yours now.",
+      "Tonight the board fills — seat them well and the stars follow."
+    ]
+  },
+  {
+    "id": "mai_d2",
+    "site": "pinewatch",
+    "day": 2,
+    "anchor": "mai",
+    "who": "Mai",
+    "lines": [
+      "I put the crew on the old warden's hut.",
+      "Watch the clock — a keepsake waits in every stage."
+    ]
+  },
+  {
+    "id": "mai_d4",
+    "site": "pinewatch",
+    "day": 4,
+    "anchor": "mai",
+    "who": "Mai",
+    "lines": [
+      "Rain tomorrow, the board says. A tarp keeps the reviews dry.",
+      "And cháu — the kettle's on if the morning runs long."
+    ]
+  },
+  {
+    "id": "warden_d1",
+    "site": "pinewatch",
+    "day": 1,
+    "anchor": "warden",
+    "who": "",
+    "lines": [
+      "The fire smells of pine resin. Home, then."
+    ]
+  },
+  {
+    "id": "mai_praise5",
+    "site": "pinewatch",
+    "anchor": "mai",
+    "who": "Mai",
+    "when": {"last_stars_min": 5},
+    "lines": [
+      "Five stars last night, cháu. I saw the reviews.",
+      "Grandpa would have framed the log for that one."
+    ]
+  },
+  {
+    "id": "mai_rain_follow",
+    "site": "pinewatch",
+    "anchor": "mai",
+    "who": "Mai",
+    "when": {"last_weather": "rain"},
+    "lines": [
+      "Slept through the whole storm, I hope. Tarps earn their keep.",
+      "Wet nights make the best steam for morning tea, at least."
+    ]
+  },
+  {
+    "id": "warden_fav_served",
+    "site": "pinewatch",
+    "anchor": "warden",
+    "who": "",
+    "lines": [
+      "Someone got exactly what they were craving last night.",
+      "Grandpa always said a full pot reads the camp better than any review."
+    ]
+  }
+]

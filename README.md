@@ -5,7 +5,9 @@ evening, decide which guest sleeps where; each morning, reshape the camp with
 what you earned. Reopen grandpa's chain of forgotten trail campsites, one
 journal page at a time.
 
-- Game design document (source of truth): `docs/GAME_DESIGN.md`
+- Doc map (what owns which truth): `docs/README.md`
+- Game design document (rules spec): `docs/GAME_DESIGN.md`
+- Architecture (systems + contracts): `docs/ARCHITECTURE.md`
 - Dev workflow: `docs/DEV_WORKFLOW.md`
 - Visual target: `docs/reference/eastward.jpg` (3/4 tilted top-down, painterly
   pixel); `docs/reference/example.png` = prop-density + dusk-mood secondary ref
@@ -29,7 +31,10 @@ tools/        sim.py (Phase -1 economy sim, --post-arc mode), paper_kit.py,
               pixellab_gen.py (PixelLab REST), slice_sheet.py + png.py (sheet tools);
               content lint and Daily solver join later
 assets_src/   source art from the tools, before import — never shipped
-docs/         GDD, dev workflow, reference/ (style targets)
+docs/         README.md (doc map) · GAME_DESIGN.md (rules spec) ·
+              ARCHITECTURE.md (systems + contracts) · UI_PRODUCTION.md
+              (UI backlog + decisions) · specs/ (design inputs) ·
+              DEV_WORKFLOW.md · SITE_BRIEFS.md · PLAN_*.md · reference/
 LEGAL/        PRIVACY.md, TERMS.md drafts (needed for the Play listing)
 ```
 

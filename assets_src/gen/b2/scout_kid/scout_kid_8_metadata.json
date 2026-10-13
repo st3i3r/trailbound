@@ -1,0 +1,36 @@
+{
+  "group_id": "da0e5816-43c5-44f2-8138-dc122b217fed",
+  "states": [
+    {
+      "character": {
+        "id": "c8bc5ed3-8c61-49cc-9454-7060e7b1e175",
+        "name": "Idle",
+        "prompt": "rotate this exact child sprite into 8 directions \u2014 keep the proportions, outfit and colours",
+        "size": {
+          "width": 32,
+          "height": 32
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-13T17:37:01.131303+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-13T17:44:29.820732"
+}

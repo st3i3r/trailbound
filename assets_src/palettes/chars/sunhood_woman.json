@@ -1,0 +1,28 @@
+{
+ "persona": "sunhood_woman",
+ "ramps": [
+  "skin_light",
+  "hair_black",
+  "cloth_pastelblue",
+  "cloth_charcoal"
+ ],
+ "ramp": [
+  "#f5cf9f",
+  "#eeb98a",
+  "#d69a68",
+  "#8a5a3a",
+  "#554a4a",
+  "#403838",
+  "#c8e0ee",
+  "#a0c8e0",
+  "#74a4c4",
+  "#4e7896",
+  "#8a8a90",
+  "#5c5660",
+  "#3f3b44",
+  "#251e24",
+  "#273828",
+  "#432f2a",
+  "#4e492b"
+ ]
+}

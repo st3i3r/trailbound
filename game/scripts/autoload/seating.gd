@@ -11,7 +11,7 @@ extends Node
 ##   pads:      {pid: {"open": bool, "shelter": "bare|platform|cabin"}}
 ##   occupants: {pid: guest_id}   — seated guests only
 ##   guests:    {guest_id: request dict}
-##   weather:   "clear" | "cloudy" | "rain"
+##   weather:   "clear" | "rain" | "storm"  (storm counts as rain)
 
 const SHELTER_COMFORT := {"bare": 0, "platform": 1, "cabin": 2}
 
@@ -185,9 +185,9 @@ static func resolve_guest(guest: Dictionary, pad_ids: Array,
 	var ev := eval_guest(guest, pad_ids, world)
 	var comfort := comfort_of(pad_ids, world)
 	var weather_term := 0
-	if world.get("weather") == "rain" \
+	if world.get("weather") in ["rain", "storm"] \
 			and not is_covered(pad_ids, world, guest.get("id", "")):
-		weather_term = -1
+		weather_term = -1                       # storm is worse rain, not clear
 	var stars := Econ.stars(comfort, meal_term, ev["needs_met"],
 		ev["aversions"], weather_term)
 	var fee := int(guest.get("fee", 0))
@@ -283,7 +283,8 @@ static func _request(arch: Dictionary, site_id: String, traits: Array,
 		index: int, rng: RandomNumberGenerator,
 		favourites: Array) -> Dictionary:
 	return {"id": "req%d" % index, "archetype": arch.get("id", ""),
-		"name": arch.get("name", ""), "traits": traits,
+		"name": arch.get("name", ""),
+		"card_name": arch.get("card_name", ""), "traits": traits,
 		"loud": arch.get("loud", false), "pads": int(arch.get("pads", 1)),
 		"fee": int(arch.get("fees", {}).get(site_id, 0)),
 		"favourite": favourites[rng.randi() % favourites.size()] \

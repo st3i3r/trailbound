@@ -47,5 +47,40 @@ static func theme() -> Theme:
     # no global text shadow — flat surfaces read clean at these
     # contrasts; UIKit.label() adds a 1px lift only for light text
     # floating over the world (the one case that needs it)
+    # ---- ScrollBars: the stock theme is dark and reads as a foreign
+    # object on the silver kit.  Thin recessed trough + graphite grabber
+    # (LINE tokens), no arrow buttons — content margins set the trough
+    # thickness (~6px), not a theme constant.
+    for bar in ["VScrollBar", "HScrollBar"]:
+        t.set_stylebox("scroll", bar, _scroll_trough())
+        t.set_stylebox("scroll_focus", bar, _scroll_trough())
+        t.set_stylebox("grabber", bar, _scroll_grab(1.0))
+        t.set_stylebox("grabber_highlight", bar, _scroll_grab(1.2))
+        t.set_stylebox("grabber_pressed", bar, _scroll_grab(0.8))
+        for k in ["increment", "increment_highlight",
+                  "increment_pressed", "decrement",
+                  "decrement_highlight", "decrement_pressed"]:
+            t.set_stylebox(k, bar, StyleBoxEmpty.new())
     _theme = t
     return t
+
+
+static func _scroll_trough() -> StyleBoxFlat:
+    var sb := StyleBoxFlat.new()
+    sb.bg_color = Color(UITokens.LINE, 0.14)      # recessed whisper
+    sb.set_corner_radius_all(3)
+    sb.content_margin_left = 2.5
+    sb.content_margin_right = 2.5
+    sb.content_margin_top = 2.5
+    sb.content_margin_bottom = 2.5
+    return sb
+
+
+static func _scroll_grab(mod: float) -> StyleBoxFlat:
+    var sb := StyleBoxFlat.new()
+    var c := UITokens.LINE
+    sb.bg_color = Color(c.r * mod, c.g * mod, c.b * mod)
+    sb.set_corner_radius_all(3)
+    sb.content_margin_top = 6.0                    # min grabber length
+    sb.content_margin_bottom = 6.0
+    return sb

@@ -1,0 +1,36 @@
+{
+  "group_id": "c33faf67-4bb1-45a0-b32c-07e8329ff287",
+  "states": [
+    {
+      "character": {
+        "id": "a57cbc0f-e3cf-4d42-976e-1fe4fcb30adb",
+        "name": "Idle",
+        "prompt": "painterly pixel art character in the style of Eastward, low top-down 3/4 view with the front drawn straight-on \u2014 chunky readable silhouette about 3.5-4 head-lengths tall filling about 90% of the canvas height, full value range with a warm upper-left lit side and a cool shadow side, hue-shifted colour ramps, adaptive dark coloured outline (never pure black), calm interior masses with detail concentrated at the silhouette, one signature colour or prop, relaxed standing pose facing south, warm friendly expression, contemporary everyday clothes of the 2020s \u2014 single subject centred on a transparent background, neutral midday light, no cast shadow, no ground patch, no rim light, no glow, no dusk tones, no text. relaxed middle-aged Vietnamese uncle, white singlet, dark shorts, slight belly, d\u00e9p t\u00f4ng rubber sandals, small thermos cup in hand",
+        "size": {
+          "width": 48,
+          "height": 48
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-13T17:06:06.453286+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-13T17:30:11.724179"
+}

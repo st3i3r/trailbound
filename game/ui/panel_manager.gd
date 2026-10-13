@@ -44,10 +44,12 @@ func _ready() -> void:
     dots.set_anchors_preset(Control.PRESET_FULL_RECT)
     dots.mouse_filter = Control.MOUSE_FILTER_IGNORE
     _dimmer.add_child(dots)
-    # §17.6: a tap on the scrim dismisses the top sheet
+    # §17.6: a tap on the scrim dismisses the top sheet — mouse clicks
+    # AND raw touch (emulate-mouse-off or stylus would otherwise miss)
     _dimmer.gui_input.connect(func(e: InputEvent) -> void:
-        if e is InputEventMouseButton and e.pressed \
-                and e.button_index == MOUSE_BUTTON_LEFT:
+        if (e is InputEventMouseButton and e.pressed \
+                and e.button_index == MOUSE_BUTTON_LEFT) \
+                or (e is InputEventScreenTouch and e.pressed):
             close())
     add_child(_dimmer)
     # keep the dimmer under whatever panel is on top
@@ -82,9 +84,15 @@ func close() -> void:
 
 
 func _grab_panel_focus(p: Control) -> void:
-    if not is_instance_valid(p):
+    # Only nav users get a starting focus — pointer users see no ring,
+    # and gui tab order stays untouched for them.
+    if not is_instance_valid(p) or not UIFeel.nav_input:
         return
     var buttons := p.find_children("", "Button", true, false)
+    for b in buttons:
+        if b.has_meta("primary") and not b.disabled:
+            (b as Button).grab_focus()
+            return
     if not buttons.is_empty():
         (buttons[0] as Button).grab_focus()
 
@@ -99,27 +107,31 @@ func _restore_focus() -> void:
 
 
 func _animate_in(p: Control, first_panel: bool) -> void:
-    ## Scale+fade pop for the panel; the scrim only fades in on the
-    ## first panel (re-fading per push would flash the stack).
+    ## Spring pop for the panel — the panel_in token runs TRANS_BACK,
+    ## so 0.85 overshoots past 1.0 before settling (the Eastward read).
+    ## The scrim only fades in on the first panel (re-fading per push
+    ## would flash the stack).
     if first_panel:
         _animate_dimmer(true)
     else:
         _dimmer.modulate.a = 1.0
     p.pivot_offset = p.size / 2.0
-    p.scale = Vector2(0.96, 0.96)
+    p.scale = Vector2(0.85, 0.85)
     p.modulate.a = 0.0
     var tw := UIFeel.apply(create_tween().set_parallel(), "panel_in")
     var d := UIFeel.dur("panel_in")
     tw.tween_property(p, "scale", Vector2.ONE, d)
     tw.tween_property(p, "modulate:a", 1.0, d)
+    UIFeel.sfx("open")
 
 
 func _animate_out(p: Control) -> void:
     var tw := UIFeel.apply(create_tween().set_parallel(), "panel_out")
     var d := UIFeel.dur("panel_out")
-    tw.tween_property(p, "scale", Vector2(0.96, 0.96), d)
+    tw.tween_property(p, "scale", Vector2(0.92, 0.92), d)
     tw.tween_property(p, "modulate:a", 0.0, d)
     tw.chain().tween_callback(p.queue_free)
+    UIFeel.sfx("close")
 
 
 func _animate_dimmer(on: bool) -> void:

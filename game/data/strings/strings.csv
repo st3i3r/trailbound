@@ -12,6 +12,7 @@ menu_settings,Settings,Cài đặt
 menu_exit,Exit,Thoát
 weather_clear,Clear,Trời quang
 weather_rain,Rain,Mưa
+weather_storm,Storm,Mưa bão
 hud_coins_short,%dc,%dc
 quit_title,Leave the camp?,Rời khỏi trại?
 quit_stay,Stay,Ở lại
@@ -20,13 +21,13 @@ hud_fire,Fire,Lửa
 tray_pick_pad,tap an open pad,chạm một ô trống
 tray_shelter,shelter,lều
 tray_rain,rain,mưa
-tray_hint,tap a card, then a pad · Goodnight ends the night,chạm thẻ rồi chạm ô · Goodnight kết thúc đêm
+tray_hint,tap a card · then an open pad · Goodnight ends the night,chạm thẻ rồi chạm ô · Goodnight kết thúc đêm
 hud_goodnight,Goodnight,Ngủ ngon
 hud_sleep,Sleep,Ngủ
 night_title,NIGHT · DAY %d,ĐÊM · NGÀY %d
 night_fees,Fees,Phí
 night_tips,Tips,Tiền tip
-night_walkins,%d walk-ins bought leftovers +%dc,%d khách vãng lai mua đồ thừa +%dc
+night_walkins,{n} walk-ins bought leftovers +{c}c,{n} khách vãng lai mua đồ thừa +{c}c
 night_gathering,Gathering bonus +%dc,Thưởng hội hè +%dc
 night_page,Journal page %d,Trang nhật ký %d
 night_tomorrow,Tomorrow,Ngày mai
@@ -37,7 +38,7 @@ night_none,No guests tonight.,Đêm nay không có khách.
 hud_headout,Head out,Lên đường
 board_title,BOOKINGS · TONIGHT,ĐẶT CHỖ · TỐI NAY
 board_forecast,Tonight: %s,Tối nay: %s
-board_demand,%d requests · %d pads open,%d yêu cầu · %d ô trống
+board_demand,{n} requests · {p} pads open,{n} yêu cầu · {p} ô trống
 board_wait,extra parties wait at the trailhead,khách thừa chờ ở đầu đường mòn
 set_title,Settings,Cài đặt
 set_sec_sound,Sound,Âm thanh
@@ -84,8 +85,8 @@ jrnl_t_thennow,Then & Now,Xưa & nay
 jrnl_regulars,Regulars,Khách quen
 jrnl_visits,%d visits,%d lần ghé
 jrnl_not_cooked,not cooked yet,chưa nấu
-jrnl_day_line,Day %d · %s,Ngày %d · %s
-jrnl_day_sub,%d guests · +%dc,%d khách · +%dc
+jrnl_day_line,Day {d} · {s},Ngày {d} · {s}
+jrnl_day_sub,{g} guests · +{c}c,{g} khách · +{c}c
 jrnl_from,From %s,Thư của %s
 jrnl_back,Back,Quay lại
 jrnl_vol2,The Second Volume,Cuốn sổ thứ hai
@@ -99,3 +100,100 @@ jrnl_empty_keepsakes,Keepsakes arrive as crew restore the site.,Kỷ vật sẽ 
 jrnl_empty_letters,No letters yet — they arrive with the mornings.,Chưa có thư nào — thư đến vào mỗi buổi sáng.
 jrnl_empty_days,Nights write this log as they pass.,Nhật ký này tự viết sau mỗi đêm.
 jrnl_empty_thennow,Reach a site and it will start keeping photos.,Đến một khu trại và nơi đó sẽ bắt đầu lưu ảnh.
+pan_t_pantry,Pantry,Kho đồ ăn
+pan_capacity,{n} of {m} slots used,{n}/{m} chỗ đã dùng
+pan_today,Tonight's menu,Thực đơn tối nay
+pan_pick,Pick two ingredients,Chọn hai nguyên liệu
+pan_cook,Cook,Nấu
+pan_res_ok,{name} · worth {p}c,{name} · giá {p}xu
+pan_res_missing,Not enough {name},Không đủ {name}
+pan_empty,The pantry is bare — gather at the trail edges.,Kho trống rồi — hái lượm dọc lề đường.
+pan_known,Known pairs · {n},Cặp đã biết · {n}
+pan_meals_none,Nothing cooked — the menu rides on staples tonight.,Chưa nấu gì — tối nay thực đơn cây nhà lá vườn.
+crew_t_sheet,Crew,Ekip trùng tu
+crew_working,{name} · stage {s} of {t},{name} · công đoạn {s}/{t}
+crew_ready,Ready — collect the keepsake,Xong rồi — nhận kỷ vật
+crew_collect,Collect,Nhận
+crew_idle,The crew rests between restorations.,Ekip nghỉ giữa các lần trùng tu.
+crew_left,{time} left,Còn {time}
+crew_speedup,Speed up −{m} min,Tăng tốc −{m} phút
+crew_free,Finish now · free,Xong ngay · miễn phí
+crew_done,Every v1 restoration is complete. The book thanks you.,Xong hết phần I. Quyển sổ cảm ơn bạn.
+crew_shelf,Keepsakes collected,Kỷ vật đã nhận
+cer_keepsake,Keepsake found,Kỷ vật mới
+cer_page,Journal page complete,Hoàn thành trang nhật ký
+cer_gift,+{n}c tucked inside,+{n}xu kèm theo
+cer_five,Five-star night,Đêm năm sao
+cer_tap,tap to continue,chạm để tiếp tục
+tray_empty,A quiet evening — the board is empty.,Tối vắng — bảng đặt trống.
+board_empty,Nobody booked tonight.,Chưa ai đặt chỗ tối nay.
+board_empty_hint,Check the forecast before you turn in.,Xem dự báo trước khi ngủ nhé.
+prep_need_rod,Needs a Fishing Rod.,Cần cần câu.
+prep_need_binocs,Needs Binoculars.,Cần ống nhòm.
+prep_pond_rest,The pond rests today.,Ao nghỉ hôm nay.
+prep_spot_done,Already scanned today.,Hôm nay ngắm rồi.
+prep_spotted,Spotted: %s,Phát hiện: %s
+prep_birds_done,Bird book complete!,Sổ chim đầy đủ!
+prep_pantry_full,Pantry's full.,Kho đầy rồi.
+prep_dog_done,Content for today.,Hôm nay đủ rồi.
+shop_t,Outfitter,Tạp hóa
+shop_tab_gear,Gear,Đồ dùng
+shop_tab_staples,Staples,Thực phẩm
+shop_owned,Owned,Đã có
+shop_full,Pantry full,Kho đầy
+shop_have,have ×{n},có ×{n}
+shop_lock_page,{site} · page {n},{site} · trang {n}
+shop_lock_reach,Reach {site},Đến {site}
+shop_lock_story,A story beat away,Sẽ đến theo cốt truyện
+shop_eff_fishing,Fish at the pond,Câu cá ở ao
+shop_eff_lookout,Spot birds at the lookout,Ngắm chim ở đồi
+shop_eff_meals,Pantry space +10,Thêm 10 chỗ kho
+shop_eff_oven,Cook oven dishes,Nấu món lò
+shop_tab_decor,Decor,Trang trí
+shop_stored,Stored,Đã cất
+shop_place,Place · {p}c,Đặt · {p}xu
+shop_place_free,Place,Đặt ra
+shop_upgrade,Upgrade · {p}c,Nâng cấp · {p}xu
+shop_back,Return · +{p}c,Trả · +{p}xu
+bld_move,Move,Chuyển
+bld_store,Store,Cất
+bld_return,Return · +{p}c,Trả · +{p}xu
+bld_not_prep,Camp work is a Prep job.,Việc trại để buổi chuẩn bị.
+pad_unlock,Unlock · {p}c,Mở ô · {p}xu
+pad_clear,Clear,Dọn
+pad_shelter_platform,Platform · {p}c,Sàn gỗ · {p}xu
+pad_shelter_cabin,Cabin · {p}c,Chòi gỗ · {p}xu
+eff_seats,+{n} seats,+{n} chỗ ngồi
+eff_light,light · reach {n},ánh sáng · {n} ô
+eff_nature,greenery · reach {n},cây xanh · {n} ô
+eff_cover,cover · reach {n},mái che · {n} ô
+eff_privacy,privacy · reach {n},riêng tư · {n} ô
+eff_dog,the stray's corner · reach {n},góc chó · {n} ô
+eff_music,music · reach {n},âm nhạc · {n} ô
+eff_play,play · reach {n},vui chơi · {n} ô
+eff_stars,stargazing · reach {n},ngắm sao · {n} ô
+eff_warm,a warmer hearth,lửa ấm hơn
+eff_none,a little charm,điểm nhấn nhỏ
+tray_serve,tap a seated guest to serve,dọn món cho khách đã ngồi
+tray_fav_served,Their favourite!,Đúng món thích!
+map_t_sheet,Trail map,Bản đồ
+map_here,here,đang ở đây
+map_travel,Travel,Đi tới
+map_morning,The trail is a morning act.,Đường mòn chỉ đi buổi sáng.
+map_pages,{n}/{t} pages in the journal,{n}/{t} trang nhật ký
+map_locked,Finish {site}'s journal first,Xong nhật ký {site} trước
+site_pinewatch,Pinewatch Forest,Rừng Pinewatch
+site_whisper_river,Whisper River,Sông Thì Thầm
+site_lantern_valley,Lantern Valley,Thung Lũng Đèn Lồng
+dog_adopted_t,He stayed.,Nó ở lại rồi.
+dog_adopted_sub,The stray decided the camp was his. What do you call him?,Chó hoang quyết định ở lại trại. Bạn gọi nó là gì?
+dog_adopted_ok,Name him,Đặt tên
+daily_t,Trail Daily #{n},Trail Daily #{n}
+daily_t_locked,Trail Daily,Trail Daily
+daily_open,Today's board is unplayed,Bảng hôm nay chưa chơi
+daily_done,Today's score: {s}/25,Điểm hôm nay: {s}/25
+daily_locked,A keepsake letter will bring the daily board.,Một thư kỷ niệm sẽ mang bảng hằng ngày đến.
+daily_copy,Copy share text,Sao chép kết quả
+daily_board,Requests,Yêu cầu
+daily_kit,Kit,Đồ bài
+daily_meals,meals on the board,món trên bảng

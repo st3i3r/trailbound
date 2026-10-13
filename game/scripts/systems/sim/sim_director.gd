@@ -212,11 +212,40 @@ static func _stim_wrap(base: Array, stim_tags: Array,
 	return steps
 
 
+## Persona pick — pure hash on (gid, cast seed): the same guest gets
+## the same face whether drawn at cast time or at seat time (the seat
+## visual uses this too, so the seated sprite IS the face the actor
+## performs with — order-independent, no rng coupling). Missing pools
+## degrade to the fallback sprite+tint; `persona` keeps the key for
+## anim lookup. Returns "" when the pool is empty.
+static func persona_key(gid: String, arch: String, seed: int,
+		personas: Dictionary) -> String:
+	var pool: Array = personas.get("archetypes", {}).get(arch, [])
+	if pool.is_empty():
+		return ""
+	return String(pool[absi(int(hash("%s:%d" % [gid, seed])))
+		% pool.size()])
+
+
+static func _persona(_w: SimWorld, personas: Dictionary, arch: String,
+		gid: String, seed: int) -> Dictionary:
+	var key := persona_key(gid, arch, seed, personas)
+	if key.is_empty():
+		var fb: Dictionary = personas.get("fallback", {})
+		return {"sprite": String(fb.get("sprite", "")),
+			"tint": String(fb.get("tint", "")), "guest": gid}
+	return {"persona": key,
+		"sprite": "characters/%s/%s_south" % [key, key],
+		"guest": gid}
+
+
 ## Evening cast: every seated guest performs an archetype loop from
 ## their pad; the dog patrols when adopted. Deterministic — same
-## state + seed => same performance.
+## state + seed => same performance. `personas` = data/actors.json —
+## each guest's face is picked from the archetype pool through w.rng,
+## so the same night replays the same faces (D4.1).
 static func cast_night(st: Dictionary, layout: Dictionary,
-		seed: int) -> SimWorld:
+		seed: int, personas: Dictionary = {}) -> SimWorld:
 	var w := SimWorld.new(seed)
 	var spots: Dictionary = layout.get("pads", {}).get("spots", {})
 	var bank: Variant = _bank(layout)
@@ -334,8 +363,7 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 		var comps := {"pos": {"x": home.x, "y": home.y},
 			"schedule": _jitter(w, steps),
 			"anchor": anchor,
-			"persona": {"sprite": "warden_south",
-				"guest": gid},
+			"persona": _persona(w, personas, arch, gid, seed),
 			"anim": {"name": "idle", "fps": 6.0}}
 		for k in extra:
 			comps[k] = extra[k]
@@ -378,7 +406,7 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 		w.spawn({"pos": {"x": home.x, "y": home.y},
 			"schedule": _jitter(w, steps),
 			"anchor": {"kind": "pt", "ref": "dog"},
-			"persona": {"sprite": "dog"},
+			"persona": _persona(w, personas, "dog", "dog", seed),
 			"tags": {"tags": ["dog", "fluffy"]},
 			"perceive": {"sight_r": 130.0, "hear_r": 140.0,
 				"weights": {"oddity": 0.9}},

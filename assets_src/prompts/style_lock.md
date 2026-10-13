@@ -16,8 +16,10 @@ gen job — never a full scene. Crops teach LOOK (craft level, outline,
 shading); prompts teach CONTENT. Style refs anchor to target-quality
 art (Eastward/Octopia crops in `assets_src/refs/crops/`,
 `docs/reference/`), never to shipped Trailbound art — self-referencing
-caps output at current quality. Palette is owned by `tb_grade`, so a
-ref need only carry craft.
+caps output at current quality. `docs/reference/ui_stale/` is
+quarantined (2026-10-15): mislabeled editorial captures, not
+Eastward — never send them as style refs. Palette is owned by
+`tb_grade`, so a ref need only carry craft.
 
 ## Post-gen grade (deterministic, applied to every pipeline copy)
 

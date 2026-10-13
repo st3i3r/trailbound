@@ -25,8 +25,8 @@ func _process(_delta: float) -> void:
     var dead := []
     for tok in _markers:
         var m: Dictionary = _markers[tok]
-        var n: Node2D = m["node"]
-        if not is_instance_valid(n):     # world node died under us
+        var n = m["node"]                # untyped — a freed instance
+        if not is_instance_valid(n):     # can't enter a typed var
             m["control"].queue_free()
             dead.append(tok)
             continue
@@ -64,6 +64,21 @@ func release(token: int) -> void:
 func clear() -> void:
     for tok in _markers.keys():
         release(tok)
+
+
+## Glass affordance chip on a marker: small panel + content, caller
+## places the glyph (icon_rect, label).  Returns [token, panel] — the
+## token for release(), the panel for pivot/tween work.
+func icon_chip(anchor: Node2D, content: Control, offset: Vector2,
+        size := Vector2(18, 18)) -> Array:
+    var tok := marker(anchor, offset)
+    var p := Panel.new()
+    p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    p.add_theme_stylebox_override("panel", UIKit.flat("glass_chip"))
+    p.size = size
+    p.add_child(content)
+    marker_control(tok).add_child(p)
+    return [tok, p]
 
 
 ## Nine-slice bubble chrome for marker content — caller parents it into

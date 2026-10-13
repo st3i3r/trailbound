@@ -1,0 +1,36 @@
+{
+  "group_id": "bf87df11-777f-45ec-aab6-006e0993c9f7",
+  "states": [
+    {
+      "character": {
+        "id": "3400f865-6026-4952-b83e-77cc52d1f13d",
+        "name": "Idle",
+        "prompt": "painterly pixel art character in the style of Eastward, low top-down 3/4 view with the front drawn straight-on \u2014 chunky readable silhouette about 3.5-4 head-lengths tall filling about 90% of the canvas height, full value range with a warm upper-left lit side and a cool shadow side, hue-shifted colour ramps, adaptive dark coloured outline (never pure black), calm interior masses with detail concentrated at the silhouette, one signature colour or prop, relaxed standing pose facing south, warm friendly expression, contemporary everyday clothes of the 2020s \u2014 single subject centred on a transparent background, neutral midday light, no cast shadow, no ground patch, no rim light, no glow, no dusk tones, no text. young Vietnamese woman in a pastel-blue full sun-protection jacket with the hood up, dark leggings, sneakers, canvas tote bag",
+        "size": {
+          "width": 48,
+          "height": 48
+        },
+        "template_id": "mannequin",
+        "directions": 8,
+        "view": "low top-down",
+        "created_at": "2026-10-13T17:06:12.287475+00:00"
+      },
+      "folder": "Idle",
+      "frames": {
+        "rotations": {
+          "south": "Idle/rotations/south.png",
+          "south-east": "Idle/rotations/south-east.png",
+          "east": "Idle/rotations/east.png",
+          "north-east": "Idle/rotations/north-east.png",
+          "north": "Idle/rotations/north.png",
+          "north-west": "Idle/rotations/north-west.png",
+          "west": "Idle/rotations/west.png",
+          "south-west": "Idle/rotations/south-west.png"
+        },
+        "animations": {}
+      }
+    }
+  ],
+  "export_version": "3.1",
+  "export_date": "2026-10-13T17:30:32.413700"
+}

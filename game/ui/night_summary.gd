@@ -65,6 +65,7 @@ func _build(day: int, forecast: String) -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(title)
 	_build_reviews(v)
+	_build_vignette(v)
 	_build_totals(forecast, v)
 	_build_buttons(v)
 
@@ -84,9 +85,7 @@ func _build_reviews(parent: Control) -> void:
 	scroll.add_child(list)
 	var results: Array = _rep.get("results", [])
 	if results.is_empty():
-		var none := UIKit.label_for(tr("night_none"),
-			UITokens.TypeRole.BODY, UITokens.DIM)
-		list.add_child(none)
+		UIKit.empty(list, "guestbook", tr("night_none"))
 		return
 	var best_id: String = _rep.get("best", {}).get("id", "")
 	for r in results:
@@ -151,6 +150,42 @@ func _term(icon_name: String, sign: String) -> Control:
 	return row
 
 
+## spec 005 A: tonight's vignette is a beat, not bookkeeping — a chip
+## card between the reviews and the ledger (label + one-line scene
+## description).  The matching light cue is the scene's job: it tracks
+## the row's `cue` term while this sheet is open.
+func _build_vignette(parent: Control) -> void:
+	var vid := String(_rep.get("vignette", ""))
+	if vid == "":
+		return
+	var row := {}
+	for v in Catalog.data.get("vignettes", []):
+		if v.get("id") == vid:
+			row = v
+			break
+	if row.is_empty():
+		return
+	var card := PanelContainer.new()
+	card.name = "VignetteCard"
+	card.add_theme_stylebox_override("panel", UIKit.flat("glass_chip"))
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 8)
+	h.alignment = BoxContainer.ALIGNMENT_CENTER
+	card.add_child(h)
+	h.add_child(UIKit.icon_rect("moon"))
+	var mid := VBoxContainer.new()
+	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	mid.add_theme_constant_override("separation", 0)
+	h.add_child(mid)
+	mid.add_child(UIKit.label_for(String(row.get("label", vid)),
+		UITokens.TypeRole.HEAD, UITokens.GOLD))
+	var line := UIKit.label_for(String(row.get("line", "")),
+		UITokens.TypeRole.BODY, UITokens.DIM)
+	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	mid.add_child(line)
+	parent.add_child(card)
+
+
 # ------------------------------------------------------------ totals
 
 func _build_totals(forecast: String, parent: Control) -> void:
@@ -169,7 +204,7 @@ func _build_totals(forecast: String, parent: Control) -> void:
 		UITokens.PAPER))
 	if walks > 0:
 		box.add_child(UIKit.label_for(
-			tr("night_walkins") % [walks, sales],
+			tr("night_walkins").format({"n": walks, "c": sales}),
 			UITokens.TypeRole.BODY, UITokens.PAPER))
 	if gather > 0:
 		box.add_child(UIKit.label_for(
@@ -207,6 +242,7 @@ func run_count_up() -> void:
 		return
 	var income := int(_rep.get("income", 0))
 	var from := Game.coins - income
+	UIFeel.sfx("coin")
 	var tw := UIFeel.apply(create_tween(), "count_up")
 	tw.tween_method(func(v): _coins_l.text = "%dc" % int(v),
 		float(from), float(Game.coins), UIFeel.dur("count_up"))
@@ -218,7 +254,8 @@ func _build_buttons(parent: Control) -> void:
 	var brow := HBoxContainer.new()
 	brow.add_theme_constant_override("separation", UITokens.SP2)
 	var tips := int(_rep.get("tips", 0))
-	if Ads.can_double_tips(Game.day) and tips > 0:
+	if Ads.can_double_tips(Game.day) and tips > 0 \
+			and Game.tips_doubled_day != Game.day:
 		_double_b = UIKit.btn(brow, Vector2(150, UITokens.MIN_TOUCH),
 			tr("night_double") % tips, "green")
 		_double_b.pressed.connect(_on_double)
@@ -228,6 +265,7 @@ func _build_buttons(parent: Control) -> void:
 	brow.add_child(push)
 	var sleep := UIKit.btn(brow, Vector2(104, UITokens.MIN_TOUCH),
 		tr("night_sleep"), "gold")
+	sleep.set_meta("primary", true)      # nav-mode focus lands here
 	sleep.pressed.connect(func(): sleep_pressed.emit())
 	parent.add_child(brow)
 
@@ -235,14 +273,16 @@ func _build_buttons(parent: Control) -> void:
 func _on_double() -> void:
 	if _doubled or _double_b == null:
 		return
-	_doubled = true
 	var tips := int(_rep.get("tips", 0))
+	if not Game.double_tips(tips):
+		return                            # already claimed this night
+	_doubled = true
 	Ads.show_rewarded_night_bonus(Game.day)   # mock: instant reward
-	Game.coins += tips
 	_double_b.disabled = true
 	_double_b.text = tr("night_doubled") % tips
 	# recount to the new total so the tally never lies
 	UIFeel.haptic("pay")
+	UIFeel.sfx("pay")
 	var tw := UIFeel.apply(create_tween(), "recount")
 	tw.tween_method(func(v): _coins_l.text = "%dc" % int(v),
 		float(Game.coins - tips), float(Game.coins),

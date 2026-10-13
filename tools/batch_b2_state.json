@@ -1,0 +1,90 @@
+{
+ "warden": {
+  "character_id": "5c46829b-6f6b-4028-a496-3159425bc5f8",
+  "template": "mannequin"
+ },
+ "ranger_mai": {
+  "character_id": "63f02b24-de59-40f6-9985-06d5569dd455",
+  "template": "mannequin"
+ },
+ "backpacker_woman": {
+  "character_id": "4a938bba-bcaf-462e-adf8-018f565bba18",
+  "template": "mannequin"
+ },
+ "aodai_woman": {
+  "character_id": "fdad4b0c-a37c-4ae2-967e-561c46f13d3f",
+  "template": "mannequin"
+ },
+ "phuot_rider": {
+  "character_id": "a224d8ea-be21-4751-9496-4d50de72ee5e",
+  "template": "mannequin"
+ },
+ "backpacker_man": {
+  "character_id": "61e5900e-144a-4857-a992-b903890d2976",
+  "template": "mannequin"
+ },
+ "angler_uncle": {
+  "character_id": "11c5c011-bd93-4545-baa1-09b28508d454",
+  "template": "mannequin"
+ },
+ "bird_uncle": {
+  "character_id": "48adeaef-a93b-4e2e-8441-a8d0a3229177",
+  "template": "mannequin"
+ },
+ "cyclist": {
+  "character_id": "384def57-2b7c-4813-868d-b7bcb5540ac5",
+  "template": "mannequin"
+ },
+ "food_vlogger": {
+  "character_id": "c35e9719-1e17-4d2b-8fc2-6564fc6e6f35",
+  "template": "mannequin"
+ },
+ "grandma_ba": {
+  "character_id": "f61aa433-453f-4bae-8b7e-6f4c042c54d1",
+  "template": "mannequin"
+ },
+ "grandpa_mu": {
+  "character_id": "b704e827-4fdd-46c5-ac71-a389f1d7ecad",
+  "template": "mannequin"
+ },
+ "auntie_dobo": {
+  "character_id": "20fa347b-7428-4f1c-8b14-121c1ffa244e",
+  "template": "mannequin"
+ },
+ "uncle_deptong": {
+  "character_id": "a57cbc0f-e3cf-4d42-976e-1fe4fcb30adb",
+  "template": "mannequin"
+ },
+ "sunhood_woman": {
+  "character_id": "3400f865-6026-4952-b83e-77cc52d1f13d",
+  "template": "mannequin"
+ },
+ "student_bucket": {
+  "character_id": "c0b32a4a-fac0-46d7-9e36-20d043e88c0d",
+  "template": "mannequin"
+ },
+ "vendor_ganh": {
+  "character_id": "8fd5fea7-f06f-4dd1-b3b4-87d1ea5c6660",
+  "template": "mannequin"
+ },
+ "bean": {
+  "character_id": "359a96ed-7c76-481a-aa0c-310f1a8fba3d",
+  "template": "quadruped"
+ },
+ "scout_kid": {
+  "character_id": "c8bc5ed3-8c61-49cc-9454-7060e7b1e175",
+  "template": "kid_v3"
+ },
+ "teen_jersey": {
+  "character_id": "00d3d976-84fb-4b12-a627-10567577cc00",
+  "template": "kid_v3"
+ },
+ "kid_pinkdress": {
+  "character_id": "5bb78af8-6ca0-4563-976f-bf2f6e88298b",
+  "template": "kid_v3"
+ },
+ "border_collie": {
+  "character_id": "0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19f",
+  "template": "quadruped"
+ }
+}

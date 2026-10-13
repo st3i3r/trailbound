@@ -1,0 +1,7 @@
+[
+ {"id": "improv_fryup",  "name": "Improv Fry-Up",   "kinds": ["fish", "staple"],   "price": 15},
+ {"id": "campfire_poach","name": "Campfire Poach",  "kinds": ["fish", "forage"],   "price": 14},
+ {"id": "double_catch",  "name": "Double Catch",    "kinds": ["fish", "fish"],     "price": 16},
+ {"id": "camp_plate",    "name": "Camp Plate",      "kinds": ["forage", "staple"], "price": 12},
+ {"id": "foragers_mix",  "name": "Forager's Mix",   "kinds": ["forage", "forage"], "price": 10}
+]

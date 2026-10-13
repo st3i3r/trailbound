@@ -8,8 +8,6 @@ extends CanvasLayer
 ## at our scale and costs one ColorRect until art direction wants more.
 
 const VEIL := Color(0.07, 0.09, 0.05)        # deep forest, ~clear colour
-const T_OUT := 0.22                          # cover time s
-const T_IN := 0.30                           # reveal time s
 
 var _rect: ColorRect
 var _busy := false
@@ -37,7 +35,7 @@ func reveal() -> void:
         return
     _rect.visible = true
     _rect.mouse_filter = Control.MOUSE_FILTER_STOP
-    await _fade(0.0, T_IN)
+    await _fade(0.0, UIFeel.dur("veil_in"))
     _rect.visible = false                       # alpha-0 still eats input
     _rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
@@ -55,7 +53,7 @@ func to_scene(path: String) -> void:
     _busy = true
     _rect.visible = true
     _rect.mouse_filter = Control.MOUSE_FILTER_STOP
-    await _fade(1.0, T_OUT)
+    await _fade(1.0, UIFeel.dur("veil_out"))
     get_tree().change_scene_to_file(path)
     # the new scene calls reveal() once its _ready() has laid out —
     # cover the load window in case _ready() is slow (first build)
@@ -63,6 +61,6 @@ func to_scene(path: String) -> void:
 
 
 func _fade(a: float, t: float) -> void:
-    var tw := create_tween()
+    var tw := UIFeel.apply(create_tween(), "veil_in")
     tw.tween_property(_rect, "modulate:a", a, t)
     await tw.finished

@@ -17,6 +17,13 @@ const A := "res://assets/pinewatch/"
 func _ready() -> void:
 	theme = UITheme.theme()
 	Transition.snap_reveal()      # lift the boot veil for --shot/--lint
+	# shot variants: --lang=vi renders a locale, --big forces the large
+	# text scale — the two configs where width/overflow bugs live
+	for a in OS.get_cmdline_args():
+		if a.begins_with("--lang="):
+			TranslationServer.set_locale(a.get_slice("=", 1))
+		elif a == "--big":
+			UIKit.text_scale = 1
 	var bg := ColorRect.new()
 	bg.color = Color("2a3520")          # scene-dark backdrop
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -215,6 +222,7 @@ func _lint_all() -> int:
 	fails += _lint_icons()
 	fails += _lint_strings()
 	fails += _lint_contrast()
+	fails += _lint_names()
 	fails += _lint_widths()
 	return fails
 
@@ -341,6 +349,35 @@ func _lum(c: Color) -> float:
 			else pow((v + 0.055) / 1.055, 2.4)
 	return 0.2126 * f.call(c.r) + 0.7152 * f.call(c.g) \
 		+ 0.0722 * f.call(c.b)
+
+
+## Data-driven strings land in fixed card rows the key lint can't
+## see: tray card names get CAPTION text in EveningTray.NAME_W px
+## (booking rows are far wider — never binding).  Cards show the
+## card_name short form (data may omit → full name).  Names clip_text
+## now, so overflow is a naming problem, not a draw bug — a real
+## failure so data stays honest at both text scales (incl. " ×N").
+func _lint_names() -> int:
+	var bad := []
+	var f := UIKit.font_for(UITokens.TypeRole.CAPTION)
+	var prev: int = UIKit.text_scale
+	for scale in [0, 1]:
+		UIKit.text_scale = scale
+		var sz := UIKit.type_size(UITokens.TypeRole.CAPTION)
+		for src in ["archetypes", "regulars"]:
+			for row: Dictionary in Catalog.data.get(src, []):
+				var n := String(row.get("card_name",
+					row.get("name", "")))
+				if int(row.get("pads", 1)) > 1:
+					n += " ×%d" % int(row["pads"])
+				var w: float = f.get_string_size(n,
+					HORIZONTAL_ALIGNMENT_LEFT, -1.0, sz).x
+				if w > EveningTray.NAME_W:
+					bad.append("%s (%s %.0fpx scale=%d)"
+						% [n, src, w, scale])
+	UIKit.text_scale = prev
+	print("LINT dynamic names:", "PASS" if bad.is_empty() else bad)
+	return bad.size()
 
 
 ## Width drift (advisory — not counted): VI strings longer than ~1.7×

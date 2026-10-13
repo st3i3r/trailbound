@@ -1,0 +1,31 @@
+{
+ "persona": "grandma_ba",
+ "ramps": [
+  "skin_light",
+  "hair_grey",
+  "cloth_mauve",
+  "gear_straw"
+ ],
+ "ramp": [
+  "#f5cf9f",
+  "#eeb98a",
+  "#d69a68",
+  "#8a5a3a",
+  "#d0cec4",
+  "#b8b8b0",
+  "#8a8a84",
+  "#55524a",
+  "#d8b0b8",
+  "#c098a4",
+  "#9a7284",
+  "#6b4e5c",
+  "#e8d088",
+  "#c8a858",
+  "#96783c",
+  "#5c4a24",
+  "#251e24",
+  "#273828",
+  "#432f2a",
+  "#4e492b"
+ ]
+}

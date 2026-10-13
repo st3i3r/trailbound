@@ -120,7 +120,7 @@ func spot() -> Dictionary:
 	if not unlogged.is_empty():
 		bird = unlogged[rng.randi() % unlogged.size()]
 		g.field_notes.append(bird["id"])
-	var fpx: Variant = g.site_row().get("errand_spots", {}).get(
+	var fpx: Variant = g._layout().get("errand_spots", {}).get(
 		"forage")
 	if fpx != null:                        # bonus node needs ground
 		var pool: Array = g._ingredients_of_kind("forage")

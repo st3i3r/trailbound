@@ -1,0 +1,26 @@
+{
+ "persona": "kid_pinkdress",
+ "ramps": [
+  "skin_light",
+  "hair_dark",
+  "cloth_pink"
+ ],
+ "ramp": [
+  "#f5cf9f",
+  "#eeb98a",
+  "#d69a68",
+  "#8a5a3a",
+  "#6b4a34",
+  "#5a3f2e",
+  "#3d2818",
+  "#ffd0d8",
+  "#f0a8b8",
+  "#d88798",
+  "#a86070",
+  "#6b3a48",
+  "#251e24",
+  "#273828",
+  "#432f2a",
+  "#4e492b"
+ ]
+}

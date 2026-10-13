@@ -180,6 +180,30 @@ VI-width drift list (>1.7× EN — containers to eyeball, not failures).
 Golden diffs: re-shoot to the same path and compare; the canonical
 goldens live under `assets_src/cleanup/golden/` once a set is blessed.
 
+Verify pass after gameplay changes (one sweep covers the loop):
+
+```bat
+godot.cmd --headless --path game res://scenes/pinewatch_test.tscn --smoke
+godot.cmd --headless --path game res://scenes/ui_gallery.tscn --lint
+for %t in (test_seating test_dog test_vol2 test_crew test_daily test_spotting test_sim brief_check) do ^
+    godot.cmd --headless --path game res://tests/%t.tscn
+:: CI-only, minutes long (400-day seed solver — do NOT run casually):
+godot.cmd --headless --path game res://tests/daily_check.tscn
+```
+
+⚠ `--lint` is `ui_gallery.tscn`'s flag — running it on
+`pinewatch_test.tscn` finds no handler and the scene just idles in its
+main loop: it *looks* like a hang and produces nothing (bit us once —
+the LINT lines live on the gallery).
+
+⚠ Headless hygiene on Windows: a killed/timed-out shell orphans the
+`godot.exe` child, which then blocks forever writing to a dead stdout
+pipe — the next run appears hung too. Wrap headless calls in
+`timeout -k 5 150 godot.cmd …` so they can't outlive the session, and
+kill by PID (`taskkill /PID <pid> /T` or `Stop-Process -Force`), not by
+shell. A process with a window title (`Trailbound (DEBUG)`) is a live
+debug session — never touch it; headless runs have no window.
+
 App shell (the real boot path — `run/main_scene` is `title.tscn`):
 
 ```bat
@@ -217,8 +241,10 @@ peering bits, terrain sets water/forest/stone vs grass). Re-run
 HUD notes: pills/buttons use nine-slice insets from
 `ui/ui_atlas_meta.json`; chrome fades to 20 % after ~3 s idle (mouse
 motion wakes it); F1 toggles the dev-only Vietnamese diacritics label.
-Fonts: F1 (display) → Be Vietnam Pro (body) → engine fallback. Neither
-bundled font has ★/→ glyphs — star previews draw an icon plus a number.
+Fonts: Be Vietnam Pro is the whole text stack (SemiBold→Medium→Regular
+→ `ThemeDB` fallback); the F1 pixel font is retired — ASCII-only, no VI
+diacritics. No bundled font has ★/→ glyphs — star previews draw an icon
+plus a number.
 Known bug (UI-001, `docs/UI_PRODUCTION.md`): the code uses `I1_4`, which
 is the *sun*; the star is `I1_1` and the coin is `I1_0`.
 

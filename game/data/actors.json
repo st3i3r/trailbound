@@ -1,0 +1,151 @@
+{
+ "_doc": "Actor persona layer (PLAN_gameplay D4 + PROMPT_PACK Batch B2). Archetype is sim metadata; persona is what renders. Cast picks a persona from the archetype pool via w.rng — same night replays the same faces. sprite = characters/<key>/ dir holding <key>_{dir}.png 8-dir stills + A2_idle_south_{n}.png when the anim lands; missing dirs fall back to `fallback` (interim placeholder until the PixelLab cast ships). anim_map: sim anim name -> how the presenter renders it; `_dir` = directional stills, others map to a base anim or emote. Size is BAKED INTO THE ART per the Batch B2 consistency spec (adult 42-44px figure in 48x48, kid 32-34, dog 30-34) — personas render at uniform world scale, no render-time rescale.",
+ "anim_map": {
+  "walk": "_dir",
+  "fish": "idle",
+  "play": "idle",
+  "sit": "idle",
+  "sniff": "idle",
+  "flee": "walk",
+  "wary": "idle",
+  "idle": "idle"
+ },
+ "fallback": {
+  "sprite": "characters/warden/A2_idle_south_0",
+  "tint": "aab8a2"
+ },
+ "archetypes": {
+  "hiker": [
+   "backpacker_woman",
+   "sunhood_woman"
+  ],
+  "scout": [
+   "scout_kid",
+   "teen_jersey"
+  ],
+  "couple": [
+   "aodai_woman",
+   "student_bucket",
+   "uncle_deptong"
+  ],
+  "family": [
+   "kid_pinkdress",
+   "grandma_ba"
+  ],
+  "van_lifer": [
+   "phuot_rider",
+   "backpacker_man"
+  ],
+  "angler": [
+   "angler_uncle",
+   "grandpa_mu"
+  ],
+  "photographer": [
+   "bird_uncle",
+   "student_bucket"
+  ],
+  "cyclist": [
+   "cyclist"
+  ],
+  "food_blogger": [
+   "food_vlogger",
+   "auntie_dobo",
+   "vendor_ganh"
+  ],
+  "dog": [
+   "bean",
+   "border_collie"
+  ]
+ },
+ "personas": {
+  "warden": {
+   "kind": "named",
+   "sprite": "characters/warden"
+  },
+  "ranger_mai": {
+   "kind": "named",
+   "sprite": "characters/ranger_mai"
+  },
+  "bean": {
+   "kind": "named",
+   "sprite": "characters/bean",
+   "dog": true
+  },
+  "backpacker_woman": {
+   "kind": "guest",
+   "sprite": "characters/backpacker_woman"
+  },
+  "scout_kid": {
+   "kind": "guest",
+   "sprite": "characters/scout_kid"
+  },
+  "aodai_woman": {
+   "kind": "guest",
+   "sprite": "characters/aodai_woman"
+  },
+  "kid_pinkdress": {
+   "kind": "guest",
+   "sprite": "characters/kid_pinkdress"
+  },
+  "phuot_rider": {
+   "kind": "guest",
+   "sprite": "characters/phuot_rider"
+  },
+  "backpacker_man": {
+   "kind": "guest",
+   "sprite": "characters/backpacker_man"
+  },
+  "angler_uncle": {
+   "kind": "guest",
+   "sprite": "characters/angler_uncle"
+  },
+  "bird_uncle": {
+   "kind": "guest",
+   "sprite": "characters/bird_uncle"
+  },
+  "cyclist": {
+   "kind": "guest",
+   "sprite": "characters/cyclist"
+  },
+  "food_vlogger": {
+   "kind": "guest",
+   "sprite": "characters/food_vlogger"
+  },
+  "grandma_ba": {
+   "kind": "guest",
+   "sprite": "characters/grandma_ba"
+  },
+  "grandpa_mu": {
+   "kind": "guest",
+   "sprite": "characters/grandpa_mu"
+  },
+  "auntie_dobo": {
+   "kind": "guest",
+   "sprite": "characters/auntie_dobo"
+  },
+  "uncle_deptong": {
+   "kind": "guest",
+   "sprite": "characters/uncle_deptong"
+  },
+  "sunhood_woman": {
+   "kind": "guest",
+   "sprite": "characters/sunhood_woman"
+  },
+  "teen_jersey": {
+   "kind": "guest",
+   "sprite": "characters/teen_jersey"
+  },
+  "student_bucket": {
+   "kind": "guest",
+   "sprite": "characters/student_bucket"
+  },
+  "vendor_ganh": {
+   "kind": "guest",
+   "sprite": "characters/vendor_ganh"
+  },
+  "border_collie": {
+   "kind": "guest",
+   "sprite": "characters/border_collie"
+  }
+ }
+}

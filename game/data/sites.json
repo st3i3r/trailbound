@@ -16,6 +16,7 @@
     "platform_price": 100,
     "cabin_price": null,
     "rain_chance": 0.2,
+    "storm_chance": 0.08,
     "meal_price": 18,
     "page_gifts": [
       20,
@@ -57,6 +58,7 @@
     "platform_price": 125,
     "cabin_price": 275,
     "rain_chance": 0.25,
+    "storm_chance": 0.12,
     "meal_price": 25,
     "page_gifts": [
       30,
@@ -103,6 +105,7 @@
     "platform_price": 150,
     "cabin_price": 325,
     "rain_chance": 0.1667,
+    "storm_chance": 0.06,
     "meal_price": 30,
     "page_gifts": [
       40,

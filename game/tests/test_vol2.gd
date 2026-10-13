@@ -129,6 +129,7 @@ func _ready() -> void:
 	Game.meals = [{"id": "trail_stew", "price": 18},
 		{"id": "trail_stew", "price": 18}]
 	var coins0 := Game.coins
+	Game.set_phase(Game.Phase.EVENING)
 	var rep := Game.goodnight()
 	var fees2 := int(g1.get("fee", 40)) + int(g2.get("fee", 40))
 	check("brief met pays +25%", rep["gathering"].get("met") == true
@@ -153,17 +154,23 @@ func _ready() -> void:
 	Game.seat("qc_2", ["p7"])
 	Game.seat("qc_3", ["p1"])
 	var met0: int = st["counters"].get("gatherings_met", 0)
+	Game.set_phase(Game.Phase.EVENING)
 	rep = Game.goodnight()
 	check("missed brief pays nothing", rep["gathering"].get("bonus",
 		0) == 0 and st["counters"].get("gatherings_met", 0) == met0)
 
 	# --- Vol II night pages --------------------------------------------
-	# P9: six parties, every one 5-star.
+	# P9: six parties, every one 5-star. Chilly guests need warmth —
+	# only the six pads inside the (upgraded) fire's r3 can hit 5★;
+	# p1/p8 sit outside even the Stone Fire Pit's reach.
 	st["weather"] = "clear"
 	st["decor"] = []
 	st["assignments"] = {}
 	st["guests"] = {}
-	var six := ["p1", "p2", "p3", "p6", "p7", "p8"]
+	for pid in ["p4", "p5"]:
+		st["pads"][pid]["open"] = true
+		st["pads"][pid]["shelter"] = "platform"
+	var six := ["p2", "p3", "p4", "p5", "p6", "p7"]
 	for i in six.size():
 		var gg := _inject("pf_%d" % i, "hiker", ["chilly"])
 		gg["favourite"] = "trail_stew"
@@ -171,6 +178,7 @@ func _ready() -> void:
 	Game.meals = []
 	for i in 6:
 		Game.meals.append({"id": "trail_stew", "price": 18})
+	Game.set_phase(Game.Phase.EVENING)
 	rep = Game.goodnight()
 	check("perfect night stamps P9", rep["pages"].has(9),
 		"pages %s stars %s" % [rep["pages"], rep["results"].map(

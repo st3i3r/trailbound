@@ -25,8 +25,10 @@ func _ready() -> void:
 	check("bonus node revealed",
 		st_sp["forage_nodes"].size() == nodes_before + 1
 		and st_sp["forage_nodes"][-1].get("bonus", false))
-	check("bonus node gathers", Game.gather("fb").size() > 0
-		or Game.pantry.size() >= 20)
+	var fb_id := String(st_sp["forage_nodes"][-1]["id"]) \
+		if not st_sp["forage_nodes"].is_empty() else ""
+	check("bonus node gathers", fb_id != ""
+		and (Game.gather(fb_id).size() > 0 or Game.pantry.size() >= 20))
 	check("once per site day", Game.spot().is_empty())
 	# Log the remaining three Pinewatch birds, then check the cap.
 	for i in 3:
