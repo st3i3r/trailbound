@@ -373,6 +373,9 @@ the backend above into that feeling — with honest status:
 | Spectating is the reward | The night cast IS the ant-farm — watching kids at the swing and the dog's rounds is the payoff, not a chore-skip | Built (D4) — presenter + scenario data remaining |
 | Opt-in tactility | Errands stay manual and tactile (forage/fish are rolls with feel, not menu clicks); nothing is auto-played | Needs the tactile pass when errands land (D2.2) |
 | Juice comes from sim signals | `emote`/`heard`/`percept` transitions drive presenter juice: squish-stretch on flee, "!" bubble on flinch, soft sfx on bark; coins in the night summary are physical pickups, not ledger deltas | Sim signals exist; presenter maps them (D4 view) |
+| Challenge ceiling | "Meaningful interactions, never too much challenge" — the seat puzzle is cleverness *rewarded*, not competence *tested*; a wrong layout is still a fine night, just less rich | Structural (no-fail floor) — keep as the D2 tuning rule |
+| Attachment cadence | Retention = missing the place: **every day ends with one small visible growth AND one anticipated tomorrow** (a regular returning, a letter waiting, a restoration finishing) | Vehicles exist (bookings/arcs/letters/crew) — make it a day-generator invariant |
+| Abundance, not scarcity | The site always feels *provided* — pantry stocked enough to cook, guests always arriving; pressure is arrangement, never survival | Economy watch-item: coins may floor at 0 for pacing but nothing should read as deprivation |
 
 Micro/meso/macro rhythm (already staggered, keep it that way):
 
