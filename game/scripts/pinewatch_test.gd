@@ -225,8 +225,10 @@ var _veil_chan := []                         #   outgoing fades on one
 var _rain: GPUParticles2D                    # slanted 2.5D downpour
 var _leaves: GPUParticles2D                  # làn gió debris stream
 var _noise_cache := {}                       # seed -> FastNoiseLite tex
-var _storm_on := false
-var _storm_tween: Tween
+var _lightning_on := false                   # profile's flash flag
+var _lightning_target := STORM_MUL           # settle color per profile
+var _weather_tween: Tween
+var _overlay_fades := {}                     # rect -> live fade Tween
 var _lightning_cd := 0.0                     # presenter rng, unseeded
 var marks: Node2D                            # hover + star previews above world
 var hover: Sprite2D
@@ -374,6 +376,7 @@ func _ready() -> void:
     _rain.process_material = pm
     _rain.texture = _rain_tex()
     _rain.position = Vector2(GW * T * 0.5 + 160, -30)
+    _rain.visibility_rect = Rect2(-1400, -800, 3000, 2000)
     stage.add_child(_rain)
     _leaves = GPUParticles2D.new()           # làn gió debris — leaves
     _leaves.name = "LeafDebris"              # sweeping sideways on wind
@@ -393,6 +396,7 @@ func _ready() -> void:
     _leaves.process_material = lm
     _leaves.texture = _leaf_tex()
     _leaves.position = Vector2(-20, GH * T * 0.4)
+    _leaves.visibility_rect = Rect2(-1400, -800, 3000, 2000)
     stage.add_child(_leaves)
     _build_props()
     _build_actors()
@@ -538,13 +542,15 @@ func _process(delta: float) -> void:
         if not is_equal_approx(s.modulate.a, target):
             s.modulate.a = move_toward(s.modulate.a, target,
                 delta * FADE_SPEED)
-    if _storm_on:                             # lightning: snap the grade
-        _lightning_cd -= delta                # to an overexposed glare,
-        if _lightning_cd <= 0.0:              # then let the grade tween
-            _lightning_cd = randf_range(2.5, 7.0)   # settle back
-            _grade.color = STORM_FLASH
-            var ft := create_tween()
-            ft.tween_property(_grade, "color", STORM_MUL, 0.15)
+    if _lightning_on and _lightning_cd > 0.0 \
+            and _grade.color.is_equal_approx(_lightning_target):
+        _lightning_cd -= delta                # flash only once the
+        if _lightning_cd <= 0.0:              # grade has ARRIVED —
+            _lightning_cd = randf_range(2.5, 7.0)   # mid-ramp snaps
+            _grade.color = STORM_FLASH        # fight the transition
+            var ft := create_tween()          # tween and pop
+            ft.tween_property(_grade, "color",
+                _lightning_target, 0.15)
     if hud == null:
         return
     idle_ms += delta
@@ -594,16 +600,17 @@ const WEATHER_PROFILES := {
 
 func _set_weather(state: String, dur := 4.0) -> void:
     var p: Dictionary = WEATHER_PROFILES[state]
-    _storm_on = p.get("lightning", false)
+    _lightning_on = p.get("lightning", false)
+    _lightning_target = p["color"]
     _lightning_cd = randf_range(1.5, 4.0)
-    if _storm_tween and _storm_tween.is_running():
-        _storm_tween.kill()
+    if _weather_tween and _weather_tween.is_running():
+        _weather_tween.kill()
     var instant := dur <= 0.05
     if instant:                                # QA shots / boot resolve
         _grade.color = p["color"]
     else:
-        _storm_tween = create_tween().set_parallel(true)
-        _storm_tween.tween_property(_grade, "color", p["color"], dur)\
+        _weather_tween = create_tween().set_parallel(true)
+        _weather_tween.tween_property(_grade, "color", p["color"], dur)\
             .set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
     _apply_overlay(_warp_chan, p.get("warp"), dur, instant)
     _apply_overlay(_veil_chan, p.get("veil"), dur, instant)
@@ -634,12 +641,14 @@ func _apply_overlay(chan: Array, spec: Variant,
     var sm := (showing.material as ShaderMaterial) if showing else null
     if sm != null and sm.shader != null \
             and sm.shader.resource_path == spec["shader"]:
-        if instant:                            # same effect: retarget
+        _kill_fade(showing)                    # a rect mid-fade-out can
+        if instant:                            # be revived — kill the
             sm.set_shader_parameter("intensity", spec["val"])
-        else:
-            _storm_tween.tween_property(sm,
+        else:                                  # stale tween or its
+            _weather_tween.tween_property(sm,  # hide callback fires on
                 "shader_parameter/intensity", spec["val"], dur)
-        return
+        return                                 # the reviving effect
+    _kill_fade(free)                           # same for a reused slot
     var fm := free.material as ShaderMaterial  # different effect —
     fm.shader = load(spec["shader"])           # incoming rolls in on
     _bind_noise(fm, spec["shader"])            # the free slot while
@@ -647,16 +656,27 @@ func _apply_overlay(chan: Array, spec: Variant,
     if instant:
         fm.set_shader_parameter("intensity", spec["val"])
         if showing != null:
+            _kill_fade(showing)
             showing.visible = false
     else:
         fm.set_shader_parameter("intensity", 0.0)
-        _storm_tween.tween_property(fm,
+        _weather_tween.tween_property(fm,
             "shader_parameter/intensity", spec["val"], dur)
         if showing != null:
             _fade_out(showing, dur * 0.5, instant)
 
 
+## Fade tweens are tracked per rect — a slot reused while a fade is
+## still running must not let the stale tween drive the NEW effect's
+## intensity to 0 or fire its hide callback.
+func _kill_fade(rect: ColorRect) -> void:
+    if _overlay_fades.has(rect):
+        _overlay_fades[rect].kill()
+        _overlay_fades.erase(rect)
+
+
 func _fade_out(rect: ColorRect, dur: float, instant: bool) -> void:
+    _kill_fade(rect)
     var m := rect.material as ShaderMaterial
     if m.shader == null or instant:
         rect.visible = false
@@ -664,7 +684,10 @@ func _fade_out(rect: ColorRect, dur: float, instant: bool) -> void:
     var ft := create_tween()                   # own tween: callback on
     ft.tween_property(m,                       # a parallel tween has
         "shader_parameter/intensity", 0.0, dur)   # fuzzy step timing
-    ft.tween_callback(func(): rect.visible = false)
+    ft.tween_callback(func():
+        rect.visible = false
+        _overlay_fades.erase(rect))
+    _overlay_fades[rect] = ft
 
 
 func _bind_noise(m: ShaderMaterial, path: String) -> void:
