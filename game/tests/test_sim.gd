@@ -164,8 +164,24 @@ func _ready() -> void:
 	var w9 := SimDirector.cast_night(st4, layout, 6)
 	check("kid program scored",
 		String(w9.getc(1, "schedule")["steps"][0]["op"]) ==
-			"react_tag")
+			"respond")
+	check("kid has perceive weights",
+		float(w9.getc(1, "perceive")["weights"]["dog"]) > 0.0)
 	check("dog has affordance tag",
 		Array(w9.getc(2, "tags")["tags"]).has("dog"))
+
+	# generality: a NEW stimulus pair with zero new code — an
+	# oddity entity spawns near the patrol; the dog leaves its
+	# route to investigate (respond -> goto percept -> sniff)
+	w9.spawn({"pos": {"x": 250.0, "y": 360.0},
+		"tags": {"tags": ["oddity"]}})
+	var investigated := false
+	for i in 40:
+		w9.tick(0.25)
+		var dp: Dictionary = w9.getc(2, "pos", {})
+		if not dp.is_empty() and Vector2(dp["x"], dp["y"]) \
+				.distance_to(Vector2(250, 360)) < 40.0:
+			investigated = true
+	check("dog investigates oddity", investigated)
 
 	finish()

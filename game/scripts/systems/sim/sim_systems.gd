@@ -27,7 +27,16 @@ static func schedule(w: SimWorld, dt: float) -> void:
 					if not sc.get("started", false):
 						var tgt := Vector2.ZERO
 						var have := true
-						if step.has("tag"):
+						if step.has("percept"):
+							# navigate to a scored stimulus —
+							# entities AND transient cues alike
+							var pc: Dictionary = w.getc(eid,
+								"percept", {}).get("by_tag", {})
+							if pc.has(step["percept"]):
+								tgt = pc[step["percept"]]["pos"]
+							else:
+								have = false
+						elif step.has("tag"):
 							# walk to the nearest entity advertising
 							# the affordance tag (approach/pet)
 							var n := _near_tag(w, eid,
@@ -88,7 +97,8 @@ static func schedule(w: SimWorld, dt: float) -> void:
 					w.emit(Vector2(float(p.get("x", 0.0)),
 						float(p.get("y", 0.0))),
 						String(step.get("cue", "")), eid,
-						float(step.get("t", 2.0)))
+						float(step.get("t", 2.0)),
+						step.get("tags", []))
 					_next(sc)
 				"react":
 					# consume the heard inbox latched by sys_listen
@@ -103,12 +113,11 @@ static func schedule(w: SimWorld, dt: float) -> void:
 						sc["i"] += 1
 					sc["started"] = false
 				"react_tag":
-					# utility-scored proximity reaction (sight
-					# channel): score = fear * (1 - dist/r) vs
-					# the nearest entity carrying step.tag; bands
-					# pick the outcome (flee / back / approach).
-					# Continuous stimuli are polled correctly —
-					# only transient cues need the heard inbox.
+					# low-level poll: score = fear * (1 - dist/r)
+					# vs nearest tagged entity — no perceive comp
+					# needed. Prefer `respond` for persona-driven
+					# reactions; this stays for scripted fixed
+					# reactions inside authored programs.
 					var n2: Dictionary = _near_tag(w, eid,
 						String(step.get("tag", "")),
 						float(step.get("r", 120.0)))
@@ -125,6 +134,27 @@ static func schedule(w: SimWorld, dt: float) -> void:
 								to2 = int(b.get("goto", to2))
 								break
 					sc["i"] = to2
+					sc["started"] = false
+				"respond":
+					# scored response (production path): consult
+					# the percept.by_tag map sys_sense built —
+					# any tag in step.tags counts, best score
+					# wins; bands pick the outcome branch.
+					var pc: Dictionary = w.getc(eid, "percept",
+						{}).get("by_tag", {})
+					var to3: int = sc["i"] + 1
+					var best_s := -1.0
+					for t in step.get("tags", []):
+						if pc.has(t) and \
+								float(pc[t]["score"]) > best_s:
+							best_s = float(pc[t]["score"])
+					if best_s >= 0.0:
+						for b in step.get("bands", []):
+							if b.has("else") or best_s >= \
+									float(b.get("gte", 0.0)):
+								to3 = int(b.get("goto", to3))
+								break
+					sc["i"] = to3
 					sc["started"] = false
 				_:
 					_next(sc)
@@ -196,23 +226,66 @@ static func move(w: SimWorld, dt: float) -> void:
 		pos["y"] = p.y
 
 
-## Sensory delivery: entities with listen+pos pick up live cues
-## inside listen.r -> heard inbox. Delivery is event-latched, not
-## polled, so a react step can't miss a transient cue between
-## loop passes (the senses are a system, not a schedule step).
-static func listen(w: SimWorld, _dt: float) -> void:
-	for eid in w.query(["pos", "listen"]):
-		var ln: Dictionary = w.getc(eid, "listen")
+## Perception — the general Stimulus Registry -> Perception ->
+## Scored Percept pipeline (PLAN D4), entity scale. Two channels:
+##
+##   transient (hearing): cues inside perceive.hear_r latch into
+##     `heard` — reflex channel for `react` steps
+##   continuous (sight):  EVERY stimulus — tagged entities AND
+##     tagged cues — inside perceive.sight_r is scored
+##       score = perceive.weights[tag] * (1 - dist/sight_r)
+##     best per tag lands in `percept.by_tag` — the utility
+##     channel for `respond` steps
+##
+## Persona is data (weights + radii), so "kid meets dog" and
+## "dog investigates oddity" are the same machinery — adding an
+## interaction pair is adding tags and weights, not code.
+static func sense(w: SimWorld, _dt: float) -> void:
+	for eid in w.query(["pos", "perceive"]):
+		var per: Dictionary = w.getc(eid, "perceive")
 		var p: Dictionary = w.getc(eid, "pos")
 		var me := Vector2(float(p["x"]), float(p["y"]))
+		var weights: Dictionary = per.get("weights", {})
+		var sr := float(per.get("sight_r", 150.0))
+		var hr := float(per.get("hear_r", 140.0))
+		var by_tag := {}
 		for c in w.cues:
 			if c["src"] == eid:
 				continue
 			var cp: Vector2 = c["pos"]
-			if me.distance_to(cp) <= float(ln.get("r", 96.0)):
+			var d := me.distance_to(cp)
+			if d <= hr:
 				w.put(eid, "heard", {"cue": String(c["cue"]),
 					"src": c["src"], "pos": cp, "t": 1.5})
-				break
+			if d <= sr:
+				_score(w, eid, by_tag, c.get("tags", [c["cue"]]),
+					cp, weights, sr, c["src"], d)
+		for o in w.query(["pos", "tags"]):
+			if o == eid:
+				continue
+			var op: Dictionary = w.getc(o, "pos")
+			var opv := Vector2(float(op["x"]), float(op["y"]))
+			var d2 := me.distance_to(opv)
+			if d2 <= sr:
+				_score(w, eid, by_tag,
+					w.getc(o, "tags", {}).get("tags", []),
+					opv, weights, sr, o, d2)
+		if by_tag.is_empty():
+			w.stores.get("percept", {}).erase(eid)
+		else:
+			w.put(eid, "percept", {"by_tag": by_tag})
+
+
+static func _score(_w: SimWorld, _eid: int, by_tag: Dictionary,
+		tags: Array, pos: Vector2, weights: Dictionary,
+		r: float, src: Variant, d: float) -> void:
+	for t in tags:
+		var wt := float(weights.get(String(t), 0.0))
+		if wt <= 0.0:
+			continue
+		var s: float = wt * (1.0 - d / r)
+		if not by_tag.has(t) or s > by_tag[t]["score"]:
+			by_tag[t] = {"score": s, "pos": pos, "src": src}
 
 
 ## Timers: life.ttl despawns the entity; emote.t clears the icon.

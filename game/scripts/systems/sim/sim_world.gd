@@ -14,13 +14,16 @@ var ctx := {}                           # cast context: weather,
                                         # vignette, items — set by
                                         # the Director, read by
                                         # select/if branch ops
-var cues := []                          # live cues [{pos, cue, src,
-                                        # t}] — react ops scan it;
-                                        # sys_life expires entries
+var cues := []                          # live stimuli [{pos, cue,
+                                        # tags, src, t}] — transient
+                                        # channel; tagged entities
+                                        # are the continuous channel
 
 
-func emit(pos: Vector2, cue: String, src: int, ttl := 2.0) -> void:
-	cues.append({"pos": pos, "cue": cue, "src": src, "t": ttl})
+func emit(pos: Vector2, cue: String, src: int, ttl := 2.0,
+		tags: Array = []) -> void:
+	cues.append({"pos": pos, "cue": cue, "src": src, "t": ttl,
+		"tags": tags if not tags.is_empty() else [cue]})
 
 
 func _init(seed := 1) -> void:
@@ -74,5 +77,5 @@ func tick(dt: float) -> void:
 	t += dt
 	SimSystems.schedule(self, dt)
 	SimSystems.move(self, dt)
-	SimSystems.listen(self, dt)
+	SimSystems.sense(self, dt)
 	SimSystems.life(self, dt)

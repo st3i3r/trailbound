@@ -128,26 +128,44 @@ and stays deterministic.
 
 ### Systems (ticked in order)
 
-`sys_schedule` → `sys_move` → `sys_listen` → `sys_life`.
+`sys_schedule` → `sys_move` → `sys_sense` → `sys_life`.
 `sys_scene` (duets) joins when pairwise vignettes land — scripted
 pairs, never emergent AI.
 
-### Entity affordances + scored reactions (interactions)
+### Interactions: the general stimulus pipeline (production)
 
-Two sense channels, matching the production pattern
-(Stimulus Registry -> Perception -> Scored Reaction):
+Everything that can be perceived is a **stimulus** — tagged
+entities (continuous channel) and tagged cues (transient
+channel) share one registry shape `{tags, pos, t?}`:
 
-| Channel | Mechanism | Example |
-|---|---|---|
-| Hearing (transient cues) | `emit` -> `w.cues` -> `sys_listen` -> `heard` inbox -> `react` | dog's bark -> dog_wary flinch |
-| Sight (continuous proximity) | `tags` comp advertises affordances (`dog`, `fluffy`, `kid`) -> `react_tag` scored bands | kid meets dog: `score = fear*(1-dist/150)` -> flee / stand wary / approach + pet |
-| Movement to affordances | `goto {"tag":"dog"}` resolves nearest tagged entity | kid walks over to pet |
+```
+emit/tags -> stimulus set -> sys_sense -> per-entity percept
+             (any tag)      (weights x falloff)   + heard inbox
+```
 
-The scored-band formula is utility AI delivered in one op —
-persona weights (fear .55 kid / .9 dog_wary) produce different
-outcomes from the same system, no pair-scripting. Semantic
-memory (dog bond, wary-after-repeated-barks) stays where it
-belongs: persistent game flags, not sim state.
+- `perceive` comp = the persona: `{"sight_r","hear_r",
+  "weights":{tag: weight}}`. Persona is DATA — weights and
+  radii, no code. score = weights[tag] * (1 - dist/sight_r),
+  best per tag lands in `percept.by_tag`.
+- `respond` op consumes percepts: `{"op":"respond",
+  "tags":["dog"], "bands":[{gte,goto},{else,goto}]}` — picks
+  the best-scoring wanted stimulus, bands branch to programs.
+- `react` op remains the reflex channel: cue name -> heard
+  inbox -> binary flinch (transient events).
+- `goto` targets resolve three ways: `"to":[x,y]`,
+  `"tag":"dog"` (nearest tagged entity), `"percept":"oddity"`
+  (a scored stimulus — covers cue positions).
+- Adding an interaction pair = adding tags + weights.
+  "Dog meets oddity" needed zero new code: oddity entity gets
+  `tags:[oddity]`, dog gets `weights:{oddity:.9}` + a respond
+  wrap; it investigates, sniffs, and barks an `alarm` cue —
+  itself a stimulus other actors can respond to. Chained
+  causal interactions emerge from the data.
+
+Persona weights (kid .55 / dog_wary .9 / dog-oddity .9) pick
+different outcomes from the same machinery — flee, wary, pet,
+investigate — no pair-scripting. Semantic memory stays in
+persistent game flags, not sim state.
 
 ### Item-bound anchors — the genre-SOTA property
 

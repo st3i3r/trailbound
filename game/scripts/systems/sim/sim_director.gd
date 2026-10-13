@@ -37,15 +37,14 @@ static func _jitter(w: SimWorld, steps: Array) -> Dictionary:
 	return sc
 
 
-## Wrap a base loop with a scored dog-proximity check (utility
-## reaction, PLAN D4): step 0 evaluates fear*(1-dist/150) against
-## the nearest "dog"-tagged entity. Kids get three bands —
-## flee / stand wary / walk over and pet; wary guests get two —
-## flee / stand wary. Same formula, different persona weights.
-static func _dog_react_wrap(base: Array, fear: float,
+## Wrap a base loop with a scored-stimulus check (production
+## response pipeline, PLAN D4): step 0's `respond` consults the
+## entity's percept map — weights live on the perceive comp, so
+## the same wrap serves any stimulus. Kids: flee / wary / pet.
+## Wary personas: flee / wary. The stimulus tags are parameters.
+static func _stim_wrap(base: Array, stim_tags: Array,
 		home: Vector2, allow_pet: bool) -> Array:
-	var steps := [{"op": "react_tag", "tag": "dog", "r": 150.0,
-		"fear": fear}]
+	var steps := [{"op": "respond", "tags": stim_tags}]
 	steps.append_array(base)
 	var flee_i := steps.size()
 	steps.append_array([{"op": "anim", "name": "flee"},
@@ -59,7 +58,8 @@ static func _dog_react_wrap(base: Array, fear: float,
 	if allow_pet:
 		var pet_i := wary_i + 3
 		steps.append_array([
-			{"op": "goto", "tag": "dog", "speed": 35.0},
+			{"op": "goto", "percept": stim_tags[0],
+				"speed": 35.0},
 			{"op": "anim", "name": "pet"},
 			{"op": "emote", "icon": "heart", "t": 1.5},
 			{"op": "wait", "t": 1.5}, {"op": "jump", "to": 0}])
@@ -142,20 +142,23 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 						{"op": "jump", "to": 0}]
 				if dog_here:
 					extra["tags"] = {"tags": ["kid"]}
-					steps = _dog_react_wrap(base, 0.55, home,
-						true)
+					extra["perceive"] = {"sight_r": 150.0,
+						"weights": {"dog": 0.55, "fluffy": 0.55}}
+					steps = _stim_wrap(base, ["dog", "fluffy"],
+						home, true)
 				else:
 					steps = base
 			_:
 				if traits.has("dog_wary") and dog_here:
 					# two senses: bark cue -> flinch (hearing);
-					# dog proximity -> flee/wary (sight)
-					extra["listen"] = {"r": 140.0}
+					# dog proximity -> flee/wary (scored sight)
+					extra["perceive"] = {"hear_r": 140.0,
+						"sight_r": 150.0,
+						"weights": {"dog": 0.9}}
 					steps = [
 						{"op": "react", "to": "bark",
 							"goto": 5},
-						{"op": "react_tag", "tag": "dog",
-							"r": 150.0, "fear": 0.9,
+						{"op": "respond", "tags": ["dog"],
 							"bands": [
 								{"gte": 0.55, "goto": 7},
 								{"else": true, "goto": 11}]},
@@ -196,7 +199,13 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 					visit.append(pid)
 		if visit.is_empty():
 			visit = spots.keys().slice(0, 3)
-		var steps := [{"op": "anim", "name": "walk"}]
+		# patrol past occupied pads; anything tagged "oddity" is
+		# investigated (goto the percept's position), sniffed and
+		# barked at — the alarm cue is itself a stimulus others
+		# can respond to. Same pipeline, different weights.
+		var steps := [{"op": "respond", "tags": ["oddity"],
+			"bands": [{"gte": 0.3, "goto": -1}]},
+			{"op": "anim", "name": "walk"}]
 		for pid in visit:
 			var pt := _cell_pt(spots[pid])
 			steps.append({"op": "goto", "to": [pt.x, pt.y],
@@ -205,11 +214,21 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 			steps.append({"op": "emit", "cue": "bark", "t": 2.0})
 			steps.append({"op": "wait", "t": 1.5})
 		steps.append({"op": "jump", "to": 0})
+		var inv_i := steps.size()
+		steps[0]["bands"][0]["goto"] = inv_i
+		steps.append_array([
+			{"op": "goto", "percept": "oddity", "speed": 70.0},
+			{"op": "anim", "name": "sniff"},
+			{"op": "emit", "cue": "bark", "t": 2.0,
+				"tags": ["alarm", "noise"]},
+			{"op": "wait", "t": 2.0}, {"op": "jump", "to": 0}])
 		var home := _cell_pt(spots[visit[0]])
 		w.spawn({"pos": {"x": home.x, "y": home.y},
 			"schedule": _jitter(w, steps),
 			"anchor": {"kind": "pt", "ref": "dog"},
 			"persona": {"sprite": "dog"},
 			"tags": {"tags": ["dog", "fluffy"]},
+			"perceive": {"sight_r": 130.0, "hear_r": 140.0,
+				"weights": {"oddity": 0.9}},
 			"anim": {"name": "walk", "fps": 8.0}})
 	return w
