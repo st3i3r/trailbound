@@ -70,11 +70,82 @@ player can only seat guests; the camp never changes.
 - Dog adoption vignette + rounds
 - Trail Daily entry
 
-## Depth rules going forward
+## Phase D4 — Actor layer: SOTA sim-first ECS (core first)
 
-- Every backend verb needs a scene path before it counts as
-  "done" — backend-only systems are inventory, not gameplay.
-- Determinism: placement legality is data-driven (decor_cells),
-  never ad-hoc pixel checks.
-- The authored scene stays fixed (GDD §5.8): Build mode edits
-  decor_cells only.
+The camp must be watchable: kids playing, the dog on rounds, the
+angler casting, the warden on chores (§13.4 vignettes, "alive in
+ten seconds" pillar). Actors are **performers replaying the
+resolved night, not agents** — deterministic cast, canned
+performance. The SOTA shape for a deterministic Godot game is a
+**sim/view split ECS**, not a node ECS and not restaurant-sim
+agent AI:
+
+```
+SimWorld (pure data, fixed-dt tick, seeded)
+   entities  = int ids
+   stores    = comp_name -> {eid: Dictionary}
+   systems   = static funcs run in order each tick
+Director   = casting layer: Game state -> entity spawns
+View       = presenter node: sim pos/persona -> sprite nodes
+             (y-sorted world children; zero sim logic)
+```
+
+### Components (dict schema, v1)
+
+| Component | Fields | Purpose |
+|---|---|---|
+| `pos` | x, y | sim position, world px |
+| `mover` | speed, target, arrived | waypoint move |
+| `schedule` | steps[], i, wait, started | behavior program |
+| `anchor` | kind(pad/spot/item/pt), ref | home base |
+| `persona` | sprite, tint, scale | view hint |
+| `anim` | name, fps | current loop |
+| `scene` | id, role, peers[] | pairwise vignette membership |
+| `life` | ttl | despawn timer |
+
+### Schedule ops (the canned-loop DSL)
+
+`{"op":"goto","to":[x,y],"speed":n}` → blocks until `mover.arrived`
+`{"op":"anim","name":"fish","fps":6}` → sets anim, advances
+`{"op":"wait","t":2.0}` / `{"op":"emote","icon":"x","t":1}` /
+`{"op":"jump","to":0}` (loop) / `{"op":"scene","id":"kids_tag"}`
+
+### Systems (ticked in order)
+
+`sys_schedule` → `sys_move` → `sys_scene` → `sys_life`.
+`sys_scene` orchestrates duets (kids tag: one scene entity writes
+both movers' targets — scripted pairs, never emergent AI).
+
+### Determinism contract
+
+- World holds one seeded `rng`; systems draw only from it.
+- Fixed-dt accumulation (`t += dt`); same seed + same cast ⇒ same
+  final positions. Verified headless (test_sim).
+- Actor state is **ephemeral**: rebuilt per phase from Game state,
+  never serialized — saves keep only sim inputs.
+
+### Director casting (scenario tables deferred)
+
+`cast_night(st, vignette)` / `cast_morning(st)` map seated
+archetypes + placed items → entity programs. v1 casts a minimal
+in-code table (guest idle at pad, dog patrol, angler→bank); the
+full archetype/weather/item scenario matrix is a data file later.
+
+### The three clocks (documented so they never cross)
+
+1. **Day clock** — phase/batch: MORNING→PREP→EVENING→NIGHT (game.gd)
+2. **Real clock** — crew stages only, UTC, offline-safe (§8.4)
+3. **Sim clock** — actor ECS tick; presentation-time only, paused
+   with panels, rewound identically on reload
+
+## Broader architecture analysis (same pass)
+
+| Aspect | Verdict | Action |
+|---|---|---|
+| Sim boundary | `seating`/`econ`/`game` logic is nearly pure; ECS sim joins it | Keep Nodes out of `systems/` — lint: no `Node` types below `ui/` |
+| Commit boundary | `bought_today` covers purchases only | Extend to a **day action log**: move/store/return/unlock/clear all undoable-until-Goodnight |
+| Event flow | signals + trigger dicts today | `EventLog` for night summary/journal/analytics — one ordered list per day |
+| Content lint | decor_cells hand-authored, neighbours hand-authored | CI validator: decor_cells ⊆ core & unblocked; neighbours symmetric; errand spots on ground; r-reach ≤ ~3 pads |
+| Save/migration | `state_dict`+`_migrate` works | Actors excluded by design; add migration matrix to tests when schema bumps |
+| Pathfinding | Not needed — open field, waypoint tweens | Revisit only if obstacles dense; authored routes cover it |
+| Staff AI | Not in v1 | If staffing lands: per-agent task queue, not a job-board system |

@@ -1,0 +1,74 @@
+extends "res://tests/harness.gd"
+## Headless ECS checks (PLAN_gameplay D4). Run:
+##   godot --headless --path game tests/test_sim.tscn
+## Exit code = number of failed checks.
+
+
+func _snapshot(w: SimWorld) -> Dictionary:
+	var snap := {}
+	for eid in w.query(["pos"]):
+		var pos: Dictionary = w.getc(eid, "pos")
+		var anim: Dictionary = w.getc(eid, "anim", {})
+		snap[eid] = [pos["x"], pos["y"], anim.get("name", "")]
+	return snap
+
+
+func _ready() -> void:
+	print("=== actor ECS (D4) ===")
+
+	# --- world primitives ------------------------------------------------
+	var w := SimWorld.new(7)
+	var e1 := w.spawn({"pos": {"x": 0.0, "y": 0.0}})
+	var e2 := w.spawn({"pos": {"x": 10.0, "y": 0.0},
+		"anim": {"name": "walk", "fps": 8.0}})
+	check("query subset", w.query(["pos", "anim"]) == [e2])
+	check("query all pos", w.query(["pos"]).size() == 2)
+
+	# --- schedule: goto blocks until arrival, then advances --------------
+	var prog := [{"op": "anim", "name": "walk"},
+		{"op": "goto", "to": [100.0, 0.0], "speed": 50.0},
+		{"op": "anim", "name": "sit"}, {"op": "wait", "t": 1.0},
+		{"op": "jump", "to": 0}]
+	w.put(e1, "schedule", {"steps": prog, "i": 0, "wait": 0.0,
+		"started": false})
+	w.tick(0.5)                          # anim step -> goto starts
+	check("goto started", w.has(e1, "mover"))
+	check("walk anim set",
+		String(w.getc(e1, "anim")["name"]) == "walk")
+	w.tick(1.0)                          # 50px + 25px = 75 < 100
+	var mv: Dictionary = w.getc(e1, "mover")
+	check("en route", not mv["arrived"])
+	w.tick(1.0)                          # +75 = 150 -> arrives, anim
+	check("arrived", w.getc(e1, "mover")["arrived"])
+	w.tick(0.01)
+	check("sit after arrival",
+		String(w.getc(e1, "anim")["name"]) == "sit")
+	check("wait armed",
+		float(w.getc(e1, "schedule")["wait"]) > 0.9)
+
+	# --- life: ttl despawns ----------------------------------------------
+	var e3 := w.spawn({"pos": {"x": 0.0, "y": 0.0},
+		"life": {"ttl": 0.2}})
+	w.tick(0.3)
+	check("life despawn", not w.query(["pos"]).has(e3))
+
+	# --- determinism: same cast + seed -> same snapshot ------------------
+	var st := {"assignments": {"g1": ["p7"], "g2": ["p1"]},
+		"guests": {"g1": {"archetype": "angler"},
+			"g2": {"archetype": "camper"}},
+		"dog": {"met": true}, "decor": []}
+	var layout: Dictionary = Catalog.data["layouts"]["pinewatch"]
+	var w1 := SimDirector.cast_night(st, layout, 42)
+	var w2 := SimDirector.cast_night(st, layout, 42)
+	for i in 40:
+		w1.tick(0.25)
+		w2.tick(0.25)
+	check("deterministic replay",
+		_snapshot(w1) == _snapshot(w2),
+		str(_snapshot(w1)))
+	check("cast size", w1.query(["pos"]).size() == 3)   # 2 guests + dog
+	check("angler goes to bank",
+		float(w1.getc(1, "pos")["x"]) < 200.0 or
+		String(w1.getc(1, "anim")["name"]) == "fish")
+
+	finish()
