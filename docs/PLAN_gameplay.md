@@ -307,6 +307,7 @@ ticks at fixed dt accumulated from it.
 | cue `bark`/`alarm` | soft sfx + bark bubble |
 | `ctx.weather` | audio mixer: rain low-pass + woodwinds; actor sprite state variants (umbrella/tarp idle) |
 | `anim` name | frame set; `flee`/`wary`/`pet` are authored loops |
+| coincidental sprite overlap | deterministic render offset from world rng + back-sprite alpha dip — residual fix only; real prevention is socket claiming below |
 | night summary payment | physical coin pickups: spawn → bounce → magnet to wallet |
 
 ### Adjacency visual variants (build-mode delight)
@@ -318,11 +319,27 @@ pad shows the shelter drape, swing with kids nearby gains a
 gentle sway at rest. Pure presentation; driven by the same
 decor/neighbour data the solver uses.
 
+### Sockets = anchor slot capacity (the deferred item, named)
+
+Items expose per-sub-position anchor slots — the campfire's
+log seats, the swing's two seats, the bank's single fishing
+spot, a picnic table's benches. At cast time the Director
+*claims* sockets (seeded order) so actors never stack: two
+kids get swing-A + ground-B, four campers get fire seats
+1-4. This replaces the vague "anchor capacity" TODO and is
+the real answer to sprite stacking (visual offsets are only
+the residual fix). Data shape: `sockets` block per item —
+`{id, px_offset, facing}` — anchors bind to a socket, not
+just an item.
+
 ### Ambient audio beds
 
 `audio.gd` becomes a stem mixer: base loop + phase layers
 (evening guitars) + weather layers (rain patter + low-pass) —
-crossfaded, not switched.
+crossfaded, not switched. Plus a **spatial layer**: a `zones`
+block in layout JSON (pond → frogs/lap, treeline → birds,
+fire → crackle, hut yard → quiet), gains driven by camera
+distance — the campsite mix moves as the view pans.
 
 ## Broader architecture analysis (same pass)
 
@@ -331,10 +348,11 @@ crossfaded, not switched.
 | Sim boundary | `seating`/`econ`/`game` logic is nearly pure; ECS sim joins it | Keep Nodes out of `systems/` — lint: no `Node` types below `ui/` |
 | Commit boundary | `bought_today` covers purchases only | Extend to a **day action log**: move/store/return/unlock/clear all undoable-until-Goodnight |
 | Event flow | signals + trigger dicts today | `EventLog` for night summary/journal/analytics — one ordered list per day |
-| Content lint | decor_cells hand-authored, neighbours hand-authored | **Audit already caught real data bugs**: (2,2) was in decor_cells but always strands the p1/p8 pocket; (1,3) was a decor_cell ON a blocked water cell — both removed from the layout. Still want the CI validator: neighbours symmetric; errand spots on ground; r-reach ≤ ~3 pads |
+| Content lint | ~~hand-authored~~ **in-test lint shipped**: decor⊆walkable, no dead cells, pads walkable+reachable, fire solid, errands grounded | Extend to: neighbours symmetric; r-reach ≤ ~3 pads; MASK↔nav cross-check (water cells ⊆ blocked) when a MASK parser lands |
 | Save/migration | `state_dict`+`_migrate` works | Actors excluded by design; add migration matrix to tests when schema bumps |
 | Pathfinding | **Cast-time static cost routing** — the map dictates the path, not the actor: `nav.blocked` cells (water/fire/treeline) + soft pad cost in layout JSON; LOS fast path else A* on the cell grid, emitted as `goto` chains. Deterministic, pure-data, no runtime navmesh/physics | Done — `_route`/`_goto_legs` in SimDirector; dynamic targets (flee home, goto tag/percept) stay straight-line, noted limitation |
 | Tile-as-data | Our split-list version of their per-tile record: `nav.blocked` (nav layer), `decor_cells`/`pads`/`bank_cells` (gameplay layer). Same substance | **Placement deadlock guard added** — `_strands_any` flood-fills walkable cells before/after a drop; sealing a reachable region rejects the placement (covers buy/move/place_stored). Occupant-per-tile for movers rejected — pos queries suffice |
+| Map layers | Painterly equivalent of the L0/L1/L2 tilemap model: baked ground PNG + tintmap (terrain), `PROPS` table (static env), layout JSON (interactive). No runtime TileMapLayer — that's the Eastward approach; Terrains auto-tiler is authoring-tool material, not runtime | **Layout-integrity lint added** (test_seating): decor⊆walkable, no dead cells, pads walkable+mutually reachable, fire solid, errands on/near ground. FastNoiseLite procedural maps rejected for runtime — sites are authored content; possible offline tool role later |
 | Site portability | Engine layer is site-agnostic: no Pinewatch refs in `sim/`. Site = layout JSON contract (`pads.spots`, `errand_spots`, `nav`, `decor_cells`) + scenario table. `cast_night` is hand-authored Pinewatch content pending the scenario matrix | Done — `_bank` returns null without `errand_spots.pond` (angler falls back to idle); remaining site data is the planned JSON matrix |
 | Staff AI | Not in v1 | If staffing lands: per-agent task queue, not a job-board system |
 

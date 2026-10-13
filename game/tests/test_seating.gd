@@ -227,6 +227,58 @@ func _ready() -> void:
 		Game._strands_any(corridor, [Vector2i(1, 0)]))
 	check("capping corridor end ok",
 		not Game._strands_any(corridor, [Vector2i(0, 0)]))
+	# --- layout integrity lint: terrain truth stays single-source ----
+	# decor_cells ⊆ walkable (caught (1,3) water), no decor_cell always
+	# strands (caught (2,2) sealing the p1/p8 pocket), pads all walkable
+	# + mutually reachable, fire solid, errands on/near ground.
+	var lay: Dictionary = Game._layout()
+	var walk: Dictionary = Game._walk_cells(lay)
+	var navb := {}
+	for c in lay.get("nav", {}).get("blocked", []):
+		navb[Vector2i(int(c[0]), int(c[1]))] = true
+	var bad_cell: Variant = null
+	for c in lay.get("decor_cells", []):
+		var v := Vector2i(int(c[0]), int(c[1]))
+		if not walk.has(v):
+			bad_cell = v
+	check("decor cells walkable", bad_cell == null, str(bad_cell))
+	var dead_cell: Variant = null
+	for c in lay.get("decor_cells", []):
+		var v := Vector2i(int(c[0]), int(c[1]))
+		if Game._strands_any(walk, [v]):
+			dead_cell = v
+	check("no dead decor cell", dead_cell == null, str(dead_cell))
+	var spots: Dictionary = lay["pads"]["spots"]
+	var bad_pad: Variant = null
+	for pid in spots:
+		var v := Vector2i(int(spots[pid][0]), int(spots[pid][1]))
+		if not walk.has(v):
+			bad_pad = pid
+	check("pads all walkable", bad_pad == null, str(bad_pad))
+	var reach := Game._reachable_set(walk)
+	var lost_pad: Variant = null
+	for pid in spots:
+		var v := Vector2i(int(spots[pid][0]), int(spots[pid][1]))
+		if not reach.has(v):
+			lost_pad = pid
+	check("pads mutually reachable", lost_pad == null, str(lost_pad))
+	var fire: Array = lay["campfire"]["cell"]
+	check("fire is solid", navb.has(Vector2i(int(fire[0]),
+		int(fire[1]))))
+	var bad_errand: Variant = null
+	for key in lay.get("errand_spots", {}):
+		var p: Array = lay["errand_spots"][key]
+		var v := Vector2i(int(p[0] / 64.0), int(p[1] / 64.0))
+		if walk.has(v):
+			continue
+		var ok := false
+		for d in [Vector2i(1, 0), Vector2i(-1, 0),
+				Vector2i(0, 1), Vector2i(0, -1)]:
+			if walk.has(v + d):
+				ok = true
+		if not ok:
+			bad_errand = key
+	check("errands on/near ground", bad_errand == null, str(bad_errand))
 	check("fire pit r3", Game.buy_decor("stone_fire_pit", [])
 		and Game.coins == 430
 		and Game.site_state()["campfire"]["radius"] == 3)
