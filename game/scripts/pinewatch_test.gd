@@ -521,6 +521,12 @@ const WEATHER_PROFILES := {
     #             haze shader; cast weights pond/shade spots.
     # "wind":     cool-gray grade + VERTEX-sway material on tall
     #             props (roots stay pinned) + leaf-debris emitter.
+    #             Drive via RenderingServer.global_shader_parameter_set
+    #             ("global_wind_speed") — one call, every swaying
+    #             material reads it; phase from world-x, not uniforms.
+    #             Sway factor needs anchors.json anchor_y (offset puts
+    #             VERTEX.y ∈ [-ay, h-ay] — only base-anchored props get
+    #             the write-up's neat [-h,0] range).
 }
 
 

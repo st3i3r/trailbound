@@ -202,6 +202,12 @@ Incidents obey the cozy contract: a lừa-đảo guest is *denied
 upside* (tips less, one guest's night sours, tap-to-shoo or the
 warden handles him) — never owned-resource loss.
 
+Weather also shapes the *offer*, not the books: a demand matrix
+(`weather → booking weights + item demand`) feeds the day roll —
+storm days roll fewer bookings and heavier cocoa/firewood demand,
+heatwaves push pond seats and cold drinks. Multipliers tune what
+arrives and what sells; they never touch coins already earned.
+
 ### Entropy (actor-scale verdicts, applied)
 
 At ~10-15 actors the crowd-sim playbook mostly doesn't apply:
