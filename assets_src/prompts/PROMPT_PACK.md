@@ -361,6 +361,17 @@ Species list pending D-PP-1. Slots per species: perched + in-flight (birds), in-
 
 ### Batch D — food, ingredients, keepsakes (class: item icon / hero item)
 
+**Content-icon spec (confirmed 2026-10-15 off genuine Eastward
+captures — `docs/reference/ui_eastward/`):** item icons ARE painterly
+pixel sprites — dark *coloured* outline, chunky 2-3 tone shading,
+saturated, one object centred on transparency; NEVER flat monochrome
+(flat silhouettes are the chrome-glyph class, our `G_*` code set).
+The hero/detail view shows the SAME sprite enlarged — on Eastward's
+result card the dish hero sits inside a **dark ring medallion** drawn
+by chrome, so hero gens stay unframed art. Selection = thin corner
+brackets (chrome), not a fill — our vermilion focus ring already reads
+equivalent.
+
 - **D1 (≤42, 64 slots, ≈10):** 22 dishes + 17 ingredients + 9 keepsakes at 32 px
 - **D2 (≤85, 16 slots, 2 jobs ≈20):** 22 dish heroes + 9 keepsake heroes at 64 px (result card, journal)
 
