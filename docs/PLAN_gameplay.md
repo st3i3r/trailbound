@@ -269,6 +269,13 @@ ghost ──cancel──▶ idle
   "watch the stars move" moment is the core toy.
 - Touch ergonomics: pickup radius ≥ 24px, 0.15s long-press to
   pick up placed items, two-finger or dedicated button to cancel.
+- **Context-action rows** (the state-enum → verb pattern): every
+  tappable object carries a state enum and the tap surfaces only
+  the legal verbs — pad `overgrown` → [Unlock price] / `paid` →
+  [Clear] / `open` → [Upgrade]; placed decor → [Move] [Store]
+  [Return if today's]; errand node → [Forage] [Fish]; dog →
+  [Pet]. The scene reads as passive-until-touched, which is the
+  cozy contract's tactility rule made concrete.
 
 ### 4. EventLog — one ordered stream per day
 
