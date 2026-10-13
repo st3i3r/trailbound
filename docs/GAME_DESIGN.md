@@ -684,6 +684,59 @@ On day 2, Ranger Mai's van drops off a small volunteer crew. At each site they r
 
 Glasscoast and the hidden cove are only foreshadowed in v1 (Appendix D).
 
+### 11.1 The growth model: capacity in frame, not tiles
+
+Trailbound uses the same earn-to-expand loop as shop games
+(Good Pizza et al.) but the unit being expanded is not map tiles —
+the map frame is full-size from day 1. What is locked is **usable
+capacity inside the frame**:
+
+| Growth vector | Gated by | Shop-game equivalent |
+|---|---|---|
+| Pad spots (2-3 open → 8 max, overgrown until cleared) | Coins → Clear transform | Buying floor tiles |
+| Pad tiers: bare → Platform +1 → Cabin +2 | Coins + page unlocks | Upgrading stations |
+| Amenity items (~30: Stool, Lantern, Tarp, Guitar Stump…) | Journal pages unlock, then coins | New recipes/equipment |
+| Sites: Pinewatch → Whisper River → Lantern Valley | Finish a chapter's 5 pages | Next location |
+| Crew restorations (Warden's Hut, Boathouse, Workshop) | Real time, free, never blocks | Milestone buildings |
+
+Why the frame stays fixed:
+
+- **Restoration fantasy needs the "after" visible** — like
+  renovation games showing the whole house with dirty rooms, the
+  overgrown pads sit visibly on the finished map (§5.1). The site
+  the player will build is already there, waiting.
+- **The puzzle needs fixed geometry** — trait radii (fire warmth
+  r2, music, aversions) and hand-authored neighbour lists only
+  stay legible on a static board; expanding tiles would scramble
+  them.
+- **One-screen rule** — the 10×4-cell puzzle core must fit the
+  640-px view without a camera in v1.
+- **"The camp is the reward"** — every coin lands visibly on the
+  same screen; the Then/Now photo pair (§8.3) is the payoff.
+
+#### Before/after visual states (art contract)
+
+Every site map therefore exists in (at least) two states painted
+on the SAME composition:
+
+- **Day-1 "before":** fire unlit, locked pads shown as overgrown
+  (grass/bramble over the pad cell, stones, debris), sparse
+  amenity props, cooler/desaturated grade — the site looks
+  *abandoned but intact*, not ruined.
+- **Restored "after":** lit fire, cleared pads, placed items, warm
+  grade — the full composition.
+- Per-pad states: open → **overgrown → clearing → pad** (§5.1);
+  the clear transform is the tactile reward, so each locked spot
+  needs an overgrown look that can swap to the cleared cell.
+- Progress in between comes from items bought into empty space —
+  art only needs the two endpoint grades plus the per-pad
+  overgrown/cleared swap, not a continuum.
+
+The current Pinewatch painted map (ground_v16 + props) is the
+"after" state. The "before" state is a derived variant: same
+ground/trees, unlit fire ring, overgrown decals on locked pad
+cells, amenity props removed, cooler grade.
+
 ## 12. Cast
 
 ### 12.1 Main characters
