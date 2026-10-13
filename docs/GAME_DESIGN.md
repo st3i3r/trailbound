@@ -225,6 +225,33 @@ stars = clamp(2 + comfort + meal + traits + weather, 1, 5)
 - It never rains on a site's first day. Pinewatch day 4 rains by script (§14).
 - Otherwise rain is seeded per site and day: about 1 day in 5 at Pinewatch, 1 in 4 at Whisper River and 1 in 6 at Lantern Valley.
 
+### 5.8 Build mode — what the player edits
+
+Placement is the puzzle (§1), so the game ships a player-facing
+Build mode — but its scope is **items on decor cells**, never the
+authored scene.
+
+| Editable (Build mode) | Fixed (never player-editable) |
+|---|---|
+| Amenity items on decor cells: place, move, store, return | Terrain, water, treeline, campfire, pad spots |
+| Pad-tier upgrades (Platform, Cabin) | Hero objects: van, hut, crew structures, dock |
+| | Errand spots, lookout, trail entries, MASK zones |
+
+- Interaction (§17.2): touch-first drag → snap to legal decor cell
+  → ghost preview → radius ring → live star deltas → free undo or
+  return until Goodnight (§6.1). Works in Prep and Evening.
+- Legal cells come from the layout's decor-cell set; an item is
+  only placeable where the lint rule still holds (r1 ≈ 2 pads,
+  r2 ≈ 4 — §5.1).
+- **Why the scene stays fixed:** neighbour lists, trait radii,
+  Water/View tags and errand spots are hand-authored geometry —
+  move the fire or a tree and the board stops being fair or
+  legible. The composed vignettes are also the storytelling.
+- **Shared tech:** the same drag/snap/preview code powers an
+  internal dev layout mode (`--edit`, cell restriction lifted) for
+  map authoring. Dev tooling only — never shipped. This is the
+  tooling decision behind PLAN §5.8.
+
 ## 6. Economy (single source of truth)
 
 ### 6.1 Rules
