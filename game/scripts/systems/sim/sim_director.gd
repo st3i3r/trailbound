@@ -6,11 +6,11 @@ extends RefCounted
 ## archetype/trait/item/weather scenario matrix becomes a JSON
 ## data file when real scenarios land.
 
-const CELL := 64.0
+const CELL := SimGrid.CELL
 
 
 static func _cell_pt(c: Array, dy := 48.0) -> Vector2:
-	return Vector2(c[0] * CELL + CELL / 2.0, c[1] * CELL + dy)
+	return SimGrid.cell_pt(Vector2i(int(c[0]), int(c[1])), dy)
 
 
 static func _bank(layout: Dictionary) -> Variant:
@@ -19,7 +19,7 @@ static func _bank(layout: Dictionary) -> Variant:
 
 
 static func _px_cell(p: Vector2) -> Vector2i:
-	return Vector2i(int(p.x / CELL), int(p.y / CELL))
+	return SimGrid.px_cell(p)
 
 
 ## Cast-time routing (static cost matrix, PLAN D4): the map
@@ -31,11 +31,12 @@ static func _px_cell(p: Vector2) -> Vector2i:
 static func _route(layout: Dictionary, a: Vector2,
 		b: Vector2) -> Array:
 	var nav: Dictionary = layout.get("nav", {})
-	var blocked := {}
-	for c in nav.get("blocked", []):
-		blocked["%d,%d" % [c[0], c[1]]] = true
-	if blocked.is_empty():
+	var cells := SimGrid.blocked(layout)
+	if cells.is_empty():
 		return [b]
+	var blocked := {}
+	for c in cells:
+		blocked["%d,%d" % [c.x, c.y]] = true
 	var ca := _px_cell(a)
 	var cb := _px_cell(b)
 	if _los(blocked, ca, cb):
@@ -136,7 +137,33 @@ static func _goto_legs(layout: Dictionary, a: Vector2,
 
 
 static func _schedule(steps: Array) -> Dictionary:
+	_resolve_labels(steps)
 	return {"steps": steps, "i": 0, "wait": 0.0, "started": false}
+
+
+## Programs may mark a step with "label" and branch to it by name
+## (jump.to / react.goto / band.goto) instead of magic indexes —
+## resolved once at schedule build, so editing a program can no
+## longer silently re-point a branch.
+static func _resolve_labels(steps: Array) -> void:
+	var at := {}
+	for i in steps.size():
+		var lbl: Variant = steps[i].get("label")
+		if lbl != null:
+			at[lbl] = i
+	for st in steps:
+		st.erase("label")
+		if st.get("op") == "jump":
+			var v: Variant = st.get("to")
+			if v is String and at.has(v):
+				st["to"] = at[v]
+		var gt: Variant = st.get("goto")
+		if gt is String and at.has(gt):
+			st["goto"] = at[gt]
+		for b in st.get("bands", []):
+			var v: Variant = b.get("goto")
+			if v is String and at.has(v):
+				b["goto"] = at[v]
 
 
 ## Seed-baked entropy (PLAN D4): draw per-entity phase offsets and
@@ -162,26 +189,25 @@ static func _stim_wrap(base: Array, stim_tags: Array,
 		home: Vector2, allow_pet: bool) -> Array:
 	var steps := [{"op": "respond", "tags": stim_tags}]
 	steps.append_array(base)
-	var flee_i := steps.size()
-	steps.append_array([{"op": "anim", "name": "flee"},
+	steps.append_array([{"op": "anim", "name": "flee",
+			"label": "flee"},
 		{"op": "goto", "to": [home.x, home.y], "speed": 80.0},
 		{"op": "wait", "t": 2.0}, {"op": "jump", "to": 0}])
-	var wary_i := flee_i + 4
-	steps.append_array([{"op": "anim", "name": "wary"},
+	steps.append_array([{"op": "anim", "name": "wary",
+			"label": "wary"},
 		{"op": "wait", "t": 1.5}, {"op": "jump", "to": 0}])
-	var bands := [{"gte": 0.55, "goto": flee_i},
-		{"gte": 0.25, "goto": wary_i}]
+	var bands := [{"gte": 0.55, "goto": "flee"},
+		{"gte": 0.25, "goto": "wary"}]
 	if allow_pet:
-		var pet_i := wary_i + 3
 		steps.append_array([
 			{"op": "goto", "percept": stim_tags[0],
-				"speed": 35.0},
+				"speed": 35.0, "label": "pet"},
 			{"op": "anim", "name": "pet"},
 			{"op": "emote", "icon": "heart", "t": 1.5},
 			{"op": "wait", "t": 1.5}, {"op": "jump", "to": 0}])
-		bands.append({"else": true, "goto": pet_i})
+		bands.append({"else": true, "goto": "pet"})
 	else:
-		bands.append({"else": true, "goto": wary_i})
+		bands.append({"else": true, "goto": "wary"})
 	steps[0]["bands"] = bands
 	return steps
 
@@ -280,23 +306,25 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 						"weights": {"dog": 0.9}}
 					steps = [
 						{"op": "react", "to": "bark",
-							"goto": 5},
+							"goto": "flinch"},
 						{"op": "respond", "tags": ["dog"],
 							"bands": [
-								{"gte": 0.55, "goto": 7},
-								{"else": true, "goto": 11}]},
+								{"gte": 0.55, "goto": "flee"},
+								{"else": true, "goto": "wary"}]},
 						{"op": "anim", "name": "idle"},
 						{"op": "wait", "t": 4.0},
 						{"op": "jump", "to": 0},
 						{"op": "emote", "icon": "!",
-							"t": 1.0},
+							"t": 1.0, "label": "flinch"},
 						{"op": "jump", "to": 0},
-						{"op": "anim", "name": "flee"},
+						{"op": "anim", "name": "flee",
+							"label": "flee"},
 						{"op": "goto", "to": [home.x, home.y],
 							"speed": 80.0},
 						{"op": "wait", "t": 2.0},
 						{"op": "jump", "to": 0},
-						{"op": "anim", "name": "wary"},
+						{"op": "anim", "name": "wary",
+							"label": "wary"},
 						{"op": "wait", "t": 1.5},
 						{"op": "jump", "to": 0}]
 				else:
@@ -327,7 +355,7 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 		# barked at — the alarm cue is itself a stimulus others
 		# can respond to. Same pipeline, different weights.
 		var steps := [{"op": "respond", "tags": ["oddity"],
-			"bands": [{"gte": 0.3, "goto": -1}]},
+			"bands": [{"gte": 0.3, "goto": "investigate"}]},
 			{"op": "anim", "name": "walk"}]
 		var prev := _cell_pt(spots[visit[0]])
 		for pid in visit:
@@ -339,10 +367,9 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 			steps.append({"op": "wait", "t": 1.5})
 			prev = pt
 		steps.append({"op": "jump", "to": 0})
-		var inv_i := steps.size()
-		steps[0]["bands"][0]["goto"] = inv_i
 		steps.append_array([
-			{"op": "goto", "percept": "oddity", "speed": 70.0},
+			{"op": "goto", "percept": "oddity", "speed": 70.0,
+				"label": "investigate"},
 			{"op": "anim", "name": "sniff"},
 			{"op": "emit", "cue": "bark", "t": 2.0,
 				"tags": ["alarm", "noise"]},

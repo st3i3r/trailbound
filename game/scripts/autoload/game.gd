@@ -1111,37 +1111,14 @@ func _decor_blocked(ignore := -1) -> Dictionary:
 	return out
 
 
-## Walkable cells = core grid minus nav.blocked; pads are
-## soft-passable so they never wall a path.
+## Walkable/reachability delegate to SimGrid — the single parser
+## for layout.nav (was a second, divergent implementation here).
 func _walk_cells(layout: Dictionary) -> Dictionary:
-	var out := {}
-	var core: Array = layout.get("camp_core_max_cells", [0, 0])
-	var nav := {}
-	for c in layout.get("nav", {}).get("blocked", []):
-		nav[Vector2i(int(c[0]), int(c[1]))] = true
-	for y in int(core[1]):
-		for x in int(core[0]):
-			var c := Vector2i(x, y)
-			if not nav.has(c):
-				out[c] = true
-	return out
+	return SimGrid.walk_cells(layout)
 
 
 func _reachable_set(cells: Dictionary) -> Dictionary:
-	if cells.is_empty():
-		return {}
-	var seed: Vector2i = cells.keys()[0]
-	var seen := {seed: true}
-	var queue := [seed]
-	while not queue.is_empty():
-		var c: Vector2i = queue.pop_back()
-		for d in [Vector2i(1, 0), Vector2i(-1, 0),
-				Vector2i(0, 1), Vector2i(0, -1)]:
-			var n: Vector2i = c + d
-			if cells.has(n) and not seen.has(n):
-				seen[n] = true
-				queue.append(n)
-	return seen
+	return SimGrid.reachable(cells)
 
 
 ## Placement deadlock guard: dropping pts must not strand any

@@ -356,6 +356,8 @@ distance — the campsite mix moves as the view pans.
 | Reserved zones | Off-limits regions are implicit across 6 keys (pads, fire, nav, bank, decor, crew_plots) | Site 2 schema: `reserved: [{id, kind, cells}]` — crew plots, bank apron, fire yard declare their exclusion explicitly; lint reads them instead of inferring |
 | Site portability | Engine layer is site-agnostic: no Pinewatch refs in `sim/`. Site = layout JSON contract (`pads.spots`, `errand_spots`, `nav`, `decor_cells`) + scenario table. `cast_night` is hand-authored Pinewatch content pending the scenario matrix | Done — `_bank` returns null without `errand_spots.pond` (angler falls back to idle); remaining site data is the planned JSON matrix |
 | Staff AI | Not in v1 | If staffing lands: per-agent task queue, not a job-board system |
+| Smell audit (2026-10-13) | **SimGrid** now the single home of CELL + nav/walkable/reachable parsing (was duplicated in director + game.gd + test) | Program **labels** replace magic jump indexes (`goto:"flee"` resolves at schedule build — `goto:5/7/11`, `-1` patch, `flee_i+4` are gone). Dead keys removed (`lookout` dup, `bank_cells`). Stale `[96,72]` fallbacks in errands.gd gated — no forage spot → no nodes |
+| Remaining smells | `cast_night` ~150 lines = content in engine (by design; scenario JSON is the fix). `pinewatch_test.gd` 1525 lines is a testbed becoming the real scene — split when it ships. `game.gd` 1.6k-line autoload — watch it. `visit=spots.keys().slice(0,3)` leans on dict order | Patrol `emit bark` is untagged (ambient) vs investigate `["alarm","noise"]` — semantic asymmetry, keep. Git history has one cosmetic duplicate commit |
 
 ## The cozy UX contract (cross-cutting, applies to every phase)
 

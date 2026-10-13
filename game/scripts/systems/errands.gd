@@ -16,8 +16,10 @@ func _init(game) -> void:
 func roll_forage() -> Array:
 	var pool: Array = g._ingredients_of_kind("forage")
 	var rng: RandomNumberGenerator = g._rng_for("forage")
-	var fpx: Array = Catalog.data.get("layouts", {}).get(
-		g.site_id, {}).get("errand_spots", {}).get("forage", [96, 72])
+	var fpx: Variant = Catalog.data.get("layouts", {}).get(
+		g.site_id, {}).get("errand_spots", {}).get("forage")
+	if fpx == null:
+		return []                         # no forage ground on this site
 	var nodes := []
 	var goldcap_day: bool = rng.randf() < 1.0 / 3.0 \
 		and pool.any(func(i): return i.get("rare", false))
@@ -115,17 +117,18 @@ func spot() -> Dictionary:
 	if not unlogged.is_empty():
 		bird = unlogged[rng.randi() % unlogged.size()]
 		g.field_notes.append(bird["id"])
-	var fpx: Array = g.site_row().get("errand_spots", {}).get(
-		"forage", [96, 72])
-	var pool: Array = g._ingredients_of_kind("forage")
-	var items := []
-	for i in 2:
-		items.append(_pick_weighted(pool, rng,
-			func(i2): return i2.get("rare", false)))
-	st["forage_nodes"].append({"id": "fb", "items": items,
-		"bonus": true,
-		"px": [fpx[0] + rng.randi_range(-72, 72),
-			fpx[1] + rng.randi_range(-28, 28)]})
+	var fpx: Variant = g.site_row().get("errand_spots", {}).get(
+		"forage")
+	if fpx != null:                        # bonus node needs ground
+		var pool: Array = g._ingredients_of_kind("forage")
+		var items := []
+		for i in 2:
+			items.append(_pick_weighted(pool, rng,
+				func(i2): return i2.get("rare", false)))
+		st["forage_nodes"].append({"id": "fb", "items": items,
+			"bonus": true,
+			"px": [fpx[0] + rng.randi_range(-72, 72),
+				fpx[1] + rng.randi_range(-28, 28)]})
 	return {"bird": bird,
 		"all_logged": _site_bird_count() <= g.field_notes.filter(
 			func(b): return _bird_site(b) == g.site_id).size()}

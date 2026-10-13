@@ -268,7 +268,8 @@ func _ready() -> void:
 	var bad_errand: Variant = null
 	for key in lay.get("errand_spots", {}):
 		var p: Array = lay["errand_spots"][key]
-		var v := Vector2i(int(p[0] / 64.0), int(p[1] / 64.0))
+		var v := Vector2i(int(p[0] / SimGrid.CELL),
+			int(p[1] / SimGrid.CELL))
 		if walk.has(v):
 			continue
 		var ok := false
