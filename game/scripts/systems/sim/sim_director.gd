@@ -45,15 +45,31 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 	var w := SimWorld.new(seed)
 	var spots: Dictionary = layout.get("pads", {}).get("spots", {})
 	var bank := _bank(layout)
+	# cast context for select/if branches: which items exist and
+	# where — placement changes the night (AC-style item binding)
+	var items: Array = []
+	var item_pt := {}
+	for d in st.get("decor", []):
+		items.append(d["id"])
+		var cells: Array = d.get("cells", [])
+		if not cells.is_empty():
+			item_pt[d["id"]] = _cell_pt(cells[0])
+	w.ctx = {"items": items,
+		"weather": st.get("weather", "clear")}
+	var dog_here: bool = st.get("dog", {}).get("met", false) \
+		or items.has("dog_bed")
 	for gid in st.get("assignments", {}):
 		var pads: Array = st["assignments"][gid]
 		if pads.is_empty() or not spots.has(pads[0]):
 			continue
 		var pid: String = pads[0]
 		var home := _cell_pt(spots[pid])
-		var arch := String(st.get("guests", {}).get(gid, {}) \
-			.get("archetype", ""))
+		var g: Dictionary = st.get("guests", {}).get(gid, {})
+		var arch := String(g.get("archetype", ""))
+		var traits: Array = g.get("traits", [])
+		var anchor := {"kind": "pad", "ref": pid}
 		var steps: Array
+		var extra := {}
 		match arch:
 			"angler":
 				steps = [
@@ -68,35 +84,76 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 					{"op": "anim", "name": "sit"},
 					{"op": "wait", "t": 6.0},
 					{"op": "jump", "to": 0}]
+			"kids", "family":
+				# the swing the player placed changes the cast
+				if item_pt.has("swing"):
+					var sw: Vector2 = item_pt["swing"]
+					anchor = {"kind": "item", "ref": "swing"}
+					steps = [
+						{"op": "anim", "name": "walk"},
+						{"op": "goto", "to": [sw.x, sw.y],
+							"speed": 55.0},
+						{"op": "anim", "name": "play"},
+						{"op": "wait", "t": 5.0},
+						{"op": "anim", "name": "walk"},
+						{"op": "goto", "to": [home.x, home.y],
+							"speed": 55.0},
+						{"op": "anim", "name": "idle"},
+						{"op": "wait", "t": 3.0},
+						{"op": "jump", "to": 0}]
+				else:
+					steps = [{"op": "anim", "name": "idle"},
+						{"op": "wait", "t": 4.0},
+						{"op": "jump", "to": 0}]
 			_:
-				steps = [
-					{"op": "anim", "name": "idle"},
-					{"op": "wait", "t": 4.0},
-					{"op": "jump", "to": 0}]
-		w.spawn({"pos": {"x": home.x, "y": home.y},
+				if traits.has("dog_wary") and dog_here:
+					# scripted reaction: the dog's bark cue latches
+					# into `heard` (sys_listen) -> flinch emote
+					extra["listen"] = {"r": 140.0}
+					steps = [
+						{"op": "react", "to": "bark", "goto": 4},
+						{"op": "anim", "name": "idle"},
+						{"op": "wait", "t": 4.0},
+						{"op": "jump", "to": 0},
+						{"op": "emote", "icon": "!",
+							"t": 1.0},
+						{"op": "jump", "to": 0}]
+				else:
+					steps = [{"op": "anim", "name": "idle"},
+						{"op": "wait", "t": 4.0},
+						{"op": "jump", "to": 0}]
+		var comps := {"pos": {"x": home.x, "y": home.y},
 			"schedule": _jitter(w, steps),
-			"anchor": {"kind": "pad", "ref": pid},
+			"anchor": anchor,
 			"persona": {"sprite": "warden_south",
 				"guest": gid},
-			"anim": {"name": "idle", "fps": 6.0}})
-	# the dog patrols pad to pad and sniffs (§9) once adopted
-	if st.get("dog", {}).get("met", false) \
-			or st.get("decor", []).any(
-				func(d): return d["id"] == "dog_bed"):
-		var keys := spots.keys()
-		if not keys.is_empty():
-			var steps := [{"op": "anim", "name": "walk"}]
-			for i in 3:
-				var pt := _cell_pt(spots[keys[i % keys.size()]])
-				steps.append({"op": "goto", "to": [pt.x, pt.y],
-					"speed": 60.0})
-				steps.append({"op": "anim", "name": "sniff"})
-				steps.append({"op": "wait", "t": 1.5})
-			steps.append({"op": "jump", "to": 0})
-			var home := _cell_pt(spots[keys[0]])
-			w.spawn({"pos": {"x": home.x, "y": home.y},
-				"schedule": _jitter(w, steps),
-				"anchor": {"kind": "pt", "ref": "dog"},
-				"persona": {"sprite": "dog"},
-				"anim": {"name": "walk", "fps": 8.0}})
+			"anim": {"name": "idle", "fps": 6.0}}
+		for k in extra:
+			comps[k] = extra[k]
+		w.spawn(comps)
+	# the dog does its rounds past seated guests (§9): sniff, bark —
+	# the bark cue is what dog_wary guests react to
+	if dog_here:
+		var visit := []
+		for gid in st.get("assignments", {}):
+			for pid in st["assignments"][gid]:
+				if spots.has(pid) and not visit.has(pid):
+					visit.append(pid)
+		if visit.is_empty():
+			visit = spots.keys().slice(0, 3)
+		var steps := [{"op": "anim", "name": "walk"}]
+		for pid in visit:
+			var pt := _cell_pt(spots[pid])
+			steps.append({"op": "goto", "to": [pt.x, pt.y],
+				"speed": 60.0})
+			steps.append({"op": "anim", "name": "sniff"})
+			steps.append({"op": "emit", "cue": "bark", "t": 2.0})
+			steps.append({"op": "wait", "t": 1.5})
+		steps.append({"op": "jump", "to": 0})
+		var home := _cell_pt(spots[visit[0]])
+		w.spawn({"pos": {"x": home.x, "y": home.y},
+			"schedule": _jitter(w, steps),
+			"anchor": {"kind": "pt", "ref": "dog"},
+			"persona": {"sprite": "dog"},
+			"anim": {"name": "walk", "fps": 8.0}})
 	return w

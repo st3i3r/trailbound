@@ -53,6 +53,39 @@ static func schedule(w: SimWorld, dt: float) -> void:
 				"jump":
 					sc["i"] = int(step.get("to", 0))
 					sc["started"] = false
+				"select":
+					# mini-BT selector: jump to the first branch
+					# whose ctx condition holds, else "else"
+					var to := int(step.get("else", sc["i"] + 1))
+					for b in step.get("branches", []):
+						if _cond(w, eid, b):
+							to = int(b.get("goto", to))
+							break
+					sc["i"] = to
+					sc["started"] = false
+				"if":
+					sc["i"] = int(step.get("goto", sc["i"] + 1)) \
+						if _cond(w, eid, step) else sc["i"] + 1
+					sc["started"] = false
+				"emit":
+					var p: Dictionary = w.getc(eid, "pos", {})
+					w.emit(Vector2(float(p.get("x", 0.0)),
+						float(p.get("y", 0.0))),
+						String(step.get("cue", "")), eid,
+						float(step.get("t", 2.0)))
+					_next(sc)
+				"react":
+					# consume the heard inbox latched by sys_listen
+					var hd: Dictionary = w.getc(eid, "heard", {})
+					var hit := String(hd.get("cue", "")) == \
+						String(step.get("to", ""))
+					if hit:
+						w.stores.get("heard", {}).erase(eid)
+						sc["i"] = int(step.get("goto",
+							sc["i"] + 1))
+					else:
+						sc["i"] += 1
+					sc["started"] = false
 				_:
 					_next(sc)
 
@@ -62,6 +95,23 @@ static func _next(sc: Dictionary) -> void:
 	if sc["i"] >= sc["steps"].size():
 		sc["i"] = sc["steps"].size() - 1
 	sc["started"] = false
+
+
+## Branch condition for select/if: ctx keys must equal, "item"
+## must be in ctx.items (item-bound behavior), "anchor" matches
+## the entity's anchor ref. Deterministic — state, not rng.
+static func _cond(w: SimWorld, eid: int, c: Dictionary) -> bool:
+	for k in c.get("ctx", {}):
+		if w.ctx.get(k) != c["ctx"][k]:
+			return false
+	if c.has("item") and not Array(w.ctx.get("items", [])) \
+			.has(String(c["item"])):
+		return false
+	if c.has("anchor"):
+		var a: Dictionary = w.getc(eid, "anchor", {})
+		if String(a.get("ref", "")) != String(c["anchor"]):
+			return false
+	return true
 
 
 ## Waypoint move: straight-line toward mover.target at mover.speed.
@@ -84,6 +134,25 @@ static func move(w: SimWorld, dt: float) -> void:
 		pos["y"] = p.y
 
 
+## Sensory delivery: entities with listen+pos pick up live cues
+## inside listen.r -> heard inbox. Delivery is event-latched, not
+## polled, so a react step can't miss a transient cue between
+## loop passes (the senses are a system, not a schedule step).
+static func listen(w: SimWorld, _dt: float) -> void:
+	for eid in w.query(["pos", "listen"]):
+		var ln: Dictionary = w.getc(eid, "listen")
+		var p: Dictionary = w.getc(eid, "pos")
+		var me := Vector2(float(p["x"]), float(p["y"]))
+		for c in w.cues:
+			if c["src"] == eid:
+				continue
+			var cp: Vector2 = c["pos"]
+			if me.distance_to(cp) <= float(ln.get("r", 96.0)):
+				w.put(eid, "heard", {"cue": String(c["cue"]),
+					"src": c["src"], "pos": cp, "t": 1.5})
+				break
+
+
 ## Timers: life.ttl despawns the entity; emote.t clears the icon.
 static func life(w: SimWorld, dt: float) -> void:
 	for eid in w.query(["life"]):
@@ -91,8 +160,15 @@ static func life(w: SimWorld, dt: float) -> void:
 		lf["ttl"] -= dt
 		if lf["ttl"] <= 0.0:
 			w.despawn(eid)
-	for eid in w.query(["emote"]):
-		var em: Dictionary = w.getc(eid, "emote")
-		em["t"] -= dt
-		if em["t"] <= 0.0:
-			w.stores["emote"].erase(eid)
+	for eid in w.query(["emote", "heard"]):
+		for n in ["emote", "heard"]:
+			var c: Dictionary = w.getc(eid, n, {})
+			if c.is_empty():
+				continue
+			c["t"] -= dt
+			if c["t"] <= 0.0:
+				w.stores[n].erase(eid)
+	for i in range(w.cues.size() - 1, -1, -1):
+		w.cues[i]["t"] -= dt
+		if w.cues[i]["t"] <= 0.0:
+			w.cues.remove_at(i)

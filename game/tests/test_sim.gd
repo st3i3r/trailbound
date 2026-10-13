@@ -71,4 +71,45 @@ func _ready() -> void:
 		float(w1.getc(1, "pos")["x"]) < 200.0 or
 		String(w1.getc(1, "anim")["name"]) == "fish")
 
+	# --- select: item-bound branch ---------------------------------------
+	var w3 := SimWorld.new(3)
+	w3.ctx = {"items": ["tarp"]}
+	var e4 := w3.spawn({"pos": {"x": 0.0, "y": 0.0},
+		"schedule": {"steps": [
+			{"op": "select", "else": 4, "branches":
+				[{"item": "tarp", "goto": 2}]},
+			{"op": "anim", "name": "a"},
+			{"op": "anim", "name": "with_tarp"},
+			{"op": "wait", "t": 9.0},
+			{"op": "anim", "name": "no_tarp"},
+			{"op": "wait", "t": 9.0}],
+			"i": 0, "wait": 0.0, "started": false}})
+	w3.tick(0.1)
+	check("select picks item branch",
+		String(w3.getc(e4, "anim")["name"]) == "with_tarp")
+
+	# --- item binding: kids anchored to the placed swing -----------------
+	var st2 := {"assignments": {"g1": ["p7"]},
+		"guests": {"g1": {"archetype": "kids"}},
+		"dog": {"met": false},
+		"decor": [{"id": "swing", "cells": [[5, 5]]}]}
+	var w4 := SimDirector.cast_night(st2, layout, 5)
+	check("kids bound to swing",
+		String(w4.getc(1, "anchor")["ref"]) == "swing")
+	check("ctx lists items",
+		Array(w4.ctx["items"]).has("swing"))
+
+	# --- emit/react: dog's bark cue -> dog_wary flinch -------------------
+	var st3 := {"assignments": {"g1": ["p7"]},
+		"guests": {"g1": {"archetype": "camper",
+			"traits": ["dog_wary"]}},
+		"dog": {"met": true}, "decor": []}
+	var w5 := SimDirector.cast_night(st3, layout, 9)
+	var flinched := false
+	for i in 40:
+		w5.tick(0.25)
+		if w5.has(1, "emote"):
+			flinched = true
+	check("dog_wary flinches at bark", flinched)
+
 	finish()

@@ -103,18 +103,42 @@ View       = presenter node: sim pos/persona -> sprite nodes
 | `scene` | id, role, peers[] | pairwise vignette membership |
 | `life` | ttl | despawn timer |
 
-### Schedule ops (the canned-loop DSL)
+### Schedule ops — a real mini-BT, not a toy sequence
 
-`{"op":"goto","to":[x,y],"speed":n}` → blocks until `mover.arrived`
-`{"op":"anim","name":"fish","fps":6}` → sets anim, advances
-`{"op":"wait","t":2.0}` / `{"op":"emote","icon":"x","t":1}` /
-`{"op":"jump","to":0}` (loop) / `{"op":"scene","id":"kids_tag"}`
+The DSL is a restricted **behavior tree**: sequences plus
+select/condition/reaction nodes — the same paradigm ambient-NPC
+systems in production games use, kept deterministic.
+
+```
+goto / anim / wait / emote / jump          (sequence ops)
+select {branches:[{ctx:{k:v}|item|anchor -> goto}], else}
+if    {cond -> goto}                       (condition nodes)
+emit  {cue, t}                             (broadcast a cue at pos)
+react {to, goto}                           (consume heard inbox)
+```
+
+### Senses are a system, not a step (learned the hard way)
+
+`sys_listen` delivers cues inside `listen.r` into a per-entity
+`heard` inbox — **event-latched, not polled**. First version had
+react scan live cues at eval time; a 5s loop polling a 2s cue
+misses ~60% of events. The inbox pattern is the SOTA-correct
+shape (senses are systemic delivery, reactions are consumption)
+and stays deterministic.
 
 ### Systems (ticked in order)
 
-`sys_schedule` → `sys_move` → `sys_scene` → `sys_life`.
-`sys_scene` orchestrates duets (kids tag: one scene entity writes
-both movers' targets — scripted pairs, never emergent AI).
+`sys_schedule` → `sys_move` → `sys_listen` → `sys_life`.
+`sys_scene` (duets) joins when pairwise vignettes land — scripted
+pairs, never emergent AI.
+
+### Item-bound anchors — the genre-SOTA property
+
+`w.ctx = {items, weather}` at cast time; the Director binds
+actors to *player-placed* decor (kids→the placed swing, dog→
+dog_bed patrols occupied pads, angler→pond). Placement changes
+the night — build mode feeding the sim is the Animal Crossing
+property, and it is already live.
 
 ### Determinism contract
 
