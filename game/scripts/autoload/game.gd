@@ -580,7 +580,7 @@ func _fresh_site(site: StringName) -> Dictionary:
 	var fire: Dictionary = layout.get("campfire",
 		{"cell": [0, 0], "radius": 2})
 	var fcell: Array = fire.get("cell", [0, 0])
-	return {"pads": pads, "decor": [],
+	return {"pads": pads, "decor": [], "stored": [],
 		"campfire": {"cell": Vector2i(fcell[0], fcell[1]),
 			"radius": int(fire.get("radius", 2))},
 		"seats": 0, "reviews": [], "weather": "clear",
@@ -1081,11 +1081,63 @@ func _story_done(reg_id: String) -> bool:
 
 # --- purchases (§6.1: one currency, no debt, refund until Goodnight) ---
 
+## Legal placement cells + footprint check (§5.8): decor lands only
+## on the layout's decor_cells, never on pads, the fire, water or a
+## cell another item already covers.
+func _layout(site := site_id) -> Dictionary:
+	return Catalog.data.get("layouts", {}).get(site, {})
+
+
+func _decor_cell_set() -> Dictionary:
+	var out := {}
+	for c in _layout().get("decor_cells", []):
+		out[Vector2i(int(c[0]), int(c[1]))] = true
+	return out
+
+
+func _decor_blocked(ignore := -1) -> Dictionary:
+	var st := site_state()
+	var layout := _layout()
+	var out := {}
+	for pid in layout.get("pads", {}).get("spots", {}):
+		var c: Array = layout["pads"]["spots"][pid]
+		out[Vector2i(int(c[0]), int(c[1]))] = true
+	out[st["campfire"]["cell"]] = true
+	for i in st["decor"].size():
+		if i == ignore:
+			continue
+		for c in st["decor"][i]["cells"]:
+			out[c] = true
+	return out
+
+
+func _footprint_ok(row: Dictionary, cells: Array, ignore := -1) -> bool:
+	var size := String(row.get("size", "1x1"))
+	if size == "campfire":
+		return true                              # ring upgrade, no cells
+	var legal := _decor_cell_set()
+	var blocked := _decor_blocked(ignore)
+	var want := 1 if size == "1x1" else 2
+	if cells.size() != want:
+		return false
+	var pts := []
+	for c in cells:
+		var v: Vector2i = c if c is Vector2i \
+			else Vector2i(int(c[0]), int(c[1]))
+		if not legal.has(v) or blocked.has(v):
+			return false
+		pts.append(v)
+	if want == 2 and abs(pts[1].x - pts[0].x) != 1:
+		return false                             # 2x1 = horizontal pair
+	return true
+
+
 func buy_decor(item_id: String, cells: Array) -> bool:
 	var row := _row("decor", item_id)
 	var st := site_state()
 	if row.is_empty() or coins < int(row.get("price", 0)) \
-			or not _is_unlocked(row.get("unlock", "")):
+			or not _is_unlocked(row.get("unlock", "")) \
+			or not _footprint_ok(row, cells):
 		return false
 	coins -= int(row["price"])
 	if row.get("size") == "campfire":                # Stone Fire Pit
@@ -1100,19 +1152,100 @@ func buy_decor(item_id: String, cells: Array) -> bool:
 	return true
 
 
-func open_pad(pad_id: String) -> bool:
+## §6.1 build verbs: move and store are always free; today's buys
+## return for a full refund until Goodnight; older items store, not
+## sell.
+func move_decor(idx: int, cells: Array) -> bool:
+	var st := site_state()
+	if idx < 0 or idx >= st["decor"].size():
+		return false
+	if not _footprint_ok(_row("decor", st["decor"][idx]["id"]),
+			cells, idx):
+		return false
+	st["decor"][idx]["cells"] = cells
+	return true
+
+
+func store_decor(idx: int) -> bool:
+	var st := site_state()
+	if idx < 0 or idx >= st["decor"].size():
+		return false
+	var d: Dictionary = st["decor"][idx]
+	st["seats"] -= int(_row("decor", d["id"]).get("seats", 0))
+	st["stored"].append({"id": d["id"], "effect": d["effect"],
+		"reach": d["reach"]})
+	st["decor"].remove_at(idx)
+	return true
+
+
+func place_stored(item_id: String, cells: Array) -> bool:
+	var st := site_state()
+	var i := -1
+	for j in st.get("stored", []).size():
+		if st["stored"][j]["id"] == item_id:
+			i = j
+			break
+	if i < 0 or not _footprint_ok(_row("decor", item_id), cells):
+		return false
+	var d: Dictionary = st["stored"][i]
+	st["stored"].remove_at(i)
+	st["decor"].append({"id": d["id"], "effect": d["effect"],
+		"reach": d["reach"], "cells": cells})
+	st["seats"] += int(_row("decor", item_id).get("seats", 0))
+	return true
+
+
+func return_decor(idx: int) -> bool:
+	var st := site_state()
+	if idx < 0 or idx >= st["decor"].size():
+		return false
+	var d: Dictionary = st["decor"][idx]
+	if d["id"] not in bought_today:
+		return false                            # older items never sell
+	var row := _row("decor", d["id"])
+	coins += int(row.get("price", 0))
+	st["seats"] -= int(row.get("seats", 0))
+	st["decor"].remove_at(idx)
+	bought_today.erase(d["id"])
+	return true
+
+
+## §5.1 pad opening is two steps: pay the price (unlock_pad — the
+## spot stays overgrown and still blocks bookings), then Clear it
+## (clear_pad — free; the ~2s transform lives in the scene). The
+## price index counts owned spots (open OR paid), not just open.
+func unlock_pad(pad_id: String) -> bool:
 	var st := site_state()
 	var row := site_row()
 	var prices: Array = row.get("pad_prices", [])
-	var idx := _open_pads(st).size() - int(row.get("start_pads", 0))
+	var owned := 0
+	for pid in st["pads"]:
+		if st["pads"][pid]["open"] or st["pads"][pid].get("paid", false):
+			owned += 1
+	var idx := owned - int(row.get("start_pads", 0))
 	if idx < 0 or idx >= prices.size() \
 			or not st["pads"].has(pad_id) \
 			or st["pads"][pad_id]["open"] \
+			or st["pads"][pad_id].get("paid", false) \
 			or coins < int(prices[idx]):
 		return false
 	coins -= int(prices[idx])
+	st["pads"][pad_id]["paid"] = true
+	return true
+
+
+func clear_pad(pad_id: String) -> bool:
+	var st := site_state()
+	if not st["pads"].has(pad_id) or st["pads"][pad_id]["open"] \
+			or not st["pads"][pad_id].get("paid", false):
+		return false
 	st["pads"][pad_id]["open"] = true
 	return true
+
+
+## One-shot convenience (tests/tools): pay and clear in one call.
+func open_pad(pad_id: String) -> bool:
+	return unlock_pad(pad_id) and clear_pad(pad_id)
 
 
 func upgrade_pad(pad_id: String, shelter: String) -> bool:

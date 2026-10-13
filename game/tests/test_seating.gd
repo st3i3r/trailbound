@@ -44,13 +44,13 @@ func _ready() -> void:
 	check("day≥6 conflict pair", ok_conflicts)
 
 	# --- §5.4 worked examples ----------------------------------------
-	# Fire sits at cell (4,2) r2; p7 = (4,3) is beside it.
+	# Fire sits at cell (5,3) r2; p7 = (3,5) is inside its reach.
 	st["weather"] = "clear"
 	st["decor"] = []
 	st["assignments"] = {}
 	st["guests"] = {}
 	st["pads"]["p7"]["shelter"] = "platform"
-	_put("planter", "nature", 1, [Vector2i(3, 3)])
+	_put("planter", "nature", 1, [Vector2i(3, 4)])
 	var hiker := _inject("g_hiker", "hiker",
 		["chilly", "nature_lover"])
 	var r := Seating.resolve_guest(hiker, ["p7"], Game._world(), 1)
@@ -76,8 +76,8 @@ func _ready() -> void:
 		couple, ["p1"], Game._world(), 0)["comment"] == r["comment"])
 
 	# Same couple behind a hedge under a tarp, away from the noise.
-	_put("hedge", "privacy", 1, [Vector2i(1, 3)])
-	_put("tarp", "cover", 1, [Vector2i(0, 2)])
+	_put("hedge", "privacy", 1, [Vector2i(7, 3)])
+	_put("tarp", "cover", 1, [Vector2i(8, 5)])
 	r = Seating.resolve_guest(couple, ["p6"], Game._world(), 0)
 	check("3★: hedge privacy + covered in rain",
 		r["stars"] == 3 and r["needs_met"] == 1
@@ -94,13 +94,13 @@ func _ready() -> void:
 	_inject("g_a", "scout", ["social"])
 	check("social unmet alone", _stars("g_a", ["p1"]) == 2)
 	_inject("g_b", "hiker", ["chilly"])
-	Game.site_state()["assignments"]["g_b"] = ["p4"]   # p1's neighbour
+	Game.site_state()["assignments"]["g_b"] = ["p2"]   # p1's neighbour
 	check("social met beside guest", _stars("g_a", ["p1"]) == 3)
 	_put("lantern", "light", 1, [Vector2i(0, 1)])
 	_inject("g_owl", "scout", ["night_owl"])
 	check("night owl by lantern", _stars("g_owl", ["p1"]) == 3)
 	_inject("g_star", "scout", ["stargazer"])
-	_put("telescope", "stars", 1, [Vector2i(2, 0)])
+	_put("telescope", "stars", 1, [Vector2i(1, 1)])
 	r = Seating.resolve_guest(st["guests"]["g_star"], ["p1"],
 		Game._world(), 0)
 	check("stargazer: stars+light cancel",
@@ -186,11 +186,44 @@ func _ready() -> void:
 		and Game.coins == 780)
 	check("cabin unavailable at pinewatch",
 		not Game.upgrade_pad("p3", "cabin"))
-	check("buy lantern", Game.buy_decor("lantern", [Vector2i(5, 1)])
+	check("buy lantern", Game.buy_decor("lantern", [Vector2i(4, 3)])
 		and Game.coins == 730)
+	check("decor cell legality",
+		not Game.buy_decor("lantern", [Vector2i(5, 1)])
+		and not Game.buy_decor("lantern", [Vector2i(3, 2)])
+		and not Game.buy_decor("lantern", [Vector2i(5, 3)])
+		and Game.coins == 730)
+	check("2x1 needs a pair", not Game.buy_decor("picnic_table",
+		[Vector2i(7, 3)]))
+	# --- build verbs: move / store / return (§6.1, §5.8) ------------
+	check("move to legal cell", Game.move_decor(0, [Vector2i(2, 2)])
+		and Game.site_state()["decor"][0]["cells"][0] == Vector2i(2, 2))
+	check("move to blocked cell fails",
+		not Game.move_decor(0, [Vector2i(3, 2)]))
+	check("buy stools", Game.buy_decor("stools", [Vector2i(6, 2)])
+		and Game.coins == 705)
+	check("store frees the cell", Game.store_decor(1)
+		and Game.site_state()["decor"].size() == 1
+		and Game.site_state()["stored"].size() == 1)
+	check("re-place stored", Game.place_stored("stools",
+		[Vector2i(6, 2)]) and Game.site_state()["decor"].size() == 2)
+	check("today's buy returns", Game.return_decor(1)
+		and Game.coins == 730
+		and Game.site_state()["decor"].size() == 1)
+	check("gone from today list",
+		not "stools" in Game.bought_today)
 	check("fire pit r3", Game.buy_decor("stone_fire_pit", [])
 		and Game.coins == 430
 		and Game.site_state()["campfire"]["radius"] == 3)
+	# two-step pad opening (§5.1): unlock pays but stays overgrown —
+	# it still blocks bookings; the Clear step is free.
+	check("unlock p4 pays only", Game.unlock_pad("p4")
+		and Game.coins == 230
+		and not Game.site_state()["pads"]["p4"]["open"])
+	check("unpaid pad can't clear", not Game.clear_pad("p5"))
+	check("clear is free", Game.clear_pad("p4")
+		and Game.coins == 230
+		and Game.site_state()["pads"]["p4"]["open"])
 
 	# --- save round-trip ----------------------------------------------
 	var blob := Save.default_state()
@@ -201,12 +234,13 @@ func _ready() -> void:
 	var back: Dictionary = Game.site_state()
 	check("sites round-trip", back["pads"]["p3"]["open"]
 		and back["pads"]["p3"]["shelter"] == "platform"
+		and back["pads"]["p4"]["open"]
 		and back["campfire"]["radius"] == 3
 		and back["decor"].size() == 1
-		and back["decor"][0]["cells"][0] == Vector2i(5, 1)
+		and back["decor"][0]["cells"][0] == Vector2i(2, 2)
 		and back["pages_done"].has(1)
 		and back["counters"]["guests_welcomed"] == 20
-		and Game.coins == 430)
+		and Game.coins == 230)
 
 	# --- kitchen: forage → pantry → cook (§7) --------------------------
 	Game.pantry = {}
@@ -315,7 +349,7 @@ func _ready() -> void:
 		func(b): return b.get("regular") == "hung"))
 	Game.coins = 100
 	check("pennant unlocks on story", Game._is_unlocked("S:hung")
-		and Game.buy_decor("scout_pennant", [Vector2i(3, 1)]))
+		and Game.buy_decor("scout_pennant", [Vector2i(6, 2)]))
 
 	# Travel gates on chapter completion; W/L need all 5 pages done.
 	check("W locked before chapter", not Game.travel_to(&"whisper_river"))
@@ -341,7 +375,8 @@ func _ready() -> void:
 	check("Old Ba x3 → W4 + pond", Game.page_done(4)
 		and wcnt["anglers_water"] == 3
 		and Game._is_unlocked("W4")
-		and Game.buy_decor("koi_pond", [Vector2i(2, 1)]),
+		and Game.buy_decor("koi_pond",
+			[Vector2i(6, 2), Vector2i(7, 2)]),
 		"pages %s" % [Game.site_state()["pages_done"]])
 
 	# --- letters + vignettes (§8.2, §13) ---------------------------------
