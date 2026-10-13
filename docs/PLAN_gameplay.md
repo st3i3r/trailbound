@@ -323,7 +323,7 @@ ticks at fixed dt accumulated from it.
 | `emote` comp | icon bubble (","!"","♥") + squish-stretch on the sprite |
 | `percept` new entry | head-turn emote toward stimulus pos |
 | cue `bark`/`alarm` | soft sfx + bark bubble |
-| `ctx.weather` | **Built (visual half):** `--storm`/`st["weather"]` drives `_set_storm` — grade → desaturated slate (4s SINE), GPU slanted rain (box strip, `ALIGN_Y_TO_VELOCITY`), screen-space ground ripples (shader below y-sorted world), periodic lightning grade-flash. Remaining: rain low-pass audio bed, umbrella/tarp idle variants, HUD exempt from grade (`light_mode=unshaded`), fire/window warm-cut (PointLight2D or painted glow) |
+| `ctx.weather` | **Built (visual half):** `WEATHER_PROFILES` + veil/warp overlay system — sunny (vệt nắng posterized shafts, ambient), storm (slate grade + slanted rain + ground ripples + lightning flash), fog (milky grade + sương mù counter-scrolling banks), wind (overcast + làn gió ground shimmer + leaf debris). Remaining: foliage sway material (global shader param), heatwave haze, rain low-pass audio, umbrella/tarp idles, HUD grade-exempt, fire warm-cut |
 | `anim` name | frame set; `flee`/`wary`/`pet` are authored loops |
 | coincidental sprite overlap | deterministic render offset from world rng + back-sprite alpha dip — residual fix only; real prevention is socket claiming below |
 | actor behind tall prop | **walk-behind fade shipped** (pinewatch_test): `FADEABLE` props get a zone over their upper art; actor footing inside lerps alpha to 0.35. Verified — dog behind the van shows through |
