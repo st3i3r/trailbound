@@ -132,6 +132,23 @@ and stays deterministic.
 `sys_scene` (duets) joins when pairwise vignettes land — scripted
 pairs, never emergent AI.
 
+### Entity affordances + scored reactions (interactions)
+
+Two sense channels, matching the production pattern
+(Stimulus Registry -> Perception -> Scored Reaction):
+
+| Channel | Mechanism | Example |
+|---|---|---|
+| Hearing (transient cues) | `emit` -> `w.cues` -> `sys_listen` -> `heard` inbox -> `react` | dog's bark -> dog_wary flinch |
+| Sight (continuous proximity) | `tags` comp advertises affordances (`dog`, `fluffy`, `kid`) -> `react_tag` scored bands | kid meets dog: `score = fear*(1-dist/150)` -> flee / stand wary / approach + pet |
+| Movement to affordances | `goto {"tag":"dog"}` resolves nearest tagged entity | kid walks over to pet |
+
+The scored-band formula is utility AI delivered in one op —
+persona weights (fear .55 kid / .9 dog_wary) produce different
+outcomes from the same system, no pair-scripting. Semantic
+memory (dog bond, wary-after-repeated-barks) stays where it
+belongs: persistent game flags, not sim state.
+
 ### Item-bound anchors — the genre-SOTA property
 
 `w.ctx = {items, weather}` at cast time; the Director binds

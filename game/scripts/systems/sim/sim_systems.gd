@@ -25,11 +25,27 @@ static func schedule(w: SimWorld, dt: float) -> void:
 			match String(step.get("op", "")):
 				"goto":
 					if not sc.get("started", false):
+						var tgt := Vector2.ZERO
+						var have := true
+						if step.has("tag"):
+							# walk to the nearest entity advertising
+							# the affordance tag (approach/pet)
+							var n := _near_tag(w, eid,
+								String(step["tag"]),
+								float(step.get("r", 400.0)))
+							if n.is_empty():
+								have = false
+							else:
+								tgt = n["pos"]
+						else:
+							tgt = Vector2(float(step["to"][0]),
+								float(step["to"][1]))
+						if not have:
+							_next(sc)
+							continue
 						w.put(eid, "mover", {
 							"speed": float(step.get("speed", 50.0)),
-							"target": Vector2(
-								float(step["to"][0]),
-								float(step["to"][1])),
+							"target": tgt,
 							"arrived": false})
 						sc["started"] = true
 					if w.getc(eid, "mover", {}).get("arrived", false):
@@ -86,6 +102,30 @@ static func schedule(w: SimWorld, dt: float) -> void:
 					else:
 						sc["i"] += 1
 					sc["started"] = false
+				"react_tag":
+					# utility-scored proximity reaction (sight
+					# channel): score = fear * (1 - dist/r) vs
+					# the nearest entity carrying step.tag; bands
+					# pick the outcome (flee / back / approach).
+					# Continuous stimuli are polled correctly —
+					# only transient cues need the heard inbox.
+					var n2: Dictionary = _near_tag(w, eid,
+						String(step.get("tag", "")),
+						float(step.get("r", 120.0)))
+					var to2: int = sc["i"] + 1
+					if not n2.is_empty():
+						var score := clampf(
+							float(step.get("fear", 0.5)) *
+							(1.0 - float(n2["dist"]) /
+								float(step.get("r", 120.0))),
+							0.0, 1.0)
+						for b in step.get("bands", []):
+							if b.has("else") or score >= \
+									float(b.get("gte", 0.0)):
+								to2 = int(b.get("goto", to2))
+								break
+					sc["i"] = to2
+					sc["started"] = false
 				_:
 					_next(sc)
 
@@ -95,6 +135,28 @@ static func _next(sc: Dictionary) -> void:
 	if sc["i"] >= sc["steps"].size():
 		sc["i"] = sc["steps"].size() - 1
 	sc["started"] = false
+
+
+## Nearest entity advertising an affordance tag within r — the
+## Smart-Object lookup (Sims affordances, entity scale). Returns
+## {eid, dist, pos} or {} when nothing qualifies.
+static func _near_tag(w: SimWorld, eid: int, tag: String,
+		r: float) -> Dictionary:
+	var p: Dictionary = w.getc(eid, "pos", {})
+	var me := Vector2(float(p.get("x", 0.0)), float(p.get("y", 0.0)))
+	var best := {}
+	for other in w.query(["pos", "tags"]):
+		if other == eid:
+			continue
+		var tags: Array = w.getc(other, "tags", {}).get("tags", [])
+		if not tags.has(tag):
+			continue
+		var op: Dictionary = w.getc(other, "pos")
+		var opv := Vector2(float(op["x"]), float(op["y"]))
+		var d := me.distance_to(opv)
+		if d <= r and (best.is_empty() or d < best["dist"]):
+			best = {"eid": other, "dist": d, "pos": opv}
+	return best
 
 
 ## Branch condition for select/if: ctx keys must equal, "item"

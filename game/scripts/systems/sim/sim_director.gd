@@ -37,6 +37,39 @@ static func _jitter(w: SimWorld, steps: Array) -> Dictionary:
 	return sc
 
 
+## Wrap a base loop with a scored dog-proximity check (utility
+## reaction, PLAN D4): step 0 evaluates fear*(1-dist/150) against
+## the nearest "dog"-tagged entity. Kids get three bands —
+## flee / stand wary / walk over and pet; wary guests get two —
+## flee / stand wary. Same formula, different persona weights.
+static func _dog_react_wrap(base: Array, fear: float,
+		home: Vector2, allow_pet: bool) -> Array:
+	var steps := [{"op": "react_tag", "tag": "dog", "r": 150.0,
+		"fear": fear}]
+	steps.append_array(base)
+	var flee_i := steps.size()
+	steps.append_array([{"op": "anim", "name": "flee"},
+		{"op": "goto", "to": [home.x, home.y], "speed": 80.0},
+		{"op": "wait", "t": 2.0}, {"op": "jump", "to": 0}])
+	var wary_i := flee_i + 4
+	steps.append_array([{"op": "anim", "name": "wary"},
+		{"op": "wait", "t": 1.5}, {"op": "jump", "to": 0}])
+	var bands := [{"gte": 0.55, "goto": flee_i},
+		{"gte": 0.25, "goto": wary_i}]
+	if allow_pet:
+		var pet_i := wary_i + 3
+		steps.append_array([
+			{"op": "goto", "tag": "dog", "speed": 35.0},
+			{"op": "anim", "name": "pet"},
+			{"op": "emote", "icon": "heart", "t": 1.5},
+			{"op": "wait", "t": 1.5}, {"op": "jump", "to": 0}])
+		bands.append({"else": true, "goto": pet_i})
+	else:
+		bands.append({"else": true, "goto": wary_i})
+	steps[0]["bands"] = bands
+	return steps
+
+
 ## Evening cast: every seated guest performs an archetype loop from
 ## their pad; the dog patrols when adopted. Deterministic — same
 ## state + seed => same performance.
@@ -85,11 +118,13 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 					{"op": "wait", "t": 6.0},
 					{"op": "jump", "to": 0}]
 			"kids", "family":
-				# the swing the player placed changes the cast
+				# the swing the player placed changes the cast;
+				# the dog's proximity scores their reaction
+				var base: Array
 				if item_pt.has("swing"):
 					var sw: Vector2 = item_pt["swing"]
 					anchor = {"kind": "item", "ref": "swing"}
-					steps = [
+					base = [
 						{"op": "anim", "name": "walk"},
 						{"op": "goto", "to": [sw.x, sw.y],
 							"speed": 55.0},
@@ -102,21 +137,41 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 						{"op": "wait", "t": 3.0},
 						{"op": "jump", "to": 0}]
 				else:
-					steps = [{"op": "anim", "name": "idle"},
+					base = [{"op": "anim", "name": "play"},
 						{"op": "wait", "t": 4.0},
 						{"op": "jump", "to": 0}]
+				if dog_here:
+					extra["tags"] = {"tags": ["kid"]}
+					steps = _dog_react_wrap(base, 0.55, home,
+						true)
+				else:
+					steps = base
 			_:
 				if traits.has("dog_wary") and dog_here:
-					# scripted reaction: the dog's bark cue latches
-					# into `heard` (sys_listen) -> flinch emote
+					# two senses: bark cue -> flinch (hearing);
+					# dog proximity -> flee/wary (sight)
 					extra["listen"] = {"r": 140.0}
 					steps = [
-						{"op": "react", "to": "bark", "goto": 4},
+						{"op": "react", "to": "bark",
+							"goto": 5},
+						{"op": "react_tag", "tag": "dog",
+							"r": 150.0, "fear": 0.9,
+							"bands": [
+								{"gte": 0.55, "goto": 7},
+								{"else": true, "goto": 11}]},
 						{"op": "anim", "name": "idle"},
 						{"op": "wait", "t": 4.0},
 						{"op": "jump", "to": 0},
 						{"op": "emote", "icon": "!",
 							"t": 1.0},
+						{"op": "jump", "to": 0},
+						{"op": "anim", "name": "flee"},
+						{"op": "goto", "to": [home.x, home.y],
+							"speed": 80.0},
+						{"op": "wait", "t": 2.0},
+						{"op": "jump", "to": 0},
+						{"op": "anim", "name": "wary"},
+						{"op": "wait", "t": 1.5},
 						{"op": "jump", "to": 0}]
 				else:
 					steps = [{"op": "anim", "name": "idle"},
@@ -155,5 +210,6 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 			"schedule": _jitter(w, steps),
 			"anchor": {"kind": "pt", "ref": "dog"},
 			"persona": {"sprite": "dog"},
+			"tags": {"tags": ["dog", "fluffy"]},
 			"anim": {"name": "walk", "fps": 8.0}})
 	return w
