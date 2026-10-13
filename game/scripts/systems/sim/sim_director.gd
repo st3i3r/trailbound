@@ -19,6 +19,123 @@ static func _bank(layout: Dictionary) -> Vector2:
 	return Vector2(p[0], p[1])
 
 
+static func _px_cell(p: Vector2) -> Vector2i:
+	return Vector2i(int(p.x / CELL), int(p.y / CELL))
+
+
+## Cast-time routing (static cost matrix, PLAN D4): the map
+## dictates the path, not the actor. nav.blocked cells cost inf;
+## pad cells cost pad_cost (prefer walking around tents, not
+## through them). Straight lines take the fast path; anything
+## crossing water/fire/the treeline gets an A* detour emitted as
+## a chain of goto steps — deterministic, no runtime pathfinding.
+static func _route(layout: Dictionary, a: Vector2,
+		b: Vector2) -> Array:
+	var nav: Dictionary = layout.get("nav", {})
+	var blocked := {}
+	for c in nav.get("blocked", []):
+		blocked["%d,%d" % [c[0], c[1]]] = true
+	if blocked.is_empty():
+		return [b]
+	var ca := _px_cell(a)
+	var cb := _px_cell(b)
+	if _los(blocked, ca, cb):
+		return [b]
+	# A* on the cell grid (4-dir); pads are soft cost, the
+	# destination cell is always allowed even if flagged
+	var pads: Dictionary = layout.get("pads", {}).get("spots", {})
+	var pad_cost := float(nav.get("pad_cost", 3.0))
+	var open := [{"c": ca, "f": 0.0}]
+	var came := {}
+	var cost := {"%d,%d" % [ca.x, ca.y]: 0.0}
+	var found := false
+	var guard := 0
+	while not open.is_empty() and guard < 400:
+		guard += 1
+		var bi := 0
+		for i in open.size():
+			if open[i]["f"] < open[bi]["f"]:
+				bi = i
+		var cur: Dictionary = open[bi]
+		open.remove_at(bi)
+		var c: Vector2i = cur["c"]
+		if c == cb:
+			found = true
+			break
+		var ck := "%d,%d" % [c.x, c.y]
+		for d in [Vector2i(1, 0), Vector2i(-1, 0),
+				Vector2i(0, 1), Vector2i(0, -1)]:
+			var n: Vector2i = c + d
+			var nk := "%d,%d" % [n.x, n.y]
+			if blocked.has(nk) and n != cb:
+				continue
+			var step := 1.0
+			for pid in pads:
+				var pc: Array = pads[pid]
+				if int(pc[0]) == n.x and int(pc[1]) == n.y:
+					step = pad_cost
+					break
+			var nc: float = cost[ck] + step
+			if not cost.has(nk) or nc < cost[nk]:
+				cost[nk] = nc
+				came[nk] = ck
+				var h: float = absf(n.x - cb.x) + absf(
+					n.y - cb.y)
+				open.append({"c": n, "f": nc + h})
+	if not found:
+		return [b]
+	var cells: Array = [cb]
+	var k := "%d,%d" % [cb.x, cb.y]
+	var sk := "%d,%d" % [ca.x, ca.y]
+	while k != sk:
+		k = came[k]
+		var parts := k.split(",")
+		cells.push_front(Vector2i(int(parts[0]),
+			int(parts[1])))
+	var pts := []
+	for c2 in cells:
+		pts.append(_cell_pt([c2.x, c2.y]))
+	pts.append(b)
+	return pts
+
+
+## Supercover line-of-sight over the cell grid: any blocked cell
+## on the straight path (destination excluded) means we route.
+static func _los(blocked: Dictionary, a: Vector2i,
+		b: Vector2i) -> bool:
+	var x := a.x
+	var y := a.y
+	var dx: int = b.x - a.x
+	var dy: int = b.y - a.y
+	var nx: int = absi(dx)
+	var ny: int = absi(dy)
+	var sx := 1 if dx > 0 else -1
+	var sy := 1 if dy > 0 else -1
+	var err := nx - ny
+	while not (x == b.x and y == b.y):
+		if blocked.has("%d,%d" % [x, y]):
+			return false
+		var e2 := 2 * err
+		if e2 > -ny:
+			err -= ny
+			x += sx
+		elif e2 < nx:
+			err += nx
+			y += sy
+	return true
+
+
+## Route -> goto step chain (each goto blocks until arrival, so
+## consecutive gotos are natural waypoint following).
+static func _goto_legs(layout: Dictionary, a: Vector2,
+		b: Vector2, speed: float) -> Array:
+	var steps := []
+	for p in _route(layout, a, b):
+		steps.append({"op": "goto", "to": [p.x, p.y],
+			"speed": speed})
+	return steps
+
+
 static func _schedule(steps: Array) -> Dictionary:
 	return {"steps": steps, "i": 0, "wait": 0.0, "started": false}
 
@@ -105,18 +222,19 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 		var extra := {}
 		match arch:
 			"angler":
-				steps = [
-					{"op": "anim", "name": "walk"},
-					{"op": "goto", "to": [bank.x, bank.y],
-						"speed": 40.0},
+				steps = [{"op": "anim", "name": "walk"}]
+				steps.append_array(_goto_legs(layout, home,
+					bank, 40.0))
+				steps.append_array([
 					{"op": "anim", "name": "fish"},
 					{"op": "wait", "t": 8.0},
-					{"op": "anim", "name": "walk"},
-					{"op": "goto", "to": [home.x, home.y],
-						"speed": 40.0},
+					{"op": "anim", "name": "walk"}])
+				steps.append_array(_goto_legs(layout, bank,
+					home, 40.0))
+				steps.append_array([
 					{"op": "anim", "name": "sit"},
 					{"op": "wait", "t": 6.0},
-					{"op": "jump", "to": 0}]
+					{"op": "jump", "to": 0}])
 			"kids", "family":
 				# the swing the player placed changes the cast;
 				# the dog's proximity scores their reaction
@@ -124,18 +242,19 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 				if item_pt.has("swing"):
 					var sw: Vector2 = item_pt["swing"]
 					anchor = {"kind": "item", "ref": "swing"}
-					base = [
-						{"op": "anim", "name": "walk"},
-						{"op": "goto", "to": [sw.x, sw.y],
-							"speed": 55.0},
+					base = [{"op": "anim", "name": "walk"}]
+					base.append_array(_goto_legs(layout, home,
+						sw, 55.0))
+					base.append_array([
 						{"op": "anim", "name": "play"},
 						{"op": "wait", "t": 5.0},
-						{"op": "anim", "name": "walk"},
-						{"op": "goto", "to": [home.x, home.y],
-							"speed": 55.0},
+						{"op": "anim", "name": "walk"}])
+					base.append_array(_goto_legs(layout, sw,
+						home, 55.0))
+					base.append_array([
 						{"op": "anim", "name": "idle"},
 						{"op": "wait", "t": 3.0},
-						{"op": "jump", "to": 0}]
+						{"op": "jump", "to": 0}])
 				else:
 					base = [{"op": "anim", "name": "play"},
 						{"op": "wait", "t": 4.0},
@@ -206,13 +325,15 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 		var steps := [{"op": "respond", "tags": ["oddity"],
 			"bands": [{"gte": 0.3, "goto": -1}]},
 			{"op": "anim", "name": "walk"}]
+		var prev := _cell_pt(spots[visit[0]])
 		for pid in visit:
 			var pt := _cell_pt(spots[pid])
-			steps.append({"op": "goto", "to": [pt.x, pt.y],
-				"speed": 60.0})
+			steps.append_array(_goto_legs(layout, prev, pt,
+				60.0))
 			steps.append({"op": "anim", "name": "sniff"})
 			steps.append({"op": "emit", "cue": "bark", "t": 2.0})
 			steps.append({"op": "wait", "t": 1.5})
+			prev = pt
 		steps.append({"op": "jump", "to": 0})
 		var inv_i := steps.size()
 		steps[0]["bands"][0]["goto"] = inv_i

@@ -184,4 +184,25 @@ func _ready() -> void:
 			investigated = true
 	check("dog investigates oddity", investigated)
 
+	# --- cast-time routing: detour around blocked cells ------------------
+	# (160,352) cell(2,5) -> (32,240) cell(0,3): the straight line
+	# crosses water cell (1,4)/(1,5); the route must go around.
+	var pts := SimDirector._route(layout, Vector2(160, 352),
+		Vector2(32, 240))
+	var blocked := {}
+	for c in layout["nav"]["blocked"]:
+		blocked["%d,%d" % [c[0], c[1]]] = true
+	var clean := true
+	for p in pts:
+		var c := SimDirector._px_cell(p)
+		if blocked.has("%d,%d" % [c.x, c.y]):
+			clean = false
+	check("route detours blocked cells",
+		pts.size() > 2 and clean, str(pts))
+
+	# straight line with no obstacles -> single waypoint fast path
+	var pts2 := SimDirector._route(layout, Vector2(224, 176),
+		Vector2(352, 176))
+	check("clear line fast path", pts2 == [Vector2(352, 176)])
+
 	finish()

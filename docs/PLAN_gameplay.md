@@ -306,7 +306,7 @@ ticks at fixed dt accumulated from it.
 | Event flow | signals + trigger dicts today | `EventLog` for night summary/journal/analytics — one ordered list per day |
 | Content lint | decor_cells hand-authored, neighbours hand-authored | CI validator: decor_cells ⊆ core & unblocked; neighbours symmetric; errand spots on ground; r-reach ≤ ~3 pads |
 | Save/migration | `state_dict`+`_migrate` works | Actors excluded by design; add migration matrix to tests when schema bumps |
-| Pathfinding | Not needed — open field, waypoint tweens | Revisit only if obstacles dense; authored routes cover it |
+| Pathfinding | **Cast-time static cost routing** — the map dictates the path, not the actor: `nav.blocked` cells (water/fire/treeline) + soft pad cost in layout JSON; LOS fast path else A* on the cell grid, emitted as `goto` chains. Deterministic, pure-data, no runtime navmesh/physics | Done — `_route`/`_goto_legs` in SimDirector; dynamic targets (flee home, goto tag/percept) stay straight-line, noted limitation |
 | Staff AI | Not in v1 | If staffing lands: per-agent task queue, not a job-board system |
 
 ## The cozy UX contract (cross-cutting, applies to every phase)
