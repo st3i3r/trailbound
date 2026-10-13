@@ -118,6 +118,23 @@ def main():
                      .filter(ImageFilter.MaxFilter(5)))
     interior = (fam == 0) & (non_g == 0)
     a[interior] = flat[interior]
+    # Phase 5.2b — the fill tiles bake a scalloped shingle motif that
+    # wall-papers across the field (visible once dirt shrank). The ref
+    # ground is a flat wash: flatten interiors to family median + 2%
+    # broad luminance noise; transition pixels at edges keep detail.
+    gbase = np.median(a[interior], axis=0) if interior.any() \
+        else np.median(a[fam == 0], axis=0)
+    gn = (smooth_noise(a.shape[:2], rng, (6, 24)) - 0.5) * 2 * 0.045
+    a[interior] = np.clip(gbase * (1.0 + gn[interior][:, None]), 0, 255)
+    # water: interior -> ref teal #309d80, shore-band -> pulled 50%
+    w_edge = np.array(Image.fromarray((fam != 2).astype(np.uint8))
+                      .filter(ImageFilter.MaxFilter(5)))
+    w_in = (fam == 2) & (w_edge == 0)
+    w_shore = (fam == 2) & (w_edge != 0)
+    wbase = np.array([58.0, 160.0, 132.0])
+    wn = (smooth_noise(a.shape[:2], rng, (6, 24)) - 0.5) * 2 * 0.05
+    a[w_in] = np.clip(wbase * (1.0 + wn[w_in][:, None]), 0, 255)
+    a[w_shore] = np.clip(a[w_shore] * 0.45 + wbase * 0.55, 0, 255)
 
     # ---- 1. tonal blotches — the visible "sun pool" patches in the ref
     # are larger and softer than generic noise: low octaves, grass gets
@@ -137,6 +154,20 @@ def main():
         wm = fam == 2
         g = a[:, :, 1]; g[wm] = np.clip(g[wm] * 1.07, 0, 255)
         b = a[:, :, 2]; b[wm] = np.clip(b[wm] * 0.96, 0, 255)
+        # 5.0 warm sun pools — the ref's grass is washed by big soft
+        # warm patches (top-left field brightest); 2-3 gaussian pools
+        # on open grass, warm-yellow lift, no hard edge
+        yy, xx = np.mgrid[0:H, 0:W]
+        for cx, cy, rad in ((0.30, 0.28, 0.20), (0.68, 0.52, 0.16),
+                            (0.20, 0.60, 0.13)):
+            d2 = ((xx - cx * W) ** 2 / (rad * W) ** 2 +
+                  (yy - cy * H) ** 2 / (rad * H) ** 2)
+            pool = np.clip(1.0 - d2, 0, 1) ** 2
+            gm = fam == 0
+            a[:, :, 0] = np.where(gm, np.clip(
+                a[:, :, 0] + pool * 22.0, 0, 255), a[:, :, 0])
+            a[:, :, 1] = np.where(gm, np.clip(
+                a[:, :, 1] + pool * 12.0, 0, 255), a[:, :, 1])
         Image.fromarray(a.astype(np.uint8)).save(dst)
         print(f"dressed(light) {src} -> {dst} ({W}x{H})")
         return
