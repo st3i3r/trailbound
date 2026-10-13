@@ -23,6 +23,20 @@ static func _schedule(steps: Array) -> Dictionary:
 	return {"steps": steps, "i": 0, "wait": 0.0, "started": false}
 
 
+## Seed-baked entropy (PLAN D4): draw per-entity phase offsets and
+## wait-time jitter from the world rng at cast time — identical
+## loops desynchronize while replay stays deterministic (draws
+## happen in spawn order). Applied to wait steps + a start delay.
+static func _jitter(w: SimWorld, steps: Array) -> Dictionary:
+	for st in steps:
+		if st.get("op") == "wait":
+			st["t"] = maxf(0.2, float(st["t"]) +
+				w.rng.randf_range(-0.4, 0.4) * float(st["t"]))
+	var sc := _schedule(steps)
+	sc["wait"] = w.rng.randf_range(0.0, 1.5)
+	return sc
+
+
 ## Evening cast: every seated guest performs an archetype loop from
 ## their pad; the dog patrols when adopted. Deterministic — same
 ## state + seed => same performance.
@@ -60,7 +74,7 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 					{"op": "wait", "t": 4.0},
 					{"op": "jump", "to": 0}]
 		w.spawn({"pos": {"x": home.x, "y": home.y},
-			"schedule": _schedule(steps),
+			"schedule": _jitter(w, steps),
 			"anchor": {"kind": "pad", "ref": pid},
 			"persona": {"sprite": "warden_south",
 				"guest": gid},
@@ -81,7 +95,7 @@ static func cast_night(st: Dictionary, layout: Dictionary,
 			steps.append({"op": "jump", "to": 0})
 			var home := _cell_pt(spots[keys[0]])
 			w.spawn({"pos": {"x": home.x, "y": home.y},
-				"schedule": _schedule(steps),
+				"schedule": _jitter(w, steps),
 				"anchor": {"kind": "pt", "ref": "dog"},
 				"persona": {"sprite": "dog"},
 				"anim": {"name": "walk", "fps": 8.0}})

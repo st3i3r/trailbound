@@ -131,6 +131,18 @@ archetypes + placed items → entity programs. v1 casts a minimal
 in-code table (guest idle at pad, dog patrol, angler→bank); the
 full archetype/weather/item scenario matrix is a data file later.
 
+### Entropy (actor-scale verdicts, applied)
+
+At ~10-15 actors the crowd-sim playbook mostly doesn't apply:
+
+| Technique | Verdict | Where |
+|---|---|---|
+| Phase jitter | **Adopted** — Director bakes seed-drawn offsets into wait steps + a 0-1.5s start delay at cast time | `_jitter()`; sim stays pure, replay deterministic |
+| Anchor slot claims | Adopt later — swing seats 2 kids, fire 4, bank 1: a capacity dict on anchors, not token pools | scenario tables |
+| Per-eid anim frame offset | Adopt in presenter — `(t + eid*0.17) % dur`, the free DOTS/VAT analog | view presenter |
+| Time-sliced brains, ORCA, VAT, GOAP | Rejected — scale is 10-15 sprites on an open field | — |
+| Utility AI | Rejected at tick level (breaks determinism) — **already exists at cast level**: `_vignette_weight` is utility scoring over vignette candidates | `game.gd` |
+
 ### The three clocks (documented so they never cross)
 
 1. **Day clock** — phase/batch: MORNING→PREP→EVENING→NIGHT (game.gd)
