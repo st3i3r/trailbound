@@ -44,7 +44,7 @@ player can only seat guests; the camp never changes.
 - `test_seating` green: 12 new checks + 4 stale-layout worked
   examples remapped to the v16 cells
 
-## Phase D2 — the missing half of the day (next)
+## Phase D2 — the missing half of the day (spec below)
 
 1. **Prep phase exists**: `_advance_phase` goes MORNING→PREP→EVENING.
    HUD phase button per §4 table (Head out → Goodnight).
@@ -137,6 +137,87 @@ full archetype/weather/item scenario matrix is a data file later.
 2. **Real clock** — crew stages only, UTC, offline-safe (§8.4)
 3. **Sim clock** — actor ECS tick; presentation-time only, paused
    with panels, rewound identically on reload
+
+## Phase D2 — the interaction layer (SOTA spec)
+
+The missing half of the day is not more backend — it is the
+interaction shell that exposes it. Four pieces, in build order.
+
+### 1. Phase controller (Morning→Prep→Evening→Night)
+
+SOTA pattern: a mode that owns legal verbs + visible panels,
+not a monolith checking a string. Insert `PREP` between
+`MORNING` and `EVENING`; `_advance_phase` gains enter/exit
+hooks. Each phase declares:
+
+| Phase | Legal verbs | Panels | Time |
+|---|---|---|---|
+| MORNING | read letter, travel | letter, journal | batch |
+| PREP | buy/move/store/return, unlock/clear, cook, errands | outfitter, pantry, errand pick | batch (no pressure) |
+| EVENING | seat/unseat guests, build verbs | booking board, tray | batch |
+| NIGHT | goodnight only | summary | batch |
+
+Verbs called out-of-phase return `{"ok":false,"err":"phase"}` —
+the gate lives in `game.gd`, so UI can never create illegal state.
+
+### 2. Commands + day action log (undo model)
+
+SOTA: every mutation is a command record, which gives undo and
+the "nothing is final until Goodnight" pillar for free. Replaces
+`bought_today` (superset of it):
+
+```gdscript
+st["actions"]  # [{verb, params, inverse}, ...] — day-scoped log
+{"verb":"buy_decor","params":{"item":"stump","cells":[[7,2]]},
+ "inverse":{"verb":"return_decor","params":{"inst":3}}}
+```
+
+- `undo()` pops the log and applies `inverse` — always possible
+  because every verb's inverse is total (buy↔return, move↔move,
+  unlock↔refund-until-clear, place↔store).
+- `Goodnight` **commits**: log cleared, placements become property.
+- Same-day buys stay refundable; older items move/store free and
+  are never sold (§6.1) — inverse generation knows the diff.
+
+### 3. Build-mode interaction state machine
+
+```
+idle ──pick──▶ ghost(follows touch)
+ghost ──drop legal──▶ apply command ──▶ idle
+ghost ──drop illegal──▶ rejected feedback ──▶ ghost
+ghost ──cancel──▶ idle
+```
+
+- Ghost is an **ephemeral preview entity**, never real state —
+  evaluated by calling the same pure `Seating` functions the
+  resolver uses (SOTA: preview and resolution share one truth,
+  which is also what the §10 solver needs).
+- Snap = nearest legal `decor_cell` to touch point; blocked cells
+  flash the reason (occupied / pad / fire / water / scenery).
+- Radius ring + live star delta render under the ghost — the
+  "watch the stars move" moment is the core toy.
+- Touch ergonomics: pickup radius ≥ 24px, 0.15s long-press to
+  pick up placed items, two-finger or dedicated button to cancel.
+
+### 4. EventLog — one ordered stream per day
+
+```gdscript
+st["log"]  # [{phase, kind, payload}] — append-only
+{"phase":"evening","kind":"guest_seated","payload":{gid,pad,stars}}
+```
+
+Sinks: night summary reads it (what happened), journal pages
+count from it (cumulative metrics), analytics mirrors it, the
+Then/Now photo + share moments capture from it. Replaces
+scattered counters — the audit trail IS the progression data.
+
+## Actor view presenter (when actor art lands)
+
+Thin node mirroring SimWorld — the only Node touching the sim:
+`spawn sprite on new eid / lerp display position / anim comp →
+frame / despawn`. Zero decisions in the presenter; all behavior
+lives in sim comps. Presenter ticks from `_process`; the world
+ticks at fixed dt accumulated from it.
 
 ## Broader architecture analysis (same pass)
 
