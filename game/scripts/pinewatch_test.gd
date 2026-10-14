@@ -440,7 +440,7 @@ var _hut_dress: Node2D                       # staged restoration layer
 var _hut_tok := 0                            # affordance chip token
 var _hut_ready := false                      # stage-ready chip showing
                                              # (smoke-visible state)
-var _dog_move: Sprite2D                      # directional still shown
+var _dog_move: AnimatedSprite2D              # walk anim shown
                                              # mid-round (§9)
 var _dog_shadow: Sprite2D                    # follows him on rounds
 var _dog_points: Array = []                  # waypoint ring (per site)
@@ -1561,16 +1561,17 @@ func _build_actors() -> void:
          "characters/warden/A2_idle_south_3"], 4.0, WARDEN_POS)
     warden.scale = Vector2(ch, ch)
     world.add_child(warden)
-    # camp dog idle (A3, 8f)
+    # camp dog idle (A3, 8f) — bean_quad cast, feet anchor at (26,38)
     var dog := _anchored_frames("chars",
-        ["characters/camp_dog/A3_idle_south_0",
-         "characters/camp_dog/A3_idle_south_1",
-         "characters/camp_dog/A3_idle_south_2",
-         "characters/camp_dog/A3_idle_south_3",
-         "characters/camp_dog/A3_idle_south_4",
-         "characters/camp_dog/A3_idle_south_5",
-         "characters/camp_dog/A3_idle_south_6",
-         "characters/camp_dog/A3_idle_south_7"], 5.0, _dog_pos)
+        ["characters/bean_quad/A3_idle_south_0",
+         "characters/bean_quad/A3_idle_south_1",
+         "characters/bean_quad/A3_idle_south_2",
+         "characters/bean_quad/A3_idle_south_3",
+         "characters/bean_quad/A3_idle_south_4",
+         "characters/bean_quad/A3_idle_south_5",
+         "characters/bean_quad/A3_idle_south_6",
+         "characters/bean_quad/A3_idle_south_7"], 5.0, _dog_pos,
+        Vector2(26, 38))
     dog.scale = Vector2(ch, ch)
     world.add_child(dog)
     # ranger Mai keeps watch by the path bend
@@ -1583,12 +1584,21 @@ func _build_actors() -> void:
     _char_shadow(MAI_POS, 34.0)
     actor_nodes = [warden, dog, mai]         # walk-behind fade set
     _actor_map = {"warden": warden, "dog": dog, "mai": mai}
-    # §9 rounds — the directional still swaps in for the walk tween;
-    # the idle loop owns him while he's posted.
-    _dog_move = Sprite2D.new()
+    # §9 rounds — bean_quad walk anims swap in for the tween; the
+    # idle loop owns him while he's posted.
+    _dog_move = AnimatedSprite2D.new()
     _dog_move.centered = false
     _dog_move.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
     _dog_move.scale = Vector2(ch, ch)
+    _dog_move.offset = -Vector2(26, 38)
+    var dframes := SpriteFrames.new()
+    for d4 in ["east", "south", "west", "north"]:
+        dframes.add_animation(d4)
+        dframes.set_animation_speed(d4, 8.0)
+        for i in 8:
+            dframes.add_frame(d4,
+                _tex("characters/bean_quad/A3_walk_%s_%d" % [d4, i]))
+    _dog_move.sprite_frames = dframes
     _dog_move.visible = false
     world.add_child(_dog_move)
     _dog_points = [_dog_pos,
@@ -3384,12 +3394,10 @@ func _dog_walk(dog: AnimatedSprite2D) -> void:
     var next: Vector2 = cands[randi() % cands.size()]
     _dog_walking = true
     var dir := next - dog.position
-    var tex := _tex("characters/camp_dog/camp_dog_" + _dir8(dir))
-    _dog_move.texture = tex
-    _dog_move.offset = -Vector2(tex.get_width() / 2.0,
-        tex.get_height())                    # same feet-anchor convention
+    _dog_move.animation = _dir4(dir)
     _dog_move.position = dog.position
     _dog_move.visible = true
+    _dog_move.play()
     dog.visible = false
     var dur := dir.length() / 36.0           # ~36px/s waddle
     var tw := dog.create_tween().set_parallel()
@@ -3409,6 +3417,13 @@ func _dir8(d: Vector2) -> String:
     var oct: int = int(round(d.angle() / (PI / 4.0))) & 7
     return ["east", "south-east", "south", "south-west",
         "west", "north-west", "north", "north-east"][oct]
+
+
+## 4-way direction name -> bean_quad A3_walk_<dir> anim (diagonals
+## fold to the nearest cardinal).
+func _dir4(d: Vector2) -> String:
+    var q: int = int(round(d.angle() / (PI / 2.0))) & 3
+    return ["east", "south", "west", "north"][q]
 
 
 func _check_dog_adoption() -> void:
