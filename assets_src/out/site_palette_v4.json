@@ -1,0 +1,80 @@
+{
+  "version": 4,
+  "source": "measured Eastward scene extractions (docs/reference: eastward.jpg, forest_pond, mist_pines, octopia_farm, village_nest, market, octopia_vista, night) + v3 graded-measure anchors",
+  "method": "hand-authored families from colored-pixel quantize of refs; replaces v3 which was self-derived (frequency-greedy from our own graded art) and NEVER APPLIED — palette_lock needs a flat 'ramp' key, v3 had none",
+  "note": "ground tint-map overlay is a LIGHTING layer — exempt. ground_painted.png is a baked painterly composite — exempt; its colors flow from source sheets at re-bake.",
+  "measurement": {
+    "v3_gap": "class_shares green 36.7 / warm 59.5 / cool 1.6 — Eastward's mint+indigo families nearly absent; v3 grass lights ran h65-90 warm-olive, Eastward foliage spans h73-146 chartreuse->mint; Eastward water s.5-.9 vs ours s.29-.35",
+    "foliage": ["#aabb6a chartreuse pond", "#dde798/#d7e09d pale sage lights", "#b6c896 sage", "#6b915e muted grass", "#75b18f/#83a692 mint", "#939a79 grey sage", "#51634b moss shade"],
+    "water": ["#bdd6f5 sky reflect", "#446e84 dusty blue", "#0c5a8a deep water", "#68a5a5/#5d878c/#3e5157 teal shallows"],
+    "accents": ["#d9a059 ochre village", "#d26f69 salmon barn", "#36cbb8 vivid teal", "#dfc20e rapeseed yellow", "#344ca6 mist indigo", "#e1e5c4 warm lamp light"]
+  },
+  "ramps": {
+    "grass": {
+      "hi":    ["#e1e5c4", "#d7e09d", "#dde798", "#d4d587"],
+      "light": ["#aabb6a", "#b6c896", "#c0c879", "#93a86a"],
+      "mid":   ["#6b915e", "#7a9a60", "#939a79", "#75b18f"],
+      "cool":  ["#83a692", "#5e8a70", "#4f7a62"],
+      "shade": ["#51634b", "#5a6e3c", "#3f512e", "#2e442b"]
+    },
+    "water": {
+      "light": ["#bdd6f5", "#a5c8e8", "#8fb8d8"],
+      "mid":   ["#446e84", "#5a8aa0", "#6b95a5"],
+      "teal":  ["#68a5a5", "#5d878c"],
+      "deep":  ["#0c5a8a", "#2a5a74", "#3e5157", "#25404e"]
+    },
+    "dirt": {
+      "light": ["#daad66", "#d9a059", "#e0b870"],
+      "mid":   ["#c69553", "#ba7f5d", "#a87b4a"],
+      "shade": ["#8a6a42", "#6d4c2b", "#584734"]
+    },
+    "wood": {
+      "light": ["#c8a878", "#b8906a"],
+      "mid":   ["#967050", "#7a5f51", "#634734"],
+      "shade": ["#4e3a2e", "#422b23"]
+    },
+    "accent": {
+      "ochre":   ["#d9a059", "#c39353"],
+      "salmon":  ["#e08a7a", "#d26f69", "#b85a58"],
+      "teal":    ["#5ad4c0", "#36cbb8", "#28a088"],
+      "yellow":  ["#f0d828", "#dfc20e", "#c8a820"],
+      "indigo":  ["#5568b8", "#344ca6", "#2c3e80"],
+      "flame":   ["#e8a838", "#d07830"]
+    },
+    "neutral": {
+      "cream":  ["#eff8b8", "#e8f0d0", "#dad4bf"],
+      "grey":   ["#a89f8a", "#968d75", "#787260"],
+      "khaki":  ["#bcb281", "#a89a68", "#877f41"]
+    },
+    "ink": {
+      "shade": ["#251e24", "#2d2a25", "#483f40", "#3a2f2c"],
+      "deep":  ["#172d2a", "#1a2418", "#020300"]
+    }
+  },
+  "ramp": [
+    "#e1e5c4", "#d7e09d", "#dde798", "#d4d587",
+    "#aabb6a", "#b6c896", "#c0c879", "#93a86a",
+    "#6b915e", "#7a9a60", "#939a79", "#75b18f",
+    "#83a692", "#5e8a70", "#4f7a62",
+    "#51634b", "#5a6e3c", "#3f512e", "#2e442b",
+    "#bdd6f5", "#a5c8e8", "#8fb8d8",
+    "#446e84", "#5a8aa0", "#6b95a5",
+    "#68a5a5", "#5d878c",
+    "#0c5a8a", "#2a5a74", "#3e5157", "#25404e",
+    "#daad66", "#d9a059", "#e0b870",
+    "#c69553", "#ba7f5d", "#a87b4a",
+    "#8a6a42", "#6d4c2b", "#584734",
+    "#c8a878", "#b8906a", "#967050", "#7a5f51",
+    "#634734", "#4e3a2e", "#422b23",
+    "#e08a7a", "#d26f69", "#b85a58",
+    "#5ad4c0", "#36cbb8", "#28a088",
+    "#f0d828", "#dfc20e", "#c8a820",
+    "#5568b8", "#344ca6", "#2c3e80",
+    "#e8a838", "#d07830",
+    "#eff8b8", "#e8f0d0", "#dad4bf",
+    "#a89f8a", "#968d75", "#787260",
+    "#bcb281", "#a89a68", "#877f41",
+    "#251e24", "#2d2a25", "#483f40", "#3a2f2c",
+    "#172d2a", "#1a2418", "#020300"
+  ]
+}

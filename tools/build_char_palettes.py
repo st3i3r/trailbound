@@ -41,6 +41,11 @@ MASTER = {
   "cloth_tweed":   ["#c0a888", "#a89070", "#8a7058", "#6b5340", "#4a382a"],
   "cloth_mauve":   ["#d8b0b8", "#c098a4", "#9a7284", "#6b4e5c"],
   "cloth_pastelblue": ["#c8e0ee", "#a0c8e0", "#74a4c4", "#4e7896"],
+  # measured Eastward vivid cloth (palette audit): saiga teal
+  # jacket h164 s.7, farm coral barn h3 s.5, mist indigo h227 s.69
+  "cloth_teal":    ["#6ed4b8", "#31a082", "#287860", "#1c544a"],
+  "cloth_coral":   ["#e8a08a", "#d26f69", "#b05250", "#783a40"],
+  "cloth_indigo":  ["#8090d0", "#5568b8", "#344ca6", "#28386e"],
   "gear_leather":  ["#d09a68", "#b8845a", "#93603c", "#6b4428"],
   "gear_straw":    ["#e8d088", "#c8a858", "#96783c", "#5c4a24"],
   "gear_wood":     ["#d8a868", "#b08048", "#7a5a34", "#4e3524"],

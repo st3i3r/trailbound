@@ -438,6 +438,24 @@ Eastward's own icons have no saturated blue; our birds need it).
 pooled mode here (it rebuilt the ramp from a filtered subset once
 already).
 
+**World palette audit (same day):** `site_palette_v3` was
+frequency-greedy *derived from* our own graded art and — the real
+bug — **never applied**: `palette_lock --ramp` needs a flat `ramp`
+key, v3 had `colors`(dicts)+`ramps`(nested), so every shipped
+world asset sat 0% on the ramp (grade-only look, class_shares
+warm 59.5 / cool 1.6). Measured against 8 Eastward scene captures
+(colored-px quantize): foliage spans h73-146 chartreuse→**mint**
+(`#aabb6a`→`#75b18f`/`#83a692`), water runs s.5-.9 (`#0c5a8a`,
+`#446e84`), mist `#344ca6` indigo, accents `#d26f69` salmon /
+`#36cbb8` teal / `#dfc20e` yellow. Authored
+`assets_src/out/site_palette_v4.json` (flat `ramp` + named
+`ramps`) and snapped all 350 world PNGs (decals/props/terrain
+tiles; `ground_painted` exempt — baked painterly composite,
+re-colors via re-bake). Chars/icons keep their own masters.
+`char_master` gained measured vivid cloth families
+(`cloth_teal`/`cloth_coral`/`cloth_indigo`) for future personas —
+existing persona assignments unchanged.
+
 Dishes (`recipes.json`): `camp_mash` lumpy grey-brown mash in a dented tin bowl with a spoon · `trail_stew` hearty vegetable stew in an enamel camp pot, steam · `mushroom_skewers` grilled mushroom skewers on bamboo sticks · `herb_tea` green herbal tea in a small clay cup with a mint sprig · `berry_tea` pink berry tea in a glass with floating berries · `smores` toasted marshmallow s'mores on a tin plate · `trail_sandwich` crusty baguette sandwich with pickled carrot, cucumber and herbs · `goldcap_skillet` golden mushrooms sizzling in a small cast-iron skillet · `grilled_fish` whole grilled fish on a banana leaf with lime · `noodle_soup` beef noodle soup in a big white bowl with herbs, lime and chili · `iced_coffee` iced coffee with condensed milk, drip filter on top of the glass · `com_nam` triangle rice balls with sesame salt on a banana leaf · `goi_cuon` fresh spring rolls in translucent rice paper with shrimp and herbs, dipping sauce · `che` layered sweet bean dessert in a tall glass with coconut cream · `sinh_to` mango-avocado smoothie in a glass with a straw · `ca_phe_trung` egg coffee in a small cup standing in a bowl of hot water, foamy top · `tra_mat_ong` honey tea in a glass mug with a lemon slice · `ca_kho` caramelised braised fish in a small clay pot, glossy dark sauce · `mi_quang` turmeric-yellow noodles in a shallow bowl with shrimp, peanuts and a rice cracker · `berry_pie` lattice berry pie slice on a tin plate · `honey_cakes` stack of small honey cakes drizzled with honey · `caramel_custard` caramel custard with dark caramel on a small plate
 
 Ingredients (`ingredients.json`): `mushroom` brown wild mushrooms · `herb` tied herb bundle · `berries` handful of red berries · `goldcap` golden mushroom · `honey` honey jar with a wooden dipper · `perch` small perch · `carp` carp · `trout` speckled trout · `catfish` catfish · `bread` baguette · `rice` bowl of uncooked rice · `eggs` three brown eggs · `tea` tin of tea leaves · `marshmallow` bag of marshmallows · `noodles` bundle of dried rice noodles · `coffee` bag of coffee beans · `sweet_milk` condensed milk tin
