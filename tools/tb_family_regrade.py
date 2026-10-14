@@ -44,6 +44,8 @@ def gate_mask(rgb, a, g):
     m = (a > g["a"]) & (s > g["s"]) & (h > g["h"][0]) & (h < g["h"][1])
     if "v_max" in g:
         m &= v < g["v_max"]
+    if "v_min" in g:
+        m &= v > g["v_min"]
     return m, h, s, v
 
 

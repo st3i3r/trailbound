@@ -3276,5 +3276,82 @@
    29,
    31
   ]
+ },
+ "fx/cabin_sunlit.png": {
+  "anchor_x": 60,
+  "anchor_y": 128,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   2,
+   118,
+   128
+  ]
+ },
+ "fx/outfitter_van_sunlit.png": {
+  "anchor_x": 62,
+  "anchor_y": 98,
+  "anchor": "bottom-center",
+  "content": [
+   0,
+   2,
+   124,
+   98
+  ]
+ },
+ "fx/chicken_coop_sunlit.png": {
+  "anchor_x": 32,
+  "anchor_y": 61,
+  "anchor": "bottom-center",
+  "content": [
+   3,
+   3,
+   62,
+   61
+  ]
+ },
+ "fx/dome_tent_amber_sunlit.png": {
+  "anchor_x": 48,
+  "anchor_y": 79,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   6,
+   95,
+   79
+  ]
+ },
+ "fx/dome_tent_sage_sunlit.png": {
+  "anchor_x": 48,
+  "anchor_y": 79,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   6,
+   95,
+   79
+  ]
+ },
+ "fx/dome_tent_slate_sunlit.png": {
+  "anchor_x": 48,
+  "anchor_y": 79,
+  "anchor": "bottom-center",
+  "content": [
+   1,
+   5,
+   95,
+   79
+  ]
+ },
+ "fx/moped_cub_sunlit.png": {
+  "anchor_x": 32,
+  "anchor_y": 55,
+  "anchor": "bottom-center",
+  "content": [
+   4,
+   9,
+   60,
+   55
+  ]
  }
 }

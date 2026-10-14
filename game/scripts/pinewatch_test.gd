@@ -284,10 +284,14 @@ const SIM_TO_FX := {"clear": "sunny", "rain": "rain",
 const SKY_TOP := Color("f2ecd6")             # sky sliver peeking above
 const SKY_BOT := Color("d6dcbe")             # the far canopy (pale haze)
 const SKY_H := 50.0                          # sliver height px
-const TREE_FAR := Color(0.62, 0.66, 0.72)    # shadowed treeline tints —
-const TREE_MID := Color(0.57, 0.61, 0.68)    # lightened ~10% vs the fresh
-const TREE_NEAR := Color(0.51, 0.55, 0.62)   # v2 ground so they don't
-                                             # read dead-black
+const TREE_FAR := Color(0.54, 0.62, 0.50)    # shadowed treeline tints —
+const TREE_MID := Color(0.49, 0.57, 0.43)    # warm-deep-green multiplies
+const TREE_NEAR := Color(0.43, 0.52, 0.39)   # (B>G read grey-blue, not
+                                             # forest); g-dominant keeps
+                                             # the canopy read leafy
+const OVR_TOP := Color("1d2919")             # overscan fill: deep canopy
+const OVR_BOT := Color("2c3620")             # shadowed grass at map foot
+const OVR_DEEP := Color("151b0e")            #   fading to dark soil
 # Edge-clustered decals (ground recipe): ~14 total, ONE family per
 # cluster, ONLY at edges — prop bases, pond shoreline, treeline feet.
 # Open-field interior stays EMPTY; the tint map carries macro variation.
@@ -444,9 +448,15 @@ func _tex(rel: String) -> Texture2D:
 
 
 ## Sprite2D whose bottom-center (or anchors.json anchor) sits at pos.
+## Prefers the fx/<n>_sunlit family-regraded variant when one exists —
+## originals stay the raw PixelLab export, sunlit is the graded copy.
 func _anchored(cat: String, n: String, pos: Vector2) -> Sprite2D:
     var s := Sprite2D.new()
-    s.texture = _tex(cat + "/" + n)
+    var sun := "fx/" + n + "_sunlit"
+    if ResourceLoader.exists(A + sun + ".png"):
+        s.texture = _tex(sun)
+    else:
+        s.texture = _tex(cat + "/" + n)
     # Phase 5.1 interim — nearest keeps pixel edges hard under
     # fractional scale until assets are rebaked at native size
     s.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
@@ -1190,6 +1200,22 @@ func _build_backdrop() -> void:
     var bd := Node2D.new()
     bd.name = "Backdrop"
     stage.add_child(bd)
+    # overscan: the map is 640x384 but tall/wide viewports expand past
+    # it — paint past both edges so the margin reads as the forest
+    # continuing (deep canopy above, shadowed ground below), not void
+    var ovs_top := Polygon2D.new()
+    ovs_top.polygon = PackedVector2Array([
+        Vector2(-80, -80), Vector2(GW * T + 80, -80),
+        Vector2(GW * T + 80, 4), Vector2(-80, 4)])
+    ovs_top.color = OVR_TOP
+    bd.add_child(ovs_top)
+    var ovs_bot := Polygon2D.new()
+    ovs_bot.polygon = PackedVector2Array([
+        Vector2(-80, GH * T - 2), Vector2(GW * T + 80, GH * T - 2),
+        Vector2(GW * T + 80, GH * T + 80), Vector2(-80, GH * T + 80)])
+    ovs_bot.vertex_colors = PackedColorArray(
+        [OVR_BOT, OVR_BOT, OVR_DEEP, OVR_DEEP])
+    bd.add_child(ovs_bot)
     # thin sky sliver first — Eastward forest edges are CANOPY, not
     # open sky; only a pale line peeks above the far tree mass
     var sky := Polygon2D.new()
