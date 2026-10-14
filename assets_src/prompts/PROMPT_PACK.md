@@ -581,13 +581,13 @@ Walks: `animate_character` template, south / north / east (west mirrored)
   `first_frame_url` reuse mode is for direction rotation ONLY, it
   will not repose (width/height/style args rejected too).
 
-### Batch H — restoration, Clear, states
+### Batch H — restoration, Clear, states — **SHIPPED** (`tools/batch_h_states.py`)
 
-- **H1 Warden's Hut stages** (`edit_image_pro_flash` from the restored `cottage_shed`, 128 px, palette correction on, 3 × 2 seeds ≈36): `hut_s0` ruined, collapsed roof, broken shutters, brambles and vines over the walls · `hut_s1` brambles cleared, roof open with bare rafters · `hut_s2` new roof tiles, shutters still broken · `hut_s3` = restored (existing)
-- **H2 overgrown pads** (batch ≤85, 16 slots, ≈10): `pad_overgrown_a..d` square of earth covered by tall weeds, brambles, a fallen branch and stones · `pad_clearing_a..b` patchy dirt with weed stubs · `pad_cleared_a..b` freshly cleared packed earth with a few pebbles
-- **H3 night/occupied states** (`create_object_state`, ≈5 each, ≈20): `dome_tent_sage_night`, `dome_tent_amber_night` warm lantern glow inside the modern dome tent, door half open *(targets the A-R4 dome masters — the canvas `tent_green`/`tent_red` ids retire)* · `cabin_night` warm light in the windows · `pallet_deck_occupied` bedroll and a small lantern on the deck
-- **H4 tent re-author** — **folded into A-R4**: the shipped canvas A-frame pad tents (`tent_green`, `tent_red`), the warden tent and the brown tarp tent are replaced by `dome_tent_{sage,amber,slate}` per the style_lock prop era spec
-- Boathouse and Lantern Workshop stages: with their sites
+- **H1 Warden's Hut stages** (`edit_image_pro_flash` from the shipped `cabin` master, identity + anchor preserved): `cabin_s0` brambles + collapsed roof over the stilt silhouette · `cabin_s1` cleared, bare rafters · `cabin_s2` fresh roof planks on weathered walls · restored = existing `cabin`
+- **H2 pad ground** (`create_object_pro_flash`, 64 px class, style-ref `refs/crops/tuft` + `ground`): `pad_overgrown_a/b` weed-covered pitch · `pad_cleared` packed pitch earth — runtime draws these UNDER the bracket markers; the clear scatter shrinks the overgrowth, `_sync_pad_visual` resurfaces it as the cleared tile
+- **H3 night/occupied states** (`edit_image_pro_flash` on the day masters): `dome_tent_{sage,amber,slate}_night` warm interior glow + cool shell · `cabin_night` lit window · `pallet_deck_occupied` bedroll + lantern
+- **Runtime**: `HUT_STAGES` swap in `_sync_crew_hut` (sprite carries state, modulate dim retired) · `ground_<pid>` tiles in `_build_pads`/`_play_clear`/`_sync_pad_visual` · `_sync_night_props` swaps tent/deck/hut at `EVENING+`, on seat/unseat, and at boot for loaded saves
+- Palette: everything v4-locked (the night amber survived — the ramp's ochre family carries it). Boathouse and Lantern Workshop stages ship with their sites.
 
 ### Batch I — events (§13.5)
 

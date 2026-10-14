@@ -268,6 +268,9 @@ const DECAL_FAMILIES := {
     "moss":   ["tuft_moss_patch", "decal_soil_patch", "decal_soil_mound"],
 }
 const TENTS := ["dome_tent_sage", "dome_tent_amber", "dome_tent_slate"]
+# Batch H: hut stage art (index = crew stage, last = restored cabin)
+const HUT_STAGES := ["cabin_s0", "cabin_s1", "cabin_s2", "cabin"]
+const PAD_OVERGROWN := ["pad_overgrown_a", "pad_overgrown_b"]
 
 # ------------------------------------------------------------- grade pass
 const WARM_MUL := Color("fbf4e4")            # sunny filmic multiply —
@@ -687,6 +690,7 @@ func _ready() -> void:
     if not WEATHER_PROFILES.has(wkey):
         wkey = "sunny"
     _set_weather(wkey, 0.0)                  # instant at boot
+    _sync_night_props()                      # loaded saves land lit
     _booted = true                           # phase signals from here
     _drain_ceremonies()                      # on roll; boot-queued
                                              # milestones play now
@@ -872,8 +876,39 @@ func _on_phase_dusk(p: int) -> void:
     # signals fired during our own _ready resolve instantly — the
     # first frame must already read as evening, not roll toward it
     _fx.set_dusk(_dusk_target(p), 3.5 if _booted else 0.0)
+    _sync_night_props()
     if p == Game.Phase.MORNING and not _weather_forced:
         _apply_day_weather(6.0 if _booted else 0.0)
+
+
+## Batch H night read — at EVENING/NIGHT occupied tents glow from
+## inside, occupied pallet decks gain the bedroll+lantern overlay,
+## and the restored hut lights its window (via _sync_crew_hut).
+## Day restores the day sprites.  Called on every phase flip and
+## after seat/unseat so loaded saves and arrivals match the hour.
+func _sync_night_props() -> void:
+    var night := Game.phase in [Game.Phase.EVENING, Game.Phase.NIGHT]
+    var occupied := {}
+    for pid_list in Game.site_state()["assignments"].values():
+        for pid2 in pid_list:
+            occupied[pid2] = true
+    for gid2 in tent_nodes:
+        for t in tent_nodes[gid2]:
+            var key := String(t.get_meta("tent_key", ""))
+            if key == "":
+                continue
+            var want := key + "_night" if night else key
+            if ResourceLoader.exists(A + "props_medium/%s.png" % want):
+                t.texture = _tex("props_medium/" + want)
+    for pid in _pad_shelters:
+        var ov: Sprite2D = _pad_shelters[pid]
+        if ov.get_meta("shelter", "") != "platform":
+            continue
+        var want2 := "pallet_deck_occupied" \
+            if (night and occupied.has(pid)) else "pallet_deck"
+        if ResourceLoader.exists(A + "props_medium/%s.png" % want2):
+            ov.texture = _tex("props_medium/" + want2)
+    _sync_crew_hut()
 
 
 func _dusk_target(p: int) -> float:
@@ -1196,6 +1231,22 @@ func _build_pads(rng: RandomNumberGenerator) -> void:
         var rect := Rect2(origin + Vector2(c[0], c[1]) * CELL,
                           Vector2(CELL, CELL))
         pad_cells[pid] = rect
+        # Batch H: real ground under the bracket — an overgrown
+        # weed plot while locked (the clear scatter eats it),
+        # packed pitch earth once open.  Drawn BEFORE the marker
+        # so the brackets stay legible on top.
+        var g := Sprite2D.new()
+        g.name = "ground_" + pid
+        g.centered = false
+        g.texture = _tex("decals/pad_cleared" if pid in open_pads
+            else "decals/" + PAD_OVERGROWN[
+                hash(pid) % PAD_OVERGROWN.size()])
+        g.position = rect.position
+        var gw := float(g.texture.get_width())
+        var gs: float = minf(1.0, CELL * 1.1 / gw)
+        g.scale = Vector2.ONE * gs
+        g.set_meta("s0", gs)
+        pads_node.add_child(g)
         var m := Sprite2D.new()
         m.texture = _tex("pad_open" if pid in open_pads else "pad_locked")
         m.centered = false
@@ -2210,8 +2261,9 @@ func _seat_visual(gid: String, pads: Array) -> void:
     tent_nodes[gid] = []
     var idx := absi(hash(gid + arch) as int)
     for pid in pads:
-        var t := _anchored("props_medium",
-                           TENTS[idx % TENTS.size()], Vector2.ZERO)
+        var tk: String = TENTS[idx % TENTS.size()]
+        var t := _anchored("props_medium", tk, Vector2.ZERO)
+        t.set_meta("tent_key", tk)      # night swap reads this
         idx += 1
         var r: Rect2 = pad_cells[pid]
         t.position = r.position + Vector2(CELL / 2.0, CELL)
@@ -2220,6 +2272,7 @@ func _seat_visual(gid: String, pads: Array) -> void:
     hud.tray.mark_seated(gid)
     _refresh_bubbles()
     _sync_marks()
+    _sync_night_props()                        # evening arrival = lit
     _recast_if_evening()                       # the new guest walks in
 
 
@@ -2230,6 +2283,7 @@ func _unseat_visual(gid: String) -> void:
     for t in tent_nodes.get(gid, []):
         t.queue_free()
     tent_nodes[gid] = []
+    _sync_night_props()                        # freed pads go dark
     if guest_bubbles.has(gid):
         markers.release(guest_bubbles[gid])
         guest_bubbles.erase(gid)
@@ -3647,6 +3701,16 @@ func _sync_pad_visual(pid: String) -> void:
         return
     spr.texture = _tex("pad_open" if st.get("open", false) \
         else "pad_locked")
+    # ground tile: open pads sit on packed pitch earth.  The clear
+    # scatter shrinks the overgrown tile away; this resurfaces it in
+    # its cleared outfit (the marker pop carries the beat — pop
+    # tweens to scale 1.0 which would break a shrunken decal).
+    var gnd: Sprite2D = pads_node.get_node_or_null("ground_" + pid)
+    if gnd != null and st.get("open", false):
+        gnd.texture = _tex("decals/pad_cleared")
+        gnd.rotation = 0.0
+        gnd.modulate.a = 1.0
+        gnd.scale = Vector2.ONE * float(gnd.get_meta("s0", 1.0))
     var shelter := String(st.get("shelter", "bare"))
     if shelter == "bare" or _pad_shelters.has(pid):
         return
@@ -3654,6 +3718,7 @@ func _sync_pad_visual(pid: String) -> void:
         else "props_large",
         "pallet_deck" if shelter == "platform" else "cottage_shed",
         pad_cells[pid].position + Vector2(CELL / 2.0, CELL))
+    ov.set_meta("shelter", shelter)           # night swap reads this
     var w := ov.texture.get_width() * ov.scale.x
     if w > CELL * 1.05:                      # pad furniture, not a prop
         ov.scale *= CELL * 1.05 / w
@@ -3763,6 +3828,7 @@ func _play_clear(pid: String) -> void:
     _sync_pad_chips()
     var spr := pads_node.get_node_or_null("mark_" + pid)
     var tuft := pads_node.get_node_or_null("tuft_" + pid)
+    var gnd := pads_node.get_node_or_null("ground_" + pid)
     var r: Rect2 = pad_cells[pid]
     if UIFeel.reduced_motion:
         if tuft != null:
@@ -3790,6 +3856,14 @@ func _play_clear(pid: String) -> void:
         tw2.tween_property(tuft, "scale", Vector2.ZERO, 0.55)
         tw2.tween_property(tuft, "modulate:a", 0.0, 0.55)
         tw2.finished.connect(tuft.queue_free)
+    if gnd != null:
+        # the overgrown plot shrinks into the earth — _finish_clear
+        # resurfaces it as the packed pitch tile
+        var twg := gnd.create_tween()
+        twg.set_parallel()
+        twg.tween_property(gnd, "rotation_degrees", 120.0, 0.55)
+        twg.tween_property(gnd, "scale", Vector2.ZERO, 0.55)
+        twg.tween_property(gnd, "modulate:a", 0.0, 0.55)
     if spr != null:
         var tw3 := spr.create_tween()
         tw3.tween_property(spr, "modulate",
@@ -3904,6 +3978,18 @@ func _sync_crew_hut(animate := false) -> void:
     var stage := _crew_stage(sid)
     var total: int = _crew_rows(sid).get("stages", []).size()
     var restored := total > 0 and stage >= total
+    # stage art swap (Batch H): the sprite itself carries the state —
+    # ruin -> cleared -> roof fixed -> restored cabin.  A lit-window
+    # night variant lands at dusk once the hut is whole again.
+    var day_tex: String = HUT_STAGES[mini(stage,
+        HUT_STAGES.size() - 1)]
+    var want := String(day_tex)
+    if restored and Game.phase in [Game.Phase.EVENING,
+            Game.Phase.NIGHT] and ResourceLoader.exists(
+            A + "props_large/cabin_night.png"):
+        want = "cabin_night"
+    if ResourceLoader.exists(A + "props_large/%s.png" % want):
+        _hut.texture = _tex("props_large/" + want)
     if _hut_dress != null:
         var old := _hut_dress
         _hut_dress = null
@@ -3922,8 +4008,7 @@ func _sync_crew_hut(animate := false) -> void:
     _hut_dress.name = "CrewDress"
     _hut_dress.position = _hut_px()          # sorts with the hut itself
     world.add_child(_hut_dress)
-    _hut.modulate = Color(0.72, 0.70, 0.64) if stage < 2 \
-        else Color.WHITE                       # roof fixed = undim
+    _hut.modulate = Color.WHITE              # sprite carries state
     if stage == 0:
         # ruin reads through the litter on its footprint
         for spec in [["props_medium", "debris_brambles", -26, 8],

@@ -1,0 +1,57 @@
+{
+ "cabin_s0": {
+  "reply": "status: completed\nid: 97cd3ded-23a7-4aaa-bdc6-c2d2253bc1a3\njob_id: 97cd3ded-23a7-4aaa-bdc6-c2d2253bc1a3\nframes: 1\ntransparent: yes\nasset_id: 5f6e30d7-00b7-5d2c-8ee4-041b91d78d4e\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 6 generations\n",
+  "file": "D:\\monet\\trail-bound\\assets_src\\gen\\h\\cabin_s0.png",
+  "staged": "D:\\monet\\trail-bound\\game\\assets\\pinewatch\\props_large\\cabin_s0.png"
+ },
+ "cabin_s1": {
+  "reply": "status: completed\nid: a5bdf878-4096-41c6-a78a-5c378eb42ec5\njob_id: a5bdf878-4096-41c6-a78a-5c378eb42ec5\nframes: 1\ntransparent: yes\nasset_id: 9f240bcf-c0da-550a-b03b-2930e37f97a2\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 6 generations\n",
+  "file": "D:\\monet\\trail-bound\\assets_src\\gen\\h\\cabin_s1.png",
+  "staged": "D:\\monet\\trail-bound\\game\\assets\\pinewatch\\props_large\\cabin_s1.png"
+ },
+ "cabin_s2": {
+  "reply": "status: completed\nid: b423e47f-af1a-4f5e-a71c-fee52ead8bf7\njob_id: b423e47f-af1a-4f5e-a71c-fee52ead8bf7\nframes: 1\ntransparent: yes\nasset_id: 6a489abf-d599-5611-bd76-83d030c5beec\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 6 generations\n",
+  "file": "D:\\monet\\trail-bound\\assets_src\\gen\\h\\cabin_s2.png",
+  "staged": "D:\\monet\\trail-bound\\game\\assets\\pinewatch\\props_large\\cabin_s2.png"
+ },
+ "pad_overgrown_a": {
+  "reply": "status: completed\nid: 118a6055-e7e1-4646-b527-b20a8c16d3fa\nname: pad_overgrown_a\nstate_name: base\ndirections: 1\nsize: 64x64px\nview: low top-down\ngroup: 2b693ba1-fb30-4096-b857-04795acb3ad8\n\nrotations:\n  unknown: https://backblaze.pixellab.ai/file/pixellab-characters/objects/729a5452-65ea-4e0f-8867-a",
+  "file": "D:\\monet\\trail-bound\\assets_src\\gen\\h\\pad_overgrown_a.png",
+  "staged": "D:\\monet\\trail-bound\\game\\assets\\pinewatch\\decals\\pad_overgrown_a.png"
+ },
+ "pad_overgrown_b": {
+  "reply": "status: completed\nid: 3fd700ea-6279-47bf-b3a9-1e94e20497fa\nname: pad_overgrown_b\nstate_name: base\ndirections: 1\nsize: 64x64px\nview: low top-down\ngroup: 366b18c2-4301-40dc-939c-226ef687e7ea\n\nrotations:\n  unknown: https://backblaze.pixellab.ai/file/pixellab-characters/objects/729a5452-65ea-4e0f-8867-a",
+  "file": "D:\\monet\\trail-bound\\assets_src\\gen\\h\\pad_overgrown_b.png",
+  "staged": "D:\\monet\\trail-bound\\game\\assets\\pinewatch\\decals\\pad_overgrown_b.png"
+ },
+ "pad_cleared": {
+  "reply": "status: completed\nid: ba2fc2cc-dd53-4799-b826-f532a6a78bb0\nname: pad_cleared\nstate_name: base\ndirections: 1\nsize: 64x64px\nview: low top-down\ngroup: 21666b41-250c-4af0-8851-270945b15e05\n\nrotations:\n  unknown: https://backblaze.pixellab.ai/file/pixellab-characters/objects/729a5452-65ea-4e0f-8867-a2cd8",
+  "file": "D:\\monet\\trail-bound\\assets_src\\gen\\h\\pad_cleared.png",
+  "staged": "D:\\monet\\trail-bound\\game\\assets\\pinewatch\\decals\\pad_cleared.png"
+ },
+ "dome_tent_sage_night": {
+  "reply": "status: completed\nid: 1ed3643b-2393-4e6b-92a7-9b3fbdb3f1f7\njob_id: 1ed3643b-2393-4e6b-92a7-9b3fbdb3f1f7\nframes: 1\ntransparent: yes\nasset_id: fed71a66-14fc-59f8-94df-38a0a9874a38\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 5 generations\n",
+  "file": "D:\\monet\\trail-bound\\assets_src\\gen\\h\\dome_tent_sage_night.png",
+  "staged": "D:\\monet\\trail-bound\\game\\assets\\pinewatch\\props_medium\\dome_tent_sage_night.png"
+ },
+ "dome_tent_amber_night": {
+  "reply": "status: completed\nid: 5b387e30-1695-432e-988a-bd735ecb759d\njob_id: 5b387e30-1695-432e-988a-bd735ecb759d\nframes: 1\ntransparent: yes\nasset_id: 2eb44e4a-26dc-5fa6-89f2-140ed517d284\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 5 generations\n",
+  "file": "D:\\monet\\trail-bound\\assets_src\\gen\\h\\dome_tent_amber_night.png",
+  "staged": "D:\\monet\\trail-bound\\game\\assets\\pinewatch\\props_medium\\dome_tent_amber_night.png"
+ },
+ "dome_tent_slate_night": {
+  "reply": "status: completed\nid: 24695398-a51c-4688-8b2d-262aa6b45ba7\njob_id: 24695398-a51c-4688-8b2d-262aa6b45ba7\nframes: 1\ntransparent: yes\nasset_id: 0300cdf2-1ccf-529a-8646-db85375d17b6\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 5 generations\n",
+  "file": "D:\\monet\\trail-bound\\assets_src\\gen\\h\\dome_tent_slate_night.png",
+  "staged": "D:\\monet\\trail-bound\\game\\assets\\pinewatch\\props_medium\\dome_tent_slate_night.png"
+ },
+ "cabin_night": {
+  "reply": "status: completed\nid: 3acd381f-b03e-4bb3-9b0c-b52eea171485\njob_id: 3acd381f-b03e-4bb3-9b0c-b52eea171485\nframes: 1\ntransparent: yes\nasset_id: 1fa63532-983d-5513-8b09-4bd5617c58ad\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 6 generations\n",
+  "file": "D:\\monet\\trail-bound\\assets_src\\gen\\h\\cabin_night.png",
+  "staged": "D:\\monet\\trail-bound\\game\\assets\\pinewatch\\props_large\\cabin_night.png"
+ },
+ "pallet_deck_occupied": {
+  "reply": "status: completed\nid: 34194260-b08e-4df9-9c7c-505f2b93fa28\njob_id: 34194260-b08e-4df9-9c7c-505f2b93fa28\nframes: 1\ntransparent: yes\nasset_id: fdf99363-c931-5e9a-afe2-753628b7b4c1\nasset_type: image\nasset_status: saved\ngallery: saved to your PixelLab gallery (pixellab.ai/create)\ncharged: 5 generations\n",
+  "file": "D:\\monet\\trail-bound\\assets_src\\gen\\h\\pallet_deck_occupied.png",
+  "staged": "D:\\monet\\trail-bound\\game\\assets\\pinewatch\\props_medium\\pallet_deck_occupied.png"
+ }
+}
