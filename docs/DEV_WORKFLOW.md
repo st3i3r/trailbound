@@ -240,6 +240,21 @@ Pass
 style reference for future generations so candidates land pre-graded —
 don't use raw eastward.jpg anymore.
 
+Animation generation (`tools/batch_g_anims.py`, full notes in
+PROMPT_PACK §Batch G): same-silhouette clips (walk, idle, gestures,
+casts, head dips) go `animate_character` template/v3
+action_description. **Pose-class clips (sit, kneel, lie, crouch —
+anything that changes the silhouette's height class) CANNOT be
+prompted into existence** — the engine animates the standing
+rotation image and returns a standing sway. The enforced flow:
+`edit_image_pro_flash` repose the still → save
+`assets_src/gen/g/<key>/pose_<clip>.png` → `batch_g_anims.py fire`
+attaches it as `custom_start_frame_base64` automatically (the driver
+refuses pose-class clips without it). Frames re-anchor bottom-center
+onto the still canvas, then persona-ramp lock. Walk cadence is
+distance-driven (`STEP_PX` in `actor_view.gd`) — do not retime via
+fps.
+
 Terrain: `python tools/make_tileset.py` regenerates
 `game/resources/pinewatch_terrain.tres` from the wang-sheet JSONs in
 `game/assets/pinewatch/terrain/` (3 atlas sources × 16 tiles, corner

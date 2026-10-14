@@ -53,13 +53,29 @@ KIDS = {"scout_kid", "kid_pinkdress", "grandma_ba"}
 MOVERS = ANGLERS | KIDS | QUADS          # personas that actually path
 CARD = ["south", "north", "east", "west"]
 
+# POSE-CLASS RULE (learned the hard way, 2026-10-16):
+# animate_character animates the character's ROTATION IMAGE — an
+# action_description can bend limbs but cannot change the pose
+# class (standing -> seated/kneeling/prone keeps the standing
+# silhouette; "sitting on a stool" produced a standing sway).
+# Fix: repose first — edit_image_pro_flash the still into the
+# target pose, save as assets_src/gen/g/<key>/pose_<clip>.png,
+# then v3 with custom_start_frame_base64=<that file>.
+# fire() REFUSES a pose-class clip without its repose frame.
+# Also: never name the petting target ("pet a dog" bakes a dog
+# INTO the sprite) — describe only the person's own pose.
+POSECLASS = {"sit", "pet"}               # stand->sit / stand->kneel
+POSE_SRC = os.path.join(GEN, "%s", "pose_%s.png")   # key, clip
+
 # clip -> per-persona v3 action line (movement only)
 V3 = {
     "fish": "standing at the water edge holding a fishing rod, "
             "casting the line then holding it still, watching",
-    "sit": "sitting on a low camping stool, relaxed gentle sway",
+    "sit": "seated cross-legged, gently swaying, hands resting "
+           "on knees",
     "play": "bouncing and playing with energy, arms swinging",
-    "pet": "kneeling down and reaching a hand out to pet a dog",
+    "pet": "kneeling low, gently rocking forward and back, "
+           "outstretched hand stroking softly",
     "sniff": "sniffing the ground, nose low, tail wagging",
     "play_dog": "play bow — front down, rear up, tail wagging fast",
 }
@@ -121,6 +137,16 @@ def fire(only=None, anim=None):
         else:
             args["action_description"] = what
             args["frame_count"] = frames
+            if clip in POSECLASS:
+                psrc = POSE_SRC % (key, clip)
+                if not os.path.exists(psrc):
+                    print("SKIP %s — pose-class clip needs a repose "
+                          "frame at %s (edit_image_pro_flash first; "
+                          "see POSECLASS)" % (jk, psrc))
+                    continue
+                import base64
+                args["custom_start_frame_base64"] = base64.b64encode(
+                    open(psrc, "rb").read()).decode()
         out = harness("animate_character", args)
         ent["reply"] = out[:400]
         if "error" in out.lower() or "failed" in out.lower():

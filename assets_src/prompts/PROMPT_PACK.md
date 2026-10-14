@@ -550,6 +550,21 @@ Walks: `animate_character` template, south / north / east (west mirrored)
   still's canvas by bbox bottom-center (`_norm_frames`) so clips of
   any source size ground identically — no anchor drift. Palette-
   lock to the persona ramp after normalize.
+- **POSE-CLASS RULE (hard-won, verified on sit + pet):**
+  `animate_character` — template AND v3 — animates the character's
+  **rotation image**: `action_description` can bend limbs but cannot
+  change the pose class. "sitting on a stool" produced a *standing*
+  sway; "kneeling to pet a dog" produced a standing wave (and baked
+  a hallucinated dog into the sprite — never name the interaction
+  target). Same-silhouette motions (walk/idle/arm gestures/head
+  dips/rod casts/play-bow) work fine with action_description.
+  For any stand→{sit,kneel,lie,crouch} clip: **repose first** —
+  `edit_image_pro_flash` the still into the target pose →
+  `animate_character` v3 `custom_start_frame_base64` = that pose →
+  the loop stays posed. `batch_g_anims.py` enforces it: clips in
+  `POSECLASS` skip with a hint unless
+  `assets_src/gen/g/<key>/pose_<clip>.png` exists. Eastward does
+  the equivalent: seated NPCs are authored seated sprites.
 - **Tool gotchas learned:** job slots are **per direction** (a 4-dir
   walk = 4 of 8 slots; cap error must not mark `fired`); frame URLs
   (`{i}.png` pattern) can lag a couple of minutes after `done` —
@@ -557,7 +572,11 @@ Walks: `animate_character` template, south / north / east (west mirrored)
   downloading; download dirs contain a non-image `download.png`
   artifact — filter frames by the `<dir>_<i>.png` pattern before
   PIL; `get_character` output arrives with cp1252-mangled em-dashes —
-  parse on section shape, never literal `—`.
+  parse on section shape, never literal `—`; `batch_d1.harness`
+  sys.exit()s on subprocess failure — use the local non-fatal
+  `harness` in batch_g_anims for loops; `create_object_pro_flash`
+  `first_frame_url` reuse mode is for direction rotation ONLY, it
+  will not repose (width/height/style args rejected too).
 
 ### Batch H — restoration, Clear, states
 
