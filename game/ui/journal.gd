@@ -253,9 +253,12 @@ func _rows_field_notes(list: Control) -> void:
 	for b in Catalog.data.get("birds", []):
 		var seen: bool = b["id"] in Game.field_notes
 		any = any or seen
-		_row(list, "leaf", b["name"] if seen else "? ? ?",
+		var has_art := seen and UIKit.icon_exists(b["id"])
+		_row(list, b["id"] if has_art else "leaf",
+			b["name"] if seen else "? ? ?",
 			"check" if seen else "", not seen,
-			b["note"] if seen else Game.site_name(b["site"]))
+			b["note"] if seen else Game.site_name(b["site"]),
+			32 if has_art else 16)
 	if not any:
 		_empty(list, "jrnl_empty_field", "field_notes")
 

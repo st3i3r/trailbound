@@ -230,7 +230,19 @@
   "old_trail_register_hero": "old_trail_register_hero",
   "photo_on_the_porch_hero": "photo_on_the_porch_hero",
   "carved_oar_hero": "carved_oar_hero",
-  "old_bas_boat_hero": "old_bas_boat_hero"
+  "old_bas_boat_hero": "old_bas_boat_hero",
+  "jay": "bird_jay",
+  "woodpecker": "bird_woodpecker",
+  "bulbul": "bird_bulbul",
+  "tawny_owl": "bird_tawny_owl",
+  "kingfisher": "bird_kingfisher",
+  "heron": "bird_heron",
+  "dipper": "bird_dipper",
+  "skylark": "bird_skylark",
+  "bee_eater": "bird_bee_eater",
+  "hoopoe": "bird_hoopoe",
+  "kestrel": "bird_kestrel",
+  "wagtail": "bird_wagtail"
  },
  "traits": {
   "comment": "trait id -> glyph (13 traits from traits.json); flat marks, tinted at call site",

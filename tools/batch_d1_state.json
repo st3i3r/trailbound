@@ -192,7 +192,7 @@
   "kind": "keep"
  },
  "hero_noodle_soup": {
-  "object_id": "9f17a9b7-3d5c-4620-b457-334429dc7a39",
+  "object_id": "ef115a57-26f9-4027-b0c1-cba21917c42e",
   "kind": "dish"
  },
  "hero_trail_stew": {
@@ -284,5 +284,53 @@
  },
  "hero_unfinished_lantern": {
   "object_id": "dc166183-eecd-4c51-ba63-3002b3c644b8"
+ },
+ "jay": {
+  "object_id": "54f1a098-13d6-4e75-95af-612de5b84163",
+  "kind": "bird"
+ },
+ "woodpecker": {
+  "object_id": "e6bfac5e-a2cc-4fc5-9c00-4391ea4292e3",
+  "kind": "bird"
+ },
+ "bulbul": {
+  "object_id": "4a750b7c-9b64-4392-8699-426f7dc11ddd",
+  "kind": "bird"
+ },
+ "tawny_owl": {
+  "object_id": "a541d6d5-14b4-4fec-b127-24556dc39c92",
+  "kind": "bird"
+ },
+ "kingfisher": {
+  "object_id": "8a0700fa-4902-44da-b7b4-d50fce0e5254",
+  "kind": "bird"
+ },
+ "heron": {
+  "object_id": "71c6c441-dca6-4fd0-92e8-701599f92cc4",
+  "kind": "bird"
+ },
+ "dipper": {
+  "object_id": "cbdf0d0e-e9c5-420c-a5bc-3beed65e4976",
+  "kind": "bird"
+ },
+ "skylark": {
+  "object_id": "8ac14687-335d-408f-8f15-3d3577ae6916",
+  "kind": "bird"
+ },
+ "bee_eater": {
+  "object_id": "f337457f-131a-44b6-9813-b727f89b9a31",
+  "kind": "bird"
+ },
+ "hoopoe": {
+  "object_id": "acf30eae-9f32-4d5a-96ed-57599ea8c66f",
+  "kind": "bird"
+ },
+ "kestrel": {
+  "object_id": "7e53f02e-384b-4cb1-a07b-da3a9a9f1fb6",
+  "kind": "bird"
+ },
+ "wagtail": {
+  "object_id": "4605909c-1602-4d4e-9e06-08e8bf6d5fa2",
+  "kind": "bird"
  }
 }

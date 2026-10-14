@@ -83,11 +83,24 @@ JOBS = [
  ("bamboo_frames", "keep", "bamboo lantern frames with rice paper"),
  ("pattern_book", "keep", "a battered pattern book with a fabric bookmark"),
  ("unfinished_lantern", "keep", "a half-finished silk lantern"),
+ # field-notes birds (birds.json) — perched pose for journal rows
+ ("jay", "bird", "a Eurasian jay perched, pinkish-tan body, blue-barred wing patch, black moustache stripe"),
+ ("woodpecker", "bird", "a great spotted woodpecker clinging upright, black and white plumage, red belly patch"),
+ ("bulbul", "bird", "a red-whiskered bulbul perched, dark crest, small red cheek patch"),
+ ("tawny_owl", "bird", "a tawny owl perched, round head, mottled brown plumage, dark eyes"),
+ ("kingfisher", "bird", "a common kingfisher perched on a twig, electric blue back, orange breast"),
+ ("heron", "bird", "a grey heron standing tall, long neck, black eyebrow plume"),
+ ("wagtail", "bird", "a grey wagtail perched on a pebble, grey back, yellow underside, long tail"),
+ ("dipper", "bird", "a white-throated dipper on a wet stone, dark brown body, white bib"),
+ ("skylark", "bird", "a skylark standing on the ground, streaked brown, small crest"),
+ ("bee_eater", "bird", "a bee-eater perched on a wire, turquoise body, rusty crown, black mask"),
+ ("hoopoe", "bird", "a hoopoe standing on grass, salmon-pink body, black-and-white wings, raised crest"),
+ ("kestrel", "bird", "a kestrel perched, rufous back, grey head, hooked beak"),
 ]
 
 FILE_ID = {}  # key -> icon filename stem
 for k, kind, _l in JOBS:
-    FILE_ID[k] = {"dish": "dish_%s", "ing": "ing_%s",
+    FILE_ID[k] = {"dish": "dish_%s", "ing": "ing_%s", "bird": "bird_%s",
                   "keep": "%s"}[kind] % (k if kind != "keep" else k)
 
 HERO_KEYS = [k for k, kind, _l in JOBS if kind in ("dish", "keep")]
@@ -216,13 +229,15 @@ def resolve():
     list_objects — the fire reply's first uuid is the job id."""
     st = load_state()
     out = harness("list_objects", {"limit": 50})
+    seen = set()          # list is newest-first — first match wins
     for ln in out.splitlines():
         m = re.match(r"\s*([0-9a-f-]{36})\s*\|\s*(\S+)", ln)
         if not m:
             continue
         oid, name = m.group(1), m.group(2)
-        if name in st and st[name].get("object_id") != oid:
+        if name in st and name not in seen:
             st[name]["object_id"] = oid
+            seen.add(name)
     save_state(st)
 
 
