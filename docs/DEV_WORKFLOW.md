@@ -241,7 +241,10 @@ style reference for future generations so candidates land pre-graded —
 don't use raw eastward.jpg anymore.
 
 Animation generation (`tools/batch_g_anims.py`, full notes in
-PROMPT_PACK §Batch G): same-silhouette clips (walk, idle, gestures,
+PROMPT_PACK §Batch G): **universal baseline = idle (south) + walk
+(S/N/E/W) for every persona** — walk is not optional, any guest can
+flee or be pathed by new scenarios; archetype activities layer on
+top. Same-silhouette clips (walk, idle, gestures,
 casts, head dips) go `animate_character` template/v3
 action_description. **Pose-class clips (sit, kneel, lie, crouch —
 anything that changes the silhouette's height class) CANNOT be

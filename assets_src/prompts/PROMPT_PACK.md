@@ -525,11 +525,14 @@ Walks: `animate_character` template, south / north / east (west mirrored)
 
 #### Batch G runtime — implemented 2026-10-16 (`tools/batch_g_anims.py`)
 
-- **Driver matrix** (what the sim actually emits — `sim_director`
-  `anim_map`): `idle` south loop for all 22 personas
+- **Driver matrix** (universal baseline + archetype layer —
+  `sim_director` `anim_map`): `idle` south loop for all 22 personas
   (`breathing-idle` template; `idle` for quadrupeds) · `walk`
-  S/N/E/W **only for movers that path off-pad** — anglers, kids/
-  family, dogs (`walking-8-frames`; `walk-8-frames` for quads) ·
+  S/N/E/W **for ALL 22** (`walking-8-frames`; `walk-8-frames` for
+  quads) — walk is the universal verb: `dog_wary` rolls on any guest
+  (flee renders walk at 80 px/s) and the scenario matrix can path
+  anyone (arrivals, strolls, vignettes). Eastward-equivalent: every
+  NPC ships idle+walk, bespoke actions layer on top ·
   `fish`+`sit` for anglers, `play`+`pet` for kids, `sniff`+`play`
   for dogs (custom `action_description` + `frame_count` on
   `animate_character` — no v3 needed). `wary`/`flee` get no art:

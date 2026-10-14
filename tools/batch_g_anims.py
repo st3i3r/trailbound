@@ -88,10 +88,12 @@ def jobs():
         out.append((key, "idle", "template",
                     "idle" if quad else "breathing-idle",
                     ["south"], None))
-        if key in MOVERS:
-            out.append((key, "walk", "template",
-                        "walk-8-frames" if quad else
-                        "walking-8-frames", CARD, None))
+        # walk is the universal verb — EVERY persona gets it:
+        # dog_wary rolls on any guest (flee=walk at 80px/s) and the
+        # scenario matrix paths anyone (arrivals, strolls, vignettes)
+        out.append((key, "walk", "template",
+                    "walk-8-frames" if quad else
+                    "walking-8-frames", CARD, None))
         if key in ANGLERS:
             out.append((key, "fish", "v3", V3["fish"], ["south"], 8))
             out.append((key, "sit", "v3", V3["sit"], ["south"], 4))
