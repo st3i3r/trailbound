@@ -190,5 +190,99 @@
  "unfinished_lantern": {
   "object_id": "dcc85030-3e5c-43ed-975e-29ce7ba2231f",
   "kind": "keep"
+ },
+ "hero_noodle_soup": {
+  "object_id": "9f17a9b7-3d5c-4620-b457-334429dc7a39",
+  "kind": "dish"
+ },
+ "hero_trail_stew": {
+  "object_id": "7f5d4bfc-4541-4d4e-ade5-0810ea61ae8b"
+ },
+ "hero_camp_mash": {
+  "object_id": "299abffb-90f8-432e-b39e-d92275fad0f6"
+ },
+ "hero_mushroom_skewers": {
+  "object_id": "e6f65455-f671-47cc-b858-6224e4e0eb42"
+ },
+ "hero_herb_tea": {
+  "object_id": "e160c4da-4926-4c79-b02f-0cf9fb870621"
+ },
+ "hero_berry_tea": {
+  "object_id": "2b2963ae-97f2-4155-9d99-05fa61366fb3"
+ },
+ "hero_smores": {
+  "object_id": "282af384-9a04-4bae-bb91-758d6cfa026e"
+ },
+ "hero_trail_sandwich": {
+  "object_id": "eccc5831-fd64-43d5-b41e-c3c2e0ed222e"
+ },
+ "hero_goldcap_skillet": {
+  "object_id": "169980b6-7ab3-4146-b4a6-2dedb019669a"
+ },
+ "hero_grilled_fish": {
+  "object_id": "20dcfa54-fedc-4652-8495-1c4b986ea512"
+ },
+ "hero_iced_coffee": {
+  "object_id": "7df931e8-c2d9-4f56-8153-e8ef7e107270"
+ },
+ "hero_com_nam": {
+  "object_id": "e34cb8b7-53eb-47d6-a436-80a8b3d79ccb"
+ },
+ "hero_goi_cuon": {
+  "object_id": "96e1c06d-08d6-4da6-aec1-9fe8a8c51c3b"
+ },
+ "hero_che": {
+  "object_id": "dfbf5fbc-2f06-48f4-a7be-1d34d0934475"
+ },
+ "hero_sinh_to": {
+  "object_id": "4198a3e8-3cfe-4b6a-b84a-35d7a93579ee"
+ },
+ "hero_ca_phe_trung": {
+  "object_id": "7a34dd78-d270-4e31-8442-476dc5132737"
+ },
+ "hero_tra_mat_ong": {
+  "object_id": "961e9418-1ec5-4ca5-bc18-ce65d15626ee"
+ },
+ "hero_ca_kho": {
+  "object_id": "124b767f-63b3-438c-8a04-7976bb17908b"
+ },
+ "hero_mi_quang": {
+  "object_id": "ba141c8a-4813-4c9d-928b-a1f23b628b09"
+ },
+ "hero_berry_pie": {
+  "object_id": "fe3bbcd8-eeba-460e-aaff-00fd3bbb71b5"
+ },
+ "hero_honey_cakes": {
+  "object_id": "7d5d07af-b0b2-4dff-80e0-f7e02f0286a6"
+ },
+ "hero_caramel_custard": {
+  "object_id": "434809bb-9dfd-4d95-aaa8-b2ea72b5fc36"
+ },
+ "hero_grandpas_thermos": {
+  "object_id": "5803f268-8cbe-4e00-8828-c7cf95c8dece"
+ },
+ "hero_old_trail_register": {
+  "object_id": "23d6d0e5-3c63-4875-bccd-d5dda338f83b"
+ },
+ "hero_photo_on_the_porch": {
+  "object_id": "ec3f845d-ed5d-46cc-9cab-4c1c30ada92b"
+ },
+ "hero_carved_oar": {
+  "object_id": "b0b3cc4c-fc8c-4885-ba30-f10f2da63025"
+ },
+ "hero_river_chart": {
+  "object_id": "92a75dd6-98c5-4dae-ac8b-450ee7768d5c"
+ },
+ "hero_old_bas_boat": {
+  "object_id": "2e5d5ea9-756c-4137-a7e4-d358bde4489b"
+ },
+ "hero_bamboo_frames": {
+  "object_id": "36a1bd6f-a9cf-4029-b5e1-0bc37b0bfa8a"
+ },
+ "hero_pattern_book": {
+  "object_id": "d8c9558b-7f7c-47cb-8652-914e62f859a2"
+ },
+ "hero_unfinished_lantern": {
+  "object_id": "dc166183-eecd-4c51-ba63-3002b3c644b8"
  }
 }

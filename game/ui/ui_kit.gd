@@ -374,7 +374,8 @@ static func pressable(b: Button, squash := true) -> Button:
 ## surface; "focus"/"sel_glow" is the nav-mode vermilion halo ring.
 const FLAT_PIECES := ["sheet", "glass_panel", "glass_chip", "glass_pill",
     "btn_pill", "btn_green", "btn_gold", "btn_disabled",
-    "bubble", "bubble_prompt", "bubble_speech_flat", "focus", "sel_glow"]
+    "bubble", "bubble_prompt", "bubble_speech_flat", "focus", "sel_glow",
+    "medallion"]
 
 
 static func flat(piece: String, mod := 1.0, alpha := 1.0) -> StyleBoxFlat:
@@ -391,6 +392,9 @@ static func flat(piece: String, mod := 1.0, alpha := 1.0) -> StyleBoxFlat:
                          bg = UITokens.GLASS;    line = UITokens.LINE; r = 4
         "focus", "sel_glow":
                          bg = Color(0, 0, 0, 0); line = UITokens.VERMILION; r = 5
+        # the result-card hero ring — deep lacquer disc behind a
+        # content sprite, Eastward's dish medallion
+        "medallion":     bg = UITokens.DIM_BG;   line = UITokens.LINE; r = 999
         _:               bg = UITokens.GLASS;    line = UITokens.LINE
     if mod != 1.0:
         bg = Color(bg.r * mod, bg.g * mod, bg.b * mod, bg.a)

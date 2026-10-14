@@ -20,6 +20,7 @@ var _slot_a := ""
 var _slot_b := ""
 var _res_text := ""
 var _res_tint: Color = UITokens.PAPER
+var _res_dish := ""                # last cooked recipe id -> hero card
 
 
 static func make() -> PantrySheet:
@@ -43,9 +44,12 @@ func _build() -> void:
 	m.add_theme_constant_override("margin_right", 14)
 	m.add_theme_constant_override("margin_bottom", 12)
 	add_child(m)
+	var scroll := ScrollContainer.new()
+	m.add_child(scroll)
 	_v = VBoxContainer.new()
+	_v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_v.add_theme_constant_override("separation", 5)
-	m.add_child(_v)
+	scroll.add_child(_v)
 	var x := UIKit.icon_btn(self, "close")
 	x.position = Vector2(W - UITokens.MIN_TOUCH - 8, 4)
 	x.pressed.connect(_close)
@@ -105,7 +109,10 @@ func _build_main() -> void:
 	sb.pressed.connect(func(): _slot_b = ""; _rebuild())
 
 	# --- result + tonight's menu (result text survives rebuilds —
-	# the cook outcome paints into the fresh layout)
+	# the cook outcome paints into the fresh layout). A successful
+	# cook also earns the dish-hero medallion card.
+	if _res_dish != "" and UIKit.icon_exists(_res_dish + "_hero"):
+		_v.add_child(_result_card(_res_dish))
 	var res := UIKit.label_for(_res_text, UITokens.TypeRole.BODY,
 		_res_tint)
 	res.name = "Result"
@@ -215,6 +222,7 @@ func _on_cook() -> void:
 	if _slot_a == "" or _slot_b == "":
 		_res_text = tr("pan_pick")
 		_res_tint = UITokens.DIM
+		_res_dish = ""
 		UIFeel.sfx("warn")
 		_rebuild()
 		return
@@ -227,19 +235,63 @@ func _on_cook() -> void:
 				{"name": r.get("name", "?"),
 				 "p": int(r.get("meal", {}).get("price", 0))})
 			_res_tint = UITokens.GREEN
+			_res_dish = String(r.get("recipe", ""))
 			_slot_a = ""
 			_slot_b = ""
 		"oven_hint":
 			UIFeel.sfx("warn")
 			_res_text = String(r.get("hint", ""))
 			_res_tint = UITokens.GOLD
+			_res_dish = ""
 		_:                                   # "missing"
 			UIFeel.sfx("warn")
 			UIFeel.haptic("warn")
 			_res_text = tr("pan_res_missing").format(
 				{"name": _ing_name(String(r.get("missing", "?")))})
 			_res_tint = UITokens.RED
+			_res_dish = ""
 	_rebuild()
+
+
+## The cook payoff: dish hero in a dark medallion ring + name + price —
+## the Eastward result-card read (hero art 64px native, ring is chrome).
+func _result_card(dish_id: String) -> Control:
+	var card := PanelContainer.new()
+	card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	card.add_theme_stylebox_override("panel", UIKit.flat("glass_panel"))
+	var h := HBoxContainer.new()
+	h.alignment = BoxContainer.ALIGNMENT_CENTER
+	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	h.add_theme_constant_override("separation", 8)
+	var ring := PanelContainer.new()
+	ring.custom_minimum_size = Vector2(72, 72)
+	ring.add_theme_stylebox_override("panel", UIKit.flat("medallion"))
+	var ic := UIKit.icon_rect(dish_id + "_hero", null, 64)
+	ic.set_anchors_preset(Control.PRESET_CENTER)
+	ring.add_child(ic)
+	h.add_child(ring)
+	var info := VBoxContainer.new()
+	info.alignment = BoxContainer.ALIGNMENT_CENTER
+	var rname := dish_id
+	var price := 0
+	for r in Catalog.data.get("recipes", []):
+		if r.get("id") == dish_id:
+			rname = r.get("name", dish_id)
+			break
+	for meal in Game.meals:
+		if meal.get("id") == dish_id:
+			price = int(meal.get("price", 0))
+	info.add_child(UIKit.label_for(rname, UITokens.TypeRole.HEAD,
+		UITokens.PAPER))
+	var prow := HBoxContainer.new()
+	prow.add_theme_constant_override("separation", 3)
+	prow.add_child(UIKit.icon_rect("coin"))
+	prow.add_child(UIKit.label_for("%d" % price,
+		UITokens.TypeRole.BODY, UITokens.PAPER))
+	info.add_child(prow)
+	h.add_child(info)
+	card.add_child(h)
+	return card
 
 
 func _meal_strip() -> Control:

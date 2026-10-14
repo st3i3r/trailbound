@@ -90,6 +90,71 @@ for k, kind, _l in JOBS:
     FILE_ID[k] = {"dish": "dish_%s", "ing": "ing_%s",
                   "keep": "%s"}[kind] % (k if kind != "keep" else k)
 
+HERO_KEYS = [k for k, kind, _l in JOBS if kind in ("dish", "keep")]
+
+HERO_BLOCK = ("painterly pixel art game illustration in the style "
+              "of Eastward — chunky readable silhouette filling "
+              "about 85% of the canvas with a 4-5px margin all "
+              "round, dark warm-brown coloured outline (never pure "
+              "black), 2-3 tone shading with warm upper-left light "
+              "and a cool shadow side, saturated colours, rich "
+              "interior texture and garnish detail suited to the "
+              "larger canvas, single subject centred on a "
+              "transparent background, no cast shadow, no ground "
+              "patch, no rim light, no text — ")
+
+
+def _upload(path):
+    url = harness("get_upload_url", {})
+    m = re.search(r'https://api\.pixellab\.ai/v2/uploads/\S+', url)
+    if not m:
+        sys.exit("no upload url in reply")
+    r = subprocess.run(["curl", "-sS", "-F", "file=@" + path,
+                        m.group(0)], capture_output=True, text=True,
+                       cwd=ROOT)
+    ref = json.loads(r.stdout).get("ref", "")
+    if not ref:
+        sys.exit("upload failed: " + r.stdout[:300])
+    return ref
+
+
+def fire_hero(only=None):
+    """D2: 64x64 heroes for dishes + keepsakes. Fresh gen with the
+    craft ref — NOTE: using the D1 icon as style_image locks the
+    figure to 32px inside the 64px canvas (verified hero_noodle_
+    soup pilot); palette consistency comes from the pooled lock."""
+    st = load_state()
+    for key in HERO_KEYS:
+        if only and key not in only:
+            continue
+        ent = st.setdefault("hero_" + key, {})
+        if ent.get("object_id"):
+            continue
+        line = next(l for k, _t, l in JOBS if k == key)
+        args = {"description": HERO_BLOCK + line, "name": "hero_" + key,
+                "n_directions": 1, "width": 64, "height": 64,
+                "view": "low top-down",
+                "style_image": {"url": STYLE_REF,
+                                "usage_description":
+                                    "match this pixel-art craft: "
+                                    "outline weight, shading ramps, "
+                                    "colour depth"},
+                "style_options": {"color_palette": False,
+                                  "outline": True, "shading": True,
+                                  "detail": True}}
+        try:
+            out = harness("create_object_pro_flash", args)
+        except SystemExit as e:
+            if "concurrent" in str(e).lower():
+                print("cap reached — rerun fire_hero after finish")
+                return
+            raise
+        m = re.search(
+            r"\b[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\b", out)
+        ent["object_id"] = m.group(0) if m else ""
+        save_state(st)
+        print("fired hero_" + key, ent["object_id"])
+
 
 def harness(tool, args, extra=None):
     cmd = [sys.executable, "tools/pixellab_mcp.py", tool,
@@ -180,8 +245,8 @@ def poll():
 
 
 def _normalize(path):
-    """Fit the figure inside a 30x30 box centred on the 32x32 canvas
-    (nearest). Guarantees the >=1px margin the gate requires."""
+    """Fit the figure inside the canvas-2 margin box (32px icon ->
+    30px box, 64px hero -> 60px box), centred, nearest."""
     from PIL import Image
     im = Image.open(path).convert("RGBA")
     box = im.getchannel("A").getbbox()
@@ -189,14 +254,17 @@ def _normalize(path):
         return
     fig = im.crop(box)
     fw, fh = fig.size
-    if fw <= 30 and fh <= 30 and box[0] >= 1 and box[1] >= 1 \
-            and box[2] <= 31 and box[3] <= 31:
+    cw, ch = im.size
+    m = 2 if ch == 64 else 1
+    bw, bh = cw - 2 * m, ch - 2 * m
+    if fw <= bw and fh <= bh and box[0] >= m and box[1] >= m \
+            and box[2] <= cw - m and box[3] <= ch - m:
         return
-    s = min(30.0 / fw, 30.0 / fh)
+    s = min(float(bw) / fw, float(bh) / fh)
     nw, nh = max(1, round(fw * s)), max(1, round(fh * s))
     fig = fig.resize((nw, nh), Image.NEAREST)
     out = Image.new("RGBA", im.size, (0, 0, 0, 0))
-    out.paste(fig, ((32 - nw) // 2, (32 - nh) // 2))
+    out.paste(fig, ((cw - nw) // 2, (ch - nh) // 2))
     out.save(path)
 
 
@@ -215,13 +283,20 @@ def _bbox(path):
 
 
 def _gate(key, path):
+    import png as pngmod
+    w, h, _rows = pngmod.read(path)
     b = _bbox(path)
     if not b:
         print("  %s EMPTY" % key)
         return False
     fh = b[3] - b[2] + 1
-    margin = min(b[0], b[2], 31 - b[1], 31 - b[3])
-    ok = 20 <= fh <= 30 and margin >= 1
+    margin = min(b[0], b[2], w - 1 - b[1], h - 1 - b[3])
+    # 32px icon: 20-30px figure, >=1px margin
+    # 64px hero: 30-56px figure, >=2px margin — Eastward's dish reads
+    # ~37px inside its medallion; the ring is chrome, the hero sits
+    # inside it, and non-integer nearest-rescaling mushes edges
+    lo, hi, mmin = (30, 56, 2) if h == 64 else (20, 30, 1)
+    ok = lo <= fh <= hi and margin >= mmin
     print("  %-22s h=%dpx margin=%d %s" % (key, fh, margin,
           "ok" if ok else "FAIL"))
     return ok
@@ -238,6 +313,7 @@ def finish(keys=None):
         oid = ent.get("object_id")
         if not oid:
             continue
+        base = key[5:] if key.startswith("hero_") else key
         gendir = os.path.join(GENDIR, key)
         os.makedirs(gendir, exist_ok=True)
         raw = os.path.join(gendir, "%s.png" % key)
@@ -274,7 +350,11 @@ def finish(keys=None):
                    + files + ["--colors", "48"], check=True, cwd=ROOT)
     for f in files:
         key = os.path.basename(f)[:-4]
-        shutil.copy2(f, os.path.join(STAGE, FILE_ID[key] + ".png"))
+        if key.startswith("hero_"):
+            stem = FILE_ID[key[5:]] + "_hero"
+        else:
+            stem = FILE_ID[key]
+        shutil.copy2(f, os.path.join(STAGE, stem + ".png"))
     print("staged %d icons -> %s" % (len(files), STAGE))
     _wire_icons_json()
 
@@ -289,6 +369,12 @@ def _wire_icons_json():
                 and obj.get(key) != fid:
             obj[key] = fid
             n += 1
+        hero = fid + "_hero"
+        if kind in ("dish", "keep") and \
+                os.path.exists(os.path.join(STAGE, hero + ".png")) \
+                and obj.get(key + "_hero") != hero:
+            obj[key + "_hero"] = hero
+            n += 1
     json.dump(d, open(ICONS_JSON, "w"), indent=1, ensure_ascii=False)
     print("icons.json: %d mappings wired" % n)
 
@@ -299,6 +385,10 @@ if __name__ == "__main__":
         fire({"noodle_soup"})
     elif cmd == "fire":
         fire(set(sys.argv[2:]) or None)
+    elif cmd == "hero_pilot":
+        fire_hero({"noodle_soup"})
+    elif cmd == "fire_hero":
+        fire_hero(set(sys.argv[2:]) or None)
     elif cmd == "poll":
         poll()
     elif cmd == "finish":

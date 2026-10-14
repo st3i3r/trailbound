@@ -410,6 +410,19 @@ evening-tray meal chip (84px, dish art left), journal recipe +
 keepsake rows (`_row` gained `icon_size`; content art at 32px,
 undiscovered rows keep the glyph).
 
+**D2 shipped (same day):** 31 heroes (22 dishes + 9 keepsakes) at
+64×64 via `fire_hero`. Two lessons recorded: (1) passing the D1 icon
+as `style_image` locks the figure to the ref's pixel size — the icon
+was redrawn 31px inside the 64px canvas; heroes use the craft ref
+instead and share palette through the pooled ramp; (2) hero fill is
+smaller than icon fill BY DESIGN — Eastward's dish reads ~37px
+inside its medallion, so the gate is 30-56px figure on the 64px
+canvas, and under-fill is never fixed with non-integer nearest
+rescaling (mushes edges). File id `<stem>_hero`, icon key
+`<id>_hero`. Display: the pantry cook result card — `medallion`
+flat piece (dark lacquer disc, r=999) + `icon_rect(id+"_hero",
+null, 64)` + name/price.
+
 Dishes (`recipes.json`): `camp_mash` lumpy grey-brown mash in a dented tin bowl with a spoon · `trail_stew` hearty vegetable stew in an enamel camp pot, steam · `mushroom_skewers` grilled mushroom skewers on bamboo sticks · `herb_tea` green herbal tea in a small clay cup with a mint sprig · `berry_tea` pink berry tea in a glass with floating berries · `smores` toasted marshmallow s'mores on a tin plate · `trail_sandwich` crusty baguette sandwich with pickled carrot, cucumber and herbs · `goldcap_skillet` golden mushrooms sizzling in a small cast-iron skillet · `grilled_fish` whole grilled fish on a banana leaf with lime · `noodle_soup` beef noodle soup in a big white bowl with herbs, lime and chili · `iced_coffee` iced coffee with condensed milk, drip filter on top of the glass · `com_nam` triangle rice balls with sesame salt on a banana leaf · `goi_cuon` fresh spring rolls in translucent rice paper with shrimp and herbs, dipping sauce · `che` layered sweet bean dessert in a tall glass with coconut cream · `sinh_to` mango-avocado smoothie in a glass with a straw · `ca_phe_trung` egg coffee in a small cup standing in a bowl of hot water, foamy top · `tra_mat_ong` honey tea in a glass mug with a lemon slice · `ca_kho` caramelised braised fish in a small clay pot, glossy dark sauce · `mi_quang` turmeric-yellow noodles in a shallow bowl with shrimp, peanuts and a rice cracker · `berry_pie` lattice berry pie slice on a tin plate · `honey_cakes` stack of small honey cakes drizzled with honey · `caramel_custard` caramel custard with dark caramel on a small plate
 
 Ingredients (`ingredients.json`): `mushroom` brown wild mushrooms · `herb` tied herb bundle · `berries` handful of red berries · `goldcap` golden mushroom · `honey` honey jar with a wooden dipper · `perch` small perch · `carp` carp · `trout` speckled trout · `catfish` catfish · `bread` baguette · `rice` bowl of uncooked rice · `eggs` three brown eggs · `tea` tin of tea leaves · `marshmallow` bag of marshmallows · `noodles` bundle of dried rice noodles · `coffee` bag of coffee beans · `sweet_milk` condensed milk tin
