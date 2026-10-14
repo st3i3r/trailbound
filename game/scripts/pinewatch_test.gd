@@ -124,7 +124,6 @@ const PROPS_PINEWATCH := [
     ["fx", "tree_broadleaf_sunlit",    628, 300, 0.0, 0.55],
     # ===== HUT YARD — homestead in the dirt pocket (top-right) =====
     ["props_large",  "cabin",             530, 112, 0.0, 1.05],
-    ["props_small",  "spirit_house",      612, 116, 0.0, 1.05],
     ["props_medium", "chicken_coop",      578, 132, 0.0, 0.95],
     ["props_small",  "clothesline",       494, 140, 0.0, 1.10],
     # ===== NW — amber tent pitch =====
@@ -138,53 +137,26 @@ const PROPS_PINEWATCH := [
     ["props_medium", "tripod_cauldron",   368, 228],
     ["props_small",  "log_stool",         312, 252],
     ["props_small",  "log_stool",         332, 264],
-    ["props_small",  "log_stool",         416, 258],
     ["props_medium", "lantern_post",      326, 206, -3.0, 1.10],
-    ["props_small",  "axe_on_log",        402, 246],
-    ["props_small",  "firewood_bundle",   392, 248, 0.0, 0.62],
     # ===== POND — smaller pond, willow + fishing vignette =====
     ["fx", "tree_feathery_sunlit",     134, 288, 0.0, 0.80],
-    ["decals",       "decal_lily_pad",     36, 258],
-    ["decals",       "decal_lily_pad",     88, 322],
     ["props_small",  "fishing_rod",       144, 300, -6.0],
     ["props_small",  "tackle_box",        152, 310],
     # ===== TRAILHEAD — van unloading at spine exit =====
     ["props_large",  "outfitter_van",     440, 348, 0.0, 1.35],
     ["props_small",  "signpost",          394, 342],
-    ["props_medium", "moped_cub",         404, 360, 0.0, 1.10],
+    ["props_medium", "prop_supply_crate_0", 482, 372],
     # ===== E — rest corner attached to the van cluster =====
     ["props_large",  "picnic_table",      522, 306, 0.0, 0.62],
-    ["props_medium", "picnic_basket",     528, 294],
     ["props_medium", "picnic_umbrella",   516, 296],
-    ["props_small",  "thermos",           514, 298],
-    # ===== TREELINE FEET — undergrowth at the edge; the open field
-    # stays empty (Eastward reads ~60-70% open grass) =====
-    ["props_medium", "pine_sapling",      170,  96],
-    ["props_medium", "pine_sapling",      214,  94],
-    ["props_medium", "fern_bank",         340,  96],
+    # ===== TREELINE FEET — sparse undergrowth at the edge only;
+    # the ref stands trees on bare grass (~70% open) =====
     ["props_medium", "fern_bank",         104,  98],
-    ["props_medium", "bush_round_m",      272, 114],
-    ["props_medium", "bush_round_m",      440, 116],
     ["props_medium", "bush_white_flower_v", 384, 110],
-    ["props_medium", "stump_mushroom",    236, 108],
-    # ===== HUT YARD — the working homestead =====
-    ["props_large",  "banana_clump",      608, 200, 0.0, 0.62],
+    ["props_medium", "bush_round_m",      440, 116],
     # ===== CAMPFIRE HUB — cook support; one anchor + woodpile =====
     ["props_medium", "woodpile",          296, 244],
     ["props_medium", "dirt_patch",        368, 244],
-    # ===== POND — bank vignette: willow + blossom + hammock =====
-    ["props_medium", "bamboo_bench",      244, 304],
-    ["props_medium", "debris_log_mossy",  142, 336],
-    ["props_medium", "prop_boulder_0",    166, 336],
-    ["props_large",  "tree_cherry",       196, 298, 0.0, 0.55],
-    ["props_large",  "hammock",           104, 302, 0.0, 0.60],
-    ["decals",       "decal_duckweed",     52, 290],
-    ["decals",       "decal_duckweed",    108, 306],
-    ["decals",       "step_stone_a",      148, 338],
-    ["decals",       "step_stone_b",      166, 344],
-    # ===== TRAILHEAD — van unloading + cook stall =====
-    ["props_medium", "prop_supply_crate_0", 482, 372],
-    ["props_large",  "cook_shelter",      584, 372, 0.0, 0.85],
     # ===== BOUNDARY marks =====
 ]
 
