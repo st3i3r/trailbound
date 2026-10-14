@@ -2,13 +2,14 @@
  "_doc": "Actor persona layer (PLAN_gameplay D4 + PROMPT_PACK Batch B2). Archetype is sim metadata; persona is what renders. Cast picks a persona from the archetype pool via w.rng — same night replays the same faces. sprite = characters/<key>/ dir holding <key>_{dir}.png 8-dir stills + A2_idle_south_{n}.png when the anim lands; missing dirs fall back to `fallback` (interim placeholder until the PixelLab cast ships). anim_map: sim anim name -> how the presenter renders it; `_dir` = directional stills, others map to a base anim or emote. Size is BAKED INTO THE ART per the Batch B2 consistency spec (adult 42-44px figure in 48x48, kid 32-34, dog 30-34) — personas render at uniform world scale, no render-time rescale.",
  "anim_map": {
   "walk": "_dir",
-  "fish": "idle",
-  "play": "idle",
-  "sit": "idle",
-  "sniff": "idle",
-  "flee": "walk",
-  "wary": "idle",
-  "idle": "idle"
+  "flee": "_dir",
+  "idle": "idle",
+  "fish": "fish",
+  "play": "play",
+  "sit": "sit",
+  "sniff": "sniff",
+  "pet": "pet",
+  "wary": "wary"
  },
  "fallback": {
   "sprite": "characters/warden/A2_idle_south_0",

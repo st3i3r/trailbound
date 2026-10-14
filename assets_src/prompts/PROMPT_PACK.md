@@ -523,6 +523,42 @@ Walks: `animate_character` template, south / north / east (west mirrored)
 | props (`animate_object` v3) | awning flutter · lantern sway · pennant flutter · laundry flutter · hen pecking · duck swimming · bird hop and fly-off |
 | VFX (`vfx_workbench`, free) | stall and fire smoke, steam, water ripple, fireflies, falling petals, sparkle, confetti, stamp burst, coin pop |
 
+#### Batch G runtime — implemented 2026-10-16 (`tools/batch_g_anims.py`)
+
+- **Driver matrix** (what the sim actually emits — `sim_director`
+  `anim_map`): `idle` south loop for all 22 personas
+  (`breathing-idle` template; `idle` for quadrupeds) · `walk`
+  S/N/E/W **only for movers that path off-pad** — anglers, kids/
+  family, dogs (`walking-8-frames`; `walk-8-frames` for quads) ·
+  `fish`+`sit` for anglers, `play`+`pet` for kids, `sniff`+`play`
+  for dogs (custom `action_description` + `frame_count` on
+  `animate_character` — no v3 needed). `wary`/`flee` get no art:
+  wary→idle+`!` chip, flee→walk clip (distance-stepping reads as a
+  run at 80 px/s). Warden's existing `A2_*` clips are copied to the
+  persona contract (`warden_idle_south_*`, `warden_walk_*`) — zero
+  gens.
+- **Foot-slide SOTA fix — distance-driven stepping:** `actor_view`
+  accumulates `moved.length()` and picks
+  `frame = int(walk_acc / STEP_PX) % n` (`STEP_PX=5`), not a fps —
+  cadence tracks speed at 35/55/80 px/s alike. Diagonals drive the
+  dominant-cardinal clip (`CARD_OF`). Idles keep time-based
+  `play()` with a presentation-only `randi()` start-frame desync.
+- **Contract:** `still_<dir>` (8-way stills, always) ·
+  `<clip>_<dir>` generated (walk) · `<clip>_south` activities ·
+  fallback chain `<anim>_south → idle_south → still_south`.
+- **Frame normalization:** every gen frame is re-anchored onto the
+  still's canvas by bbox bottom-center (`_norm_frames`) so clips of
+  any source size ground identically — no anchor drift. Palette-
+  lock to the persona ramp after normalize.
+- **Tool gotchas learned:** job slots are **per direction** (a 4-dir
+  walk = 4 of 8 slots; cap error must not mark `fired`); frame URLs
+  (`{i}.png` pattern) can lag a couple of minutes after `done` —
+  poll multi-dir jobs until ALL `want_dirs` urls are present before
+  downloading; download dirs contain a non-image `download.png`
+  artifact — filter frames by the `<dir>_<i>.png` pattern before
+  PIL; `get_character` output arrives with cp1252-mangled em-dashes —
+  parse on section shape, never literal `—`.
+
 ### Batch H — restoration, Clear, states
 
 - **H1 Warden's Hut stages** (`edit_image_pro_flash` from the restored `cottage_shed`, 128 px, palette correction on, 3 × 2 seeds ≈36): `hut_s0` ruined, collapsed roof, broken shutters, brambles and vines over the walls · `hut_s1` brambles cleared, roof open with bare rafters · `hut_s2` new roof tiles, shutters still broken · `hut_s3` = restored (existing)

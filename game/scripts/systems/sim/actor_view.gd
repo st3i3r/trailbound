@@ -10,17 +10,33 @@ extends Node
 ## (any sheet open — no actors walking while you read a letter).
 ##
 ## Rendering contract (actors.json anim_map):
-##   walk -> "_dir": 8-way directional stills <key>_<dir>.png
-##   <other> -> "idle": south still; <key>_idle_south_<n>.png loops
-##     upgrade to an AnimatedSprite2D with a per-eid phase offset
-## Missing persona dirs degrade to actors.json's fallback sprite+tint.
-## Despawned eids fade out over ~0.3s. Emote comps raise a chip over
-## the sprite while emote.t lives.
+##   walk/flee -> "_dir": distance-driven step cycle — the frame index
+##     is a function of ground travelled (frame = acc/STEP_PX), so
+##     cadence always matches speed at any gait; <key>_walk_<dir>_<i>
+##     clips where they exist, else the 8-way stills swap as before
+##   <other>  -> clip name: <key>_<anim>_south_<i>.png loops play
+##     when present, else the south still (idle fallback chain)
+## Personas with no clips still work — stills only.  Missing persona
+## dirs degrade to actors.json's fallback sprite+tint.  Despawned
+## eids fade out over ~0.3s.  Emote chips ride above the sprite.
 
 const DT := 1.0 / 30.0                 # fixed sim step (presentation)
 const DIR8 := ["east", "south-east", "south", "south-west",
 	"west", "north-west", "north", "north-east"]
 const FADE_OUT := 0.30
+const STEP_PX := 5.0                   # 1 walk frame per 5px travelled
+const CLIPS := ["idle", "walk", "fish", "sit", "play", "pet",
+	"sniff", "wary"]
+## diagonal travel drives the dominant-cardinal clip — generated
+## walks only exist for N/S/E/W (8-way diagonal stills cover the
+## rest), so a strafing actor keeps stepping instead of freezing
+## on a still mid-slide
+const CARD_OF := {
+	"east": "east", "south-east": "south",
+	"south": "south", "south-west": "south",
+	"west": "west", "north-west": "north",
+	"north": "north", "north-east": "north",
+}
 
 var sim: SimWorld
 var actors_data: Dictionary = {}       # data/actors.json
@@ -103,7 +119,7 @@ func _spawn(eid: int) -> Dictionary:
 	world.add_child(sp)
 	actor_nodes.append(sp)
 	return {"node": sp, "key": key, "anim": "", "dir": "south",
-		"chip": -1}
+		"chip": -1, "clip": "", "walk_acc": 0.0}
 
 
 func _sprite(key: String) -> CanvasItem:
@@ -112,34 +128,42 @@ func _sprite(key: String) -> CanvasItem:
 		tex_path(base + "_south"))
 	var sc := Vector2(char_scale, char_scale)
 	if has_dir:
-		var idle0 := base + "_idle_south_0"
-		if ResourceLoader.exists(tex_path(idle0)):
-			var frames := SpriteFrames.new()
-			frames.add_animation("main")
-			var i := 0
-			while ResourceLoader.exists(
-					tex_path("%s_idle_south_%d" % [base, i])):
-				frames.add_frame("main", tex.call(
-					"%s_idle_south_%d" % [base, i]))
-				i += 1
-			frames.set_animation_speed("main", 4.0)
-			var a := AnimatedSprite2D.new()
-			a.sprite_frames = frames
-			a.centered = false
-			a.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-			var sz := frames.get_frame_texture("main", 0).get_size()
-			a.offset = -Vector2(sz.x / 2.0, sz.y)
-			a.scale = sc
-			a.play("main")
-			return a
-		var s := Sprite2D.new()
-		s.texture = tex.call(base + "_south")
-		s.centered = false
-		s.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		s.offset = -Vector2(s.texture.get_width() / 2.0,
-			s.texture.get_height())
-		s.scale = sc
-		return s
+		var frames := SpriteFrames.new()
+		for d in DIR8:                             # stills — always
+			if ResourceLoader.exists(tex_path(base + "_" + d)):
+				frames.add_animation("still_" + d)
+				frames.add_frame("still_" + d,
+					tex.call(base + "_" + d))
+		for an in CLIPS:                           # generated clips
+			for d in DIR8:
+				var c := "%s_%s" % [an, d]
+				if not ResourceLoader.exists(
+						tex_path("%s_%s_0" % [base, c])):
+					continue
+				frames.add_animation(c)
+				var i := 0
+				while ResourceLoader.exists(
+						tex_path("%s_%s_%d" % [base, c, i])):
+					frames.add_frame(c,
+						tex.call("%s_%s_%d" % [base, c, i]))
+					i += 1
+				frames.set_animation_speed(c, 5.0)
+		var a := AnimatedSprite2D.new()
+		a.sprite_frames = frames
+		a.centered = false
+		a.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		var first := "idle_south" if \
+			frames.has_animation("idle_south") else "still_south"
+		var sz := frames.get_frame_texture(first, 0).get_size()
+		a.offset = -Vector2(sz.x / 2.0, sz.y)
+		a.scale = sc
+		a.animation = first
+		a.play(first)
+		# desync: stagger the start frame so the crowd never
+		# breathes in phase (presentation-only randi — the sim
+		# stays deterministic)
+		a.frame = randi() % frames.get_frame_count(first)
+		return a
 	# fallback — the actors.json placeholder, tinted per persona entry
 	var fb: Dictionary = actors_data.get("fallback", {})
 	var s2 := Sprite2D.new()
@@ -170,10 +194,43 @@ func _pose(rec: Dictionary, eid: int, p: Vector2,
 		.get(aname, "idle"))
 	if moved.length() > 0.5:
 		rec["dir"] = _dir8(moved)
-	if render == "_dir":
-		_still(rec, rec["dir"])
-	elif rec["node"] is Sprite2D:
-		_still(rec, "south")
+	rec["walk_acc"] += moved.length()
+	var n: CanvasItem = rec["node"]
+	if n is AnimatedSprite2D:
+		var frames: SpriteFrames = n.sprite_frames
+		if render == "_dir":
+			var wc: String = "walk_" + String(
+				CARD_OF.get(rec["dir"], rec["dir"]))
+			if not frames.has_animation(wc):
+				wc = "walk_" + rec["dir"]      # rare: diag clip exists
+			if frames.has_animation(wc):
+				_clip(rec, wc)
+				n.stop()                    # frame = f(distance)
+				n.frame = int(rec["walk_acc"] / STEP_PX) \
+					% frames.get_frame_count(wc)
+			else:                            # no clip dir -> still
+				_clip(rec, "still_" + rec["dir"])
+		else:
+			var c := render + "_south"
+			var fps := float(anim.get("fps", 5.0))
+			if frames.has_animation(c):
+				_clip(rec, c, fps)
+			elif frames.has_animation("idle_south"):
+				_clip(rec, "idle_south", fps)
+			else:
+				_clip(rec, "still_south")
+	elif n is Sprite2D:
+		_still(rec, rec["dir"] if render == "_dir" else "south")
+
+
+func _clip(rec: Dictionary, c: String, fps := 5.0) -> void:
+	if rec["clip"] == c:
+		return
+	rec["clip"] = c
+	var n: AnimatedSprite2D = rec["node"]
+	n.sprite_frames.set_animation_speed(c, fps)
+	n.animation = c
+	n.play(c)
 
 
 func _still(rec: Dictionary, dir: String) -> void:

@@ -1,0 +1,584 @@
+{
+ "bean/idle": {
+  "fired": true,
+  "reply": "character: 359a96ed-7c76-481a-aa0c-310f1a8fba3d\nanimation: idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=7aff75ea-98ae-4a66-81bd-e60e8b4a1481\ngroup: 0d13900d-bc00-40a1-b017-d3eee8b7f4c6\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"359a96ed-7c76-481a-aa0c-310f1a8fba3d\", template_animation_id=\"idle\", animation_group_i",
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/359a96ed-7c76-481a-aa0c-310f1a8fba3d/animations/04d11ee8-90c8-4fc2-9847-d249cbb51b27/south/{i}.png?t=1791948794222",
+   "download": "https://api.pixellab.ai/mcp/characters/359a96ed-7c76-481a-aa0c-310f1a8fba3d/download"
+  },
+  "done": true,
+  "staged": true,
+  "want_dirs": [
+   "south"
+  ]
+ },
+ "bean/walk": {
+  "fired": true,
+  "reply": "character: 359a96ed-7c76-481a-aa0c-310f1a8fba3d\nanimation: walk-8-frames\nmode: template\ndirections: south, north, east, west (4 jobs)\njob_ids: south=0ce93b84-91ca-40e3-8c14-ee01853cd933, north=d3af7544-791e-400a-aede-0ba1b8d8a887, east=7fe32c7b-f8cc-426e-a11c-c32fb6685fbe, west=ab4af2ff-c501-4f65-84af-c852765028de\ngroup: a2216561-b777-40d9-aaed-435c46277460\ncost: 4 generations (1/dir x 4)\neta: ~2-",
+  "urls": {
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/359a96ed-7c76-481a-aa0c-310f1a8fba3d/animations/d8d09c5e-0f94-40d3-916b-529ed80c17c8/east/{i}.png?t=1791948829001",
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/359a96ed-7c76-481a-aa0c-310f1a8fba3d/animations/f01c920a-dcc8-40b0-8c42-fe27aad0c946/south/{i}.png?t=1791948822462",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/359a96ed-7c76-481a-aa0c-310f1a8fba3d/animations/2098f8f0-2ab3-4fd0-a5ee-43ed77aabd7d/west/{i}.png?t=1791948791319",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/359a96ed-7c76-481a-aa0c-310f1a8fba3d/animations/92c6c1ce-df41-4eb9-b4da-8eb632993b44/north/{i}.png?t=1791948778688"
+  },
+  "done": true,
+  "staged": true,
+  "want_dirs": [
+   "south",
+   "north",
+   "east",
+   "west"
+  ]
+ },
+ "bean/sniff": {
+  "fired": true,
+  "reply": "character: 359a96ed-7c76-481a-aa0c-310f1a8fba3d\nanimation: v3 custom (sniffing the ground, nose low, tail wagging)\ndirections: south (1 jobs)\njob_ids: south=de706832-3f0d-4b10-8843-2b2b5bd7aec7\ngroup: ad1f8825-e863-4573-9655-5dc0aac2b4fb\nframes: 7 (1 reference + 6 animated)\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min/direction\n\nhint: get_character(character_id=\"359a96ed-7c76-481a-aa0c-310f1a8fba3",
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/359a96ed-7c76-481a-aa0c-310f1a8fba3d/animations/1b9ef92e-f0da-4fca-85bd-bc8d1269d0d3/south/{i}.png?t=1791948811458"
+  },
+  "done": true,
+  "staged": true,
+  "want_dirs": [
+   "south"
+  ]
+ },
+ "bean/play": {
+  "fired": true,
+  "reply": "character: 359a96ed-7c76-481a-aa0c-310f1a8fba3d\nanimation: v3 custom (play bow \u00e2\u20ac\u201d front down, rear up, tail wagging fast)\ndirections: south (1 jobs)\njob_ids: south=a5cedf25-c7ef-49ab-87fd-d7a0bd52edb0\ngroup: 45bcec16-a45f-4e90-a74e-8f8cd19ad461\nframes: 7 (1 reference + 6 animated)\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min/direction\n\nhint: get_character(character_id=\"359a96ed-7c76-481a-aa0c-310",
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/359a96ed-7c76-481a-aa0c-310f1a8fba3d/animations/69513eaf-239b-40cc-a1f2-60aef0a1ed82/south/{i}.png?t=1791948813034"
+  },
+  "done": true,
+  "staged": true,
+  "want_dirs": [
+   "south"
+  ]
+ },
+ "scout_kid/idle": {
+  "fired": true,
+  "reply": "character: c8bc5ed3-8c61-49cc-9454-7060e7b1e175\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=ac5b9a3f-c511-415f-b708-683fc4ea792d\ngroup: a72e734d-d4ff-4b91-a9a9-4909b9980caa\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"c8bc5ed3-8c61-49cc-9454-7060e7b1e175\", template_animation_id=\"breathing-idle",
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/c8bc5ed3-8c61-49cc-9454-7060e7b1e175/animations/79ff8bb2-0215-496d-9e7c-208fca6ee5d8/south/{i}.png?t=1791948782165",
+   "download": "https://api.pixellab.ai/mcp/characters/c8bc5ed3-8c61-49cc-9454-7060e7b1e175/download"
+  },
+  "done": true,
+  "staged": true,
+  "want_dirs": [
+   "south"
+  ]
+ },
+ "warden/idle": {
+  "fired": true,
+  "done": true,
+  "staged": true,
+  "note": "A2 clip reused",
+  "want_dirs": [
+   "south"
+  ]
+ },
+ "warden/walk": {
+  "fired": true,
+  "done": true,
+  "staged": true,
+  "note": "A2 clip reused"
+ },
+ "angler_uncle/idle": {
+  "reply": "character: 11c5c011-bd93-4545-baa1-09b28508d454\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=c28997db-b676-4e7e-be55-b5745f0e7c0a\ngroup: 968a7826-2578-4289-80c3-414c721e665a\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"11c5c011-bd93-4545-baa1-09b28508d454\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/11c5c011-bd93-4545-baa1-09b28508d454/animations/cdc2ae9c-7da8-4cf4-82f0-8fb6a2c0278e/south/{i}.png?t=1791949993014",
+   "download": "https://api.pixellab.ai/mcp/characters/11c5c011-bd93-4545-baa1-09b28508d454/download"
+  },
+  "done": true,
+  "staged": true,
+  "want_dirs": [
+   "south"
+  ]
+ },
+ "angler_uncle/walk": {
+  "reply": "character: 11c5c011-bd93-4545-baa1-09b28508d454\nanimation: walking-8-frames\nmode: template\ndirections: south, north, east, west (4 jobs)\njob_ids: south=4c4daf81-8f78-4786-a778-7b73f66bf79a, north=d99019e4-2b34-40d0-9128-6e97c443b53a, east=f5a1a550-6539-408a-9bc9-ce99ff6f9ce5, west=952009c5-cfd5-458d-8589-401f00bc3987\ngroup: 835f41d7-8386-4236-a1fa-408c7fa2d2ca\ncost: 4 generations (1/dir x 4)\neta: ",
+  "fired": true,
+  "urls": {
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/11c5c011-bd93-4545-baa1-09b28508d454/animations/dc09fd12-e657-4d42-a16e-cd69a94ac80f/west/{i}.png?t=1791949985184",
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/11c5c011-bd93-4545-baa1-09b28508d454/animations/e1d1c85f-9894-4744-a59e-4cfce476f7c5/south/{i}.png?t=1791950014509",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/11c5c011-bd93-4545-baa1-09b28508d454/animations/540b7f9c-38c1-4a2f-8284-7c6431b9893e/north/{i}.png?t=1791949997587",
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/11c5c011-bd93-4545-baa1-09b28508d454/animations/9d1b2b10-a5ef-43b1-819a-3688146e2549/east/{i}.png?t=1791949989903"
+  },
+  "done": true,
+  "staged": true,
+  "want_dirs": [
+   "south",
+   "north",
+   "east",
+   "west"
+  ]
+ },
+ "angler_uncle/fish": {
+  "reply": "character: 11c5c011-bd93-4545-baa1-09b28508d454\nanimation: v3 custom (standing at the water edge holding a fishing rod, casting the line then holding it still, watching)\ndirections: south (1 jobs)\njob_ids: south=50594177-5014-44d0-8580-a9c5f4003de5\ngroup: e44825f8-2d0f-4c53-89af-a25c65a166c8\nframes: 9 (1 reference + 8 animated)\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min/direction\n\nhint: get_char",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/11c5c011-bd93-4545-baa1-09b28508d454/animations/715d0703-f1a8-4cab-ba3f-95d90e7e4835/south/{i}.png?t=1791950067782"
+  },
+  "done": true,
+  "staged": true,
+  "want_dirs": [
+   "south"
+  ]
+ },
+ "angler_uncle/sit": {
+  "reply": "character: 11c5c011-bd93-4545-baa1-09b28508d454\nanimation: v3 custom (sitting on a low camping stool, relaxed gentle sway)\ndirections: south (1 jobs)\njob_ids: south=25bd040c-e9e1-4500-8698-93d850ef10a2\ngroup: 9dcae7cc-fba9-43ba-9160-33e1fa04ed57\nframes: 5 (1 reference + 4 animated)\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min/direction\n\nhint: get_character(character_id=\"11c5c011-bd93-4545-baa1-09b",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/11c5c011-bd93-4545-baa1-09b28508d454/animations/ddb6114a-2f85-47eb-92c0-b232bba5fa94/south/{i}.png?t=1791950013106"
+  },
+  "done": true,
+  "staged": true,
+  "want_dirs": [
+   "south"
+  ]
+ },
+ "aodai_woman/idle": {
+  "reply": "character: fdad4b0c-a37c-4ae2-967e-561c46f13d3f\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=5435988c-5917-4529-b8f2-de259848d62e\ngroup: ffecfe7c-7f8e-40fc-8ec5-71203e0fc73c\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"fdad4b0c-a37c-4ae2-967e-561c46f13d3f\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/fdad4b0c-a37c-4ae2-967e-561c46f13d3f/animations/27f75d82-d855-4fd7-b6df-b5b0b3b0eefb/south/{i}.png?t=1791949994801",
+   "download": "https://api.pixellab.ai/mcp/characters/fdad4b0c-a37c-4ae2-967e-561c46f13d3f/download"
+  },
+  "done": true,
+  "staged": true,
+  "want_dirs": [
+   "south"
+  ]
+ },
+ "auntie_dobo/idle": {
+  "reply": "character: 20fa347b-7428-4f1c-8b14-121c1ffa244e\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=506ebe7e-f0dc-4586-99cd-a4fc68f86e0f\ngroup: cad99596-19c5-42dc-befc-827eef0c9179\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"20fa347b-7428-4f1c-8b14-121c1ffa244e\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/20fa347b-7428-4f1c-8b14-121c1ffa244e/animations/de2449f0-5d65-48ff-b4ff-c18d99191926/south/{i}.png?t=1791950298832",
+   "download": "https://api.pixellab.ai/mcp/characters/20fa347b-7428-4f1c-8b14-121c1ffa244e/download"
+  },
+  "done": true,
+  "want_dirs": [
+   "south"
+  ],
+  "staged": true
+ },
+ "backpacker_man/idle": {
+  "reply": "character: 61e5900e-144a-4857-a992-b903890d2976\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=3f55dbe3-d2c3-403c-99e4-d3328ecf4eef\ngroup: d69a0728-c1d2-40f2-9069-e765d9bad2d9\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"61e5900e-144a-4857-a992-b903890d2976\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/61e5900e-144a-4857-a992-b903890d2976/animations/a0ccb442-8aec-4da0-b266-b0744b9a9a76/south/{i}.png?t=1791950301102",
+   "download": "https://api.pixellab.ai/mcp/characters/61e5900e-144a-4857-a992-b903890d2976/download"
+  },
+  "done": true,
+  "want_dirs": [
+   "south"
+  ],
+  "staged": true
+ },
+ "backpacker_woman/idle": {
+  "reply": "character: 4a938bba-bcaf-462e-adf8-018f565bba18\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=f8f490eb-78b3-4a96-8d05-f03eca3894a1\ngroup: 7baff376-8b63-429e-95e9-f481485a0e49\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"4a938bba-bcaf-462e-adf8-018f565bba18\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/4a938bba-bcaf-462e-adf8-018f565bba18/animations/703d38f5-f754-4107-8753-2aa374bf5e4e/south/{i}.png?t=1791950321926",
+   "download": "https://api.pixellab.ai/mcp/characters/4a938bba-bcaf-462e-adf8-018f565bba18/download"
+  },
+  "done": true,
+  "want_dirs": [
+   "south"
+  ],
+  "staged": true
+ },
+ "bird_uncle/idle": {
+  "reply": "character: 48adeaef-a93b-4e2e-8441-a8d0a3229177\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=6669c1ce-2444-4070-9360-0c0de6a8092b\ngroup: 2f46e32f-e8c5-4626-9455-bbb64a5e0b13\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"48adeaef-a93b-4e2e-8441-a8d0a3229177\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/48adeaef-a93b-4e2e-8441-a8d0a3229177/animations/92523525-850a-4e2c-9419-dfba2ce5b27b/south/{i}.png?t=1791950318465",
+   "download": "https://api.pixellab.ai/mcp/characters/48adeaef-a93b-4e2e-8441-a8d0a3229177/download"
+  },
+  "done": true,
+  "want_dirs": [
+   "south"
+  ],
+  "staged": true
+ },
+ "border_collie/idle": {
+  "reply": "character: 0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19f\nanimation: idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=94017b86-ceb4-43a5-80b7-308dfb16c47e\ngroup: 0b8e93da-1579-4fa3-bbc7-07bb49069d8b\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19f\", template_animation_id=\"idle\", animation_group_i",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19f/animations/dbc9ce93-5633-46f3-9336-c5f7c0bef657/south/{i}.png?t=1791950321210",
+   "download": "https://api.pixellab.ai/mcp/characters/0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19f/download"
+  },
+  "done": true,
+  "want_dirs": [
+   "south"
+  ],
+  "staged": true
+ },
+ "border_collie/walk": {
+  "reply": "character: 0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19f\nanimation: walk-8-frames\nmode: template\ndirections: south, north, east, west (4 jobs)\njob_ids: south=dae53108-be7f-4b7f-ae0f-5f69e385af01, north=9e6d3955-42db-4f9c-a03b-fb62bba3607a, east=8501283a-fa2a-40ac-9f30-fdf37514a8c2, west=0dd6df77-63e3-466e-a21f-e3e1e1fc366d\ngroup: 2d2b1524-27ce-404a-ab0d-37adfa2d0d0e\ncost: 4 generations (1/dir x 4)\neta: ~2-",
+  "fired": true,
+  "urls": {
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19f/animations/714fdc74-d5c5-48f3-80cf-0cd25bf346f0/west/{i}.png?t=1791950430029",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19f/animations/b7b872ba-1d2f-4e88-8119-d686f5a7a4e6/north/{i}.png?t=1791950422301",
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19f/animations/c8fe3076-969a-43c9-a513-daa34f5569bd/south/{i}.png?t=1791950392193",
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19f/animations/41f279e6-d60e-40c4-a218-9e093302a3e5/east/{i}.png?t=1791950439717"
+  },
+  "done": true,
+  "want_dirs": [
+   "south",
+   "north",
+   "east",
+   "west"
+  ],
+  "staged": true
+ },
+ "border_collie/sniff": {
+  "reply": "character: 0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19f\nanimation: v3 custom (sniffing the ground, nose low, tail wagging)\ndirections: south (1 jobs)\njob_ids: south=926bc406-7cdf-4bb6-af16-835f8362ce13\ngroup: a4f92f11-a38b-49d8-8a22-89d1626b0958\nframes: 7 (1 reference + 6 animated)\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min/direction\n\nhint: get_character(character_id=\"0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19f/animations/f8885c13-da1c-409b-8ef4-c1e78b41170f/south/{i}.png?t=1791950455803"
+  },
+  "done": true,
+  "want_dirs": [
+   "south"
+  ],
+  "staged": true
+ },
+ "border_collie/play": {
+  "reply": "character: 0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19f\nanimation: v3 custom (play bow \u00e2\u20ac\u201d front down, rear up, tail wagging fast)\ndirections: south (1 jobs)\njob_ids: south=803fb0a6-7d50-4572-b532-dd16a2554a45\ngroup: 51330cc7-575b-49dc-9cbe-6481891c1fce\nframes: 7 (1 reference + 6 animated)\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min/direction\n\nhint: get_character(character_id=\"0ec5d5b2-f18e-4f8c-b77f-0c2",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/0ec5d5b2-f18e-4f8c-b77f-0c2f7e81d19f/animations/69d5a4de-2ca4-499f-8667-f801396eb750/south/{i}.png?t=1791950458165"
+  },
+  "done": true,
+  "want_dirs": [
+   "south"
+  ],
+  "staged": true
+ },
+ "cyclist/idle": {
+  "reply": "character: 384def57-2b7c-4813-868d-b7bcb5540ac5\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=c40d7f7b-245e-4411-ac0b-4a3a327ea706\ngroup: 2ddd585c-ddc1-4411-8933-35b1db4cc95e\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"384def57-2b7c-4813-868d-b7bcb5540ac5\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/384def57-2b7c-4813-868d-b7bcb5540ac5/animations/89ed8a00-53eb-482e-adc6-24cd6d146d12/south/{i}.png?t=1791950444196",
+   "download": "https://api.pixellab.ai/mcp/characters/384def57-2b7c-4813-868d-b7bcb5540ac5/download"
+  },
+  "done": true,
+  "want_dirs": [
+   "south"
+  ],
+  "staged": true
+ },
+ "food_vlogger/idle": {
+  "reply": "character: c35e9719-1e17-4d2b-8fc2-6564fc6e6f35\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=365e2b0e-44ff-47fc-9f6d-97532535ca47\ngroup: c4246269-7988-4780-b569-08c9a9f3ec4c\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"c35e9719-1e17-4d2b-8fc2-6564fc6e6f35\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/c35e9719-1e17-4d2b-8fc2-6564fc6e6f35/animations/8b4f3262-fc49-4287-8a27-502051949062/south/{i}.png?t=1791950420022",
+   "download": "https://api.pixellab.ai/mcp/characters/c35e9719-1e17-4d2b-8fc2-6564fc6e6f35/download"
+  },
+  "done": true,
+  "want_dirs": [
+   "south"
+  ],
+  "staged": true
+ },
+ "grandma_ba/idle": {
+  "reply": "character: f61aa433-453f-4bae-8b7e-6f4c042c54d1\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=0a938cd5-0f34-479b-a74f-4ae6187a8269\ngroup: a60e7300-7aa7-4f86-8483-2f92e64a5953\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"f61aa433-453f-4bae-8b7e-6f4c042c54d1\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/f61aa433-453f-4bae-8b7e-6f4c042c54d1/animations/f0f5f934-bcd4-40b5-bb3e-e974f308b238/south/{i}.png?t=1791950560700",
+   "download": "https://api.pixellab.ai/mcp/characters/f61aa433-453f-4bae-8b7e-6f4c042c54d1/download"
+  },
+  "done": true,
+  "want_dirs": [
+   "south"
+  ],
+  "staged": true
+ },
+ "grandma_ba/walk": {
+  "reply": "character: f61aa433-453f-4bae-8b7e-6f4c042c54d1\nanimation: walking-8-frames\nmode: template\ndirections: south, north, east, west (4 jobs)\njob_ids: south=6926f555-644d-4ce8-9f77-5e5bd60fbaa7, north=99d7d27b-6a81-4918-b7a9-a0c03ee3b25d, east=97dc87d6-1562-4e63-914f-ac78008f5952, west=685c7d4e-796d-4986-9716-76acebdff3f8\ngroup: 70eb0b18-f872-42b0-b8dd-f4296cbafc27\ncost: 4 generations (1/dir x 4)\neta: ",
+  "fired": true,
+  "urls": {
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/f61aa433-453f-4bae-8b7e-6f4c042c54d1/animations/b50e01b8-937b-467b-9b0a-3583591b3ee8/east/{i}.png?t=1791950590089",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/f61aa433-453f-4bae-8b7e-6f4c042c54d1/animations/ffbc1776-d987-4472-9962-2340ffc7f5b6/north/{i}.png?t=1791950582129",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/f61aa433-453f-4bae-8b7e-6f4c042c54d1/animations/51a5a1a8-e922-4c1d-a5ed-b1b3ad632c18/west/{i}.png?t=1791950577369",
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/f61aa433-453f-4bae-8b7e-6f4c042c54d1/animations/b03a72dc-1977-4b88-a338-7704fded4e02/south/{i}.png?t=1791950569238"
+  },
+  "done": true,
+  "want_dirs": [
+   "south",
+   "north",
+   "east",
+   "west"
+  ],
+  "staged": true
+ },
+ "grandma_ba/play": {
+  "reply": "character: f61aa433-453f-4bae-8b7e-6f4c042c54d1\nanimation: v3 custom (bouncing and playing with energy, arms swinging)\ndirections: south (1 jobs)\njob_ids: south=e6229307-b190-488d-acc8-7e3fe91a3767\ngroup: 2071cd9c-7c31-4605-ac4f-9658ed599148\nframes: 7 (1 reference + 6 animated)\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min/direction\n\nhint: get_character(character_id=\"f61aa433-453f-4bae-8b7e-6f4c042",
+  "fired": true,
+  "want_dirs": [
+   "south"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/f61aa433-453f-4bae-8b7e-6f4c042c54d1/animations/db843afe-20b7-4a28-87d9-0b39c7475070/south/{i}.png?t=1791950638668"
+  },
+  "done": true,
+  "staged": true
+ },
+ "grandma_ba/pet": {
+  "reply": "character: f61aa433-453f-4bae-8b7e-6f4c042c54d1\nanimation: v3 custom (kneeling down and reaching a hand out to pet a dog)\ndirections: south (1 jobs)\njob_ids: south=e17774e3-2524-44a1-a2af-91450a6cd75d\ngroup: 7e31cbb1-c543-4e71-b8b4-20fbca9ed939\nframes: 5 (1 reference + 4 animated)\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min/direction\n\nhint: get_character(character_id=\"f61aa433-453f-4bae-8b7e-6f4c",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/f61aa433-453f-4bae-8b7e-6f4c042c54d1/animations/3acc7d09-464b-4dad-945e-207d3e33d467/south/{i}.png?t=1791950602124"
+  },
+  "done": true,
+  "want_dirs": [
+   "south"
+  ],
+  "staged": true
+ },
+ "grandpa_mu/idle": {
+  "reply": "character: b704e827-4fdd-46c5-ac71-a389f1d7ecad\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=76dd26c2-f8e3-4a79-8618-d6d9f7a2804a\ngroup: 1dbeb58b-1ba9-4cd5-9567-e7ff6fb6714c\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"b704e827-4fdd-46c5-ac71-a389f1d7ecad\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/b704e827-4fdd-46c5-ac71-a389f1d7ecad/animations/6fc93145-6fd5-4f02-8bf3-1a56c574a6ee/south/{i}.png?t=1791950594948",
+   "download": "https://api.pixellab.ai/mcp/characters/b704e827-4fdd-46c5-ac71-a389f1d7ecad/download"
+  },
+  "done": true,
+  "want_dirs": [
+   "south"
+  ],
+  "staged": true
+ },
+ "grandpa_mu/walk": {
+  "reply": "character: b704e827-4fdd-46c5-ac71-a389f1d7ecad\nanimation: walking-8-frames\nmode: template\ndirections: south, north, east, west (4 jobs)\njob_ids: south=4b67efa9-e235-4a7e-bbf1-a4cfda0198cc, north=97c28eee-bc5d-4c77-bdf2-e3386e110785, east=b7830f0b-e5a4-426e-9dba-12119aed35d6, west=bf64744b-454d-436c-bc07-6a6d8ea7c021\ngroup: ccd1f5bf-b196-4882-bb49-4a508386473a\ncost: 4 generations (1/dir x 4)\neta: ",
+  "fired": true,
+  "want_dirs": [
+   "south",
+   "north",
+   "east",
+   "west"
+  ],
+  "urls": {
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/b704e827-4fdd-46c5-ac71-a389f1d7ecad/animations/abac2935-a68e-4f9a-8b36-ccd8da9fd335/east/{i}.png?t=1791950837550",
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/b704e827-4fdd-46c5-ac71-a389f1d7ecad/animations/adb19dd4-2ccc-48f9-9195-ac9bba7f5a6c/south/{i}.png?t=1791950786117",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/b704e827-4fdd-46c5-ac71-a389f1d7ecad/animations/a1a77e67-65b4-4f15-933d-73c9c7e3c4bf/west/{i}.png?t=1791950771993",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/b704e827-4fdd-46c5-ac71-a389f1d7ecad/animations/8c1e76e9-0e59-40e5-8c69-d2133e37de54/north/{i}.png?t=1791950756659"
+  },
+  "done": true,
+  "staged": true
+ },
+ "grandpa_mu/fish": {
+  "reply": "character: b704e827-4fdd-46c5-ac71-a389f1d7ecad\nanimation: v3 custom (standing at the water edge holding a fishing rod, casting the line then holding it still, watching)\ndirections: south (1 jobs)\njob_ids: south=18596cf2-8148-4230-ac18-d9502c9d27eb\ngroup: ec72513c-56eb-4417-902d-dc6250cc7d06\nframes: 9 (1 reference + 8 animated)\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min/direction\n\nhint: get_char",
+  "fired": true,
+  "want_dirs": [
+   "south"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/b704e827-4fdd-46c5-ac71-a389f1d7ecad/animations/18a118b1-64e9-460d-8070-f9827eee08b5/south/{i}.png?t=1791950842112"
+  },
+  "done": true,
+  "staged": true
+ },
+ "grandpa_mu/sit": {
+  "reply": "character: b704e827-4fdd-46c5-ac71-a389f1d7ecad\nanimation: v3 custom (sitting on a low camping stool, relaxed gentle sway)\ndirections: south (1 jobs)\njob_ids: south=a7d48f64-4ca9-4f7c-b931-974e294b970c\ngroup: 0da9d256-a26e-4135-b409-ec347d2359b4\nframes: 5 (1 reference + 4 animated)\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min/direction\n\nhint: get_character(character_id=\"b704e827-4fdd-46c5-ac71-a38",
+  "fired": true,
+  "want_dirs": [
+   "south"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/b704e827-4fdd-46c5-ac71-a389f1d7ecad/animations/2ef88aba-bb9c-4741-a6e8-e084285142fe/south/{i}.png?t=1791950794085"
+  },
+  "done": true,
+  "staged": true
+ },
+ "kid_pinkdress/idle": {
+  "reply": "character: 5bb78af8-6ca0-4563-976f-bf2f6e88298b\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=4cc5f92a-adca-41c5-9810-0db38a8e3f2c\ngroup: a3974228-2288-4402-a6e0-49f6e13b50ea\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"5bb78af8-6ca0-4563-976f-bf2f6e88298b\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "want_dirs": [
+   "south"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/5bb78af8-6ca0-4563-976f-bf2f6e88298b/animations/30f5667f-a95b-4696-a7ea-67e352ad9e4d/south/{i}.png?t=1791950770560",
+   "download": "https://api.pixellab.ai/mcp/characters/5bb78af8-6ca0-4563-976f-bf2f6e88298b/download"
+  },
+  "done": true,
+  "staged": true
+ },
+ "kid_pinkdress/walk": {
+  "reply": "character: 5bb78af8-6ca0-4563-976f-bf2f6e88298b\nanimation: walking-8-frames\nmode: template\ndirections: south, north, east, west (4 jobs)\njob_ids: south=e375e8fb-fbae-4eac-a2b4-ce555fa8d137, north=0cfeb049-8102-4cd8-952c-deeced27b3e3, east=3b705cb3-6f03-4354-a4b0-6245b8103bca, west=b84f0ec0-ce17-4710-ac21-5bbf5c2c7d6a\ngroup: 64747aab-697f-417e-924f-b757d16cf83f\ncost: 4 generations (1/dir x 4)\neta: ",
+  "fired": true,
+  "want_dirs": [
+   "south",
+   "north",
+   "east",
+   "west"
+  ],
+  "urls": {
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/5bb78af8-6ca0-4563-976f-bf2f6e88298b/animations/23f2ac20-6dc6-4b0c-b9b5-bf9193a16bae/north/{i}.png?t=1791951029026",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/5bb78af8-6ca0-4563-976f-bf2f6e88298b/animations/dac475e7-6347-4fe1-bf93-a06be92aeda7/west/{i}.png?t=1791951019633",
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/5bb78af8-6ca0-4563-976f-bf2f6e88298b/animations/55ee9a5d-bc3c-4adc-b803-2dfdbf7d4560/east/{i}.png?t=1791951018437",
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/5bb78af8-6ca0-4563-976f-bf2f6e88298b/animations/334930ba-d071-4d5e-85be-a1d66fa5efa2/south/{i}.png?t=1791951008739"
+  },
+  "done": true,
+  "staged": true
+ },
+ "kid_pinkdress/play": {
+  "reply": "character: 5bb78af8-6ca0-4563-976f-bf2f6e88298b\nanimation: v3 custom (bouncing and playing with energy, arms swinging)\ndirections: south (1 jobs)\njob_ids: south=86849fff-2b82-45f9-9dcd-4fe73805a787\ngroup: 82bd1629-f7d0-465f-8af0-8cce8b03e886\nframes: 7 (1 reference + 6 animated)\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min/direction\n\nhint: get_character(character_id=\"5bb78af8-6ca0-4563-976f-bf2f6e8",
+  "fired": true,
+  "want_dirs": [
+   "south"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/5bb78af8-6ca0-4563-976f-bf2f6e88298b/animations/d100f51e-7c47-4d19-868b-257ee8670886/south/{i}.png?t=1791951060200"
+  },
+  "done": true,
+  "staged": true
+ },
+ "kid_pinkdress/pet": {
+  "reply": "character: 5bb78af8-6ca0-4563-976f-bf2f6e88298b\nanimation: v3 custom (kneeling down and reaching a hand out to pet a dog)\ndirections: south (1 jobs)\njob_ids: south=b29a2d2e-0a94-4783-8bec-c0d3e8f147a3\ngroup: c055d3d7-f047-462b-86d1-8bd7b083c1d6\nframes: 5 (1 reference + 4 animated)\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min/direction\n\nhint: get_character(character_id=\"5bb78af8-6ca0-4563-976f-bf2f",
+  "fired": true,
+  "want_dirs": [
+   "south"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/5bb78af8-6ca0-4563-976f-bf2f6e88298b/animations/23967a37-e4b5-4284-adb3-7f70ffadb20a/south/{i}.png?t=1791951033655"
+  },
+  "done": true,
+  "staged": true
+ },
+ "phuot_rider/idle": {
+  "reply": "character: a224d8ea-be21-4751-9496-4d50de72ee5e\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=505fe342-16e9-4cde-8ebc-de4cd658da53\ngroup: 67978409-ab5b-4762-8b7d-6ee3ceafe8e9\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"a224d8ea-be21-4751-9496-4d50de72ee5e\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "want_dirs": [
+   "south"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/a224d8ea-be21-4751-9496-4d50de72ee5e/animations/a9dffc94-7047-4c48-9924-95977d2c820f/south/{i}.png?t=1791951010399",
+   "download": "https://api.pixellab.ai/mcp/characters/a224d8ea-be21-4751-9496-4d50de72ee5e/download"
+  },
+  "done": true,
+  "staged": true
+ },
+ "ranger_mai/idle": {
+  "reply": "character: 63f02b24-de59-40f6-9985-06d5569dd455\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=637b9fcd-852e-4b35-861a-c21276b734d3\ngroup: 4a01131e-d545-4623-bfb9-a23d90c3b694\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"63f02b24-de59-40f6-9985-06d5569dd455\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "want_dirs": [
+   "south"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/63f02b24-de59-40f6-9985-06d5569dd455/animations/c70770f9-8274-49b7-8382-8a6ab60b0e5e/south/{i}.png?t=1791951071570",
+   "download": "https://api.pixellab.ai/mcp/characters/63f02b24-de59-40f6-9985-06d5569dd455/download"
+  },
+  "done": true,
+  "staged": true
+ },
+ "scout_kid/walk": {
+  "reply": "character: c8bc5ed3-8c61-49cc-9454-7060e7b1e175\nanimation: walking-8-frames\nmode: template\ndirections: south, north, east, west (4 jobs)\njob_ids: south=f67673e1-8342-4d50-9724-7ddbf584269b, north=fbac17b6-2614-4c80-a19f-49e44caa6a37, east=dbeb1958-65f0-4673-bf52-5f274a0f1a09, west=690b3337-0945-4237-9403-964659507613\ngroup: f7f582e9-91c4-466d-a002-1d4058ff92eb\ncost: 4 generations (1/dir x 4)\neta: ",
+  "fired": true,
+  "want_dirs": [
+   "south",
+   "north",
+   "east",
+   "west"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/c8bc5ed3-8c61-49cc-9454-7060e7b1e175/animations/c084ae20-eaea-462f-b862-447ce0b9f69f/south/{i}.png?t=1791951268655",
+   "east": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/c8bc5ed3-8c61-49cc-9454-7060e7b1e175/animations/f564bd77-c8ed-40b9-9b97-d5d00089bcc3/east/{i}.png?t=1791951238947",
+   "west": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/c8bc5ed3-8c61-49cc-9454-7060e7b1e175/animations/4ef4c301-9204-4c3a-99c3-69e8186922d6/west/{i}.png?t=1791951230481",
+   "north": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/c8bc5ed3-8c61-49cc-9454-7060e7b1e175/animations/029d6b41-0b04-40fe-9ede-255aa56e8d66/north/{i}.png?t=1791951227107"
+  },
+  "done": true,
+  "staged": true
+ },
+ "scout_kid/play": {
+  "reply": "character: c8bc5ed3-8c61-49cc-9454-7060e7b1e175\nanimation: v3 custom (bouncing and playing with energy, arms swinging)\ndirections: south (1 jobs)\njob_ids: south=1f63ecd1-575e-42de-97f5-2758af8842df\ngroup: c87a72b3-cbc4-4d21-b5e9-2c2b3f8c3cc5\nframes: 7 (1 reference + 6 animated)\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min/direction\n\nhint: get_character(character_id=\"c8bc5ed3-8c61-49cc-9454-7060e7b",
+  "fired": true,
+  "want_dirs": [
+   "south"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/c8bc5ed3-8c61-49cc-9454-7060e7b1e175/animations/9abefe7d-e11a-4765-9b97-1aedae279a03/south/{i}.png?t=1791951320733"
+  },
+  "done": true,
+  "staged": true
+ },
+ "scout_kid/pet": {
+  "reply": "character: c8bc5ed3-8c61-49cc-9454-7060e7b1e175\nanimation: v3 custom (kneeling down and reaching a hand out to pet a dog)\ndirections: south (1 jobs)\njob_ids: south=8f57e5a3-f75d-4584-82e1-6474f81bdea5\ngroup: 73725808-9e93-41a6-bfaf-205959a60c37\nframes: 5 (1 reference + 4 animated)\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min/direction\n\nhint: get_character(character_id=\"c8bc5ed3-8c61-49cc-9454-7060",
+  "fired": true,
+  "want_dirs": [
+   "south"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/c8bc5ed3-8c61-49cc-9454-7060e7b1e175/animations/6c2d9137-ef3f-414b-8fb9-92f9c0bd031b/south/{i}.png?t=1791951256247"
+  },
+  "done": true,
+  "staged": true
+ },
+ "student_bucket/idle": {
+  "reply": "character: c0b32a4a-fac0-46d7-9e36-20d043e88c0d\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=690dd542-05c1-4443-a0d3-29f04a3dea8d\ngroup: 1f9ecaf7-5fc4-45b5-99e7-6c324baad77a\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"c0b32a4a-fac0-46d7-9e36-20d043e88c0d\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "want_dirs": [
+   "south"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/c0b32a4a-fac0-46d7-9e36-20d043e88c0d/animations/9f3ef2a9-c1c1-4603-9c2f-f8378aacbf03/south/{i}.png?t=1791951240295",
+   "download": "https://api.pixellab.ai/mcp/characters/c0b32a4a-fac0-46d7-9e36-20d043e88c0d/download"
+  },
+  "done": true,
+  "staged": true
+ },
+ "sunhood_woman/idle": {
+  "reply": "character: 3400f865-6026-4952-b83e-77cc52d1f13d\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=0b537459-1a20-45f3-84f7-e72e3a03e0c7\ngroup: ebe84654-9f73-4cde-b8e9-e2d116eff86d\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"3400f865-6026-4952-b83e-77cc52d1f13d\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "want_dirs": [
+   "south"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/3400f865-6026-4952-b83e-77cc52d1f13d/animations/8538b075-e97d-41d2-be76-e7582047dfc0/south/{i}.png?t=1791951246857",
+   "download": "https://api.pixellab.ai/mcp/characters/3400f865-6026-4952-b83e-77cc52d1f13d/download"
+  },
+  "done": true,
+  "staged": true
+ },
+ "teen_jersey/idle": {
+  "reply": "character: 00d3d976-84fb-4b12-a627-10567577cc00\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=056e3b19-6852-4c2e-8d66-6a17683e4ed6\ngroup: cc071583-8744-44c0-8393-f86136ed78c6\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"00d3d976-84fb-4b12-a627-10567577cc00\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "want_dirs": [
+   "south"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/00d3d976-84fb-4b12-a627-10567577cc00/animations/cee35de1-7d93-44dd-a2e2-ba9ad55b49ed/south/{i}.png?t=1791951295088",
+   "download": "https://api.pixellab.ai/mcp/characters/00d3d976-84fb-4b12-a627-10567577cc00/download"
+  },
+  "done": true,
+  "staged": true
+ },
+ "uncle_deptong/idle": {
+  "reply": "character: a57cbc0f-e3cf-4d42-976e-1fe4fcb30adb\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=ceffaab3-c8f8-4f51-9eeb-eecd809dcfff\ngroup: ebbdf7d5-3e87-457c-8492-b63525d6b0c4\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"a57cbc0f-e3cf-4d42-976e-1fe4fcb30adb\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "want_dirs": [
+   "south"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/a57cbc0f-e3cf-4d42-976e-1fe4fcb30adb/animations/228428eb-b71f-4c77-894c-456214fbc1d6/south/{i}.png?t=1791951289554",
+   "download": "https://api.pixellab.ai/mcp/characters/a57cbc0f-e3cf-4d42-976e-1fe4fcb30adb/download"
+  },
+  "done": true,
+  "staged": true
+ },
+ "vendor_ganh/idle": {
+  "reply": "character: 8fd5fea7-f06f-4dd1-b3b4-87d1ea5c6660\nanimation: breathing-idle\nmode: template\ndirections: south (1 jobs)\njob_ids: south=c1bda344-5bfd-46b0-bac5-9c34dcc43cc6\ngroup: 37b88cc9-8a21-43c2-9ecf-71ffbc04df09\ncost: 1 generation (1/dir x 1)\neta: ~2-4 min\nadd more directions to this group: animate_character(character_id=\"8fd5fea7-f06f-4dd1-b3b4-87d1ea5c6660\", template_animation_id=\"breathing-idle",
+  "fired": true,
+  "want_dirs": [
+   "south"
+  ],
+  "urls": {
+   "south": "https://backblaze.pixellab.ai/file/pixellab-characters/729a5452-65ea-4e0f-8867-a2cd890c51cf/8fd5fea7-f06f-4dd1-b3b4-87d1ea5c6660/animations/4315ccbc-184a-40b8-ae67-d59a99c403c8/south/{i}.png?t=1791951328034",
+   "download": "https://api.pixellab.ai/mcp/characters/8fd5fea7-f06f-4dd1-b3b4-87d1ea5c6660/download"
+  },
+  "done": true,
+  "staged": true
+ }
+}
