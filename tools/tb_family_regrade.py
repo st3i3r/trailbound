@@ -55,6 +55,20 @@ def transfer(h, s, v, m, p):
         nv = v + (p["v_target"] - v) * p["v_amt"]
         ns = np.minimum(s + p["s_add"], p["s_max"])
     nh = h + (p["h_to"] - h) * p["h_amt"]
+    # sun-pool dapple: the ref's grass swings shade->near-yellow-white;
+    # a "toward" lerp compresses internal spread, so the pools get
+    # stamped back on AFTER the lerp (seeded blocky cells = pixel grammar)
+    if "dapple" in p:
+        d = p["dapple"]
+        cell, amp = d["cell"], d["amp"]
+        lo = np.random.default_rng(d["seed"]).random(
+            (max(2, nv.shape[0] // cell + 1), max(2, nv.shape[1] // cell + 1)))
+        # bilinear-upsampled low-res noise = soft organic sun pools,
+        # not an 8px checkerboard; ground is painted so soft is right
+        nse = np.asarray(Image.fromarray((lo * 255).astype(np.uint8))
+                         .resize((nv.shape[1], nv.shape[0]), Image.BILINEAR),
+                         dtype=float) / 255.0
+        nv = nv + np.clip(nse - 0.42, -0.5, 0.58) * 2.0 * amp   # warm-biased
     return nh % 1.0, np.clip(ns, 0, 1), np.clip(nv, 0, 1)
 
 
