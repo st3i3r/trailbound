@@ -1,0 +1,17 @@
+{
+  "_doc": "asset -> family + src/dst for tools/tb_family_regrade.py. dst under fx/ keeps originals untouched; anchors entries are cloned to the dst key.",
+  "map": [
+    {"src": "props_large/tree_broadleaf.png",        "family": "canopy",      "dst": "fx/tree_broadleaf_sunlit.png"},
+    {"src": "props_large/tree_feathery.png",         "family": "canopy",      "dst": "fx/tree_feathery_sunlit.png"},
+    {"src": "props_medium/fern_bank.png",            "family": "undergrowth", "dst": "fx/fern_bank_sunlit.png"},
+    {"src": "props_medium/bush_round_m.png",         "family": "undergrowth", "dst": "fx/bush_round_m_sunlit.png"},
+    {"src": "props_medium/bush_white_flower_v.png",  "family": "undergrowth", "dst": "fx/bush_white_flower_v_sunlit.png"},
+    {"src": "props_medium/bush_clover.png",          "family": "undergrowth", "dst": "fx/bush_clover_sunlit.png"},
+    {"src": "props_medium/pine_sapling.png",         "family": "undergrowth", "dst": "fx/pine_sapling_sunlit.png"},
+    {"src": "props_medium/reed_shore.png",           "family": "undergrowth", "dst": "fx/reed_shore_sunlit.png"},
+    {"src": "props_large/pine_tall_a.png",           "family": "conifer",     "dst": "fx/pine_tall_a_sunlit.png"},
+    {"src": "props_large/pine_tall_b.png",           "family": "conifer",     "dst": "fx/pine_tall_b_sunlit.png"},
+    {"src": "decals/decal_lily_pad.png",             "family": "undergrowth", "dst": "fx/decal_lily_pad_sunlit.png"},
+    {"src": "assets_src/stage/ground_dressed.png",   "family": "grass",       "dst": "fx/ground_sunlit.png", "src_root": "."}
+  ]
+}

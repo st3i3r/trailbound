@@ -13,14 +13,13 @@ uniform float dusk = 0.0;        // WorldFX scalar, driven per-frame
 uniform float front = 0.0;       // storm severity (reserved)
 
 uniform vec3 shadow_tint : source_color = vec3(0.16, 0.20, 0.42);
-uniform vec3 high_tint   : source_color = vec3(1.0, 0.93, 0.70);
+uniform vec3 high_tint   : source_color = vec3(1.0, 0.96, 0.62);
 uniform float contrast_amt = 0.13;
 uniform float split_amt    = 0.07;
 uniform float sat_amt      = 0.97;   // filmic pull-down: authored art
 uniform float vignette_amt = 0.16;   // runs ~0.55 sat; Eastward refs
                                      // grade to 0.45-0.53 — the pass
                                      // lands the composite in-band
-
 float luma(vec3 c) { return dot(c, vec3(0.299, 0.587, 0.114)); }
 
 void fragment() {

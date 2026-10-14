@@ -1,0 +1,35 @@
+{
+  "_doc": "Family-ramp transfer params measured against the Eastward refs. gate = which pixels count as the family; mode = transfer shape. affine: v' = v*mul + add (lifts floor, preserves ramp spread). toward: v' = v + (target-v)*amt (pushes mid-key surfaces toward a measured ref band). h pull = hue lerp toward family target; s = sat multiplier/floor.",
+  "canopy": {
+    "gate": {"h": [0.13, 0.62], "s": 0.15, "a": 150},
+    "mode": "affine",
+    "h_to": 0.25, "h_amt": 0.70,
+    "v_mul": 0.50, "v_add": 0.42, "v_max": 0.92,
+    "s_mul": 0.78, "s_min": 0.30,
+    "ref_mean": [153, 192, 125]
+  },
+  "undergrowth": {
+    "gate": {"h": [0.13, 0.62], "s": 0.15, "a": 150},
+    "mode": "affine",
+    "h_to": 0.27, "h_amt": 0.55,
+    "v_mul": 0.55, "v_add": 0.30, "v_max": 0.92,
+    "s_mul": 0.85, "s_min": 0.28,
+    "ref_mean": [110, 150, 90]
+  },
+  "conifer": {
+    "gate": {"h": [0.13, 0.62], "s": 0.15, "a": 150},
+    "mode": "affine",
+    "h_to": 0.32, "h_amt": 0.40,
+    "v_mul": 0.60, "v_add": 0.24, "v_max": 0.92,
+    "s_mul": 0.90, "s_min": 0.28,
+    "ref_mean": [80, 110, 85]
+  },
+  "grass": {
+    "gate": {"h": [0.12, 0.38], "s": 0.25, "v_max": 0.85, "a": 150},
+    "mode": "toward",
+    "h_to": 0.235, "h_amt": 0.55,
+    "v_target": 0.85, "v_amt": 0.72,
+    "s_add": 0.06, "s_max": 0.58,
+    "ref_mean": [174, 216, 103]
+  }
+}

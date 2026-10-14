@@ -174,6 +174,27 @@ means an emit row is overdriving the multiply (see `CUE_GAIN` in
 `world_fx.gd` — ambient cues nudge the grade, only flash and
 daylight-scatter tints may lift it).
 
+Ground / family regrade pipeline (2026-10-16 — the luminance fix):
+the painted ground and vegetation are regraded per-FAMILY, baked —
+screen-space lifts can't target grass luma without catching tents.
+
+```bash
+# 1. bake ground decals (family-aware, pad keepouts, min-spacing)
+python tools/tb_ground_scatter.py game/assets/pinewatch/terrain/ground_painted.png \
+    assets_src/stage/pinewatch_mask.txt assets_src/stage/ground_dressed.png \
+    --seed 7 --count 150 $(cat assets_src/stage/pinewatch_keepouts.txt)
+# 2. family-ramp transfer -> fx/*_sunlit.png (originals preserved)
+python tools/tb_family_regrade.py
+```
+
+`assets_src/refs/ramps.json` holds the measured per-family targets
+(canopy/undergrowth/conifer/grass — sampled vs the Eastward ref bands);
+`assets_src/family_map.json` maps asset → family + dst. The tool prints
+before→after means per asset — a family landing far off its `ref_mean`
+is a data bug. Re-run both steps after any terrain or prop palette
+change; mask export is `MASK_PINEWATCH` rows, keepouts derive from
+`data/layouts/pinewatch.json` pads (cells ×64).
+
 UI gallery (the §5.4 storybook — UI-018): every chrome component in
 labeled sections, golden-shot ready, plus the automated lints.
 

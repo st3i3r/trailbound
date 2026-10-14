@@ -112,16 +112,16 @@ const SITE_MASKS := {
 const PROPS_PINEWATCH := [
     # ===== TREELINE — rounded broadleaf wall on GRASS (ref style),
     # one species repeated, single flamboyant accent =====
-    ["props_large",  "tree_broadleaf",     40,  76, 0.0, 0.50],
-    ["props_large",  "tree_broadleaf",    112,  70, 0.0, 0.56],
-    ["props_large",  "tree_broadleaf",    210,  78, 0.0, 0.52],
-    ["props_large",  "tree_broadleaf",    296,  68, 0.0, 0.60],
+    ["fx", "tree_broadleaf_sunlit",     40,  76, 0.0, 0.50],
+    ["fx", "tree_broadleaf_sunlit",    112,  70, 0.0, 0.56],
+    ["fx", "tree_broadleaf_sunlit",    210,  78, 0.0, 0.52],
+    ["fx", "tree_broadleaf_sunlit",    296,  68, 0.0, 0.60],
     ["props_large",  "flamboyant_tree",   252,  76, 0.0, 0.58],  # accent
-    ["props_large",  "tree_broadleaf",    406,  78, 0.0, 0.58],
-    ["props_large",  "tree_broadleaf",    466,  70, 0.0, 0.52],
-    ["props_large",  "tree_broadleaf",    614,  76, 0.0, 0.60],
-    ["props_large",  "tree_broadleaf",    632, 200, 0.0, 0.70],
-    ["props_large",  "tree_broadleaf",    628, 300, 0.0, 0.55],
+    ["fx", "tree_broadleaf_sunlit",    406,  78, 0.0, 0.58],
+    ["fx", "tree_broadleaf_sunlit",    466,  70, 0.0, 0.52],
+    ["fx", "tree_broadleaf_sunlit",    614,  76, 0.0, 0.60],
+    ["fx", "tree_broadleaf_sunlit",    632, 200, 0.0, 0.70],
+    ["fx", "tree_broadleaf_sunlit",    628, 300, 0.0, 0.55],
     # ===== HUT YARD — homestead in the dirt pocket (top-right) =====
     ["props_large",  "cabin",             530, 112, 0.0, 1.05],
     ["props_small",  "spirit_house",      612, 116, 0.0, 1.05],
@@ -143,7 +143,7 @@ const PROPS_PINEWATCH := [
     ["props_small",  "axe_on_log",        402, 246],
     ["props_small",  "firewood_bundle",   392, 248, 0.0, 0.62],
     # ===== POND — smaller pond, willow + fishing vignette =====
-    ["props_large",  "tree_feathery",     134, 288, 0.0, 0.80],
+    ["fx", "tree_feathery_sunlit",     134, 288, 0.0, 0.80],
     ["decals",       "decal_lily_pad",     36, 258],
     ["decals",       "decal_lily_pad",     88, 322],
     ["props_small",  "fishing_rod",       144, 300, -6.0],
@@ -193,12 +193,12 @@ const PROPS_PINEWATCH := [
 ## reeds + lily pads reading the south bank under the water-row pads.
 const PROPS_WHISPER := [
     ["props_large",  "tree_maple",        40,  68, 0.0, 0.55],
-    ["props_large",  "tree_broadleaf",   120,  62, 0.0, 0.55],
-    ["props_large",  "tree_broadleaf",   210,  66, 0.0, 0.52],
-    ["props_large",  "tree_feathery",    300,  62, 0.0, 0.55],
-    ["props_large",  "tree_broadleaf",   400,  66, 0.0, 0.55],
+    ["fx", "tree_broadleaf_sunlit",   120,  62, 0.0, 0.55],
+    ["fx", "tree_broadleaf_sunlit",   210,  66, 0.0, 0.52],
+    ["fx", "tree_feathery_sunlit",    300,  62, 0.0, 0.55],
+    ["fx", "tree_broadleaf_sunlit",   400,  66, 0.0, 0.55],
     ["props_large",  "tree_maple",       500,  64, 0.0, 0.55],
-    ["props_large",  "tree_broadleaf",   600,  68, 0.0, 0.55],
+    ["fx", "tree_broadleaf_sunlit",   600,  68, 0.0, 0.55],
     ["props_large",  "outfitter_van",    560, 118, 0.0, 1.30],
     ["props_small",  "signpost",          64, 258],
     ["props_medium", "dome_tent_slate",  150, 140, 0.0, 1.05],
@@ -221,12 +221,12 @@ const PROPS_WHISPER := [
 ## Lantern Valley v1 dressing: compact pine camp, silk lanterns strung
 ## over the south terrace where the ground drops away.
 const PROPS_LANTERN := [
-    ["props_large",  "pine_tall_a",       60,  70, 0.0, 0.60],
-    ["props_large",  "pine_tall_b",      160,  64, 0.0, 0.58],
-    ["props_large",  "pine_tall_a",      270,  66, 0.0, 0.60],
+    ["fx", "pine_tall_a_sunlit",       60,  70, 0.0, 0.60],
+    ["fx", "pine_tall_b_sunlit",      160,  64, 0.0, 0.58],
+    ["fx", "pine_tall_a_sunlit",      270,  66, 0.0, 0.60],
     ["props_large",  "flamboyant_tree",  380,  64, 0.0, 0.55],
-    ["props_large",  "pine_tall_b",      490,  66, 0.0, 0.58],
-    ["props_large",  "pine_tall_a",      600,  70, 0.0, 0.60],
+    ["fx", "pine_tall_b_sunlit",      490,  66, 0.0, 0.58],
+    ["fx", "pine_tall_a_sunlit",      600,  70, 0.0, 0.60],
     ["props_medium", "dome_tent_amber",   80, 150, 0.0, 1.10],
     ["props_medium", "tripod_cauldron",  288, 188],
     ["props_small",  "log_stool",        250, 208],
@@ -1194,10 +1194,10 @@ func _build_ground() -> void:
     ## (UI-034 v1 dressing — a painted map replaces it when art lands).
     if _site_id == "pinewatch":
         var gs := Sprite2D.new()
-        gs.texture = _tex("terrain/ground_painted")
+        gs.texture = _tex("fx/ground_sunlit")
         gs.centered = false
         ground = gs
-        print("ground: painted map sprite (terrain/ground_painted)")
+        print("ground: sunlit variant (fx/ground_sunlit)")
     else:
         var gp := GroundPaint.new()
         gp.mask = _mask
