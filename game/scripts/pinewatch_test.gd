@@ -526,7 +526,9 @@ func _ready() -> void:
         tint.name = "GroundTint"
         tint.texture = _tex("fx/ground_tintmap")
         tint.centered = false
-        tint.modulate = Color(1, 1, 1, 0.6)  # sun pools / shade — a hint
+        tint.modulate = Color(1, 1, 1, 0.15) # whisper — the baked dapple
+                                             # now carries the pools;
+                                             # tintmap was a flat dim
         stage.add_child(tint)                # of zones, not a film
     pads_node = Node2D.new()
     pads_node.name = "Pads"
