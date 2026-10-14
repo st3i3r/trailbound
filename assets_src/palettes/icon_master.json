@@ -1,0 +1,16 @@
+{
+ "source": "Eastward inventory item-cell extraction (eastward_inventory_menu.png) + ew_saiga.jpg scene anchors + authored fauna accents",
+ "note": "flat ramp for palette_lock --ramp. Replaces the self-pooled auto_palette (food hues amplified, crimson/rose/muted-green missing)",
+ "ramp": [
+  "#251e24", "#483f40", "#332017", "#5d5749",
+  "#50351d", "#65381d", "#735241", "#845721", "#995d3f",
+  "#7c2f33", "#a13b45", "#ab5950", "#c96a54", "#be8286",
+  "#b76229", "#c97e2f", "#db934b", "#e09027", "#e3ac62",
+  "#c5b04d", "#e5c854", "#e6da8c", "#f0ed78", "#f1b238",
+  "#46684e", "#56661e", "#687669", "#8f9d87", "#99bc8f", "#c4caab",
+  "#369874", "#445456", "#5a6264", "#6a7380", "#789296",
+  "#3e8fa8", "#4fa8c9", "#7fc8c0",
+  "#6e5b51", "#96826b", "#a29386", "#b2a38f", "#c0b597",
+  "#dac19d", "#e1cbbf", "#e9cfa0", "#eee2da", "#f5e5c5", "#f8f5e2", "#fbf1d8"
+ ]
+}

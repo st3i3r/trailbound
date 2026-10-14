@@ -414,7 +414,7 @@ undiscovered rows keep the glyph).
 64×64 via `fire_hero`. Two lessons recorded: (1) passing the D1 icon
 as `style_image` locks the figure to the ref's pixel size — the icon
 was redrawn 31px inside the 64px canvas; heroes use the craft ref
-instead and share palette through the pooled ramp; (2) hero fill is
+instead and share palette through the master ramp; (2) hero fill is
 smaller than icon fill BY DESIGN — Eastward's dish reads ~37px
 inside its medallion, so the gate is 30-56px figure on the 64px
 canvas, and under-fill is never fixed with non-integer nearest
@@ -422,6 +422,21 @@ rescaling (mushes edges). File id `<stem>_hero`, icon key
 `<id>_hero`. Display: the pantry cook result card — `medallion`
 flat piece (dark lacquer disc, r=999) + `icon_rect(id+"_hero",
 null, 64)` + name/price.
+
+**Palette audit (2026-10-16):** the self-pooled ramp was measured
+against a real Eastward item-cell extraction (the ingredient grid
+in `eastward_inventory_menu.png`, blue row-strips filtered out) —
+verdict: pooled amplified warm food hues (40/48 entries h12-49),
+had no crimson/rose family, and only 2 thin greens. The
+`assets_src/palettes/icon_master.json` ramp now anchors on the
+extracted Eastward item palette (brick `#ab5950`, crimson
+`#a13b45`, dusty rose `#be8286`, muted greens h98-124 s.12-.24,
+warm near-black `#483f40`, creams `#f8f5e2`) plus saiga anchors
+and authored fauna accents (`#4fa8c9` kingfisher blue etc. —
+Eastward's own icons have no saturated blue; our birds need it).
+`finish()` locks `--ramp icon_master.json`; never reintroduce
+pooled mode here (it rebuilt the ramp from a filtered subset once
+already).
 
 Dishes (`recipes.json`): `camp_mash` lumpy grey-brown mash in a dented tin bowl with a spoon · `trail_stew` hearty vegetable stew in an enamel camp pot, steam · `mushroom_skewers` grilled mushroom skewers on bamboo sticks · `herb_tea` green herbal tea in a small clay cup with a mint sprig · `berry_tea` pink berry tea in a glass with floating berries · `smores` toasted marshmallow s'mores on a tin plate · `trail_sandwich` crusty baguette sandwich with pickled carrot, cucumber and herbs · `goldcap_skillet` golden mushrooms sizzling in a small cast-iron skillet · `grilled_fish` whole grilled fish on a banana leaf with lime · `noodle_soup` beef noodle soup in a big white bowl with herbs, lime and chili · `iced_coffee` iced coffee with condensed milk, drip filter on top of the glass · `com_nam` triangle rice balls with sesame salt on a banana leaf · `goi_cuon` fresh spring rolls in translucent rice paper with shrimp and herbs, dipping sauce · `che` layered sweet bean dessert in a tall glass with coconut cream · `sinh_to` mango-avocado smoothie in a glass with a straw · `ca_phe_trung` egg coffee in a small cup standing in a bowl of hot water, foamy top · `tra_mat_ong` honey tea in a glass mug with a lemon slice · `ca_kho` caramelised braised fish in a small clay pot, glossy dark sauce · `mi_quang` turmeric-yellow noodles in a shallow bowl with shrimp, peanuts and a rice cracker · `berry_pie` lattice berry pie slice on a tin plate · `honey_cakes` stack of small honey cakes drizzled with honey · `caramel_custard` caramel custard with dark caramel on a small plate
 

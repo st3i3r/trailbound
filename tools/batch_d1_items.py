@@ -361,8 +361,13 @@ def finish(keys=None):
                     "--target", g2], check=True, cwd=ROOT)
     files = [os.path.join(g2, f) for f in sorted(os.listdir(g2))
              if f.endswith(".png")]
+    # lock onto the ref-anchored master ramp (Eastward item-cell
+    # extraction + saiga anchors + fauna accents) — self-pooling
+    # amplified the dominant food hues and dropped crimson/greens
+    ramp = os.path.join(ROOT, "assets_src", "palettes",
+                        "icon_master.json")
     subprocess.run([sys.executable, "tools/palette_lock.py"]
-                   + files + ["--colors", "48"], check=True, cwd=ROOT)
+                   + files + ["--ramp", ramp], check=True, cwd=ROOT)
     for f in files:
         key = os.path.basename(f)[:-4]
         if key.startswith("hero_"):
