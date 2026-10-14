@@ -6,8 +6,9 @@ extends Panel
 ## the semantic sfx.  Tonight's menu strip lists Game.meals — what the
 ## guests will actually be served.
 ##
-## Ingredient art is per-kind glyph for now (leaf/fish/box); real I1
-## dish art is the Batch F follow-up, the slots keep a fixed 16px.
+## Ingredient art: painterly 32px item sprites (Batch D1).  A good
+## cook shows the Batch F cut-in — the campfire station close-up
+## with the two ingredient sprites dropped into the wok.
 
 const W := 320
 const H := 300
@@ -21,6 +22,7 @@ var _slot_b := ""
 var _res_text := ""
 var _res_tint: Color = UITokens.PAPER
 var _res_dish := ""                # last cooked recipe id -> hero card
+var _res_ings: Array = []          # the pair that went in -> cut-in
 
 
 static func make() -> PantrySheet:
@@ -111,8 +113,10 @@ func _build_main() -> void:
 	# --- result + tonight's menu (result text survives rebuilds —
 	# the cook outcome paints into the fresh layout). A successful
 	# cook also earns the dish-hero medallion card.
-	if _res_dish != "" and UIKit.icon_exists(_res_dish + "_hero"):
-		_v.add_child(_result_card(_res_dish))
+	if _res_dish != "":
+		_v.add_child(_cutin_card())
+		if UIKit.icon_exists(_res_dish + "_hero"):
+			_v.add_child(_result_card(_res_dish))
 	var res := UIKit.label_for(_res_text, UITokens.TypeRole.BODY,
 		_res_tint)
 	res.name = "Result"
@@ -226,6 +230,8 @@ func _on_cook() -> void:
 		UIFeel.sfx("warn")
 		_rebuild()
 		return
+	var in_a := _slot_a
+	var in_b := _slot_b
 	var r := Game.cook(_slot_a, _slot_b)
 	match String(r.get("result", "")):
 		"ok":
@@ -236,6 +242,7 @@ func _on_cook() -> void:
 				 "p": int(r.get("meal", {}).get("price", 0))})
 			_res_tint = UITokens.GREEN
 			_res_dish = String(r.get("recipe", ""))
+			_res_ings = [in_a, in_b]
 			_slot_a = ""
 			_slot_b = ""
 		"oven_hint":
@@ -243,6 +250,7 @@ func _on_cook() -> void:
 			_res_text = String(r.get("hint", ""))
 			_res_tint = UITokens.GOLD
 			_res_dish = ""
+			_res_ings = []
 		_:                                   # "missing"
 			UIFeel.sfx("warn")
 			UIFeel.haptic("warn")
@@ -250,7 +258,49 @@ func _on_cook() -> void:
 				{"name": _ing_name(String(r.get("missing", "?")))})
 			_res_tint = UITokens.RED
 			_res_dish = ""
+			_res_ings = []
 	_rebuild()
+
+
+## The cook moment (Batch F): the 256x128 night-station cut-in with
+## the two ingredient sprites dropped into the wok — the Eastward
+## cooking close-up read.  Icons fall a short step on open;
+## reduced-motion places them already dropped.
+func _cutin_card() -> Control:
+	var card := PanelContainer.new()
+	card.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	card.add_theme_stylebox_override("panel", UIKit.flat("glass_panel"))
+	var stage := Control.new()
+	stage.custom_minimum_size = Vector2(256, 128)
+	stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var bg := TextureRect.new()
+	bg.texture = UIKit.tex("fx/cutin_campfire_cook")
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.stretch_mode = TextureRect.STRETCH_KEEP
+	bg.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage.add_child(bg)
+	var spots := [Vector2(106, 34), Vector2(140, 34)]
+	for i in mini(_res_ings.size(), 2):
+		var ing := String(_res_ings[i])
+		if not UIKit.icon_exists(ing):
+			continue
+		var ic := UIKit.icon_rect(ing, null, 32)
+		ic.position = spots[i]
+		var land_y: float = spots[i].y + 26.0
+		if not UIFeel.reduced_motion:
+			var tw := UIFeel.apply(ic.create_tween(), "panel_in")
+			tw.tween_property(ic, "position:y", land_y, 0.22) \
+				.set_delay(0.12 + 0.16 * i)
+			ic.modulate.a = 0.0
+			UIFeel.apply(ic.create_tween(), "dimmer") \
+				.tween_property(ic, "modulate:a", 1.0, 0.1) \
+				.set_delay(0.12 + 0.16 * i)
+		else:
+			ic.position.y = land_y
+		stage.add_child(ic)
+	card.add_child(stage)
+	return card
 
 
 ## The cook payoff: dish hero in a dark medallion ring + name + price —

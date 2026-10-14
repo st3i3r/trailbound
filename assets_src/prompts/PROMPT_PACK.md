@@ -492,9 +492,19 @@ their authored 16px sprites, centred).
 - **E1 (≤85, 16 slots, ≈10):** `reed_screen` woven reed privacy screen · `dog_bed` woven rattan dog bed with a checked blanket · `stone_fire_pit` fitted stone fire pit with a grill grate · `scout_pennant` triangular felt pennant on a pole, emblem only · `dutch_oven` cast-iron pot with lid on three legs · `binoculars` pair of handheld binoculars · `reception_board` wooden booking board with pegs and blank cards (tier-up) · `kite_stake` kite string tied to a stake with the kite flying high
 - **E2 (≤170, 4 slots, 2 jobs ≈20):** `flower_arch` wooden arch covered in bougainvillea · `koi_pond` small stone-rimmed pond with lily pads and orange koi · `photo_wall` wooden frame wall of pinned blank photos · `cook_shelter` open-sided thatched kitchen shelter over a clay stove (tier-up) · `outfitter_lodge` small timber shop with a tin roof and porch beside the van (tier-up) · `trail_gate_tier` = A4 `trailhead_gate` (reuse)
 
-### Batch F — cooking cut-in (Pro Flash 256×128, ≈27 for 3 seeds)
+### Batch F — cooking cut-in — **SHIPPED** (`tools/batch_f_cutin.py`)
 
-`cutin_campfire_cook` close-up of a campfire cooking station: blackened wok on three stones, flames licking up, glowing embers, steam rising, dark night vignette, warm firelight from below. Ingredients drop in as existing D1 sprites.
+`cutin_campfire_cook` — 256×128 full-bleed scene via
+`create_image_pro_flash` (`no_background: false`; it is a scene
+panel, not an object). 3 seeds fired, seed 3 picked — widest
+centred wok, symmetric side props.  Style ref = real Eastward
+night crop `refs/grade/ew_cutin_night256.png` (lantern-glow region
+of `eastward_trailer_night.jpg`, 2:1 → 256×128): transfers the
+deep blue-purple vignette + saturated warm glow pool.  NO palette
+lock — baked night art; v4 is a day ramp and would strip the
+vignette.  Pantry `_cutin_card()` shows it on a successful cook
+with the two D1 ingredient sprites dropping into the wok
+(`UIFeel`-timed, reduced-motion places them landed).
 
 ### Batch G — animation (motion-only descriptions)
 

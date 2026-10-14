@@ -1,0 +1,20 @@
+{
+ "cutin_s1": {
+  "job": "adf8bcab-b56d-47c4-bd21-c0cf5effeddd",
+  "seed": 1,
+  "file": "D:\\monet\\trail-bound\\assets_src\\gen\\f\\cutin_s1.png",
+  "done": true
+ },
+ "cutin_s2": {
+  "job": "6ef96cf8-8bbc-4d03-a752-bbcddbe65626",
+  "seed": 2,
+  "file": "D:\\monet\\trail-bound\\assets_src\\gen\\f\\cutin_s2.png",
+  "done": true
+ },
+ "cutin_s3": {
+  "job": "f3465ecf-83b9-4699-85ff-6d6080f0f796",
+  "seed": 3,
+  "file": "D:\\monet\\trail-bound\\assets_src\\gen\\f\\cutin_s3.png",
+  "done": true
+ }
+}
