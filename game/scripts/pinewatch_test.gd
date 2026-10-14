@@ -146,9 +146,6 @@ const PROPS_PINEWATCH := [
     ["props_large",  "outfitter_van",     440, 348, 0.0, 1.35],
     ["props_small",  "signpost",          394, 342],
     ["props_medium", "prop_supply_crate_0", 482, 372],
-    # ===== E — rest corner attached to the van cluster =====
-    ["props_large",  "picnic_table",      522, 306, 0.0, 0.62],
-    ["props_medium", "picnic_umbrella",   516, 296],
     # ===== TREELINE FEET — sparse undergrowth at the edge only;
     # the ref stands trees on bare grass (~70% open) =====
     ["props_medium", "fern_bank",         104,  98],
