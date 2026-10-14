@@ -1340,7 +1340,7 @@ func _build_pads(rng: RandomNumberGenerator) -> void:
         m.position = rect.position
         pads_node.add_child(m)
         if not (pid in open_pads):
-            var tuft := _anchored("decals", "XS_13",
+            var tuft := _anchored("decals", "tuft_grass_dry",
                 rect.position + Vector2(8 + rng.randi() % 40,
                                         8 + rng.randi() % 40))
             tuft.name = "tuft_" + pid        # clear transform frees it
