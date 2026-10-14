@@ -148,7 +148,7 @@ const PROPS_PINEWATCH := [
     ["props_medium", "prop_supply_crate_0", 482, 372],
     # ===== TREELINE FEET — sparse undergrowth at the edge only;
     # the ref stands trees on bare grass (~70% open) =====
-    ["props_medium", "fern_bank",         104,  98],
+    ["props_medium", "fern_bank",         118,  96],
     ["props_medium", "bush_white_flower_v", 384, 110],
     ["props_medium", "bush_round_m",      440, 116],
     # ===== CAMPFIRE HUB — cook support; one anchor + woodpile =====

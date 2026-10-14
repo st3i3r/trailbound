@@ -40,6 +40,11 @@ POOLS = {
           ("decal_stone_moss.png", 1)],
     "W": [("decal_duckweed.png", 4), ("decal_lily_pad.png", 2)],
 }
+# pond-rim stones: flat river rocks baked along the G<->W border —
+# the ref rims every water edge with chunky painted stones
+RIM = [("step_stone_a.png", 3), ("step_stone_b.png", 3),
+       ("step_stone_c.png", 2), ("decal_pebbles.png", 2),
+       ("decal_pebbles_moss.png", 1), ("decal_stone_moss.png", 1)]
 TILE = 32
 MIN_DIST = 10          # px inside a patch — tight enough to read as one mass
 PATCH_R = 26           # patch radius
@@ -121,7 +126,55 @@ def main():
         return False
 
     layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    placed = {"G": 0, "D": 0, "W": 0}
+    placed = {"G": 0, "D": 0, "W": 0, "rim": 0}
+
+    # --- mottle pre-pass: chunky warm/cool blotches on G cells so the
+    # grass has painterly wear like the ref, not a flat fill. 8px cells,
+    # small hsv deltas — banding stays in pixel grammar.
+    arr = np.asarray(base).astype(np.float32)
+    cell = 8
+    noise = rng.random((H // cell + 1, W // cell + 1))
+    for gy in range(noise.shape[0] - 1):
+        for gx in range(noise.shape[1] - 1):
+            if family_at(gx * cell + 4, gy * cell + 4) != "G":
+                continue
+            n = noise[gy, gx]
+            if n < 0.30:      # warm sunny blotch
+                dr, dg, db = 10.0, 8.0, -6.0
+            elif n > 0.78:    # cool shade blotch
+                dr, dg, db = -10.0, -4.0, 8.0
+            else:
+                continue
+            y0, y1 = gy * cell, gy * cell + cell
+            x0, x1 = gx * cell, gx * cell + cell
+            arr[y0:y1, x0:x1, 0] += dr
+            arr[y0:y1, x0:x1, 1] += dg
+            arr[y0:y1, x0:x1, 2] += db
+    base = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
+
+    # --- rim pass: stones along grass cells that border water ---
+    rim_cells = []
+    for r in range(rows):
+        for c in range(cols):
+            if mask[r][c] not in "GD":
+                continue
+            for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols and mask[nr][nc] == "W":
+                    rim_cells.append((c * TILE, r * TILE, dc, dr))
+                    break
+    for bx, by, dc, dr in rim_cells:
+        # stone sits on the grass side, snug against the water line
+        x = bx + (TILE // 2 if dc == 0 else (4 if dc < 0 else TILE - 4))
+        y = by + (TILE // 2 if dr == 0 else (4 if dr < 0 else TILE - 4))
+        x += int(rng.integers(-6, 7)); y += int(rng.integers(-6, 7))
+        x = max(8, min(W - 8, x)); y = max(8, min(H - 8, y))
+        if too_close(x, y) or box_hits_keepout(x, y, 20, 12):
+            continue
+        d = load_decal(pick(RIM, rng), rng.uniform(0.9, 1.15))
+        layer.paste(d, (x - d.width // 2, y - d.height // 2), d)
+        spaced[int(y // MIN_DIST), int(x // MIN_DIST)] = True
+        placed["rim"] += 1
 
     # --- patch pass: a few homogeneous wear patches, not confetti ---
     centres = []
@@ -164,7 +217,7 @@ def main():
     out = Image.alpha_composite(base, layer).convert("RGB")
     out.save(outp)
     print(f"scattered {sum(placed.values())} decals "
-          f"(G:{placed['G']} D:{placed['D']} W:{placed['W']}) "
+          f"(G:{placed['G']} D:{placed['D']} W:{placed['W']} rim:{placed['rim']}) "
           f"seed={seed} -> {outp}")
 
 
