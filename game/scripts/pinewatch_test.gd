@@ -274,7 +274,10 @@ const HUT_STAGES := ["cabin_s0", "cabin_s1", "cabin_s2", "cabin"]
 const PAD_OVERGROWN := ["pad_overgrown_a", "pad_overgrown_b"]
 
 # ------------------------------------------------------------- grade pass
-const WARM_MUL := Color("fbf4e4")            # sunny filmic multiply —
+const WARM_MUL := Color.WHITE                # clean day — the post
+                                             # grade owns warmth now;
+                                             # multiply is exposure
+                                             # only, never a film
 const STORM_MUL := Color(0.38, 0.40, 0.48)   # desaturated slate — storm
 const SIM_TO_FX := {"clear": "sunny", "rain": "rain",
                     "storm": "storm"}        # sim weather -> profile
@@ -349,6 +352,9 @@ var fade_zones := []                         # [{s: Sprite2D, r: Rect2}]
 var actor_nodes := []                        # walking sprites to protect
 var _grade: CanvasModulate                   # filmic grade — weather tint
 var _fx: WorldFX                             # front/dusk scalar driver —
+var _post_layer: CanvasLayer                 # screen-space grade tier
+var _post: ColorRect                         # the pass itself
+var _post_mat: ShaderMaterial                # uniforms synced per-frame
                                              # every atmospheric channel
                                              # is a curve off these
 var _warp: ColorRect                         # ground-only screen warp
@@ -535,7 +541,8 @@ func _ready() -> void:
         tint.name = "GroundTint"
         tint.texture = _tex("fx/ground_tintmap")
         tint.centered = false
-        stage.add_child(tint)
+        tint.modulate = Color(1, 1, 1, 0.6)  # sun pools / shade — a hint
+        stage.add_child(tint)                # of zones, not a film
     pads_node = Node2D.new()
     pads_node.name = "Pads"
     stage.add_child(pads_node)
@@ -613,6 +620,21 @@ func _ready() -> void:
     add_child(_fx)
     _fx.bind(_grade, _rain, _leaves, WARM_MUL)
     Game.phase_changed.connect(_on_phase_dusk)
+    # Post-grade — one screen pass shaping tone (contrast / split-tone
+    # / vignette) on layer 7: above the world canvas + world markers,
+    # below the HUD canvas.  Drives off the same WorldFX scalars.
+    _post_layer = CanvasLayer.new()
+    _post_layer.name = "PostGradeLayer"
+    _post_layer.layer = 7
+    add_child(_post_layer)
+    _post = ColorRect.new()
+    _post.name = "PostGrade"
+    _post.mouse_filter = Control.MOUSE_FILTER_IGNORE
+    _post.set_anchors_preset(Control.PRESET_FULL_RECT)
+    _post_mat = ShaderMaterial.new()
+    _post_mat.shader = load("res://shaders/post_grade.gdshader")
+    _post.material = _post_mat
+    _post_layer.add_child(_post)
     _build_props()
     _build_ambient()
     _build_actors()
@@ -749,10 +771,28 @@ func _ready() -> void:
     for a in OS.get_cmdline_args():
         if a.begins_with("--shot="):
             shot_arg = a.get_slice("=", 1)
+    # --hide=NAME[,NAME] — layer-bisect for grade/QA shots: toggles
+    # off nodes anywhere in the tree by name before capture
+    for a in OS.get_cmdline_args():
+        if a.begins_with("--hide="):
+            for hn in a.get_slice("=", 1).split(","):
+                var n2 := find_child(hn, true, false)
+                if n2 != null:
+                    n2.visible = false
+                else:
+                    print("--hide: no node named ", hn)
     if shot_arg != "" or OS.get_cmdline_args().has("--shot"):
         Transition.snap_reveal()
         await get_tree().process_frame
         await get_tree().process_frame
+        for ch in [_warp, _warp2, _veil, _veil2]:
+            var m := ch.material as ShaderMaterial
+            print("OVERLAY ", ch.name, " vis:", ch.visible,
+                " shader:", (m.shader.resource_path if m and m.shader
+                    else "none"),
+                " int:", (m.get_shader_parameter("intensity")
+                    if m and m.shader else "-"))
+        print("OVERLAY grade:", _grade.color)
         var img := get_viewport().get_texture().get_image()
         var out := shot_arg if shot_arg != "" else \
             "D:/monet/trail-bound/assets_src/cleanup/pinewatch_engine_graded.png"
@@ -761,6 +801,9 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+    if _post_mat != null and _fx != null:    # grade tracks the scalars
+        _post_mat.set_shader_parameter("dusk", _fx.dusk)
+        _post_mat.set_shader_parameter("front", _fx.front)
     var all_actors: Array = actor_nodes
     if _actor_view != null:                   # sim cast joins the set
         all_actors = actor_nodes + _actor_view.actor_nodes
@@ -807,8 +850,8 @@ const WEATHER_PROFILES := {
     # says "start rain", it says "how far into the front we are".
     "sunny": {"color": WARM_MUL, "front": 0.0,
               "veil": {"shader": "res://shaders/sun_rays.gdshader",
-                       "val": 0.45,            # vệt nắng ambient shafts
-                       "resp": "dusk"},        # die with the light
+                       "val": 0.22,            # vệt nắng — ambient shafts
+                       "resp": "dusk"},        # stay a shimmer, die at dusk
               "warp": null,
               "lightning": false},
     "rain":  {"color": Color(0.58, 0.60, 0.68), # sim's everyday rain —

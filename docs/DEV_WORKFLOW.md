@@ -163,6 +163,17 @@ night summary; `--pose --morning` stages the board marker; `--board`
 opens the booking sheet; `--reduced-motion` runs the UI under the
 reduced-motion policy.
 
+Grade / overlay QA (`--shot` prints an `OVERLAY` line per overlay node —
+shader path + live intensity — plus the resolved `WarmGrade` colour):
+`--hide=NAME[,NAME]` toggles any node off before capture — bisect the
+compositing stack (`GroundTint`, `VeilOverlay`, `PostGradeLayer`,
+`WarmGrade`, `AmbientFX`, …) when a shot looks wrong.  Sanity rule:
+painted ground renders within ~±15 of its authored pixels (olive
+`120,172,75`); a `WarmGrade` channel >1 outside lightning/heatwave
+means an emit row is overdriving the multiply (see `CUE_GAIN` in
+`world_fx.gd` — ambient cues nudge the grade, only flash and
+daylight-scatter tints may lift it).
+
 UI gallery (the §5.4 storybook — UI-018): every chrome component in
 labeled sections, golden-shot ready, plus the automated lints.
 

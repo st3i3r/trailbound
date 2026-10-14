@@ -22,9 +22,15 @@ extends Node
 ## entirely (a hard-won class of bug — never strobe on a flag meant
 ## to prevent strobing).
 
-const DUSK_GOLD := Color(1.0, 0.84, 0.60)   # golden-hour multiply
+const DUSK_GOLD := Color(0.96, 0.90, 0.74)  # golden-hour dim — gentle;
+                                            # warmth lives in the post
+                                            # grade's split-tone, not a
+                                            # film over the frame
 const NIGHT_MUL := Color(0.30, 0.32, 0.54)  # moonlit blue multiply
 const FLASH_ADD := Color(0.95, 0.95, 1.10, 0.0)
+const CUE_GAIN := 0.22                      # authored cue hues nudge the
+                                            # grade ~+0.15/channel; raw
+                                            # adds washed the frame
 const RAIN_ON := 0.26                       # emitter hysteresis —
 const RAIN_OFF := 0.20                      # crossing up needs more
 const LEAF_ON := 0.30                       # than staying on
@@ -266,7 +272,14 @@ func _apply_grade() -> void:
 		var n: Object = e["n"]
 		var w: float = _emit_weight(StringName(e["w"]))
 		if n == null:
-			c += (e["col"] as Color) * w
+			# Cue cols are authored hues (e8c46a firelight, 6a7fa8
+			# moon) — adding them raw into a multiply channel lifts
+			# the whole frame 40%+ = milk wash.  CUE_GAIN keeps the
+			# beat a nudge of authored colour; lightning flash is a
+			# real exposure pulse and stays full-strength.
+			var gain := 1.0 if StringName(e["w"]) == &"flash" \
+				else CUE_GAIN
+			c += (e["col"] as Color) * w * gain
 		elif is_instance_valid(n):
 			n.set(StringName(e["p"]), float(e["amp"]) * w)
 		else:
