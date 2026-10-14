@@ -157,44 +157,40 @@ const PROPS_PINEWATCH := [
     ["props_medium", "picnic_basket",     528, 294],
     ["props_medium", "picnic_umbrella",   516, 296],
     ["props_small",  "thermos",           514, 298],
-    ["props_small",  "rope_coil",         470, 354],
+    ["props_small",  "rope_coil",         446, 374],
     # ===== TREELINE FEET — regen + undergrowth, pads stay clear =====
     ["props_medium", "pine_sapling",      170,  96],
-    ["props_medium", "pine_sapling",      500,  94],
+    ["props_medium", "pine_sapling",      214,  94],
     ["props_medium", "fern_bank",         340,  96],
     ["props_medium", "fern_bank",         104,  98],
     ["props_medium", "bush_round_m",      272, 114],
     ["props_medium", "bush_round_m",      440, 116],
-    ["props_medium", "bush_white_flower_v", 64, 108],
+    ["props_medium", "bush_white_flower_v", 384, 110],
     ["props_medium", "stump_mushroom",    236, 108],
     # ===== HUT YARD — the working homestead =====
-    ["props_medium", "water_jar",         558, 142],
-    ["props_medium", "rain_barrel",       592, 142],
-    ["props_medium", "potted_flowers",    506, 146],
-    ["props_medium", "bird_feeder",       508, 120],
-    ["props_large",  "banana_clump",      614, 170, 0.0, 0.62],
+    ["props_medium", "water_jar",         486, 162],
+    ["props_medium", "bird_feeder",       478, 116],
+    ["props_large",  "banana_clump",      608, 200, 0.0, 0.62],
     # ===== CAMPFIRE HUB — the cook side of the ring =====
-    ["props_medium", "woodpile",          342, 240],
+    ["props_medium", "woodpile",          296, 244],
     ["props_medium", "herb_rack",         452, 216],
     ["props_medium", "dirt_patch",        368, 244],
     ["props_small",  "camp_kettle",       352, 240],
-    ["props_large",  "pennant_string",    378, 192, 0.0, 0.55],
     # ===== POND — bank dressing + blossom accent =====
-    ["props_medium", "bamboo_bench",       76, 284],
+    ["props_medium", "bamboo_bench",      244, 304],
     ["props_medium", "debris_log_mossy",  142, 336],
-    ["props_medium", "prop_boulder_0",    206, 332],
+    ["props_medium", "prop_boulder_0",    166, 336],
     ["props_large",  "tree_cherry",       196, 298, 0.0, 0.55],
     ["props_large",  "hammock",           104, 302, 0.0, 0.60],
     ["decals",       "decal_duckweed",     52, 290],
     ["decals",       "decal_duckweed",    108, 306],
-    ["decals",       "step_stone_a",      168, 338],
-    ["decals",       "step_stone_b",      186, 342],
+    ["decals",       "step_stone_a",      148, 338],
+    ["decals",       "step_stone_b",      166, 344],
     # ===== FIELD + TRAILHEAD — the lived-in middle =====
     ["props_medium", "kite_stake",        284, 282],
     ["props_medium", "reception_board",   330, 358],
-    ["props_medium", "prop_supply_crate_0", 486, 344],
-    ["props_large",  "cook_shelter",      574, 354, 0.0, 0.85],
-    ["props_large",  "bamboo_clump",      610, 330, 0.0, 0.55],
+    ["props_medium", "prop_supply_crate_0", 482, 372],
+    ["props_large",  "cook_shelter",      584, 372, 0.0, 0.85],
     ["props_small",  "phin_coffee",       200, 224],
     ["props_small",  "tea_cup",           213, 226],
     # ===== BOUNDARY marks =====
@@ -1690,6 +1686,7 @@ func _build_ui() -> void:
     # ceremony layer rides MODAL — above the panel stack and its dimmer
     _ceremony_layer = CanvasLayer.new()
     _ceremony_layer.layer = UITokens.Tier.MODAL
+    _ceremony_layer.name = "CeremonyLayer"   # --hide QA hook
     add_child(_ceremony_layer)
     Game.crew_stage_ready.connect(func(_s):
         hud.set_crew_badge(true)
@@ -3415,9 +3412,15 @@ func _prep_tap(px: Vector2) -> String:
 func _dog_walk(dog: AnimatedSprite2D) -> void:
     if _dog_points.is_empty():
         return
-    var next: Vector2 = _dog_points[randi() % _dog_points.size()]
-    if next.distance_to(dog.position) < 10.0:
-        return                                   # re-roll next tick
+    # pick from reachable waypoints only — choosing his own spot used
+    # to no-op the tick (and flaked the smoke assert ~25% of runs)
+    var cands: Array = []
+    for p in _dog_points:
+        if (p as Vector2).distance_to(dog.position) >= 10.0:
+            cands.append(p)
+    if cands.is_empty():
+        return
+    var next: Vector2 = cands[randi() % cands.size()]
     _dog_walking = true
     var dir := next - dog.position
     var tex := _tex("characters/camp_dog/camp_dog_" + _dir8(dir))
