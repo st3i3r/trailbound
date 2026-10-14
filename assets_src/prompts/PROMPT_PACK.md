@@ -18,7 +18,7 @@ pack at execution time; this file is what gets reviewed. Rosters come from
 | 6 | Obsolete jobs | U1–U5 paper UI, I1 chrome icons, F1 font | Retired (D-UI-1/2/5) — no UI panel or font gens |
 | 7 | Signage vs "no text" | Batch A needs sign/menu/price boards | Blank faces in art; text drawn at runtime in Be Vietnam Pro (localizes EN/VI) |
 | 8 | Opaque output names | Shipped props are `S_10`, `M1_5`, `XS_33` — same smell as the I1 icons | Every slot gets a semantic `item_names` id in the job file |
-| 9 | Cost model unused | Verified quotes (`get_pro_flash_capabilities`): Pro Flash = **5 gens per image** (≤96 px), 6 at 128–192, 9 at 256×128; character 8-dir = 6. Batch tool `create_1_direction_object` = ~10 gens per job for **64 items (≤42 px) / 16 (≤85) / 4 (≤170)** | Batch tool for every square ≤170 px set; Pro Flash only for characters, non-square, >170 px, or busy style refs (`detail=false`) |
+| 9 | Cost model unused | Verified quotes (`get_pro_flash_capabilities`): Pro Flash = **5 gens per image** (≤96 px), 6 at 128–192, 9 at 256×128; character 8-dir = 6. Batch tool `create_1_direction_object` = ~10 gens per job for **64 items (≤42 px) / 16 (≤85) / 4 (≤170)** | ~~Batch tool for every square ≤170 px set~~ **REVERSED (2026-10-16, Batch E pilot):** `create_1_direction_object` produces soft-shaded generic illustrations — no `style_options`, style_images only set canvas size and copy loosely, thin grammar drifts off-palette. Shipped sprites/icons/props ALWAYS go `create_object_pro_flash` + Eastward craft BLOCK + same-size graded style ref + downstream grade+lock. The batch tool is only for throwaway candidate scouting, never for shipped art |
 | 10 | Data → art gaps not in the manifest | Decor without art: Flower Arch, Reed Screen, Dog Bed, Stone Fire Pit, Scout Pennant, Koi Pond, Photo Wall, Kite Line (flying); Warden's Hut restoration stages (§8.4); camp tier-ups (§6.7); Clear debris and overgrown pads (§5.1); tent/cabin night states; festival packs and the Music Night band (§13.5) | Batches E, H, I below |
 | 11 | Identity conflicts the prompts would bake in | Field Notes birds are mostly European species (Eurasian Jay, Tawny Owl, White-throated Dipper, Eurasian Skylark, European Bee-eater…) — only the bulbul is distinctly Vietnamese | Decision D-PP-1 (§5) before Batch C |
 | 12 | GDD vs style lock on character size | GDD §16.2 "about 48 px tall in 64×64"; style lock ≤12% | GDD §16.2 aligned to ≈43 px in 48×48 |
@@ -463,6 +463,31 @@ Ingredients (`ingredients.json`): `mushroom` brown wild mushrooms · `herb` tied
 Keepsakes (`crew.json`): `keepsake_thermos` dented green enamel thermos · `keepsake_register` worn cloth-bound ledger · `keepsake_photo` old photo in a wooden frame, sepia, faces blurred · `keepsake_oar` oar carved with initials (marks only, no letters) · `keepsake_chart` rolled hand-drawn river chart · `keepsake_boat` small wooden rowboat · `keepsake_frames` bamboo lantern frames with rice paper · `keepsake_book` battered pattern book · `keepsake_lantern` half-finished silk lantern
 
 ### Batch E — decor and gear gaps (`decor.json`, `gear.json`)
+
+**E shipped via `tools/batch_e_props.py` (create_object_pro_flash,
+NOT the batch tool — see row 9):** 16× props_medium 64px + 4×
+props_large 128px. Style refs = REAL Eastward scene crops
+(`assets_src/refs/grade/ew_prop_fence64.png` /
+`ew_prop_shop128.png`, extracted from `eastward_shopfront.png`) —
+our own graded props as refs gave copy-of-a-copy drift (soft flat
+fills; the first pilot was rejected on sight). BLOCK carries the
+"hand-painted miniature density" + weathering grammar; palette is
+NEVER a gen-time `palette=` param (forced palettes flatten fills —
+Pro pilot lesson), it's `tb_grade pinewatch_v2` +
+`palette_lock --ramp site_palette_v4` in post. World props are
+bottom-anchored (`_normalize_prop`), not icon-centred.
+Also fixed DECOR_SPRITE: 5 entries pointed at `props_medium` for
+art living in `props_small` (invisible-decor bug:
+`silk_lantern`/`lotus`/`guitar_stump`/`wind_chime`/`kite`), 6
+placeholders now map to the new art (`flower_arch`/`koi_pond`/
+`photo_wall`/`reed_screen`/`dog_bed`/`scout_pennant`), and
+`stone_fire_pit`
+(campfire-size → mutates `campfire.radius`) draws its ring via
+`_sync_fire_pit()` under the A1b flame loop. Gear icons `cooler` +
+`dutch_oven` went through the D1 driver (32px, icon_master);
+outfitter gear rows now reserve a 32px slot (painterly icons
+render untinted at native size; `fishing_rod`/`binoculars` keep
+their authored 16px sprites, centred).
 
 - **E1 (≤85, 16 slots, ≈10):** `reed_screen` woven reed privacy screen · `dog_bed` woven rattan dog bed with a checked blanket · `stone_fire_pit` fitted stone fire pit with a grill grate · `scout_pennant` triangular felt pennant on a pole, emblem only · `dutch_oven` cast-iron pot with lid on three legs · `binoculars` pair of handheld binoculars · `reception_board` wooden booking board with pegs and blank cards (tier-up) · `kite_stake` kite string tied to a stake with the kite flying high
 - **E2 (≤170, 4 slots, 2 jobs ≈20):** `flower_arch` wooden arch covered in bougainvillea · `koi_pond` small stone-rimmed pond with lily pads and orange koi · `photo_wall` wooden frame wall of pinned blank photos · `cook_shelter` open-sided thatched kitchen shelter over a clay stove (tier-up) · `outfitter_lodge` small timber shop with a tin roof and porch beside the van (tier-up) · `trail_gate_tier` = A4 `trailhead_gate` (reuse)

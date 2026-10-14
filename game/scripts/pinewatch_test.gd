@@ -379,6 +379,7 @@ var fire_bubble: Panel                       # marker content over the fire
 var _fire_on := false
 var _fire_tween: Tween
 var _fire_light: PointLight2D                # hearth glow — emit row
+var _fire_pit: Sprite2D                      # stone ring when upgraded
 var _quit: Control                           # quit-confirm panel (one at a time)
 
 var selected := ""                           # guest id being placed
@@ -1338,10 +1339,15 @@ func _embed_base(p: Array, rng: RandomNumberGenerator) -> void:
 func _build_actors() -> void:
     var ch := WORLD_SCALE * 1.12    # ~0.9 — chars shrink slightly less
                                   # than props so they stay readable
+    # Stone Fire Pit upgrade swaps the bare ground for the fitted
+    # ring — drawn first so the flame loop sorts over it.  Lazy via
+    # _sync_decor_world so a mid-session buy drops the ring in too.
+    _sync_fire_pit()
     # fire loop — A1b cycle, frames 1..6 (frame 0 is the ignite lead-in)
     var fire := _anchored_frames("fx",
         ["fx/A1b_1", "fx/A1b_2", "fx/A1b_3", "fx/A1b_4", "fx/A1b_5",
          "fx/A1b_6"], 6.0, _fire_pos)
+    fire.name = "FireLoop"
     # reduced-flashing setting: the 6 fps flame cycle is the one real
     # on-screen flicker — slow it to a breathing ember instead of
     # killing the fire outright (still reads as fire, stops strobing)
@@ -3259,23 +3265,24 @@ const DECOR_SPRITE := {
     "picnic_table": ["props_large", "picnic_table"],
     "lantern": ["props_medium", "lantern_post"],
     "string_lights": ["props_large", "string_lights"],
-    "silk_lantern": ["props_medium", "silk_lantern_red"],
+    "silk_lantern": ["props_small", "silk_lantern_red"],
     "planter": ["props_medium", "flower_box"],
-    "lotus": ["props_medium", "lotus_bowl"],
-    "flower_arch": ["props_medium", "bush_white_flower_v"],
+    "lotus": ["props_small", "lotus_bowl"],
+    "flower_arch": ["props_large", "flower_arch"],
     "tarp": ["props_medium", "drying_tarp"],
     "hedge": ["props_medium", "bush_clover"],
-    "reed_screen": ["props_medium", "fence_bamboo"],
-    "dog_bed": ["props_medium", "camp_pillow"],
-    "guitar_stump": ["props_medium", "guitar"],
-    "wind_chime": ["props_medium", "chili_garlic_string"],
+    "reed_screen": ["props_medium", "reed_screen"],
+    "dog_bed": ["props_medium", "dog_bed"],
+    "guitar_stump": ["props_small", "guitar"],
+    "wind_chime": ["props_small", "chili_garlic_string"],
     "radio": ["props_medium", "radio_stump"],
     "swing": ["props_large", "swing"],
-    "kite": ["props_medium", "kite"],
+    "kite": ["props_small", "kite"],
     "telescope": ["props_medium", "viewpoint_binoculars"],
-    "scout_pennant": ["props_large", "pennant_string"],
-    "koi_pond": ["props_medium", "reed_shore"],
-    "photo_wall": ["props_medium", "clothesline"],
+    "scout_pennant": ["props_medium", "scout_pennant"],
+    "koi_pond": ["props_large", "koi_pond"],
+    "photo_wall": ["props_medium", "photo_wall"],
+    "stone_fire_pit": ["props_medium", "stone_fire_pit"],
 }
 
 
@@ -3322,6 +3329,24 @@ func _sync_decor_world() -> void:
         spr.set_meta("decor_idx", i)
         _decor_layer.add_child(spr)
         _decor_nodes[i] = spr
+    _sync_fire_pit()
+
+
+## The campfire-size row (Stone Fire Pit) mutates campfire.radius —
+## never lands in st["decor"] — so its ring sprite is maintained
+## here: spawn once upgraded, drop if the save ever regresses.
+func _sync_fire_pit() -> void:
+    var up := Game.fire_pit_upgraded()
+    if up and (_fire_pit == null or not is_instance_valid(_fire_pit)):
+        _fire_pit = _anchored("props_medium", "stone_fire_pit",
+            _fire_pos)
+        world.add_child(_fire_pit)
+        var flame := world.get_node_or_null("FireLoop")
+        if flame:                          # under the flame loop
+            world.move_child(_fire_pit, flame.get_index())
+    elif not up and _fire_pit != null and is_instance_valid(_fire_pit):
+        _fire_pit.queue_free()
+        _fire_pit = null
 
 
 func _decor_row_for(item_id: String) -> Dictionary:

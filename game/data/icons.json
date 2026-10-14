@@ -242,7 +242,9 @@
   "bee_eater": "bird_bee_eater",
   "hoopoe": "bird_hoopoe",
   "kestrel": "bird_kestrel",
-  "wagtail": "bird_wagtail"
+  "wagtail": "bird_wagtail",
+  "cooler": "gear_cooler",
+  "dutch_oven": "gear_dutch_oven"
  },
  "traits": {
   "comment": "trait id -> glyph (13 traits from traits.json); flat marks, tinted at call site",

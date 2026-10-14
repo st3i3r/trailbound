@@ -332,5 +332,13 @@
  "wagtail": {
   "object_id": "4605909c-1602-4d4e-9e06-08e8bf6d5fa2",
   "kind": "bird"
+ },
+ "cooler": {
+  "object_id": "e8b05961-1a15-45c0-b2d1-5c48bd0745e5",
+  "kind": "gear"
+ },
+ "dutch_oven": {
+  "object_id": "660964ee-bf44-4e84-8508-79debba87a4c",
+  "kind": "gear"
  }
 }

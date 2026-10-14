@@ -13,9 +13,10 @@ const H := 300
 ## mode (buy-on-place; from_stored skips the charge via place_stored).
 signal place_requested(item_id: String, from_stored: bool)
 
-## gear id -> objects-family glyph (content icons, keep colour tint)
+## gear id -> objects icon (Batch E painterly 32px; rod/bins keep
+## their authored 16px sprites — both centre in the 32px slot)
 const GEAR_ICON := {"fishing_rod": "fishing_rod",
-    "binoculars": "binoculars", "cooler": "canister", "oven": "pot"}
+    "binoculars": "binoculars", "cooler": "cooler", "oven": "dutch_oven"}
 ## gear effect -> blurbs (what buying actually unlocks in the world)
 const EFF_KEY := {"fishing": "shop_eff_fishing",
     "lookout": "shop_eff_lookout", "meals": "shop_eff_meals",
@@ -165,7 +166,7 @@ func _gear_row(row: Dictionary) -> Control:
 	h.custom_minimum_size = Vector2(0, 40)
 	h.add_theme_constant_override("separation", 8)
 	var ic := UIKit.icon_rect(GEAR_ICON.get(item_id, "tools"),
-		UITokens.PAPER, 16)
+		null, 32)
 	ic.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(ic)
 	var mid := VBoxContainer.new()

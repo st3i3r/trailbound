@@ -96,11 +96,15 @@ JOBS = [
  ("bee_eater", "bird", "a bee-eater perched on a wire, turquoise body, rusty crown, black mask"),
  ("hoopoe", "bird", "a hoopoe standing on grass, salmon-pink body, black-and-white wings, raised crest"),
  ("kestrel", "bird", "a kestrel perched, rufous back, grey head, hooked beak"),
+ # gear (gear.json — outfitter shop row icons)
+ ("cooler", "gear", "a small camping cooler box with a white lid"),
+ ("dutch_oven", "gear", "a black cast-iron camp oven pot with a lid on three legs"),
 ]
 
 FILE_ID = {}  # key -> icon filename stem
 for k, kind, _l in JOBS:
     FILE_ID[k] = {"dish": "dish_%s", "ing": "ing_%s", "bird": "bird_%s",
+                  "gear": "gear_%s",
                   "keep": "%s"}[kind] % (k if kind != "keep" else k)
 
 HERO_KEYS = [k for k, kind, _l in JOBS if kind in ("dish", "keep")]
