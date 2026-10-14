@@ -69,31 +69,43 @@ def transfer(h, s, v, m, p):
                          .resize((nv.shape[1], nv.shape[0]), Image.BILINEAR),
                          dtype=float) / 255.0
         nv = nv + np.clip(nse - 0.42, -0.5, 0.58) * 2.0 * amp   # warm-biased
-    # tonal zones: the ref ground is hand-crafted layers — grass darkens
-    # + goes olive toward water shores and map edges, canopy band stays
-    # shaded. Applied post-lerp so the zones survive compression.
+    # tonal zones: the ref ground is hand-crafted BANDS, not gradients —
+    # a distinct olive ring hugs the water rocks, then the field breaks
+    # into posterized sun/field/olive patches (watercolor washes).
+    # Applied post-lerp so the zones survive compression.
     if "zones" in p:
         z = p["zones"]
         tile = z["tile"]
         zmask = [l.rstrip("\n") for l in open(z["mask"]) if l.strip()]
         H, Wd = nv.shape
         yy, xx = np.mgrid[0:H, 0:Wd]
+        damp = np.zeros((H, Wd))
+        hue = np.zeros((H, Wd))
         wt = [(c * tile + tile / 2, r * tile + tile / 2)
               for r, row in enumerate(zmask)
               for c, ch in enumerate(row) if ch == "W"]
         if wt:
             dist = np.minimum.reduce(
                 [(xx - wx) ** 2 + (yy - wy) ** 2 for wx, wy in wt]) ** 0.5
-            shore = np.clip(1.0 - dist / z["shore_px"], 0, 1) * z["shore_amt"]
-        else:
-            shore = 0.0
-        edge = np.minimum.reduce(
-            [xx, Wd - 1 - xx, yy, H - 1 - yy])
-        ev = np.clip(1.0 - edge / z["edge_px"], 0, 1) * z["edge_amt"]
-        top = np.clip(1.0 - yy / z["top_px"], 0, 1) * z["top_amt"]
-        damp = np.clip(shore + ev + top, 0, z["cap"])
-        nv = nv * (1.0 - damp)                 # darker
-        nh = nh + shore * z.get("h_shift", 0.0)  # olive shift at shore
+            # quantized rings: inner shore band + outer fade band
+            damp += np.where(dist < z["b1_px"], z["b1_amt"],
+                     np.where(dist < z["b2_px"], z["b2_amt"], 0.0))
+            hue += np.where(dist < z["b1_px"], z["h1"],
+                    np.where(dist < z["b2_px"], z["h2"], 0.0))
+        # field patches: low-res noise posterized to 3 levels — big
+        # organic tonal zones, not per-pixel shimmer
+        lo = np.random.default_rng(z["seed"]).random(
+            (max(2, H // z["patch_px"] + 1), max(2, Wd // z["patch_px"] + 1)))
+        sm = np.asarray(Image.fromarray((lo * 255).astype(np.uint8))
+                        .resize((Wd, H), Image.BILINEAR), dtype=float) / 255.0
+        lvl = np.where(sm < z["p_lo"], -1.0, np.where(sm > z["p_hi"], 1.0, 0.0))
+        damp += -lvl * z["patch_d"]            # pockets darker, pools lift
+        hue += -lvl * z["patch_h"]             # pools yellow, pockets olive
+        edge = np.minimum.reduce([xx, Wd - 1 - xx, yy, H - 1 - yy])
+        damp += np.clip(1.0 - edge / z["edge_px"], 0, 1) * z["edge_amt"]
+        damp = np.clip(damp, -z["cap"], z["cap"])
+        nv = nv * (1.0 - damp)
+        nh = nh + hue
     return nh % 1.0, np.clip(ns, 0, 1), np.clip(nv, 0, 1)
 
 

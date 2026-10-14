@@ -32,10 +32,11 @@
     "s_add": 0.03, "s_max": 0.55,
     "dapple": {"cell": 26, "amp": 0.09, "seed": 7},
     "zones": {"mask": "assets_src/stage/pinewatch_mask.txt", "tile": 32,
-              "shore_px": 72, "shore_amt": 0.20,
-              "edge_px": 48, "edge_amt": 0.10,
-              "top_px": 1, "top_amt": 0.0,
-              "cap": 0.30, "h_shift": 0.02},
+              "b1_px": 18, "b1_amt": 0.22, "h1": 0.030,
+              "b2_px": 46, "b2_amt": 0.10, "h2": 0.015,
+              "patch_px": 34, "p_lo": 0.32, "p_hi": 0.68,
+              "patch_d": 0.07, "patch_h": 0.012, "seed": 11,
+              "edge_px": 48, "edge_amt": 0.10, "cap": 0.32},
     "ref_mean": [174, 216, 103]
   }
 }
