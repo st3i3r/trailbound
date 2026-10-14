@@ -31,6 +31,11 @@
     "v_target": 0.93, "v_amt": 0.80,
     "s_add": 0.03, "s_max": 0.55,
     "dapple": {"cell": 26, "amp": 0.09, "seed": 7},
+    "zones": {"mask": "assets_src/stage/pinewatch_mask.txt", "tile": 32,
+              "shore_px": 72, "shore_amt": 0.20,
+              "edge_px": 48, "edge_amt": 0.10,
+              "top_px": 1, "top_amt": 0.0,
+              "cap": 0.30, "h_shift": 0.02},
     "ref_mean": [174, 216, 103]
   }
 }

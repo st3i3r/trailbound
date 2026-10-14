@@ -69,6 +69,31 @@ def transfer(h, s, v, m, p):
                          .resize((nv.shape[1], nv.shape[0]), Image.BILINEAR),
                          dtype=float) / 255.0
         nv = nv + np.clip(nse - 0.42, -0.5, 0.58) * 2.0 * amp   # warm-biased
+    # tonal zones: the ref ground is hand-crafted layers — grass darkens
+    # + goes olive toward water shores and map edges, canopy band stays
+    # shaded. Applied post-lerp so the zones survive compression.
+    if "zones" in p:
+        z = p["zones"]
+        tile = z["tile"]
+        zmask = [l.rstrip("\n") for l in open(z["mask"]) if l.strip()]
+        H, Wd = nv.shape
+        yy, xx = np.mgrid[0:H, 0:Wd]
+        wt = [(c * tile + tile / 2, r * tile + tile / 2)
+              for r, row in enumerate(zmask)
+              for c, ch in enumerate(row) if ch == "W"]
+        if wt:
+            dist = np.minimum.reduce(
+                [(xx - wx) ** 2 + (yy - wy) ** 2 for wx, wy in wt]) ** 0.5
+            shore = np.clip(1.0 - dist / z["shore_px"], 0, 1) * z["shore_amt"]
+        else:
+            shore = 0.0
+        edge = np.minimum.reduce(
+            [xx, Wd - 1 - xx, yy, H - 1 - yy])
+        ev = np.clip(1.0 - edge / z["edge_px"], 0, 1) * z["edge_amt"]
+        top = np.clip(1.0 - yy / z["top_px"], 0, 1) * z["top_amt"]
+        damp = np.clip(shore + ev + top, 0, z["cap"])
+        nv = nv * (1.0 - damp)                 # darker
+        nh = nh + shore * z.get("h_shift", 0.0)  # olive shift at shore
     return nh % 1.0, np.clip(ns, 0, 1), np.clip(nv, 0, 1)
 
 
