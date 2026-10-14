@@ -241,6 +241,7 @@ const WORLD_SCALE := 0.80              # Eastward ratio pass: all
                                         # world props x0.8 so the
                                         # frame shows more world
 const WorldFX := preload("res://scripts/world_fx.gd")
+const AmbientFX := preload("res://scripts/ambient_fx.gd")
 # Stage anchors moved per-site into SITE_STAGE (UI-034): _fire_pos,
 # _dog_pos and _board_rect are set from it in _ready once site_id is
 # known.  Pinewatch keeps the authored values every tool references.
@@ -613,6 +614,7 @@ func _ready() -> void:
     _fx.bind(_grade, _rain, _leaves, WARM_MUL)
     Game.phase_changed.connect(_on_phase_dusk)
     _build_props()
+    _build_ambient()
     _build_actors()
     # Phase 5.6 — canopy crowns hanging INTO the frame top: the
     # forest reads as continuing past the camera (Eastward edge cue)
@@ -1387,6 +1389,83 @@ func _embed_base(p: Array, rng: RandomNumberGenerator) -> void:
                                   fam[rng.randi() % fam.size()], pos))
 
 
+## AmbientFX + foliage sway — the "world breathes" layer (fireflies,
+## pond glints, pollen, hut smoke, moths, butterflies) plus the wind
+## vertex wobble on rooted vegetation.  Runs AFTER _build_props so the
+## sway pass sees every decal that exists: scatter clusters, prop-foot
+## embeds and the Batch-H overgrown pad tiles all came earlier.
+const SWAY_KEYS := ["decals/tuft_", "decals/decal_fern",
+    "decals/decal_flowers", "decals/decal_dandelion",
+    "decals/decal_plantain", "decals/decal_sprout",
+    "decals/decal_berries", "decals/decal_ivy",
+    "decals/pad_overgrown"]
+
+var _amb: AmbientFX                          # null until built
+var _sway: ShaderMaterial
+
+
+func _sway_mat() -> ShaderMaterial:
+    if _sway == null:
+        _sway = ShaderMaterial.new()
+        _sway.shader = load("res://shaders/foliage_sway.gdshader")
+        _sway.set_shader_parameter("amp",
+            1.1 * (0.3 if UIFeel.reduced_motion else 1.0))
+    return _sway
+
+
+func _sways(tex: Texture2D) -> bool:
+    var p := tex.resource_path
+    for k in SWAY_KEYS:
+        if k in p:
+            return true
+    return false
+
+
+func _apply_sway() -> void:
+    for grp in [scatter, world, pads_node]:
+        if grp == null:
+            continue
+        for n in grp.get_children():
+            if n is Sprite2D and n.texture != null \
+                    and _sways(n.texture):
+                n.material = _sway_mat()
+
+
+func _build_ambient() -> void:
+    _apply_sway()
+    # lantern posts make moth anchors — the lamp head sits ~14px
+    # above the prop's ground anchor
+    var lamps: Array = []
+    for p in _props:
+        if p.size() > 1 and p[1] == "lantern_post":
+            lamps.append(Vector2(p[2], p[3] - 14.0))
+    # Pinewatch's pond rect is authored; other sites get a generous
+    # box around their pond errand spot, or nothing
+    var pond := Rect2(6, 195, 130, 105)
+    var es: Dictionary = layout.get("errand_spots", {})
+    if _site_id != "pinewatch":
+        if es.has("pond"):
+            var pp: Array = es["pond"]
+            pond = Rect2(pp[0] - 60, pp[1] - 40, 120, 80)
+        else:
+            pond = Rect2(-999, -999, 4, 4)
+    # smoke only exists where a crew structure does — sites without a
+    # hut never light a chimney
+    var smoke_at := _hut_px() + Vector2(-30, -58) \
+        if _hut != null else Vector2(-999, -999)
+    _amb = AmbientFX.new()
+    _amb.name = "AmbientFX"
+    _amb.bind(_fx, {
+        "pond": pond,
+        "treeline": Rect2(0, 30, GW * T, 70),
+        "flutter": Rect2(150, 110, 360, 160),
+        "lanterns": lamps,
+        "smoke_at": smoke_at})
+    stage.add_child(_amb)                    # over the world, under UI
+    _amb.set_smoke(_hut != null
+        and _crew_stage(_crew_sid()) > 0)
+
+
 func _build_actors() -> void:
     var ch := WORLD_SCALE * 1.12    # ~0.9 — chars shrink slightly less
                                   # than props so they stay readable
@@ -1731,6 +1810,21 @@ func _smoke() -> void:
         await get_tree().process_frame
     var fe2 := _fire_light.energy
     print("SMOKE fire flickers:", fe0 != fe1 or fe1 != fe2)
+    # AmbientFX rides the same scalars — at dusk=1: fireflies up,
+    # pollen washed out, moths hugging the lamps.  Ratios are set in
+    # _process so the frames waited above have applied them.
+    print("SMOKE ambient night:", _amb != null
+          and _amb._flies.amount_ratio > 0.5
+          and _amb._motes.amount_ratio < 0.05)
+    print("SMOKE moths on lamps:", _amb == null
+          or _amb._moths.is_empty()
+          or _amb._moths[0]["s"].modulate.a > 0.9)
+    var swayed := 0
+    for n in scatter.get_children() + world.get_children() \
+            + pads_node.get_children():
+        if n is Sprite2D and n.material is ShaderMaterial:
+            swayed += 1
+    print("SMOKE foliage sway assigned:", swayed >= 6)
     _fx.set_front(0.0, 0.05, WARM_MUL)
     _fx.set_dusk(_dusk_target(Game.phase), 0.05)
     # tracked overlay: storm's ripple warp rides the front scalar —
@@ -1857,6 +1951,8 @@ func _smoke() -> void:
         print("SMOKE crew collect:",
               got.get("keepsake", "") == &"grandpas_thermos",
               " cleared:", _hut_dress.get_child_count() == 0)
+        # stage 1 = the crew lives there now — kitchen smoke wakes
+        print("SMOKE hut smoke on:", _amb != null and _amb._smoke_on)
         # the keepsake ceremony is up now — tap through it so its light
         # cue can't leak into the prep-phase checks below
         for c in _ceremony_layer.get_children():
@@ -3978,6 +4074,8 @@ func _sync_crew_hut(animate := false) -> void:
     var stage := _crew_stage(sid)
     var total: int = _crew_rows(sid).get("stages", []).size()
     var restored := total > 0 and stage >= total
+    if _amb != null:                         # kitchen smoke = crew
+        _amb.set_smoke(stage > 0)            # living/working in it
     # stage art swap (Batch H): the sprite itself carries the state —
     # ruin -> cleared -> roof fixed -> restored cabin.  A lit-window
     # night variant lands at dusk once the hut is whole again.

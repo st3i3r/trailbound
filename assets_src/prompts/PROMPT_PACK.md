@@ -588,6 +588,7 @@ Walks: `animate_character` template, south / north / east (west mirrored)
 - **H3 night/occupied states** (`edit_image_pro_flash` on the day masters): `dome_tent_{sage,amber,slate}_night` warm interior glow + cool shell · `cabin_night` lit window · `pallet_deck_occupied` bedroll + lantern
 - **Runtime**: `HUT_STAGES` swap in `_sync_crew_hut` (sprite carries state, modulate dim retired) · `ground_<pid>` tiles in `_build_pads`/`_play_clear`/`_sync_pad_visual` · `_sync_night_props` swaps tent/deck/hut at `EVENING+`, on seat/unseat, and at boot for loaded saves
 - Palette: everything v4-locked (the night amber survived — the ramp's ochre family carries it). Boathouse and Lantern Workshop stages ship with their sites.
+- **FX layer rule (ambient pass, 2026-10-16):** any art derived from or layered over a shipped prop goes in `game/assets/pinewatch/fx/` — originals never touched in place. The ambient sprites (`fx_firefly`, `fx_sparkle`, `fx_smoke`, `fx_moth`, `fx_butterfly`, `fx_mote`) are Pillow-authored straight from ramp hexes (`#e1e5c4` lamp, `#dfc20e` amber, `#bdd6f5` sky, `#939a79` sage, `#d26f69` salmon) so they're born on-palette; sway shader lives in `shaders/foliage_sway.gdshader` and reads the `global_wind_speed` scalar WorldFX already declares.
 
 ### Batch I — events (§13.5)
 
