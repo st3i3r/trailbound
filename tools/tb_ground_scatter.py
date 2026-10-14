@@ -26,16 +26,13 @@ from PIL import Image
 
 A = "game/assets/pinewatch/decals/"
 
-# family pools: (filename, weight)
+# family pools: (filename, weight) — wear, not items: no berries,
+# mushrooms or gear mid-field (those read as objects, not texture)
 POOLS = {
-    "G": [("tuft_grass_a.png", 5), ("tuft_grass_b.png", 5), ("tuft_grass_c.png", 5),
-          ("tuft_grass_dry.png", 2), ("decal_flowers_white.png", 3),
-          ("decal_flowers_purple.png", 2), ("decal_dandelion.png", 2),
-          ("decal_fern_frond.png", 3), ("decal_fern_leaf.png", 2),
-          ("decal_mushroom_brown.png", 1), ("decal_mushroom_orange.png", 1),
-          ("decal_berries_red.png", 1), ("decal_strawberry.png", 1),
-          ("tuft_moss_patch.png", 2), ("tuft_leaf_litter.png", 2),
-          ("decal_leaf_pile.png", 1), ("decal_sprout.png", 2)],
+    "G": [("tuft_grass_a.png", 6), ("tuft_grass_b.png", 6), ("tuft_grass_c.png", 6),
+          ("tuft_grass_dry.png", 3), ("decal_flowers_white.png", 2),
+          ("decal_dandelion.png", 2), ("decal_fern_frond.png", 2),
+          ("tuft_leaf_litter.png", 2), ("decal_sprout.png", 3)],
     "D": [("decal_dirt_mound.png", 3), ("decal_soil_mound.png", 2),
           ("decal_soil_patch.png", 2), ("decal_pebbles.png", 3),
           ("decal_pebbles_moss.png", 1), ("decal_twig.png", 2),
@@ -44,8 +41,10 @@ POOLS = {
     "W": [("decal_duckweed.png", 4), ("decal_lily_pad.png", 2)],
 }
 TILE = 32
-MIN_DIST = 18          # px between decal centers — keeps scatter even
-                       # (Eastward reads sparse+regular, not clumped)
+MIN_DIST = 10          # px inside a patch — tight enough to read as one mass
+PATCH_R = 26           # patch radius
+PATCHES = 7            # localized wear patches — Eastward grammar is
+                       # homogeneous patches on open grass, not confetti
 
 
 def load_decal(name, scale):
@@ -123,29 +122,44 @@ def main():
 
     layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     placed = {"G": 0, "D": 0, "W": 0}
+
+    # --- patch pass: a few homogeneous wear patches, not confetti ---
+    centres = []
     tries = 0
-    while sum(placed.values()) < count and tries < count * 20:
+    while len(centres) < PATCHES and tries < 400:
         tries += 1
-        x = int(rng.integers(16, W - 16))
-        y = int(rng.integers(16, H - 16))
-        if rng.random() > dens[y, x]:
-            continue
-        if too_close(x, y):
-            continue
-        fam = family_at(x, y)
+        cx = int(rng.integers(24, W - 24))
+        cy = int(rng.integers(24, H - 24))
+        fam = family_at(cx, cy)
         if fam not in POOLS:
             continue
-        d = load_decal(pick(POOLS[fam], rng), rng.uniform(0.85, 1.2))
-        if box_hits_keepout(x, y, d.width, d.height):
+        if any((cx - px) ** 2 + (cy - py) ** 2 < 90 ** 2 for px, py, _ in centres):
             continue
-        # slight alpha jitter so repeats don't read as stamps
-        if rng.random() < 0.3:
-            a = np.asarray(d).copy()
-            a[..., 3] = (a[..., 3].astype(float) * rng.uniform(0.75, 1.0)).astype(np.uint8)
-            d = Image.fromarray(a)
-        layer.paste(d, (x - d.width // 2, y - d.height // 2), d)
-        spaced[int(y // MIN_DIST), int(x // MIN_DIST)] = True
-        placed[fam] += 1
+        centres.append((cx, cy, fam))
+
+    for cx, cy, fam in centres:
+        pool = POOLS[fam]
+        hero = pick(pool, rng)          # one dominant kind per patch —
+                                        # wear reads as a coherent mass
+        n = int(rng.integers(4, 8))
+        for _ in range(n):
+            x = int(cx + (rng.random() + rng.random() - 1) * PATCH_R)
+            y = int(cy + (rng.random() + rng.random() - 1) * PATCH_R)
+            if not (8 < x < W - 8 and 8 < y < H - 8):
+                continue
+            if family_at(x, y) != fam or too_close(x, y):
+                continue
+            name = hero if rng.random() < 0.7 else pick(pool, rng)
+            d = load_decal(name, rng.uniform(0.85, 1.2))
+            if box_hits_keepout(x, y, d.width, d.height):
+                continue
+            if rng.random() < 0.3:
+                a = np.asarray(d).copy()
+                a[..., 3] = (a[..., 3].astype(float) * rng.uniform(0.75, 1.0)).astype(np.uint8)
+                d = Image.fromarray(a)
+            layer.paste(d, (x - d.width // 2, y - d.height // 2), d)
+            spaced[int(y // MIN_DIST), int(x // MIN_DIST)] = True
+            placed[fam] += 1
 
     out = Image.alpha_composite(base, layer).convert("RGB")
     out.save(outp)
