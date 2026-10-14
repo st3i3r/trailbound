@@ -157,8 +157,8 @@ const PROPS_PINEWATCH := [
     ["props_medium", "picnic_basket",     528, 294],
     ["props_medium", "picnic_umbrella",   516, 296],
     ["props_small",  "thermos",           514, 298],
-    ["props_small",  "rope_coil",         446, 374],
-    # ===== TREELINE FEET — regen + undergrowth, pads stay clear =====
+    # ===== TREELINE FEET — undergrowth at the edge; the open field
+    # stays empty (Eastward reads ~60-70% open grass) =====
     ["props_medium", "pine_sapling",      170,  96],
     ["props_medium", "pine_sapling",      214,  94],
     ["props_medium", "fern_bank",         340,  96],
@@ -168,15 +168,11 @@ const PROPS_PINEWATCH := [
     ["props_medium", "bush_white_flower_v", 384, 110],
     ["props_medium", "stump_mushroom",    236, 108],
     # ===== HUT YARD — the working homestead =====
-    ["props_medium", "water_jar",         486, 162],
-    ["props_medium", "bird_feeder",       478, 116],
     ["props_large",  "banana_clump",      608, 200, 0.0, 0.62],
-    # ===== CAMPFIRE HUB — the cook side of the ring =====
+    # ===== CAMPFIRE HUB — cook support; one anchor + woodpile =====
     ["props_medium", "woodpile",          296, 244],
-    ["props_medium", "herb_rack",         452, 216],
     ["props_medium", "dirt_patch",        368, 244],
-    ["props_small",  "camp_kettle",       352, 240],
-    # ===== POND — bank dressing + blossom accent =====
+    # ===== POND — bank vignette: willow + blossom + hammock =====
     ["props_medium", "bamboo_bench",      244, 304],
     ["props_medium", "debris_log_mossy",  142, 336],
     ["props_medium", "prop_boulder_0",    166, 336],
@@ -186,13 +182,9 @@ const PROPS_PINEWATCH := [
     ["decals",       "decal_duckweed",    108, 306],
     ["decals",       "step_stone_a",      148, 338],
     ["decals",       "step_stone_b",      166, 344],
-    # ===== FIELD + TRAILHEAD — the lived-in middle =====
-    ["props_medium", "kite_stake",        284, 282],
-    ["props_medium", "reception_board",   330, 358],
+    # ===== TRAILHEAD — van unloading + cook stall =====
     ["props_medium", "prop_supply_crate_0", 482, 372],
     ["props_large",  "cook_shelter",      584, 372, 0.0, 0.85],
-    ["props_small",  "phin_coffee",       200, 224],
-    ["props_small",  "tea_cup",           213, 226],
     # ===== BOUNDARY marks =====
 ]
 
