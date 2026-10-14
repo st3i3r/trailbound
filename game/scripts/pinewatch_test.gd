@@ -146,11 +146,9 @@ const PROPS_PINEWATCH := [
     ["props_large",  "outfitter_van",     440, 348, 0.0, 1.35],
     ["props_small",  "signpost",          394, 342],
     ["props_medium", "prop_supply_crate_0", 482, 372],
-    # ===== TREELINE FEET — sparse undergrowth at the edge only;
-    # the ref stands trees on bare grass (~70% open) =====
+    # ===== TREELINE FEET — one undergrowth tuft at a trunk foot only;
+    # the ref stands trees on bare grass, nothing floats mid-field =====
     ["props_medium", "fern_bank",         118,  96],
-    ["props_medium", "bush_white_flower_v", 384, 110],
-    ["props_medium", "bush_round_m",      440, 116],
     # ===== CAMPFIRE HUB — cook support; one anchor + woodpile =====
     ["props_medium", "woodpile",          296, 244],
     ["props_medium", "dirt_patch",        368, 244],
@@ -295,21 +293,10 @@ const TREE_NEAR := Color(0.51, 0.55, 0.62)   # v2 ground so they don't
 # Open-field interior stays EMPTY; the tint map carries macro variation.
 # [centre x, centre y, family, count, radius x, radius y, terrain want]
 const DECAL_CLUSTERS := [
-    # prop bases — a little wear where things sit
-    [150.0, 232.0, "tuft",   2, 16.0, 8.0, 0],   # dome_tent_sage base
-    [110.0, 166.0, "dry",    2, 16.0, 8.0, 0],   # dome_tent_amber base
-    [312.0, 262.0, "pebble", 2, 12.0, 6.0, 1],   # stool feet (yard)
-    [578.0, 140.0, "tuft",   1, 10.0, 6.0, 0],   # chicken_coop base
-    [440.0, 358.0, "pebble", 1, 12.0, 6.0, 1],   # van wheel line (dirt)
-    # pond bank — damp moss + pebbles on the grass shore (col 3)
-    [120.0, 250.0, "moss",   2, 10.0, 14.0, 0],
-    [130.0, 300.0, "pebble", 2, 10.0, 12.0, 0],
-    [118.0, 345.0, "moss",   1, 10.0, 10.0, 0],
-    # treeline feet — grass tufts at trunk bases (wall is on grass)
-    [ 60.0, 84.0,  "tuft",   2, 16.0, 5.0, 0],
-    [230.0, 82.0,  "tuft",   2, 16.0, 5.0, 0],
-    [420.0, 82.0,  "tuft",   2, 16.0, 5.0, 0],
-    [580.0, 86.0,  "tuft",   1, 12.0, 5.0, 0],
+    # empty on purpose — ground wear is BAKED into ground_dressed by
+    # tools/tb_ground_scatter.py (tuft patches + packed pond rim).
+    # Runtime decals on top double-dressed the same zones and read as
+    # leaf clutter; ref grammar keeps open grass clean.
 ]
 const DECAL_GROUND := Color(1.0, 1.0, 1.0, 0.85)
                                              # sink decals INTO the wash

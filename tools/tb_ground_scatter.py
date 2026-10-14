@@ -26,13 +26,12 @@ from PIL import Image
 
 A = "game/assets/pinewatch/decals/"
 
-# family pools: (filename, weight) — wear, not items: no berries,
-# mushrooms or gear mid-field (those read as objects, not texture)
+# family pools: (filename, weight) — wear, not items. The ref's open
+# grass is nearly clean: NO leaf litter / flowers / fronds mid-field
+# (those read as noise); richness comes from the painted mottle alone.
 POOLS = {
     "G": [("tuft_grass_a.png", 6), ("tuft_grass_b.png", 6), ("tuft_grass_c.png", 6),
-          ("tuft_grass_dry.png", 3), ("decal_flowers_white.png", 2),
-          ("decal_dandelion.png", 2), ("decal_fern_frond.png", 2),
-          ("tuft_leaf_litter.png", 2), ("decal_sprout.png", 3)],
+          ("tuft_grass_dry.png", 3), ("decal_sprout.png", 2)],
     "D": [("decal_dirt_mound.png", 3), ("decal_soil_mound.png", 2),
           ("decal_soil_patch.png", 2), ("decal_pebbles.png", 3),
           ("decal_pebbles_moss.png", 1), ("decal_twig.png", 2),
@@ -48,8 +47,8 @@ RIM = [("step_stone_a.png", 3), ("step_stone_b.png", 3),
 TILE = 32
 MIN_DIST = 10          # px inside a patch — tight enough to read as one mass
 PATCH_R = 26           # patch radius
-PATCHES = 7            # localized wear patches — Eastward grammar is
-                       # homogeneous patches on open grass, not confetti
+PATCHES = 4            # localized wear patches — sparse; ref grass is
+                       # clean, wear lives in the mottle + the pond rim
 
 
 def load_decal(name, scale):
@@ -152,8 +151,12 @@ def main():
             arr[y0:y1, x0:x1, 2] += db
     base = Image.fromarray(np.clip(arr, 0, 255).astype(np.uint8))
 
-    # --- rim pass: stones along grass cells that border water ---
-    rim_cells = []
+    # --- rim pass: a PACKED band of chunky stones along every grass|water
+    # edge. The ref rims water with overlapping rocks that read as
+    # masonry, not spaced pebbles — stones sit ON the boundary every
+    # ~8px and may overlap. Own spacing set (7px) so packed-but-not-
+    # piled. Corner cells collect all water edges (no break).
+    rim_edges = []
     for r in range(rows):
         for c in range(cols):
             if mask[r][c] not in "GD":
@@ -161,20 +164,27 @@ def main():
             for dr, dc in ((-1, 0), (1, 0), (0, -1), (0, 1)):
                 nr, nc = r + dr, c + dc
                 if 0 <= nr < rows and 0 <= nc < cols and mask[nr][nc] == "W":
-                    rim_cells.append((c * TILE, r * TILE, dc, dr))
-                    break
-    for bx, by, dc, dr in rim_cells:
-        # stone sits on the grass side, snug against the water line
-        x = bx + (TILE // 2 if dc == 0 else (4 if dc < 0 else TILE - 4))
-        y = by + (TILE // 2 if dr == 0 else (4 if dr < 0 else TILE - 4))
-        x += int(rng.integers(-6, 7)); y += int(rng.integers(-6, 7))
-        x = max(8, min(W - 8, x)); y = max(8, min(H - 8, y))
-        if too_close(x, y) or box_hits_keepout(x, y, 20, 12):
-            continue
-        d = load_decal(pick(RIM, rng), rng.uniform(0.9, 1.15))
-        layer.paste(d, (x - d.width // 2, y - d.height // 2), d)
-        spaced[int(y // MIN_DIST), int(x // MIN_DIST)] = True
-        placed["rim"] += 1
+                    rim_edges.append((c * TILE, r * TILE, dc, dr))
+    rim_pts = []
+    for bx, by, dc, dr in rim_edges:
+        if dc != 0:  # vertical shared edge, stones march along y
+            ex = bx + (0 if dc < 0 else TILE)
+            pts = [(ex, by + t) for t in range(3, TILE, 8)]
+        else:        # horizontal shared edge, stones march along x
+            ey = by + (0 if dr < 0 else TILE)
+            pts = [(bx + t, ey) for t in range(3, TILE, 8)]
+        for x, y in pts:
+            x += int(rng.integers(-3, 4))
+            y += int(rng.integers(-3, 4))
+            x = max(8, min(W - 8, x)); y = max(8, min(H - 8, y))
+            if any((x - px) ** 2 + (y - py) ** 2 < 49 for px, py in rim_pts):
+                continue                       # 7px — packed, not piled
+            if box_hits_keepout(x, y, 18, 10):
+                continue
+            rim_pts.append((x, y))
+            d = load_decal(pick(RIM, rng), rng.uniform(1.0, 1.35))
+            layer.paste(d, (x - d.width // 2, y - d.height // 2), d)
+            placed["rim"] += 1
 
     # --- patch pass: a few homogeneous wear patches, not confetti ---
     centres = []
