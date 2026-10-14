@@ -101,8 +101,11 @@ static func _ramp_tex(points: Array) -> GradientTexture1D:
 
 func _build() -> void:
     # --- fireflies: pond swarm + sparser treeline swarm ------------
-    var g := _ramp_tex([0.0, 1.0, 0.35, 1.0, 0.2, 0.9, 0.0])
-    _flies = _emitter("fx_firefly", _pond, 14, 9.0, true)
+    # Eastward fireflies are a NIGHT phenomenon — few, tiny, deep
+    # amber, normal blending.  Additive glow here reads as bloom,
+    # which is exactly what their pixel grade never does.
+    var g := _ramp_tex([0.0, 0.7, 0.25, 0.6, 0.15, 0.5, 0.0])
+    _flies = _emitter("fx_firefly", _pond, 9, 9.0)
     var fp: ParticleProcessMaterial = _flies.process_material
     fp.initial_velocity_min = 3.0
     fp.initial_velocity_max = 8.0
@@ -112,7 +115,7 @@ func _build() -> void:
     fp.turbulence_noise_strength = 0.8
     fp.turbulence_noise_scale = 6.0
     fp.color_ramp = g
-    _flies2 = _emitter("fx_firefly", _treeline, 8, 11.0, true)
+    _flies2 = _emitter("fx_firefly", _treeline, 5, 11.0)
     var fp2: ParticleProcessMaterial = _flies2.process_material
     fp2.initial_velocity_min = 3.0
     fp2.initial_velocity_max = 7.0
@@ -125,11 +128,11 @@ func _build() -> void:
     _flies.emitting = true
     _flies2.emitting = true
     # --- pond glints -------------------------------------------------
-    _sparkle = _emitter("fx_sparkle", _pond, 9, 0.75, true)
+    _sparkle = _emitter("fx_sparkle", _pond, 6, 0.75)
     var sp: ParticleProcessMaterial = _sparkle.process_material
     sp.initial_velocity_min = 0.0
     sp.initial_velocity_max = 0.0
-    sp.color_ramp = _ramp_tex([0.0, 0.85, 0.0])
+    sp.color_ramp = _ramp_tex([0.0, 0.45, 0.0])
     _sparkle.emitting = true
     # --- daytime pollen drift ---------------------------------------
     _motes = _emitter("fx_mote", Rect2(0, 60, 640, 220), 22, 12.0)
@@ -141,7 +144,7 @@ func _build() -> void:
     mp.turbulence_enabled = true
     mp.turbulence_noise_strength = 0.5
     mp.turbulence_noise_scale = 8.0
-    mp.color_ramp = _ramp_tex([0.0, 0.55, 0.0])
+    mp.color_ramp = _ramp_tex([0.0, 0.32, 0.0])
     _motes.emitting = true
     # --- hut kitchen smoke -------------------------------------------
     _smoke = _emitter("fx_smoke",
@@ -165,8 +168,8 @@ func _build() -> void:
     scurve.add_point(Vector2(1, 1.6))        # expands as it climbs
     sc.curve = scurve
     kp.scale_curve = sc
-    kp.color_ramp = _ramp_tex([0.0, 0.5, 0.0])
-    _smoke.modulate = Color(1, 1, 1, 0.55)
+    kp.color_ramp = _ramp_tex([0.0, 0.35, 0.0])
+    _smoke.modulate = Color(1, 1, 1, 0.4)
     _smoke.emitting = _smoke_on
     # --- critters: moths on lanterns, butterflies on the meadow ------
     for i in _lanterns.size():
@@ -192,9 +195,9 @@ func _process(delta: float) -> void:
     _t += delta * _calm
     var dusk: float = _fx.dusk if _fx != null else 0.0
     var front: float = _fx.front if _fx != null else 0.0
-    # fireflies fade in with the ember curve — no pop: ratio follows
-    # dusk directly, emitters stay on so stragglers die naturally
-    var fl := clampf((dusk - 0.3) / 0.4, 0.0, 1.0) * _calm
+    # fireflies are a deep-dark read — they arrive at real dusk, not
+    # golden hour, and stay sparse even then
+    var fl := clampf((dusk - 0.55) / 0.35, 0.0, 1.0) * _calm
     _flies.amount_ratio = fl
     _flies2.amount_ratio = fl * 0.8
     _flies.emitting = fl > 0.02

@@ -1409,7 +1409,7 @@ func _sway_mat() -> ShaderMaterial:
         _sway = ShaderMaterial.new()
         _sway.shader = load("res://shaders/foliage_sway.gdshader")
         _sway.set_shader_parameter("amp",
-            1.1 * (0.3 if UIFeel.reduced_motion else 1.0))
+            0.8 * (0.3 if UIFeel.reduced_motion else 1.0))
     return _sway
 
 
