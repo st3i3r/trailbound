@@ -155,7 +155,48 @@ const PROPS_PINEWATCH := [
     # ===== E — rest corner attached to the van cluster =====
     ["props_large",  "picnic_table",      522, 306, 0.0, 0.62],
     ["props_medium", "picnic_basket",     528, 294],
+    ["props_medium", "picnic_umbrella",   516, 296],
     ["props_small",  "thermos",           514, 298],
+    ["props_small",  "rope_coil",         470, 354],
+    # ===== TREELINE FEET — regen + undergrowth, pads stay clear =====
+    ["props_medium", "pine_sapling",      170,  96],
+    ["props_medium", "pine_sapling",      500,  94],
+    ["props_medium", "fern_bank",         340,  96],
+    ["props_medium", "fern_bank",         104,  98],
+    ["props_medium", "bush_round_m",      272, 114],
+    ["props_medium", "bush_round_m",      440, 116],
+    ["props_medium", "bush_white_flower_v", 64, 108],
+    ["props_medium", "stump_mushroom",    236, 108],
+    # ===== HUT YARD — the working homestead =====
+    ["props_medium", "water_jar",         558, 142],
+    ["props_medium", "rain_barrel",       592, 142],
+    ["props_medium", "potted_flowers",    506, 146],
+    ["props_medium", "bird_feeder",       508, 120],
+    ["props_large",  "banana_clump",      614, 170, 0.0, 0.62],
+    # ===== CAMPFIRE HUB — the cook side of the ring =====
+    ["props_medium", "woodpile",          342, 240],
+    ["props_medium", "herb_rack",         452, 216],
+    ["props_medium", "dirt_patch",        368, 244],
+    ["props_small",  "camp_kettle",       352, 240],
+    ["props_large",  "pennant_string",    378, 192, 0.0, 0.55],
+    # ===== POND — bank dressing + blossom accent =====
+    ["props_medium", "bamboo_bench",       76, 284],
+    ["props_medium", "debris_log_mossy",  142, 336],
+    ["props_medium", "prop_boulder_0",    206, 332],
+    ["props_large",  "tree_cherry",       196, 298, 0.0, 0.55],
+    ["props_large",  "hammock",           104, 302, 0.0, 0.60],
+    ["decals",       "decal_duckweed",     52, 290],
+    ["decals",       "decal_duckweed",    108, 306],
+    ["decals",       "step_stone_a",      168, 338],
+    ["decals",       "step_stone_b",      186, 342],
+    # ===== FIELD + TRAILHEAD — the lived-in middle =====
+    ["props_medium", "kite_stake",        284, 282],
+    ["props_medium", "reception_board",   330, 358],
+    ["props_medium", "prop_supply_crate_0", 486, 344],
+    ["props_large",  "cook_shelter",      574, 354, 0.0, 0.85],
+    ["props_large",  "bamboo_clump",      610, 330, 0.0, 0.55],
+    ["props_small",  "phin_coffee",       200, 224],
+    ["props_small",  "tea_cup",           213, 226],
     # ===== BOUNDARY marks =====
 ]
 
@@ -203,7 +244,7 @@ const PROPS_LANTERN := [
     ["props_small",  "log_stool",        250, 208],
     ["props_small",  "log_stool",        330, 205],
     ["props_medium", "tea_table",        560, 150],
-    ["props_medium", "silk_lantern_red", 430, 180],
+    ["props_small",  "silk_lantern_red", 430, 180],
     ["props_large",  "string_lights",    140, 290],
     ["props_large",  "string_lights",    500, 290],
     ["props_medium", "lantern_post",     300, 300],
