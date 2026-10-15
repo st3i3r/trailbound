@@ -105,11 +105,11 @@ change (layout authoring), never a behavior change (actor code).
 
 ## Queued work (not yet engineered)
 
-| Item | Shape | Why it's the right next thing |
+| Item | Shape | Status |
 |---|---|---|
-| `nav.cost` terrain table | layout `nav.cost` cell→weight map merged into `_route`'s A* step cost; author road cells in layouts | the #1 believability lever once paths exist in art — RimWorld desire-path effect |
-| Program variants | per-archetype loop sets in the casting table (data), seeded pick | kills "every hiker identical" — the remaining mechanical tell |
-| Schedule arcs | optional: guests drift toward the fire/tents as the night deepens (program chapter 2) | bigger; only if night scenes feel static after the above |
+| ~~`nav.cost` terrain table~~ | shipped as `nav.road` + `road_cost` (0.7) — `_route` A* discounts road cells; pads stay `pad_cost` (3.0); authored road lanes in all three layouts | done |
+| ~~Program variants~~ | shipped in `cast_night` — one seeded draw per guest in canonical board order picks kids tag-chase / angler two-bank circuit / vista stroll / fire linger bands | done |
+| Schedule arcs | optional: guests drift toward the fire/tents as the night deepens (program chapter 2) | queued — only if night scenes feel static |
 
 Rejected: mid-resolution player verbs (spectator-night is the
 design), persona-level memory (personas are small render pools;

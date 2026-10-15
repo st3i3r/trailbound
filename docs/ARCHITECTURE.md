@@ -61,7 +61,7 @@ Catalog loads every `.json` by stem name. Key consumers:
 | File(s) | Feeds |
 |---|---|
 | `archetypes`, `traits`, `reviews`, `regulars` | board rolls, resolve_guest, guest personas |
-| `sites`, `layouts/*.json` | world geometry, pad/economy rows (three sites defined; pinewatch built) |
+| `sites`, `layouts/*.json` | world geometry, pad/economy rows (three sites defined; pinewatch built); `nav.blocked` impassable, `nav.road`/`road_cost` discounted lanes, `nav.pad_cost` soft pad penalty |
 | `crew` | structures, stages, UTC durations |
 | `letters` | journal mail — `trigger.morning` (day-gate + `guests_welcomed>=1`, D-UI-8) or `trigger.event`; `site:"any"` = the wandering mailbag, deduped via `Game.letters_delivered_any` |
 | `dialogue` | world bubbles keyed site + *site-relative* `day` or a `when` gate (`last_stars_min`, `last_weather`, `served_favourite`, `regular_visit`, `first_night`, `last_event`, `returning_min`, `wishes_met_min`, `weather_streak`), once-ever via `Game.dialogue_seen` |
