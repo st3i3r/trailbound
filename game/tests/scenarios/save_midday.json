@@ -1,0 +1,34 @@
+{
+  "id": "save_midday",
+  "title": "Save spine: quit/reload checkpoints must not lose the day",
+  "site": "pinewatch",
+  "seed": 11,
+  "setup": {
+    "coins": 250,
+    "day": 2,
+    "phase": 3,
+    "pantry": { "mushroom": 2, "herb": 1 },
+    "sites_visited": { "pinewatch": 0 }
+  },
+  "steps": [
+    { "op": "inject_guest", "id": "scout", "arch": "scout", "fee": 35,
+        "pads": 1 },
+    { "op": "seat", "guest": "scout", "pads": ["p1"] },
+    { "op": "cook", "a": "mushroom", "b": "mushroom" },
+    { "op": "save_load" },
+    { "op": "expect", "site.assignments.count": 1, "meals.count": 1,
+        "coins": 250 },
+    { "op": "set_phase", "phase": "evening" },
+    { "op": "serve", "guest": "scout", "meal": "mushroom_skewers" },
+    { "op": "save_load" },
+    { "op": "expect", "site.served.scout": "mushroom_skewers" },
+    { "op": "goodnight" },
+    { "op": "save_load" },
+    { "op": "expect", "phase": "night", "meals.count": 0 }
+  ],
+  "expect": {
+    "phase": "night",
+    "coins>=": 280
+  },
+  "twice": true
+}

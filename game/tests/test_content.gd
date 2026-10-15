@@ -433,6 +433,12 @@ func _ready() -> void:
 	check("margin ids unique",
 		margin_ids.size() == _Unique.size_of(margin_ids))
 
+	# Runtime mirror stays in sync — Catalog.validate() is the
+	# load-time guard, this scene the verbose gate (§21.2).
+	var verrs: PackedStringArray = Catalog.validate()
+	check("Catalog.validate() clean", verrs.is_empty(),
+		str(verrs.slice(0, 3)))
+
 	finish()
 
 

@@ -406,6 +406,37 @@ func upgrade_pad(pad_id: String, shelter: String) -> bool:
 	return true
 
 
+## §variant: cosmetic re-skins of placed pieces — the catalog's endless
+## cosmetic sink. Replaces the piece's variant tag; fully undoable.
+func buy_decor_variant(idx: int, name: String) -> bool:
+	var st: Dictionary = g.site_state()
+	if idx < 0 or idx >= st["decor"].size():
+		return false
+	var d: Dictionary = st["decor"][idx]
+	var row: Dictionary = g._row("decor", String(d["id"]))
+	var variants: Dictionary = row.get("variants", {})
+	if name not in variants:
+		return false
+	if String(d.get("variant", "")) == name:
+		return false
+	var price := int(variants[name])
+	if g.coins < price:
+		return false
+	g.coins -= price
+	var prev := String(d.get("variant", ""))
+	d["variant"] = name
+	g._record("buy_decor_variant", {"idx": idx, "variant": name},
+		{"verb": "unbuy_variant", "params": {"idx": idx, "prev": prev,
+			"price": price}})
+	g._log("decor_variant", {"id": String(d["id"]), "variant": name,
+		"price": price})
+	Analytics.log_event(&"purchase_item",
+		{"kind": "variant", "id": "%s:%s" % [d["id"], name],
+			"price": price})
+	g.touch()
+	return true
+
+
 func buy_gear(item_id: String) -> bool:
 	var row: Dictionary = g._row("gear", item_id)
 	if row.is_empty() or item_id in g.gear \

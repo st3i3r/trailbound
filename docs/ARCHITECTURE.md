@@ -12,7 +12,7 @@ One responsibility each; scenes never reach across boundaries.
 | Name | File | Owns |
 |---|---|---|
 | Game | `scripts/autoload/game.gd` | The whole sim: `day`, `phase` (enum BOOT/MORNING/PREP/EVENING/NIGHT), `coins`, per-site state dict, crew, journal, settings, and the public API other nodes call. `_process` ticks only `crew_tick` + `restore.tick` (1s accumulators) — **phases never tick on a clock** (D-UI-8) |
-| Catalog | `autoload/catalog.gd` | Loads `data/*.json` into `Catalog.data` (untyped Dictionary — callers must declare types; warnings-as-errors). Adding data = drop a file in `data/` |
+| Catalog | `autoload/catalog.gd` | Loads `data/*.json` into `Catalog.data` (untyped Dictionary — callers must declare types; warnings-as-errors). `validate()` mirrors `tests/test_content.tscn` (§21.2) at load so bad refs fail fast. Adding data = drop a file in `data/` + keep both gates green |
 | Econ | `autoload/econ.gd` | Pure economy functions (walk-ins, prices) — no state |
 | Seating | `autoload/seating.gd` | Board generation, meal allocation, `resolve_guest` → stars/fee/tip |
 | Save | `autoload/save.gd` | `user://save.json` + `.bak`; tmp-write → copy → rename (failure-checked, `report_nonfatal` on write/rename/corrupt paths); `SAVE_VERSION` migrations; `export_text`/`import_text` support seam. Budgets: <100 KB, <100 ms load (§22) |
@@ -25,15 +25,18 @@ One responsibility each; scenes never reach across boundaries.
 ## 2. Systems layer — leaf subsystems (`scripts/systems/`)
 
 `daily`, `dog`, `errands`, `gatherings`, `restore`, `build`,
-`journal`: each is a `RefCounted` owned by Game. **They hold no save
+`journal`, `crew`: each is a `RefCounted` owned by Game. **They hold no save
 state** — the state dict stays on Game (so `state_dict()` stays the
 one schema); the object reads `g.<state>` and mutates it; Game keeps
 one-line delegate methods as the public API. New subsystem = same
 pattern:
 state field on Game, logic file here, no autoload. `build` owns the
-purchase/footprint verbs + undo inverses (§5.8/§6.1); `journal` owns
+purchase/footprint verbs + undo inverses + decor variants (§5.8/§6.1);
+`journal` owns
 letters, Field Notes and page/chapter progression + the unlock ladder
-(§8/§6.7). `postcard` is
+(§8/§6.7); `crew` owns the v1 restoration clock — tick/start/collect/
+speedup/free-finish/readiness (§8.4/§6.10), tuning consts stay on Game
+for `restore.gd`. `postcard` is
 the exception — pure static codec (§33.5 Camp Postcards): packs
 {version, site, seed, decor placements} into a Crockford-base32
 code with an FNV checksum, ~15 chars for a typical camp; decode
@@ -171,7 +174,7 @@ curves (wildlife ducks under storm). SFX pool is semantic
 
 | Flag | Scene | Does |
 |---|---|---|
-| `--smoke` | pinewatch | ~30 runtime asserts, prints `SMOKE name:result`, quits |
+| `--smoke` | pinewatch | ~30 runtime asserts via `scripts/qa_smoke.gd`, prints `SMOKE name:result`, quits |
 | `--lint` | ui_gallery | `LINT name:PASS` — touch targets, icon registry, strings, contrast 4.5, dynamic names, VI width (advisory) |
 | `--shot[=path]` | pinewatch/gallery | rendered PNG — needs a real renderer (windowed); headless dummy can't capture |
 | `--bare/--pose/--night/--morning/--board/--settings/--journal[=<tab>]` | pinewatch | shot staging |
@@ -209,6 +212,9 @@ are artifacts — real compile check is a scene run). Generated wavs:
 | D-ARCH-6 | Commit-on-beat persistence: `touch()` on verbs (1 s tick coalesces to ≤1 write/s), `commit()` on day boundaries, focus-loss and quit paths — sleep is never a checkpoint (§4) | Landed 2026-10-13 |
 | D-ARCH-7 | Actor-presenter determinism contract: `SimWorld` ticks at **fixed dt via an accumulator** (never render delta), RNG only through `_rng_for` streams, iteration order = cast order — no `randf()`/wall-clock/dict-shuffle in sim code. Test ticks are already fixed-step; the live tick must match or replays drift | Contract 2026-10-13 — binds when the presenter lands (spec `specs/003` Dependency) |
 | D-ARCH-8 | Viewport fixed at 640×360 (`scale_mode=integer`, `aspect=expand`); maps may exceed it — `stage` pans by `_cam` (touch drag; mid/right mouse drag on desktop). Gestures obey release-under-slop law: a press arms a candidate tap, `TAP_SLOP` (7px ≈ Android scaledTouchSlop) travel turns it into a pan/card-drag, release inside commits via `_commit_map_tap` — the emulated-mouse press lands before the first drag event, so deferral is the only honest tap-vs-pan test. Card/guest gestures own their finger first; `focus_cell(c)` is the UI seam for scripted pans. `import_map --crop` = the full playable map | Landed 2026-10-19 — supersedes the no-pan interim call from the same day |
+| D-ARCH-9 | Presenter/test split: `--smoke` choreography lives in `scripts/qa_smoke.gd` (static `run(s)` + `frames_until`, scene passed untyped), the scene keeps a 13-line entry + preload — prod never imports test code, test drives prod only through tap APIs + typed reads. Same rule applies forward: world builders, input/HUD/FX/cast presenters extract with the scene owning `stage/pad_cells/panel_mgr/hud`, helpers taking it as constructor/dispatched arg | Landed 2026-10-15 — `pinewatch_test.gd` 4493→4005, `--smoke` output identical, suite green |
+| D-ARCH-10 | World-build passes live in `scripts/world_builder.gd` (`build_ground/backdrop/scatter/pads/objects/props` + `open_cell/add_shadow/embed_base`, `GroundPaint` class) — same D-ARCH-9 helper-with-scene-ref shape; the scene keeps texture primitives (`_tex/_anchored/_cell_mask/_painted_map/_shadow_texture`), node ownership, and 2-line delegates. Values flowing through the untyped scene ref take explicit types (`var x: T = s.…` — `:=` can't infer through it) | Landed 2026-10-15 — `pinewatch_test.gd` 4005→3723, ground/scatter/smoke output identical, suite green |
+| D-ARCH-11 | Gesture + tap routing lives in `scripts/input_presenter.gd` (35 verbs: card/seat/serve/drag/previews, prep/build/hut taps, pad/guest hit-tests, `unhandled` router + `commit_map_tap`) — same helper shape; the scene keeps the `_unhandled_input` entry, camera (`_cam`), selection UI state (`selected`, `_meal_sel`), nodes, and delegates. Gesture state (tap-arm, card-press/drag ghost, build ghost) moved WITH the code; scene-side readers became accessor calls (`build_armed/build_active/reset_gesture`). Node APIs route via `s` (`tr`, `create_tween`); fellow-mover calls use new names, staying code keeps `s._old` | Landed 2026-10-15 — `pinewatch_test.gd` 3723→3132, full `--smoke` incl. all tap/drag/build paths green, 9 suites green |
 
 ## 11. External design audits
 
@@ -244,12 +250,15 @@ sim/view split with ephemeral cast actors; engine/sim parity
 commit-on-beat persistence; facade + leaf subsystems (D-ARCH-2).
 
 **Watch list (not defects today):**
-- `game.gd` ~2.1k lines post-split — state hub + delegate surface;
-  the purchase and journal verb layers moved to `systems/build.gd`
-  and `systems/journal.gd` (leaf pattern, suite-guarded).
-- `pinewatch_test.gd` ~2.3k lines — world-build + input + smoke +
-  cue plumbing in one presenter; the actor-presenter work is the
-  planned split (the smoke harness living in-scene is the smell).
+- `game.gd` ~2.4k lines post-split — state hub + delegate surface;
+  purchase/journal/crew verb layers moved to `systems/build.gd`,
+  `systems/journal.gd` and `systems/crew.gd` (leaf pattern,
+  suite-guarded). Next: hosting, night, kitchen leaves.
+- `pinewatch_test.gd` 4493→3132 lines — the `--smoke` drive moved to
+  `scripts/qa_smoke.gd` (D-ARCH-9), the six world-build passes to
+  `scripts/world_builder.gd` (D-ARCH-10), gesture + tap routing to
+  `scripts/input_presenter.gd` (D-ARCH-11); remaining HUD/sheets +
+  FX/cues + cast presenters split next in that order.
 - `SAVE_VERSION=2` — real migration path exercised: frozen v1 blob at
   `tests/fixtures/save_v1.json` drives `test_save`'s fill + stability
   + *load* checks (the fill also coerces type drift — v1

@@ -26,6 +26,7 @@ const SysRestore := preload("res://scripts/systems/restore.gd")
 const SysGatherings := preload("res://scripts/systems/gatherings.gd")
 const SysBuild := preload("res://scripts/systems/build.gd")
 const SysJournal := preload("res://scripts/systems/journal.gd")
+const SysCrew := preload("res://scripts/systems/crew.gd")
 
 const SPEEDUP_MIN_CHUNK := 900.0   # §6.10: chunk = max(15 min, stage / 6)
 const SPEEDUPS_PER_STAGE := 3
@@ -67,6 +68,7 @@ var restore: RefCounted
 var gatherings: RefCounted
 var build: RefCounted
 var journal: RefCounted
+var crew_sys: RefCounted
 var passport_stamps: Array = []             # §33.5: one per scored Daily
 var days_log: Array = []                    # §8.3 journal — one row/day
 var personas_met := {}                      # archetype -> display name
@@ -85,14 +87,17 @@ func _ready() -> void:
 	gatherings = SysGatherings.new(self)
 	build = SysBuild.new(self)
 	journal = SysJournal.new(self)
+	crew_sys = SysCrew.new(self)
 	_crew_reset()
 	# settings live outside the run state — read them off disk at boot
-	# so prefs apply on the title screen too (UI-036)
+	# so prefs apply on the title screen too (UI-036). Single load:
+	# the snapshot is the canonical save shape (§22).
+	var saved: Dictionary = Save.load_state()
 	settings = Save.default_state()["settings"]
-	for k in Save.load_state().get("settings", {}):
-		settings[k] = Save.load_state()["settings"][k]
+	for k in saved.get("settings", {}):
+		settings[k] = saved["settings"][k]
 	ads = Save.default_state()["ads"]
-	ads.merge(Save.load_state().get("ads", {}), true)
+	ads.merge(saved.get("ads", {}), true)
 	apply_settings()
 	Analytics.log_event(&"app_open", {"kind": "cold",
 		"via": Platform.launch_source()})        # §25
@@ -612,141 +617,62 @@ func site_name(id: StringName) -> String:
 
 
 # ------------------------------------------------------------- crew (§8.4)
+# Bodies live in systems/crew.gd — these stay the public surface the
+# UI and tests already call. `crew` + `_next_structure` stay here for
+# the save schema (D-ARCH-2).
 
 func _crew_reset() -> void:
-	crew = {
-		"structure": "", "stage": 0, "seconds_left": 0.0,
-		"last_seen_utc": 0, "speedups_stage": 0,
-		"speedups_today": 0, "speedups_day": "", "collected": []}
+	crew_sys.reset()
 
 
 func _structure(id: StringName) -> Dictionary:
-	for s in _structures():
-		if s.get("id") == id:
-			return s
-	return {}
+	return crew_sys._structure(id)
 
 
 func _current_stage() -> Dictionary:
-	var stages: Array = _structure(crew["structure"]).get("stages", [])
-	return stages[crew["stage"]] if crew["stage"] < stages.size() else {}
+	return crew_sys._current_stage()
 
 
 func _today() -> String:
-	return Time.get_datetime_string_from_system().substr(0, 10)
+	return crew_sys._today()
 
 
 ## §8.4 clock: progress = max(0, now − last seen), so a clock set back
 ## never undoes work (forward finishing early is accepted, §32). Runs
 ## while the app is closed via the same call on load.
 func crew_tick(now := int(Time.get_unix_time_from_system())) -> void:
-	var last: int = crew["last_seen_utc"]
-	crew["last_seen_utc"] = now
-	if crew["structure"] == "" or crew["seconds_left"] <= 0.0:
-		return
-	crew["seconds_left"] = maxf(0.0,
-		crew["seconds_left"] - maxi(0, now - last))
-	if crew["seconds_left"] <= 0.0:
-		crew_stage_ready.emit(crew["structure"])
+	crew_sys.tick(now)
 
 
 func crew_start(structure: StringName) -> void:
-	var s := _structure(structure)
-	if s.is_empty() or crew["structure"] != "":
-		return
-	crew["structure"] = structure
-	crew["stage"] = 0
-	crew["seconds_left"] = float(s["stages"][0]["seconds"])
-	crew["last_seen_utc"] = int(Time.get_unix_time_from_system())
-	crew["speedups_stage"] = 0
-	_next_structure = _structures().find(s) + 1
-	Analytics.log_event(&"crew_stage_start",
-		{"structure": String(structure)})
-	crew_tick()
-	touch()
+	crew_sys.start(structure)
 
 
 ## Next structure starts itself once its site is reached and the crew
 ## is free (§8.4). The hut is day-2-gated instead (advance_day).
 func _try_start_next() -> void:
-	if crew["structure"] != "" or _next_structure >= _structures().size():
-		return
-	var s: Dictionary = _structures()[_next_structure]
-	if s.get("auto_start") == "site_reached_and_crew_free" \
-			and s.get("site", "") in sites_visited:
-		crew_start(s["id"])
+	crew_sys.try_start_next()
 
 
 ## Collect a finished stage: keepsake to the journal, next stage (or
 ## structure) starts by itself (§8.4). Returns {} when not ready.
 func crew_collect() -> Dictionary:
-	crew_tick()
-	if crew["structure"] == "" or crew["seconds_left"] > 0.0:
-		return {}
-	var s := _structure(crew["structure"])
-	var structure: StringName = s["id"]
-	var stage: Dictionary = s["stages"][crew["stage"]]
-	var keepsake: StringName = stage["keepsake"]["id"]
-	crew["collected"].append(keepsake)
-	crew["stage"] += 1
-	crew["speedups_stage"] = 0
-	var finished: bool = crew["stage"] >= s["stages"].size()
-	if finished:
-		crew["structure"] = ""
-		crew["seconds_left"] = 0.0
-		for sr in Catalog.data.get("sites", []):
-			if sr.get("crew_structure") == structure:
-				site_state(sr["id"])["vignette_restored"] = structure
-		_try_start_next()
-	else:
-		crew["seconds_left"] = float(s["stages"][crew["stage"]]["seconds"])
-	crew_collected.emit(structure, keepsake, finished)
-	Analytics.log_event(&"crew_stage_collect",
-		{"structure": String(structure), "finished": finished})
-	touch()
-	return {"structure": structure, "keepsake": keepsake,
-		"finished": finished, "vignette": s.get("vignette", "")}
+	return crew_sys.collect()
 
 
 ## Rewarded-ad speed-up (§6.10): one chunk off the stage, capped per
 ## stage and per calendar day, offered from day 4 (§8.4).
 func crew_speedup() -> float:
-	crew_tick()
-	if not crew_can_speedup():
-		return 0.0
-	if crew["speedups_day"] != _today():
-		crew["speedups_day"] = _today()
-		crew["speedups_today"] = 0
-	var chunk := maxf(SPEEDUP_MIN_CHUNK,
-		float(_current_stage()["seconds"]) / 6.0)
-	crew["seconds_left"] = maxf(0.0, crew["seconds_left"] - chunk)
-	crew["speedups_stage"] += 1
-	crew["speedups_today"] += 1
-	ads["last_rewarded_utc"] = int(Time.get_unix_time_from_system())
-	Analytics.log_event(&"ad_rewarded_complete",
-		{"placement": "crew_speedup"})
-	touch()
-	return chunk
+	return crew_sys.speedup()
 
 
 func crew_can_speedup() -> bool:
-	if day < SPEEDUP_FROM_DAY or crew["structure"] == "" \
-			or crew["seconds_left"] <= 0.0:
-		return false
-	var today_used: int = crew["speedups_today"] \
-		if crew["speedups_day"] == _today() else 0
-	return crew["speedups_stage"] < SPEEDUPS_PER_STAGE \
-		and today_used < SPEEDUPS_PER_DAY
+	return crew_sys.can_speedup()
 
 
 ## Finish is free once 5 minutes or less remain (§6.10).
 func crew_free_finish() -> bool:
-	crew_tick()
-	if crew["structure"] == "" or crew["seconds_left"] > FREE_FINISH_LEFT:
-		return false
-	crew["seconds_left"] = 0.0
-	touch()
-	return true
+	return crew_sys.free_finish()
 
 # ------------------------------------------------- Volume II (§33.3)
 #
@@ -810,19 +736,13 @@ func passport_cosmetics() -> int:
 
 
 func is_stage_ready() -> bool:
-	crew_tick()
-	return crew["structure"] != "" and crew["seconds_left"] <= 0.0
+	return crew_sys.is_stage_ready()
 
 
 ## All three v1 structures fully collected. Vol II restorations are
 ## site-team work, not the v1 crew's list (§6.11).
 func crew_done() -> bool:
-	var total := 0
-	for s in _structures():
-		if s.get("volume2", false):
-			continue
-		total += s.get("stages", []).size()
-	return crew["collected"].size() >= total and total > 0
+	return crew_sys.done()
 
 
 # ------------------------------------------------------------- hosting (§5)
@@ -1860,35 +1780,11 @@ func return_decor(idx: int) -> bool:
 	return build.return_decor(idx)
 
 
-## §variant: cosmetic re-skins of placed pieces — the catalog's endless
-## cosmetic sink. Replaces the piece's variant tag; fully undoable.
+## §variant: cosmetic re-skins of placed pieces — body lives in
+## systems/build.gd beside the other purchase verbs; this stays the
+## public surface the UI and tests already call.
 func buy_decor_variant(idx: int, name: String) -> bool:
-	var st := site_state()
-	if idx < 0 or idx >= st["decor"].size():
-		return false
-	var d: Dictionary = st["decor"][idx]
-	var row: Dictionary = _row("decor", String(d["id"]))
-	var variants: Dictionary = row.get("variants", {})
-	if name not in variants:
-		return false
-	if String(d.get("variant", "")) == name:
-		return false
-	var price := int(variants[name])
-	if coins < price:
-		return false
-	coins -= price
-	var prev := String(d.get("variant", ""))
-	d["variant"] = name
-	_record("buy_decor_variant", {"idx": idx, "variant": name},
-		{"verb": "unbuy_variant", "params": {"idx": idx, "prev": prev,
-			"price": price}})
-	_log("decor_variant", {"id": String(d["id"]), "variant": name,
-		"price": price})
-	Analytics.log_event(&"purchase_item",
-		{"kind": "variant", "id": "%s:%s" % [d["id"], name],
-			"price": price})
-	touch()
-	return true
+	return build.buy_decor_variant(idx, name)
 
 
 func return_bought(item_id: String) -> bool:
@@ -2507,15 +2403,4 @@ func load_state(state: Dictionary) -> void:
 
 ## First structure not fully collected, or one past the active one.
 func _next_unfinished() -> int:
-	for i in _structures().size():
-		var s: Dictionary = _structures()[i]
-		if s.get("id", "") == crew["structure"]:
-			return i + 1
-		var all_collected := true
-		for stage in s.get("stages", []):
-			if stage.get("keepsake", {}).get("id", "") \
-					not in crew["collected"]:
-				all_collected = false
-		if not all_collected:
-			return i
-	return _structures().size()
+	return crew_sys.next_unfinished()

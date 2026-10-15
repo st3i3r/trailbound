@@ -1,0 +1,35 @@
+{
+  "id": "build_undo",
+  "title": "Build spine: buy -> move -> store, then every step undoes clean",
+  "site": "pinewatch",
+  "seed": 3,
+  "setup": {
+    "coins": 500,
+    "day": 1,
+    "phase": 3,
+    "sites_visited": { "pinewatch": 0 }
+  },
+  "steps": [
+    { "op": "buy_decor", "id": "lantern", "cells": [[9, 9]] },
+    { "op": "expect", "coins": 450, "site.decor.count": 1 },
+    { "op": "buy_decor", "id": "bench", "cells": [[14, 7]] },
+    { "op": "expect", "coins": 410, "site.decor.count": 2,
+        "site.seats": 1 },
+    { "op": "move_decor", "idx": 1, "cells": [[11, 8]] },
+    { "op": "expect", "site.decor.count": 2 },
+    { "op": "undo" },
+    { "op": "undo" },
+    { "op": "expect", "coins": 450, "site.decor.count": 1,
+        "site.seats": 0 },
+    { "op": "undo" },
+    { "op": "expect", "coins": 500, "site.decor.count": 0 },
+    { "op": "buy_decor", "id": "bench", "cells": [[14, 7]] },
+    { "op": "store_decor", "idx": 0 },
+    { "op": "expect", "site.decor.count": 0, "site.stored.count": 1 }
+  ],
+  "expect": {
+    "site.decor.count": 0,
+    "site.stored.count": 1
+  },
+  "twice": true
+}

@@ -1,0 +1,31 @@
+{
+  "id": "pad_unlock",
+  "title": "Pad economy: locked pad -> pay -> clear -> seat on it",
+  "site": "pinewatch",
+  "seed": 5,
+  "setup": {
+    "coins": 600,
+    "day": 1,
+    "phase": 3,
+    "sites_visited": { "pinewatch": 0 }
+  },
+  "steps": [
+    { "op": "expect", "site.pads.p5.open": false },
+    { "op": "inject_guest", "id": "pair", "arch": "hiker", "fee": 30,
+        "pads": 1 },
+    { "op": "seat", "guest": "pair", "pads": ["p5"], "must_fail": true },
+    { "op": "unlock_pad", "pad": "p5" },
+    { "op": "expect", "site.pads.p5.paid": true,
+        "site.pads.p5.open": false },
+    { "op": "seat", "guest": "pair", "pads": ["p5"], "must_fail": true },
+    { "op": "clear_pad", "pad": "p5" },
+    { "op": "expect", "site.pads.p5.open": true },
+    { "op": "seat", "guest": "pair", "pads": ["p5"] },
+    { "op": "expect", "site.assignments.pair.has": "p5" }
+  ],
+  "expect": {
+    "site.pads.p5.open": true,
+    "site.assignments.count": 1
+  },
+  "twice": true
+}

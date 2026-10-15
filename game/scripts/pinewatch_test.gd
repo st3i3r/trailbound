@@ -62,9 +62,10 @@ const PROPS_PINEWATCH := [
     # ===== v17 painted map — terrain + static dressing are baked into
     # fx/ground_sunlit.png (PixelLab map-base + objects); runtime keeps
     # only the stateful/live pieces =====
-    # crew hut — sits over the baked homestead on the court's east lobe;
-    # _sync_crew_hut swaps its texture through the restore stages
-    ["props_large",  "cabin",             448, 384, 0.0, 1.05],
+    # crew hut anchor — on painted maps the sprite stays hidden and
+    # the authored PixelLab house (object layer) carries the visual;
+    # position matches the house's exported collider foot
+    ["props_large",  "cabin",             468, 389, 0.0, 1.05],
     # scorched dirt under the runtime fire ring at cell (7,7)
     ["props_medium", "dirt_patch",        480, 504],
     # junction signpost where the east lane meets the court — the
@@ -156,6 +157,9 @@ const WORLD_SCALE := 0.80              # Eastward ratio pass: all
                                         # frame shows more world
 const WorldFX := preload("res://scripts/world_fx.gd")
 const AmbientFX := preload("res://scripts/ambient_fx.gd")
+const QaSmoke := preload("res://scripts/qa_smoke.gd")
+const WorldBuilder := preload("res://scripts/world_builder.gd")
+const InputPresenter := preload("res://scripts/input_presenter.gd")
 # Stage anchors moved per-site into SITE_STAGE (UI-034): _fire_pos,
 # _dog_pos and _board_rect are set from it in _ready once site_id is
 # known.  Pinewatch keeps the authored values every tool references.
@@ -244,9 +248,6 @@ var ground: Node2D
 var stage: Node2D                            # all world layers — centred on
                                              # wide viewports (aspect=expand)
 var _cam := Vector2.ZERO                     # view offset into the stage px
-var _mb_pan := false                         # mid/right mouse drag owns it
-var _tap_armed := false                      # a press is a candidate tap
-var _tap_origin := Vector2.ZERO              # until finger-up clears slop
 var scatter: Node2D
 var pads_node: Node2D
 var shadows: Node2D                          # Phase 5.0 light model —
@@ -310,8 +311,6 @@ var tent_nodes := {}                         # gid -> [Sprite2D]
 var star_labels := {}                        # pid -> preview Node2D
 var evening_open := true                     # Enter -> Goodnight
 var night_rating := ""
-var _press := {}                             # pending card press {gid, pos}
-var _drag_ghost: Sprite2D                    # sprite following a card drag
 var _trait_names := {}                       # tid -> name (lazy)
 var guest_bubbles := {}                      # gid -> trait-state marker token
 var board_anchor: Node2D                     # notice-board prop anchor (UI-023)
@@ -334,10 +333,6 @@ var _errand_anchors := {}                    # "pond"|"lookout" -> Node2D
 var _decor_layer: Node2D                     # placed pieces, always drawn
 var _decor_nodes := {}                       # st["decor"] idx -> Sprite2D
 var _build_overlay: BuildGrid                # legal cells + candidate tint
-var _build_on := false                       # build mode owns PREP taps
-var _build_item := {}                        # {id, kind:buy|stored|move, idx}
-var _build_ghost: Sprite2D                   # snapped preview at candidate
-var _build_hint := 0                         # effect chip marker token
 var _build_menu_tok := 0                     # piece context-row token
 
 var _pad_menu_tok := 0                       # pad context-row token
@@ -362,6 +357,8 @@ var _dog_round_t := 7.0                      # seconds to first wander
 var _dog_walking := false
 
 var _tex_cache := {}
+var _builder: RefCounted  # world passes (D-ARCH-9)
+var _input: RefCounted  # gesture + tap routing (D-ARCH-9)
 
 
 func _tex(rel: String) -> Texture2D:
@@ -451,6 +448,8 @@ func _ready() -> void:
                                              # _status() once phase is known
     get_viewport().size_changed.connect(_fit_stage)
 
+    _builder = WorldBuilder.new(self)
+    _input = InputPresenter.new(self)
     _build_ground()
     _build_backdrop()
     _build_scatter(rng)
@@ -577,8 +576,7 @@ func _ready() -> void:
     var front := Node2D.new()
     front.name = "FrontCanopy"
     stage.add_child(front)
-    var painted := FileAccess.file_exists(
-        "res://assets/%s/objects.json" % _site_id)
+    var painted := _painted_map()
     for fp in [] if painted else [[34.0, 84.0, 1.45], [342.0, 74.0, 1.30]]:
         var cr := _anchored("props_large", "tree_broadleaf",
                             Vector2(fp[0], fp[1]))
@@ -1112,178 +1110,19 @@ func _cell_mask(c: Vector2i) -> int:
 
 
 func _build_ground() -> void:
-    ## The whole painted map render as one sprite — zones, transitions
-    ## and shore rims are baked art; gameplay reads MASK instead.
-    ## Sites without a baked render fall back to the mask drawn flat
-    ## (UI-034 v1 dressing — a painted map replaces it when art lands).
-    if _site_id == "pinewatch":
-        var gs := Sprite2D.new()
-        # importer writes this PNG; a non-editor launch can serve a
-        # stale ctex (no filesystem rescan) — load the file directly
-        var gi := Image.load_from_file(ProjectSettings.globalize_path(
-            "res://assets/pinewatch/fx/ground_sunlit.png"))
-        gs.texture = ImageTexture.create_from_image(gi) \
-            if gi != null else _tex("fx/ground_sunlit")
-        gs.centered = false
-        ground = gs
-        print("ground: sunlit variant (fx/ground_sunlit)")
-    else:
-        var gp := GroundPaint.new()
-        gp.mask = _mask
-        gp.t = T
-        ground = gp
-        print("ground: procedural mask render (v1 dressing)")
-    ground.name = "Ground"
-    stage.add_child(ground)
-
+    _builder.build_ground()
 
 func _open_cell(px: float, py: float, want: int) -> bool:
-    ## Scatter placement guard: the point must sit on terrain `want`
-    ## (0 grass / 1 forest) and outside every pad rect — keeps decals
-    ## off pond/path/pads exactly like the old _open_grass did.
-    var tx := int(px) / T
-    var ty := int(py) / T
-    if tx < 0 or tx >= GW or ty < 0 or ty >= GH:
-        return false
-    if _cell_mask(Vector2i(tx, ty)) != want:
-        return false
-    for r in pad_cells.values():
-        if r.has_point(Vector2(px, py)):
-            return false
-    return true
-
+    return _builder.open_cell(px, py, want)
 
 func _build_backdrop() -> void:
-    ## Depth band over the top forest strip: pale sky fading into the
-    ## dirt, then rows of darkened pines standing in front of it.  Added
-    ## right after Ground so it paints above the (fully opaque) tiles —
-    ## below them it could never be seen — and below everything else.
-    var bd := Node2D.new()
-    bd.name = "Backdrop"
-    stage.add_child(bd)
-    # overscan: the map is 640x384 but tall/wide viewports expand past
-    # it — paint past both edges so the margin reads as the forest
-    # continuing (deep canopy above, shadowed ground below), not void
-    var ovs_top := Polygon2D.new()
-    ovs_top.polygon = PackedVector2Array([
-        Vector2(-80, -80), Vector2(GW * T + 80, -80),
-        Vector2(GW * T + 80, 4), Vector2(-80, 4)])
-    ovs_top.color = OVR_TOP
-    bd.add_child(ovs_top)
-    var ovs_bot := Polygon2D.new()
-    ovs_bot.polygon = PackedVector2Array([
-        Vector2(-80, GH * T - 2), Vector2(GW * T + 80, GH * T - 2),
-        Vector2(GW * T + 80, GH * T + 80), Vector2(-80, GH * T + 80)])
-    ovs_bot.vertex_colors = PackedColorArray(
-        [OVR_BOT, OVR_BOT, OVR_DEEP, OVR_DEEP])
-    bd.add_child(ovs_bot)
-    # thin sky sliver first — Eastward forest edges are CANOPY, not
-    # open sky; only a pale line peeks above the far tree mass.
-    # Painted maps carry their own authored canopy and trees (the
-    # PixelLab object layer) — sky sliver and procedural treeline
-    # over them would wash/double-draw, so both stay fallback-only.
-    var painted := FileAccess.file_exists(
-        "res://assets/%s/objects.json" % _site_id)
-    if not painted:
-        var sky := Polygon2D.new()
-        sky.polygon = PackedVector2Array([
-            Vector2(0, 0), Vector2(GW * T, 0),
-            Vector2(GW * T, SKY_H), Vector2(0, SKY_H)])
-        sky.vertex_colors = PackedColorArray(
-            [SKY_TOP, SKY_TOP, SKY_BOT, SKY_BOT])
-        bd.add_child(sky)
-    var rows: Array = [] if painted else [
-        {"y": 46.0,  "dx": 52.0,  "x0": -30.0, "tint": TREE_FAR,  "s": 0.42},
-        {"y": 58.0,  "dx": 60.0,  "x0": 8.0,   "tint": TREE_MID,  "s": 0.50},
-        {"y": 70.0,  "dx": 66.0,  "x0": -14.0, "tint": TREE_NEAR, "s": 0.58},
-    ]
-    var k := 0
-    for r in rows:
-        var x: float = r["x0"]
-        while x < GW * T + 40.0:
-            var t := _anchored("props_large", "tree_broadleaf",
-                               Vector2(x, r["y"]))
-            t.scale = Vector2(r["s"], r["s"])
-            t.modulate = r["tint"]
-            bd.add_child(t)
-            x += r["dx"] * (0.85 + 0.3 * ((k * 7) % 3) / 2.0)
-            k += 1
-
+    _builder.build_backdrop()
 
 func _build_scatter(rng: RandomNumberGenerator) -> void:
-    scatter = Node2D.new()
-    scatter.name = "Scatter"
-    stage.add_child(scatter)
-    # edge-clustered decals (ground recipe): DECAL_CLUSTERS is a fixed
-    # list — one family per cluster, only at prop bases / shoreline /
-    # treeline feet; the open-field interior stays empty because the
-    # GroundTint overlay carries macro variation now.  pad_cells is
-    # filled from the layout here because _build_pads only runs after us.
-    if pad_cells.is_empty():
-        var spots: Dictionary = layout["pads"]["spots"]
-        for pid in spots:
-            var c: Array = spots[pid]
-            pad_cells[pid] = Rect2(origin + Vector2(c[0], c[1]) * CELL,
-                                   Vector2(CELL, CELL))
-    var placed := 0
-    for spec in DECAL_CLUSTERS:
-        var ctr := Vector2(spec[0], spec[1])
-        var fam: Array = DECAL_FAMILIES[spec[2]]
-        var want: int = spec[6]
-        for i in int(spec[3]):
-            # triangular offset -> denser near the centre, soft edges
-            var p: Vector2 = ctr + Vector2(
-                (rng.randf() + rng.randf() - 1.0) * spec[4],
-                (rng.randf() + rng.randf() - 1.0) * spec[5])
-            if _open_cell(p.x, p.y, want):
-                var d := _anchored("decals",
-                                   fam[rng.randi() % fam.size()], p)
-                d.modulate = DECAL_GROUND      # sit IN the ground wash
-                scatter.add_child(d)
-                placed += 1
-    print("scatter decals: %d (%d edge clusters)"
-          % [placed, DECAL_CLUSTERS.size()])
-
+    _builder.build_scatter(rng)
 
 func _build_pads(rng: RandomNumberGenerator) -> void:
-    var spots: Dictionary = layout["pads"]["spots"]
-    var open_pads: Array = layout["pads"]["open"]
-    for pid in spots:
-        var c: Array = spots[pid]
-        var rect := Rect2(origin + Vector2(c[0], c[1]) * CELL,
-                          Vector2(CELL, CELL))
-        pad_cells[pid] = rect
-        # Batch H: real ground under the bracket — an overgrown
-        # weed plot while locked (the clear scatter eats it),
-        # packed pitch earth once open.  Drawn BEFORE the marker
-        # so the brackets stay legible on top.
-        var g := Sprite2D.new()
-        g.name = "ground_" + pid
-        g.centered = false
-        g.texture = _tex("decals/pad_cleared" if pid in open_pads
-            else "decals/" + PAD_OVERGROWN[
-                hash(pid) % PAD_OVERGROWN.size()])
-        g.position = rect.position
-        var gw := float(g.texture.get_width())
-        var gs: float = minf(1.0, CELL * 1.1 / gw)
-        g.scale = Vector2.ONE * gs
-        g.set_meta("s0", gs)
-        pads_node.add_child(g)
-        var m := Sprite2D.new()
-        m.texture = _tex("pad_open" if pid in open_pads else "pad_locked")
-        m.centered = false
-        m.name = "mark_" + pid
-        m.position = rect.position
-        pads_node.add_child(m)
-        if not (pid in open_pads):
-            var tuft := _anchored("decals", "tuft_grass_dry",
-                rect.position + Vector2(8 + rng.randi() % 40,
-                                        8 + rng.randi() % 40))
-            tuft.name = "tuft_" + pid        # clear transform frees it
-            pads_node.add_child(tuft)
-    for pid in pad_cells:
-        _sync_pad_visual(pid)                # loaded saves: shelters
-
+    _builder.build_pads(rng)
 
 ## PixelLab object layer (map import). Each entry becomes a Node2D
 ## anchored at its collider's bottom-centre — that foot point is what
@@ -1292,54 +1131,10 @@ func _build_pads(rng: RandomNumberGenerator) -> void:
 ## ties keep the editor's layering. Sites without an objects manifest
 ## (lantern_valley, whisper_river) simply skip.
 func _build_objects() -> void:
-    var mpath := "res://assets/%s/objects.json" % _site_id
-    if not FileAccess.file_exists(mpath):
-        return
-    var list: Variant = JSON.parse_string(
-        FileAccess.get_file_as_string(mpath))
-    if not list is Array:
-        return
-    for o in list:
-        # Image.load_from_file over load(): importer-copied PNGs carry
-        # no .import metadata until the editor next scans the project
-        var img := Image.load_from_file(ProjectSettings.globalize_path(
-            "res://assets/%s/objects/%s" % [_site_id, o["img"]]))
-        if img == null:
-            continue
-        var tex := ImageTexture.create_from_image(img)
-        var anchor := Node2D.new()
-        anchor.position = Vector2(o["foot"][0], o["foot"][1])
-        var spr := Sprite2D.new()
-        spr.texture = tex
-        spr.centered = false
-        spr.position = Vector2(o["x"], o["y"]) - anchor.position
-        anchor.add_child(spr)
-        world.add_child(anchor)
-
+    _builder.build_objects()
 
 func _build_props() -> void:
-    var erng := RandomNumberGenerator.new()
-    erng.seed = 23                     # embed jitter — fixed so the
-                                       # sticker-kill is reproducible
-    for p in _props:
-        var spr := _anchored(p[0], p[1], Vector2(p[2], p[3]))
-        if p.size() > 4:               # organic lean on loose props
-            spr.rotation_degrees = p[4]
-        var sc: float = (p[5] if p.size() > 5 else 1.0) * WORLD_SCALE
-        spr.scale = Vector2(sc, sc)
-        world.add_child(spr)
-        if p[0] == "props_large" and p[1] == "cabin":
-            _hut = spr                     # crew structure anchor (§8.4)
-        if p[1] in FADEABLE:
-            # fade zone = the tall art minus its footing strip —
-            # an actor whose anchor lands inside is behind the prop
-            var sz: Vector2 = spr.texture.get_size() * sc
-            fade_zones.append({"s": spr, "r": Rect2(
-                Vector2(p[2] - sz.x / 2.0, p[3] - sz.y),
-                Vector2(sz.x, sz.y - 14.0))})
-        _embed_base(p, erng)
-        _add_shadow(p)
-
+    _builder.build_props()
 
 ## Phase 5.0+5.3 — canopy/contact shadow pools. Green-brown radial
 ## pools centred on each prop's footprint, sun upper-left so the
@@ -1368,24 +1163,7 @@ func _shadow_texture() -> Texture2D:
 
 
 func _add_shadow(p: Array) -> void:
-    if p[0] in ["terrain", "decals"] or p[1] in SHADOW_SKIP:
-        return
-    var e: Dictionary = anchors.get(p[0] + "/" + p[1] + ".png", {})
-    var tex: Texture2D = _tex(p[0] + "/" + p[1])
-    var c: Array = e.get("content",
-        [0, 0, tex.get_width(), tex.get_height()])
-    var sc: float = (p[5] if p.size() > 5 else 1.0) * WORLD_SCALE
-    var ax: float = e.get("anchor_x", tex.get_width() / 2.0)
-    var fw: float = (c[2] - c[0]) * sc * 1.15
-    var fh: float = clamp(fw * 0.30, 8.0, 36.0)
-    var cx: float = p[2] - ax * sc + (c[0] + c[2]) * 0.5 * sc
-    var s := Sprite2D.new()
-    s.texture = _shadow_texture()
-    s.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-    s.scale = Vector2(fw / 128.0, fh / 64.0)
-    s.position = Vector2(cx + 3.0, p[3] - 2.0)
-    shadows.add_child(s)
-
+    _builder.add_shadow(p)
 
 func _char_shadow(pos: Vector2, w: float) -> Sprite2D:
     var s := Sprite2D.new()
@@ -1403,43 +1181,7 @@ func _char_shadow(pos: Vector2, w: float) -> Sprite2D:
 ## The base edge gets visually broken by foreground vegetation and the
 ## prop reads as sitting IN the world, not pasted on it.
 func _embed_base(p: Array, rng: RandomNumberGenerator) -> void:
-    if p[1] in EMBED_SKIP:
-        return
-    var e: Dictionary = anchors.get(p[0] + "/" + p[1] + ".png", {})
-    var tex: Texture2D = _tex(p[0] + "/" + p[1])
-    var ax: float = e.get("anchor_x", tex.get_width() / 2.0)
-    var ay: float = e.get("anchor_y", float(tex.get_height()))
-    var c: Array = e.get("content",
-        [0, 0, tex.get_width(), tex.get_height()])
-    var sc: float = (p[5] if p.size() > 5 else 1.0) * WORLD_SCALE
-    # prop footprint in world px (content box, not the whole canvas)
-    var fx0: float = p[2] - ax * sc + c[0] * sc
-    var fx1: float = p[2] - ax * sc + c[2] * sc
-    var ch: float = (c[3] - c[1]) * sc
-    var overlap: float = clamp(ch * 0.11, 3.0, 7.0)
-    for i in 1 + rng.randi() % 3:
-        var pos := Vector2(
-            lerpf(fx0, fx1, 0.2 + 0.6 * rng.randf()),
-            p[3] + max(1.0, 8.0 - overlap + rng.randf() * 2.0 - 1.0))
-        # pos must clear the prop's own anchor y (sorts in front) and
-        # land on turf — gravel pebbles allowed on the path edge, never
-        # on pond / pads
-        var want := _cell_mask(Vector2i(int(pos.x) / T, int(pos.y) / T))
-        if want == 2:
-            continue
-        var on_pad := false
-        for r in pad_cells.values():
-            if r.has_point(pos):
-                on_pad = true
-                break
-        if on_pad:
-            continue
-        var fam_name := "tuft" if want == 0 else \
-            "litter" if want == 1 else "pebble"
-        var fam: Array = DECAL_FAMILIES[fam_name]
-        world.add_child(_anchored("decals",
-                                  fam[rng.randi() % fam.size()], pos))
-
+    _builder.embed_base(p, rng)
 
 ## AmbientFX + foliage sway — the "world breathes" layer (fireflies,
 ## pond glints, pollen, hut smoke, moths, butterflies) plus the wind
@@ -1745,13 +1487,13 @@ func _on_back() -> void:
     ## §17.6: Back closes the top sheet; on the camp screen it asks first.
     if panel_mgr.top() != null:
         panel_mgr.close()
-    elif not _build_item.is_empty():
+    elif _input.build_armed():
         _disarm_build()                    # drop the ghost, keep mode
     elif _pad_menu_pid != "":
         _close_pad_menu()
     elif _meal_sel >= 0:
         _tap_meal(-1)                        # disarm the plate
-    elif _build_on:
+    elif _input.build_active():
         _set_build(false)
     else:
         _confirm_quit()
@@ -1818,515 +1560,16 @@ func _quit_dialog() -> Control:
 ## exercises Back -> quit-confirm -> close and the fire-proximity
 ## bubble, prints assertions, quits.  Runs beside --shot, no prod cost.
 func _smoke() -> void:
-    await get_tree().process_frame
-    _on_back()
-    await _frames_until(func(): return panel_mgr.top() != null \
-        and panel_mgr.top().modulate.a > 0.9)
-    var top: Control = panel_mgr.top()
-    print("SMOKE back -> quit panel open: ", top != null,
-          " size:", top.size if top else Vector2.ZERO)
-    _on_back()
-    await _frames_until(func(): return _quit == null)
-    print("SMOKE back -> closed: ", panel_mgr.top() == null,
-          " quit cleared:", _quit == null)
-    _fire_near(true)
-    await _frames_until(func(): return fire_bubble.modulate.a > 0.9)
-    print("SMOKE fire bubble a=", snappedf(fire_bubble.modulate.a, 0.01))
-    _fire_near(false)
-    await _frames_until(func(): return not fire_bubble.visible)
-    print("SMOKE fire bubble hidden:", not fire_bubble.visible)
-    # WorldFX scalars: front rolls in and the channels derive from it —
-    # rain density + emission gate, nightfall darkens the composite
-    _fx.set_front(1.0, 0.2)
-    await _frames_until(func(): return _fx.front > 0.95)
-    print("SMOKE front rolled:", snappedf(_fx.front, 0.01),
-          " rain:", _rain.emitting)
-    _fx.set_front(0.0, 0.2)
-    await _frames_until(func(): return _fx.front < 0.05)
-    print("SMOKE front cleared:", not _rain.emitting)
-    var day_lum: float = _grade.color.r + _grade.color.g \
-        + _grade.color.b
-    _fx.set_dusk(1.0, 0.2)
-    await _frames_until(func(): return _fx.dusk > 0.95)
-    var night_lum: float = _grade.color.r + _grade.color.g \
-        + _grade.color.b
-    print("SMOKE dusk darkens:", night_lum < day_lum * 0.7)
-    # matrix.txt rows at dusk=1: a storm must DEEPEN the night, and
-    # a >1.0 profile channel is in-scatter — it can never lift it
-    _fx.set_front(1.0, 0.05, STORM_MUL)
-    var storm_lum: float = _grade.color.r + _grade.color.g \
-        + _grade.color.b
-    print("SMOKE storm-night darker:", storm_lum < night_lum)
-    _fx.base_color = Color(1.30, 1.20, 0.90)  # heatwave-class tint
-    var heat_lum: float = _grade.color.r + _grade.color.g \
-        + _grade.color.b
-    print("SMOKE scatter can't lift night:",
-          heat_lum < night_lum * 1.1)
-    print("SMOKE ember lights:", _fire_light.energy > 0.5)
-    # §5.10 jitter: the hearth breathes — two samples frames apart
-    # must differ (front=1 here, so it's already in sputter mode)
-    var fe0 := _fire_light.energy
-    for i in 5:
-        await get_tree().process_frame
-    var fe1 := _fire_light.energy
-    for i in 7:
-        await get_tree().process_frame
-    var fe2 := _fire_light.energy
-    print("SMOKE fire flickers:", fe0 != fe1 or fe1 != fe2)
-    # AmbientFX rides the same scalars — at dusk=1: fireflies up,
-    # pollen washed out, moths hugging the lamps.  Ratios are set in
-    # _process so the frames waited above have applied them.
-    print("SMOKE ambient night:", _amb != null
-          and _amb._flies.amount_ratio > 0.5
-          and _amb._motes.amount_ratio < 0.05)
-    print("SMOKE moths on lamps:", _amb == null
-          or _amb._moths.is_empty()
-          or _amb._moths[0]["s"].modulate.a > 0.9)
-    var swayed := 0
-    for n in scatter.get_children() + world.get_children() \
-            + pads_node.get_children():
-        if n is Sprite2D and n.material is ShaderMaterial:
-            swayed += 1
-    print("SMOKE foliage sway assigned:", swayed >= 6)
-    _fx.set_front(0.0, 0.05, WARM_MUL)
-    _fx.set_dusk(_dusk_target(Game.phase), 0.05)
-    # tracked overlay: storm's ripple warp rides the front scalar —
-    # at front 1.0 the shader intensity lands at its profile val
-    _set_weather("storm", 0.05)
-    var wv: ColorRect = _warp if _warp.visible else _warp2
-    var iv_raw: Variant = (wv.material as ShaderMaterial) \
-        .get_shader_parameter("intensity")
-    var iv: float = float(iv_raw) if iv_raw != null else -1.0
-    print("SMOKE ripple tracks front:", iv > 0.9)
-    _set_weather("sunny", 0.05)
-    # UI-020 tray: build -> select -> previews+strip -> seat -> unseat
-    var st: Dictionary = Game.site_state()
-    var board: Array = st["board"]
-    print("SMOKE tray cards:", hud.tray._cards.size(), "of",
-          board.size())
-    var g0: String = board[0]["id"]
-    _tap_card(g0)
-    await get_tree().process_frame
-    print("SMOKE select:", selected == g0,
-          " previews:", star_labels.size() > 0,
-          " strip:", hud.tray.strip.visible)
-    var pid0 := ""
-    for pid in pad_cells:
-        if st["pads"][pid].get("open", false) \
-                and not _pad_occupied(pid):
-            pid0 = pid
-            break
-    _try_seat(pid0)
-    await get_tree().process_frame
-    print("SMOKE seat:", st["assignments"].has(g0),
-          " card dimmed:", hud.tray.is_seated(g0),
-          " bubble:", guest_bubbles.has(g0))
-    _do_unseat(g0)
-    print("SMOKE unseat:",
-          not Game.site_state()["assignments"].has(g0),
-          " card restored:", not hud.tray.is_seated(g0),
-          " bubble freed:", not guest_bubbles.has(g0))
-    _tap_card(g0)
-    _tap_card(g0)
-    print("SMOKE toggle-deselect:", selected == "")
-    # re-seat so the night actually hosts a guest — the D-UI-8
-    # letter gate needs guests_welcomed>=1, and the payout path
-    # wants a real stay
-    _tap_card(g0)
-    _try_seat(pid0)
-    await get_tree().process_frame
-    print("SMOKE re-seat for night:", st["assignments"].has(g0))
-    # UI-038 dinner: cook the favourite (injected — the cook path is
-    # covered separately), the menu lane lights, arm + serve by hand,
-    # and the plate chip lands beside the guest
-    var g0_fav := String(st["guests"].get(g0, {}).get("favourite", ""))
-    if g0_fav == "":
-        g0_fav = "trail_stew"
-        st["guests"][g0]["favourite"] = g0_fav
-    if not Game.recipes_cooked.has(g0_fav):
-        Game.recipes_cooked.append(g0_fav)
-    Game.meals.append({"id": g0_fav, "price": 20})
-    hud.tray.set_meals(Game.meals)
-    await get_tree().process_frame           # lane lays out first
-    var midx := Game.meals.size() - 1
-    var meal_hit: bool = hud.tray.meal_at(
-        hud.tray._meals[midx].get_global_rect().get_center()) == midx
-    _tap_meal(midx)
-    _serve_tap(g0)
-    var st_sv: Dictionary = Game.site_state()
-    print("SMOKE meal lane:", meal_hit,
-          " serve:", String(st_sv["served"].get(g0, "")) == g0_fav,
-          " plate:", _served_marks.has(g0))
-    _serve_tap(g0)                            # same dish twice = unserve
-    var unserved: bool = not st_sv["served"].has(g0)
-    _serve_tap(g0)                            # and back on for the night
-    print("SMOKE unserve/re-serve:", unserved,
-          String(st_sv["served"].get(g0, "")) == g0_fav)
-    # UI-022: Goodnight -> summary sheet -> Sleep -> next morning
-    var day_before := Game.day
-    _advance_phase()
-    await _frames_until(func(): return panel_mgr.top() != null)
-    var sheet := panel_mgr.top()
-    print("SMOKE night sheet:", sheet is NightSummary)
-    if sheet is NightSummary:
-        # spec 005: the vignette beat lands — card in the sheet, its
-        # authored light cue grading the world behind; days_log gains
-        # the reactive-bark fields (fav_served/regulars)
-        var vig_card := sheet.find_child("VignetteCard", true, false)
-        print("SMOKE vignette card:", vig_card != null,
-              " cue:", String(Game._light_cue.get("id", ""))
-                  .begins_with("vig_"),
-              " fav served:", Game.days_log.back()
-                  .get("fav_served", false))
-        (sheet as NightSummary).sleep_pressed.emit()
-        # the out-tween frees the sheet — the vig cue clears on
-        # tree_exited, so wait for the cue itself to lift
-        await _frames_until(func(): return Game._light_cue.is_empty())
-        print("SMOKE sleep -> day:", Game.day == day_before + 1,
-              " closed:", panel_mgr.top() == null,
-              " morning:", Game.phase == Game.Phase.MORNING,
-              " board marker:", _board_tok != 0,
-              " cue cleared:", Game._light_cue.is_empty())
-        # UI-023: booking sheet opens -> close -> Head out -> evening
-        _open_booking()
-        await get_tree().process_frame
-        print("SMOKE booking sheet:", panel_mgr.top() is BookingBoard)
-        panel_mgr.close()
-        # §8.4 crew hut: day-2 auto-start put the crew on the warden's
-        # hut — world chip up, tap opens the sheet, a forced-ready
-        # stage flips the chip to "!" and collects into new dressing
-        var sid := _crew_sid()
-        print("SMOKE crew hut:", _hut != null,
-              " engaged:", Game.crew.get("structure", "") == sid,
-              " chip:", _hut_tok != 0,
-              " debris:", _hut_dress.get_child_count() > 0)
-        var hut_hit := _hut_tap(_hut_px())
-        await get_tree().process_frame
-        print("SMOKE crew tap:", hut_hit,
-              " sheet:", panel_mgr.top() is CrewSheet)
-        panel_mgr.close()
-        Game.crew["seconds_left"] = 0.0
-        Game.crew_tick()
-        _sync_crew_hut()
-        print("SMOKE crew ready chip:", _hut_ready)
-        var got := Game.crew_collect()
-        await get_tree().process_frame
-        print("SMOKE crew collect:",
-              got.get("keepsake", "") == &"grandpas_thermos",
-              " cleared:", _hut_dress.get_child_count() == 0)
-        # stage 1 = the crew lives there now — kitchen smoke wakes
-        print("SMOKE hut smoke on:", _amb != null and _amb._smoke_on)
-        # the keepsake ceremony is up now — tap through it so its light
-        # cue can't leak into the prep-phase checks below
-        for c in _ceremony_layer.get_children():
-            c._dismiss()
-        await get_tree().process_frame
-        # UI-034: the trail map — rows read site_card; whisper_river is
-        # locked behind the pinewatch journal until it completes, then a
-        # morning travel verb actually moves the sim site.  The scene
-        # rebuild happens through Transition.to_scene on the real path —
-        # smoke round-trips the sim instead so its own coroutine lives.
-        var ms := TrailMapSheet.make()
-        panel_mgr.open(ms)
-        await get_tree().process_frame
-        print("SMOKE map sheet:", panel_mgr.top() is TrailMapSheet,
-              " river locked:", not Game.site_reachable(&"whisper_river"))
-        panel_mgr.close()
-        Game.site_state(&"pinewatch")["pages_done"] = [1, 2, 3, 4, 5]
-        print("SMOKE travel:", Game.travel_to(&"whisper_river"),
-              " site:", String(Game.site_id) == "whisper_river")
-        Game.travel_to(&"pinewatch")         # round-trip home — scene
-                                             # keeps its pinewatch world
-        print("SMOKE travel back:",
-              String(Game.site_id) == "pinewatch",
-              " layout:", String(layout.get("site_id", ""))
-                  == "pinewatch")
-        _advance_phase()
-        await get_tree().process_frame
-        # §7 prep: the day's middle — errand decals spawn, a gather
-        # tap feeds the pantry, gear-gated spots hint instead of
-        # silently failing, the stray takes its daily pet
-        print("SMOKE prep phase:", Game.phase == Game.Phase.PREP,
-              " errand nodes:", _errand_nodes.size() > 0,
-              " spots:", _errand_anchors.size() == 2)
-        var fn0: Dictionary = Game.site_state()["forage_nodes"][0]
-        var nid0 := String(fn0["id"])
-        var pan0 := Game.pantry_count()
-        var gres := _prep_tap(Vector2(fn0["px"][0], fn0["px"][1]))
-        print("SMOKE gather:", gres == "gathered",
-              " pantry grew:", Game.pantry_count() > pan0,
-              " node faded:", not _errand_nodes.has(nid0))
-        var pp: Array = layout["errand_spots"]["pond"]
-        print("SMOKE pond locked:",
-              _prep_tap(Vector2(pp[0], pp[1])) == "locked")
-        var lp: Array = layout["errand_spots"]["lookout"]
-        print("SMOKE lookout locked:",
-              _prep_tap(Vector2(lp[0], lp[1])) == "locked")
-        print("SMOKE dog pet:", _prep_tap(_dog_pos) == "pet",
-              " pet_today:", bool(Game.dog.get("pet_today", false)))
-        # §9 rounds: the idle stray now walks his waypoint ring —
-        # walking swaps in the directional still, arrival swaps back
-        _dog_walk(_actor_map["dog"])
-        await get_tree().create_timer(0.2).timeout
-        print("SMOKE dog rounds:", _dog_walking,
-              " move still:", _dog_move.visible)
-        _actor_map["dog"].position = _dog_pos  # settle for the tap zone
-        _dog_move.visible = false
-        _dog_walking = false
-        # §9 adoption: Friend-level bond -> naming sheet -> the flag
-        # and the name persist via adopt_dog
-        Game.dog["bond"] = 30
-        _check_dog_adoption()
-        await get_tree().process_frame
-        await get_tree().process_frame
-        var ads := panel_mgr.top()
-        print("SMOKE adopt sheet:", ads is AdoptSheet)
-        if ads is AdoptSheet:
-            (ads as AdoptSheet).named.emit("Bean")
-            panel_mgr.close()            # emit path bypasses _confirm
-        print("SMOKE adopted:", Game.dog_adopted(),
-              " name:", String(Game.dog.get("name", "")) == "Bean")
-        # UI-035: pad flow — locked tap opens the row, Unlock pays and
-        # swaps to Clear, the transform runs then clear_pad lands
-        var st_pads: Dictionary = Game.site_state()["pads"]
-        var plock := ""
-        for p2 in pad_cells:
-            if not st_pads[p2].get("open", false):
-                plock = p2
-                break
-        Game.coins += 1600
-        var pad_menu_ok: bool = _prep_tap(
-            pad_cells[plock].get_center()) == "pad"
-        var mrow: Container = markers.marker_control(_pad_menu_tok)\
-            .get_child(0).get_child(0)
-        print("SMOKE pad menu:", pad_menu_ok,
-              " lock chip:", _pad_chips.has(plock))
-        mrow.get_child(0).emit_signal("pressed")   # Unlock · {p}c
-        var paid_ok: bool = st_pads[plock].get("paid", false)
-        mrow = markers.marker_control(_pad_menu_tok)\
-            .get_child(0).get_child(0)
-        mrow.get_child(0).emit_signal("pressed")   # Clear -> transform
-        await get_tree().create_timer(0.8).timeout
-        var pad_open_now: bool = st_pads[plock].get("open", false)
-        print("SMOKE pad unlock:", paid_ok,
-              " cleared:", pad_open_now,
-              " tuft freed:", pads_node.get_node_or_null(
-                  "tuft_" + plock) == null)
-        var pd_c: Array = Game.site_state()["pages_done"]
-        if 2 not in pd_c:
-            pd_c.append(2)                  # platform is the P2 offer
-        _prep_tap(pad_cells[plock].get_center())    # now: shelter row
-        var srow: Container = markers.marker_control(_pad_menu_tok)\
-            .get_child(0).get_child(0)
-        srow.get_child(0).emit_signal("pressed")    # Platform · 100c
-        print("SMOKE pad shelter:",
-              st_pads[plock].get("shelter", "bare") == "platform",
-              " overlay:", _pad_shelters.has(plock))
-        # UI-033: build mode — buy arms a ghost, drops charge + place,
-        # move/store roundtrip through the verbs, sprite follows sim
-        Game.coins += 60
-        var pd_b: Array = Game.site_state()["pages_done"]
-        if 1 not in pd_b:
-            pd_b.append(1)                  # stools/lantern are P1
-        _set_build(true)
-        _arm_build({"id": "stools", "kind": "buy", "idx": -1})
-        var fc: Array = Game.decor_cells_free()
-        var c0b: Vector2i = fc[0]
-        var px_a := _cell_px(c0b) + Vector2(CELL, CELL) / 2.0
-        var res_a := _build_tap(px_a)
-        var st_dec: Array = Game.site_state()["decor"]
-        print("SMOKE build place:", res_a == "placed",
-              " decor:", st_dec.size() == 1,
-              " sprite:", _decor_nodes.size() == 1)
-        _disarm_build()
-        var didx := st_dec.size() - 1
-        var c1b: Vector2i = fc[fc.size() - 1]   # a different free cell
-        _arm_build({"id": "stools", "kind": "move", "idx": didx})
-        var px_b := _cell_px(c1b) + Vector2(CELL, CELL) / 2.0
-        var res_b := _build_tap(px_b)
-        print("SMOKE decor move:", res_b == "placed",
-              " moved:", st_dec[didx]["cells"][0] == c1b)
-        _arm_build({"id": "stools", "kind": "stored", "idx": -1})
-        var res_c := _build_tap(Vector2(8, 8))   # far corner: illegal
-        print("SMOKE bad drop blocked:", res_c == "blocked")
-        _disarm_build()
-        var ok_st := Game.store_decor(didx)
-        _sync_decor_world()
-        print("SMOKE store:", ok_st,
-              " stored:", Game.site_state()["stored"].size() == 1,
-              " world cleared:", _decor_nodes.is_empty())
-        _arm_build({"id": "stools", "kind": "stored", "idx": -1})
-        var res_d := _build_tap(px_a)
-        print("SMOKE place_stored:", res_d == "placed",
-              " decor again:", st_dec.size() == 1)
-        _disarm_build()
-        _set_build(false)
-        _advance_phase()
-        await get_tree().process_frame
-        print("SMOKE head out -> evening:",
-              Game.phase == Game.Phase.EVENING,
-              " tray:", hud.tray.visible,
-              " marker cleared:", _board_tok == 0,
-              " errands cleared:", _errand_layer == null)
-    # UI-036: gear opens the §17.4 sheet; a toggle applies + persists
-    hud.settings_pressed.emit()
-    await _frames_until(func(): return panel_mgr.top() != null)
-    var ss := panel_mgr.top()
-    print("SMOKE settings sheet:", ss is SettingsSheet)
-    if ss is SettingsSheet:
-        var rm0: bool = UIFeel.reduced_motion
-        Game.setting("reduced_motion", not rm0)
-        print("SMOKE reduced_motion applied:",
-              UIFeel.reduced_motion == (not rm0),
-              " persisted:", bool(Game.settings["reduced_motion"])
-              == (not rm0))
-        Game.setting("reduced_motion", rm0)      # restore for later steps
-        panel_mgr.close()
-    # UI-032: the supply crate — sheet opens on the gear tab, a stamp
-    # unlocks a staple, the buy lands in the pantry and charges coins
-    hud.shop_pressed.emit()
-    await _frames_until(func(): return panel_mgr.top() != null)
-    var os := panel_mgr.top()
-    print("SMOKE outfitter sheet:", os is OutfitterSheet)
-    if os is OutfitterSheet:
-        Game.coins += 5
-        var pd: Array = Game.site_state()["pages_done"]
-        if 1 not in pd:
-            pd.append(1)                       # stamp p1: bread et al
-        var pan_n := Game.pantry_count()
-        var coins0 := Game.coins
-        var bought := Game.buy_staple("bread")
-        print("SMOKE buy staple:", bought,
-              " pantry:", Game.pantry_count() == pan_n + 1,
-              " charged:", Game.coins == coins0 - 5)
-        os._tab = "staples"
-        os._rebuild()
-        await get_tree().process_frame
-        print("SMOKE staples tab rows:",
-              os._v.get_child_count() > 0)
-        panel_mgr.close()
-    # UI-030: journal button opens the §8.3 sheet; tabs switch; the
-    # badge mirrors unread mail; days log gains a line per goodnight
-    var badge0 := Game.unread_letters().size()
-    print("SMOKE journal badge:", hud.journal_badge.text == (
-        str(badge0) if badge0 > 0 else ""))
-    hud.journal_pressed.emit()
-    await _frames_until(func(): return panel_mgr.top() != null)
-    var js := panel_mgr.top()
-    print("SMOKE journal sheet:", js is JournalSheet)
-    if js is JournalSheet:
-        var comp := Game.journal_completion()
-        print("SMOKE journal completion:",
-              comp["done"] >= 0 and comp["total"] > 0)
-        for tab in ["chapters", "letters", "days", "then_now"]:
-            js._select_tab(tab)
-            await get_tree().process_frame
-        print("SMOKE journal tabs:",
-              js._content.get_child_count() > 0)
-        # the gate must have opened: a welcomed guest tonight means
-        # mail exists for this site forever after (unconditional —
-        # the read loop below can legitimately empty on old saves)
-        print("SMOKE letter delivered:",
-              not Game.letters_for().is_empty())
-        # spec 005: opening a letter through the UI lights the warm
-        # lamp cue; the back button puts it out
-        js._select_tab("letters")
-        await get_tree().process_frame
-        var row_btns: Array = js._content.find_children(
-            "", "Button", true, false)
-        if not row_btns.is_empty():
-            row_btns[0].pressed.emit()
-            await get_tree().process_frame
-            print("SMOKE letter cue:",
-                  String(Game._light_cue.get("id", "")) == "letter")
-            var back: Array = js._content.find_children(
-                "", "Button", true, false)
-            back[0].pressed.emit()
-            await get_tree().process_frame
-            print("SMOKE letter cue cleared:",
-                  Game._light_cue.is_empty())
-        # D3.4: the days tab pins the Trail Daily card — locked pre-p06
-        # it still names the road; the letter flips it to a live entry
-        js._select_tab("days")
-        await get_tree().process_frame
-        var drows: Array = js._content.find_children(
-            "", "Button", true, false)
-        print("SMOKE daily card:", not drows.is_empty())
-        print("SMOKE daily locked:", not Game.daily_unlocked())
-        if not drows.is_empty():
-            drows[0].pressed.emit()
-            await _frames_until(
-                func(): return panel_mgr.top() != null)
-            var ds := panel_mgr.top()
-            print("SMOKE daily sheet:", ds is DailySheet)
-            panel_mgr.close()
-            await get_tree().process_frame
-            Game.site_state(&"pinewatch")[
-                "letters_delivered"].append("p06")
-            js._select_tab("days")
-            await get_tree().process_frame
-            var dl: Array = js._content.find_children(
-                "", "Label", true, false)
-            print("SMOKE daily unlocked row:", dl.any(
-                func(l): return l.text == tr("daily_open")))
-            drows = js._content.find_children(
-                "", "Button", true, false)
-            drows[0].pressed.emit()
-            await _frames_until(
-                func(): return panel_mgr.top() != null)
-            print("SMOKE daily board:",
-                  panel_mgr.top() is DailySheet)
-            panel_mgr.close()
-            await get_tree().process_frame
-        # read every staged unread letter — mornings deliver one each,
-        # so the run can carry more than one
-        var unread := Game.unread_letters()
-        for l in unread:
-            Game.read_letter(l["id"])
-        if not unread.is_empty():
-            print("SMOKE letter read:",
-                  unread.all(func(l): return l["id"] in Game.letters_read))
-        panel_mgr.close()
-        await get_tree().process_frame
-        print("SMOKE badge cleared:",
-              hud.journal_badge.text == "")
-    # spec 004: fusion tier — kind-compatible unknown pairs improvise;
-    # incompatible kinds still fall to Camp Mash; fusions stay out of
-    # the cookbook (recipes_cooked) but do log in pairs_tried
-    for k in {"perch": 1, "bread": 1, "mushroom": 1,
-            "berries": 1, "rice": 1, "coffee": 1}:
-        Game.pantry[k] = int(Game.pantry.get(k, 0)) + 1
-    var f1 := Game.cook("perch", "bread")     # fish+staple -> fry-up
-    var f2 := Game.cook("mushroom", "berries")# forage+forage -> mix
-    var f3 := Game.cook("rice", "coffee")     # staple+staple -> mash
-    print("SMOKE fusion fry-up:",
-          f1.get("recipe") == "improv_fryup",
-          " mix:", f2.get("recipe") == "foragers_mix",
-          " mash still:", f3.get("recipe") == "camp_mash")
-    print("SMOKE fusion not in book:",
-          "improv_fryup" not in Game.recipes_cooked,
-          " tried-logged:",
-          Game.pairs_tried.get("bread+perch") == "improv_fryup")
-    # commit-on-beat persistence: a verb marks dirty, the 1s tick or
-    # commit() flushes it — sleep is never the checkpoint (D-UI-8)
-    var sav_before := FileAccess.get_modified_time(
-        "user://savegame.json") \
-        if FileAccess.file_exists("user://savegame.json") else 0
-    Game.touch()
-    print("SMOKE save verb marks dirty:", Game._save_dirty)
-    Game.commit()
-    var sav_after := FileAccess.get_modified_time("user://savegame.json")
-    print("SMOKE save commit writes:",
-          not Game._save_dirty and sav_after >= sav_before)
-    get_tree().quit()
+    # QA choreography lives in scripts/qa_smoke.gd (SOTA split: prod
+    # scene owns world/HUD/FX, QaSmoke owns the --smoke drive). This
+    # stays the one-line entry the --smoke flag calls.
+    QaSmoke.run(self)
 
 
 ## Poll a condition each frame (cap ~4s) — tween timing varies headless.
+## Kept for callers; the body lives on QaSmoke with the rest of the drive.
 func _frames_until(cond: Callable, cap := 240) -> void:
-    for i in cap:
-        if cond.call():
-            return
-        await get_tree().process_frame
+    await QaSmoke.frames_until(self, cond, cap)
 
 
 # ------------------------------------------------------------- guests
@@ -2364,10 +1607,7 @@ func _spawn_board() -> void:
     var st: Dictionary = Game.site_state()
     selected = ""
     _meal_sel = -1
-    _press = {}
-    if _drag_ghost != null:
-        _drag_ghost.queue_free()
-        _drag_ghost = null
+    _input.reset_gesture()
     _clear_bubbles()
     hud.tray.visible = true
     # §5.2: a favourite reads gold once its dish has ever been cooked —
@@ -2535,20 +1775,7 @@ func _clear_bubbles() -> void:
 ## (world sprite or seated card) serves the plate.  Serving the same
 ## dish again takes it back.
 func _tap_meal(idx: int) -> void:
-    if _meal_sel == idx or idx < 0:
-        _meal_sel = -1
-        hud.tray.set_meal_selected(-1)
-        hud.tray.hide_strip()
-        if idx >= 0:
-            UIFeel.sfx("close")
-        return
-    _meal_sel = idx
-    hud.tray.set_meal_selected(idx)
-    hud.tray.show_meal(_ing_name_row("recipes",
-        String(Game.meals[idx].get("id", ""))))
-    UIFeel.sfx("pop")
-    UIFeel.haptic("press")
-
+    _input.tap_meal(idx)
 
 func _clear_served_mark(gid: String) -> void:
     if _served_marks.has(gid):
@@ -2557,130 +1784,38 @@ func _clear_served_mark(gid: String) -> void:
 
 
 func _serve_tap(gid: String) -> void:
-    var st: Dictionary = Game.site_state()
-    if _meal_sel < 0 or _meal_sel >= Game.meals.size():
-        _tap_meal(-1)
-        return
-    var mid := String(Game.meals[_meal_sel].get("id", ""))
-    var g: Node2D = guest_nodes.get(gid)
-    if String(st["served"].get(gid, "")) == mid:
-        Game.unserve(gid)
-        UIFeel.sfx("close")
-        _clear_served_mark(gid)
-    elif Game.serve_meal(gid, mid):
-        UIFeel.sfx("pop")
-        UIFeel.haptic("confirm")
-        _clear_served_mark(gid)
-        if g != null:
-            # the plate lands beside the guest's feet — a little dish
-            # on the ground, honest to the grid, no floating UI
-            var pair: Array = markers.icon_chip(g,
-                UIKit.icon_rect("bowl", UITokens.PAPER, 12),
-                Vector2(10, -10))
-            _served_marks[gid] = pair[0]
-            var fav := String(st["guests"].get(gid, {})
-                .get("favourite", ""))
-            if mid == fav and fav != "" \
-                    and Game.recipes_cooked.has(fav):
-                _float_chip(g, tr("tray_fav_served"), "heart")
-    else:
-        UIFeel.sfx("warn")
-        UIFeel.haptic("warn")
-    hud.tray.sync_served(st["served"], Game.meals)
-
+    _input.serve_tap(gid)
 
 ## Selection is the tap-tap path (UI-020): card tap -> previews +
 ## neutral strip; tap again to put the guest back.
 func _select(gid: String) -> void:
-    selected = gid
-    hud.tray.set_selected(gid)
-    hud.tray.show_guest_terms(Game.site_state()["guests"][gid],
-        tr("tray_pick_pad"))
-    _show_previews(gid)
-
+    _input.select(gid)
 
 func _deselect() -> void:
-    selected = ""
-    hud.tray.set_selected("")
-    hud.tray.hide_strip()
-    _clear_previews()
-
+    _input.deselect()
 
 func _tap_card(gid: String) -> void:
-    if Game.site_state()["assignments"].has(gid):
-        _do_unseat(gid)
-    elif gid == selected:
-        _deselect()
-    else:
-        _select(gid)
-
+    _input.tap_card(gid)
 
 func _try_seat(pid: String) -> void:
-    var st: Dictionary = Game.site_state()
-    var pick := _pads_for(selected, pid)
-    if pick.size() == int(st["guests"][selected].get("pads", 1)) \
-            and Game.seat(selected, pick):
-        UIFeel.haptic("confirm")
-        UIFeel.sfx("confirm")
-        _seat_visual(selected, pick)
-        _deselect()
-    else:
-        # tapped a pad but couldn't seat — wrong count or camp full;
-        # the card wobbles so the refusal lands on the thing tried
-        UIFeel.haptic("warn")
-        if not st["pads"].get(pid, {}).get("open", false):
-            _float_chip(pads_node.get_node("mark_" + pid),
-                tr("bld_not_prep"), "lock")
-        UIFeel.sfx("warn")
-        hud.tray.shake_card(selected)
-
+    _input.try_seat(pid)
 
 func _do_unseat(gid: String) -> void:
-    Game.unseat(gid)
-    _unseat_visual(gid)
-    _deselect()
-
+    _input.do_unseat(gid)
 
 ## Card press -> drag (UI-020): the guest sprite rides the pointer
 ## until release; release over a pad seats exactly like a tap-tap.
 func _begin_drag(gid: String) -> void:
-    _select(gid)
-    _drag_ghost = _anchored("characters/warden", "warden_south",
-        Vector2.ZERO)
-    _drag_ghost.modulate = _tint(Game.site_state()["guests"][gid])
-    _drag_ghost.modulate.a = 0.8
-    marks.add_child(_drag_ghost)
-    UIFeel.pop(_drag_ghost, Vector2(1.15, 0.8))   # pickup squash
-    UIFeel.sfx("pop")
-
+    _input.begin_drag(gid)
 
 func _end_drag(px: Vector2) -> void:
-    if _drag_ghost == null:
-        return
-    _drag_ghost.queue_free()
-    _drag_ghost = null
-    var pid := _pad_at(px)
-    if pid != "" and selected != "":
-        _try_seat(pid)
-
+    _input.end_drag(px)
 
 ## Live strip: while a guest is selected, hovering an open pad shows
 ## the full score breakdown; anywhere else it falls back to the
 ## guest's neutral trait list.
 func _update_strip(px: Vector2) -> void:
-    var gid := selected
-    if gid == "":
-        return
-    var st: Dictionary = Game.site_state()
-    var pid := _pad_at(px)
-    if pid != "" and st["pads"].get(pid, {}).get("open", false) \
-            and not _pad_occupied(pid):
-        var pick := _pads_for(gid, pid)
-        if pick.size() == int(st["guests"][gid].get("pads", 1)):
-            hud.tray.show_preview(Game.preview(gid, pick))
-            return
-    hud.tray.show_guest_terms(st["guests"][gid], tr("tray_pick_pad"))
-
+    _input.update_strip(px)
 
 ## Pad rings show on open pads with nobody seated — the tent itself
 ## is the occupied state (§5.1).
@@ -2696,70 +1831,16 @@ func _sync_marks() -> void:
 ## Pads a guest would take starting at pid — one, or pid plus its
 ## first free neighbour for a two-pad party.
 func _pads_for(gid: String, pid: String) -> Array:
-    var st: Dictionary = Game.site_state()
-    if int(st["guests"].get(gid, {}).get("pads", 1)) != 2:
-        return [pid]
-    for nb in layout["pads"]["neighbours"].get(pid, []):
-        if st["pads"].get(nb, {}).get("open", false) \
-                and not _pad_occupied(nb):
-            return [pid, nb]
-    return []
-
+    return _input.pads_for(gid, pid)
 
 func _show_previews(gid: String) -> void:
-    _clear_previews()
-    var st: Dictionary = Game.site_state()
-    var best_pid := ""
-    var best := -1
-    for pid in pad_cells:
-        if not st["pads"].get(pid, {}).get("open", false) \
-                or _pad_occupied(pid):
-            continue
-        var pick := _pads_for(gid, pid)
-        if pick.is_empty():
-            continue
-        var r := Game.preview(gid, pick)
-        if r.is_empty():
-            continue
-        if int(r["stars"]) > best:
-            best = int(r["stars"])
-            best_pid = pid
-        # star icon + number, comp-style
-        var m := Node2D.new()
-        m.position = pad_cells[pid].position + Vector2(18, 2)
-        var t := UIKit.icon_rect("star_full")
-        t.name = "Star"
-        m.add_child(t)
-        var l := UIKit.label_for("%d" % r["stars"],
-            UITokens.TypeRole.HEAD)
-        l.name = "Num"
-        l.position = Vector2(17, 2)
-        m.add_child(l)
-        star_labels[pid] = m
-        marks.add_child(m)
-    # assist mode: gild the best-scoring pad so the pick is obvious
-    # (numbers stay on every pad — this is emphasis, not hiding)
-    if bool(Game.settings.get("assist_mode", false)) \
-            and star_labels.has(best_pid):
-        var top: Node2D = star_labels[best_pid]
-        top.get_node("Star").modulate = UITokens.GOLD
-        top.get_node("Num").add_theme_color_override("font_color",
-            UITokens.GOLD)
-
+    _input.show_previews(gid)
 
 func _clear_previews() -> void:
-    for l in star_labels.values():
-        l.queue_free()
-    star_labels = {}
-
+    _input.clear_previews()
 
 func _pad_occupied(pid: String) -> bool:
-    var st: Dictionary = Game.site_state()
-    for pad_ids in st["assignments"].values():
-        if pid in pad_ids:
-            return true
-    return false
-
+    return _input.pad_occupied(pid)
 
 func _status() -> void:
     var st: Dictionary = Game.site_state()
@@ -3330,80 +2411,7 @@ func _clear_errands() -> void:
 ## PREP tap routing.  Returns a tag for the smoke harness; hit-test
 ## order is pads (fixed landmarks) -> forage -> pond -> lookout -> dog.
 func _prep_tap(px: Vector2) -> String:
-    var st: Dictionary = Game.site_state()
-    var pid := _pad_at(px)
-    if pid != "" and not _pad_clearing.has(pid):
-        _open_pad_menu(pid)
-        return "pad" if _pad_menu_pid != "" else ""
-    _close_pad_menu()                        # a tap elsewhere dismisses
-    for node in st["forage_nodes"]:
-        var nid := String(node["id"])
-        var spr: Node2D = _errand_nodes.get(nid)
-        if spr == null:
-            continue
-        if not Rect2(spr.position + Vector2(-20, -32),
-                Vector2(40, 40)).has_point(px):
-            continue
-        var got := Game.gather(nid)
-        if got.is_empty():
-            UIFeel.sfx("warn")
-            _float_chip(spr, tr("prep_pantry_full"), "leaf")
-            return "full"
-        UIFeel.sfx("pop")
-        UIFeel.haptic("press")
-        _float_chip(spr, _gain_text(got), "leaf")
-        if not st["forage_nodes"].any(func(n): return n["id"] == nid):
-            _free_errand(nid)                # cleaned out — husk fades
-        _status()                          # pantry count rides the HUD
-        return "gathered"
-    for fs in _fish_spots:
-        var water: Node2D = fs["node"]
-        if not Rect2(water.position - Vector2(28, 28),
-                Vector2(56, 56)).has_point(px):
-            continue
-        if "fishing_rod" not in Game.gear:
-            UIFeel.sfx("warn")
-            _float_chip(water, tr("prep_need_rod"), "fishing_rod")
-            return "locked"
-        var fish := Game.fish_catch(String(fs["spot"]))
-        if fish == "":
-            _float_chip(water, tr("prep_pond_rest"), "fish")
-            return "rested"
-        UIFeel.sfx("pop")
-        _float_chip(water, "+1 %s" % _ing_name(fish), "fish")
-        _status()
-        return "caught"
-    var look: Node2D = _errand_anchors.get("lookout")
-    if look != null and Rect2(look.position - Vector2(28, 28),
-            Vector2(56, 56)).has_point(px):
-        if "binoculars" not in Game.gear:
-            UIFeel.sfx("warn")
-            _float_chip(look, tr("prep_need_binocs"), "binoculars")
-            return "locked"
-        if not Game.can_spot():
-            _float_chip(look, tr("prep_spot_done"), "eye")
-            return "rested"
-        var r := Game.spot()
-        UIFeel.sfx("confirm")
-        var bird: Dictionary = r.get("bird", {})
-        _float_chip(look, tr("prep_spotted") % _ing_name_row(
-            "birds", String(bird.get("id", "")))
-            if not bird.is_empty() else tr("prep_birds_done"), "eye")
-        _sync_errand_nodes()                 # the bonus node lands live
-        return "spotted"
-    var dog: Node2D = _actor_map.get("dog")
-    if dog != null and Rect2(dog.position + Vector2(-26, -52),
-            Vector2(52, 58)).has_point(px):
-        if Game.dog_pet():
-            UIFeel.haptic("confirm")
-            UIFeel.sfx("confirm")
-            _float_chip(dog, "", "heart")
-            _sync_dog_chip()                 # paw chip retires for today
-            return "pet"
-        _float_chip(dog, tr("prep_dog_done"), "dog")
-        return "rested"
-    return ""
-
+    return _input.prep_tap(px)
 
 # ------------------------------------------------------------ the dog
 ## §9 rounds + adoption.  Rounds are view-only: a waypoint ring, a
@@ -3531,24 +2539,12 @@ const DECOR_SPRITE := {
 
 
 func _cell_px(c: Vector2i) -> Vector2:
-    return origin + Vector2(c) * CELL
-
+    return _input.cell_px(c)
 
 ## Footprint anchor: bottom-centre of the covered cells — the same
 ## convention every world prop uses.
 func _foot_anchor_px(cells: Array) -> Vector2:
-    var minx := 1e9
-    var maxx := -1e9
-    var maxy := -1e9
-    for c in cells:
-        var v: Vector2i = c if c is Vector2i \
-            else Vector2i(int(c[0]), int(c[1]))
-        minx = minf(minx, v.x)
-        maxx = maxf(maxx, v.x)
-        maxy = maxf(maxy, v.y)
-    return origin + Vector2((minx + maxx + 1.0) / 2.0,
-        maxy + 1.0) * CELL
-
+    return _input.foot_anchor_px(cells)
 
 ## Placed decor lives in the world permanently — rebuilt wholesale on
 ## any verb change (sets are small) so index keys always match the sim.
@@ -3603,93 +2599,23 @@ func _decor_row_for(item_id: String) -> Dictionary:
 ## Toggle from the HUD hammer.  Outside PREP the camp keeps working —
 ## a hint chip says why instead of silently ignoring.
 func _on_build_pressed() -> void:
-    if Game.phase != Game.Phase.PREP:
-        _hud_hint(tr("bld_not_prep"))
-        UIFeel.sfx("warn")
-        return
-    _set_build(not _build_on)
-
+    _input.on_build_pressed()
 
 func _set_build(on: bool) -> void:
-    if on == _build_on:
-        return
-    _build_on = on
-    hud.set_build_active(on)
-    _build_overlay.visible = on
-    if on:
-        _build_overlay.free_cells = Game.decor_cells_free(
-            int(_build_item.get("idx", -1)))
-        _build_overlay.queue_redraw()
-    else:
-        _disarm_build()
-        _close_piece_menu()
-
+    _input.set_build(on)
 
 ## {id, kind: buy|stored|move, idx} — arms the ghost.  move reuses the
 ## piece's own cells (ignore) so it can land where it already sits.
 func _arm_build(item: Dictionary) -> void:
-    _build_item = item
-    _set_build(true)
-    _close_piece_menu()
-    if _build_ghost != null:
-        _build_ghost.queue_free()
-        _build_ghost = null
-    var spec: Array = DECOR_SPRITE.get(String(item.get("id", "")), [])
-    if not spec.is_empty():
-        _build_ghost = _anchored(spec[0], spec[1], Vector2.ZERO)
-        _build_ghost.modulate = Color(1, 1, 1, 0.55)
-        _build_ghost.z_index = 6           # previews ride above pieces
-        world.add_child(_build_ghost)
-    var row := _decor_row_for(String(item.get("id", "")))
-    _build_item["want"] = 1 if String(row.get("size", "1x1")) == "1x1" \
-        else 2
-    if String(item.get("kind", "")) == "move":
-        var n: CanvasItem = _decor_nodes.get(int(item["idx"]))
-        if n != null:
-            n.modulate.a = 0.3           # the moving piece dims in place
-    _build_hint_show()
-
+    _input.arm_build(item)
 
 func _disarm_build() -> void:
-    if _build_ghost != null:
-        _build_ghost.queue_free()
-        _build_ghost = null
-    _build_item = {}
-    if _build_hint != 0:
-        markers.release(_build_hint)
-        _build_hint = 0
-    if _build_overlay != null:
-        _build_overlay.cand = []
-        _build_overlay.reach = 0
-        _build_overlay.queue_redraw()
-    _sync_decor_world()                  # lifts any mid-move dim
-
+    _input.disarm_build()
 
 ## The persistent twin of _float_chip — rides the armed ghost, says
 ## "{name} · {effect}" until the piece lands or the arm is cancelled.
 func _build_hint_show() -> void:
-    if _build_hint != 0:
-        markers.release(_build_hint)
-    if _build_ghost == null:
-        return
-    var row := _decor_row_for(String(_build_item.get("id", "")))
-    _build_hint = markers.marker(_build_ghost, Vector2(20, -58))
-    var chip := PanelContainer.new()
-    chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    chip.add_theme_stylebox_override("panel", UIKit.flat("glass_chip"))
-    var h := HBoxContainer.new()
-    h.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    h.add_theme_constant_override("separation", UITokens.SP1)
-    chip.add_child(h)
-    h.add_child(UIKit.icon_rect(
-        String(OutfitterSheet.DECOR_ICON.get(row.get("effect", ""),
-            "sparkle")), UITokens.GOLD, 12))
-    var l := UIKit.label_for("%s · %s" % [row.get("name", "?"),
-        OutfitterSheet.effect_text(row)],
-        UITokens.TypeRole.CAPTION, UITokens.PAPER)
-    h.add_child(l)
-    markers.marker_control(_build_hint).add_child(chip)
-
+    _input.build_hint_show()
 
 ## Screen-space nudge for "wrong phase" presses — same glass chip,
 ## pinned bottom-centre (no world anchor to ride).
@@ -3712,123 +2638,32 @@ func _hud_hint(text: String) -> void:
 
 ## Hand-off from the outfitter's Place button: sheet closes, PREP arms.
 func _on_place_requested(item_id: String, from_stored: bool) -> void:
-    if Game.phase != Game.Phase.PREP:
-        _hud_hint(tr("bld_not_prep"))
-        return                             # sheet stays open
-    panel_mgr.close()
-    _arm_build({"id": item_id,
-        "kind": "stored" if from_stored else "buy", "idx": -1})
-
+    _input.on_place_requested(item_id, from_stored)
 
 ## Pointer cell under the footprint rule: 1x1 snaps to the cell; 2x1
 ## picks the nearer horizontal pair, preferring a legal pair.
 func _footprint_at(px: Vector2) -> Array:
-    var c := Vector2i((px - origin) / CELL)
-    if int(_build_item.get("want", 1)) == 1:
-        return [c]
-    var right := [c, c + Vector2i(1, 0)]
-    var left := [c - Vector2i(1, 0), c]
-    var a: Array = right if px.distance_squared_to(
-        _foot_anchor_px(right)) <= px.distance_squared_to(
-        _foot_anchor_px(left)) else left
-    var b: Array = left if a == right else right
-    if Game.decor_placement_ok(String(_build_item["id"]), a,
-            int(_build_item.get("idx", -1))):
-        return a
-    return b
-
+    return _input.footprint_at(px)
 
 ## Motion: ghost snaps to the candidate, tinted by the real rule —
 ## green legal, red blocked; the reach ring previews coverage.
 func _ghost_to(px: Vector2) -> void:
-    if _build_ghost == null or _build_item.is_empty():
-        return
-    var cells := _footprint_at(px)
-    var ok := Game.decor_placement_ok(String(_build_item["id"]), cells,
-        int(_build_item.get("idx", -1)))
-    _build_ghost.position = _foot_anchor_px(cells)
-    _build_ghost.modulate = Color(0.55, 1.0, 0.6, 0.62) if ok \
-        else Color(1.0, 0.5, 0.45, 0.6)
-    var row := _decor_row_for(String(_build_item["id"]))
-    _build_overlay.cand = cells
-    _build_overlay.ok = ok
-    _build_overlay.reach = int(row.get("reach", 0))
-    _build_overlay.anchor = _build_ghost.position
-    _build_overlay.queue_redraw()
-
+    _input.ghost_to(px)
 
 ## Build-mode tap.  Armed -> place attempt; else piece taps open the
 ## Move/Store/Return context row.  Returns a tag for the smoke.
 func _build_tap(px: Vector2) -> String:
-    if not _build_item.is_empty():
-        return _try_place(px)
-    var idx := _decor_idx_at(px)
-    if idx >= 0:
-        _open_piece_menu(idx)
-        return "menu"
-    _close_piece_menu()
-    return ""
-
+    return _input.build_tap(px)
 
 func _try_place(px: Vector2) -> String:
-    var cells := _footprint_at(px)
-    var id := String(_build_item["id"])
-    var idx := int(_build_item.get("idx", -1))
-    if not Game.decor_placement_ok(id, cells, idx):
-        _ghost_wobble()
-        UIFeel.sfx("warn")
-        return "blocked"
-    var kind := String(_build_item["kind"])
-    var done := false
-    match kind:
-        "buy":    done = Game.buy_decor(id, cells)
-        "stored": done = Game.place_stored(id, cells)
-        "move":   done = Game.move_decor(idx, cells)
-    if not done:
-        _ghost_wobble()
-        UIFeel.sfx("warn")
-        return "blocked"
-    UIFeel.sfx("stamp")
-    UIFeel.haptic("confirm")
-    _sync_decor_world()
-    _build_overlay.free_cells = Game.decor_cells_free()
-    _build_overlay.queue_redraw()
-    _status()                            # coins pill / seat count
-    # stay armed while the same buy is still possible — stools come in
-    # twos; stored stays armed while another of that id is packed away
-    var row := _decor_row_for(id)
-    var again := false
-    if kind == "buy":
-        again = Game.coins >= int(row.get("price", 0)) \
-            and Game.is_unlocked(String(row.get("unlock", "")))
-    elif kind == "stored":
-        again = Game.site_state()["stored"].any(
-            func(d): return d["id"] == id)
-    if not again:
-        _disarm_build()
-    return "placed"
-
+    return _input.try_place(px)
 
 ## Wobble rejection — the ghost rocks and nothing else happens.
 func _ghost_wobble() -> void:
-    if _build_ghost == null:
-        return
-    var tw := create_tween()
-    UIFeel.apply(tw, "shake")
-    tw.tween_property(_build_ghost, "rotation", 0.07, 0.05)
-    tw.tween_property(_build_ghost, "rotation", -0.07, 0.08)
-    tw.tween_property(_build_ghost, "rotation", 0.0, 0.06)
-
+    _input.ghost_wobble()
 
 func _decor_idx_at(px: Vector2) -> int:
-    for i in _decor_nodes:
-        var s: Node2D = _decor_nodes[i]
-        # prop art anchors bottom-centre; the body stands above it
-        if Rect2(s.position + Vector2(-28, -52),
-                Vector2(56, 58)).has_point(px):
-            return i
-    return -1
-
+    return _input.decor_idx_at(px)
 
 ## Context row on a tapped piece: Move re-arms the ghost with kind
 ## "move", Store packs it, today's buys return for the full price.
@@ -4111,12 +2946,7 @@ func _crew_stage(sid: String) -> int:
 
 
 func _hut_px() -> Vector2:
-    var plots: Array = layout.get("crew_plots", [])
-    for p in plots:
-        if p.get("kind") == "structure" and p.has("px"):
-            return Vector2(p["px"][0], p["px"][1])
-    return _hut.position if _hut != null else Vector2.ZERO
-
+    return _input.hut_px()
 
 ## The hut is anonymous scenery until the crew engages (day-2 start or
 ## any collected stage) — a "!" on a ruin the player was never told
@@ -4128,8 +2958,7 @@ func _hut_engaged() -> bool:
 
 
 func _hut_rect() -> Rect2:
-    return Rect2(_hut_px() + Vector2(-46, -66), Vector2(98, 78))
-
+    return _input.hut_rect()
 
 func _open_crew() -> void:
     panel_mgr.open(CrewSheet.make())
@@ -4150,12 +2979,13 @@ func _on_travel(site: StringName) -> void:
 
 
 func _hut_tap(px: Vector2) -> bool:
-    if _hut == null or not _hut_engaged() \
-            or not _hut_rect().has_point(px):
-        return false
-    UIFeel.sfx("open")
-    _open_crew()
-    return true
+    return _input.hut_tap(px)
+
+func _painted_map() -> bool:
+    ## True when the site ships a PixelLab object layer — authored art
+    ## owns static props, so runtime sprite stand-ins stay hidden.
+    return FileAccess.file_exists(
+        "res://assets/%s/objects.json" % _site_id)
 
 
 ## Idempotent state->view pass: debris + dim by stage, porch glow once
@@ -4173,15 +3003,18 @@ func _sync_crew_hut(animate := false) -> void:
     # stage art swap (Batch H): the sprite itself carries the state —
     # ruin -> cleared -> roof fixed -> restored cabin.  A lit-window
     # night variant lands at dusk once the hut is whole again.
-    var day_tex: String = HUT_STAGES[mini(stage,
-        HUT_STAGES.size() - 1)]
-    var want := String(day_tex)
-    if restored and Game.phase in [Game.Phase.EVENING,
-            Game.Phase.NIGHT] and ResourceLoader.exists(
-            A + "props_large/cabin_night.png"):
-        want = "cabin_night"
-    if ResourceLoader.exists(A + "props_large/%s.png" % want):
-        _hut.texture = _tex("props_large/" + want)
+    # Painted maps: the authored house is the visual; no sprite swaps.
+    var painted := _painted_map()
+    if not painted:
+        var day_tex: String = HUT_STAGES[mini(stage,
+            HUT_STAGES.size() - 1)]
+        var want := String(day_tex)
+        if restored and Game.phase in [Game.Phase.EVENING,
+                Game.Phase.NIGHT] and ResourceLoader.exists(
+                A + "props_large/cabin_night.png"):
+            want = "cabin_night"
+        if ResourceLoader.exists(A + "props_large/%s.png" % want):
+            _hut.texture = _tex("props_large/" + want)
     if _hut_dress != null:
         var old := _hut_dress
         _hut_dress = null
@@ -4201,7 +3034,7 @@ func _sync_crew_hut(animate := false) -> void:
     _hut_dress.position = _hut_px()          # sorts with the hut itself
     world.add_child(_hut_dress)
     _hut.modulate = Color.WHITE              # sprite carries state
-    if stage == 0:
+    if stage == 0 and not painted:
         # ruin reads through the litter on its footprint
         for spec in [["props_medium", "debris_brambles", -26, 8],
                 ["props_medium", "debris_branch_pile", 20, 12],
@@ -4249,185 +3082,20 @@ func _sync_crew_hut(animate := false) -> void:
 # ------------------------------------------------------------- input
 
 func _pad_at(px: Vector2) -> String:
-    for pid in pad_cells:
-        if pad_cells[pid].has_point(px):
-            return pid
-    return ""
-
+    return _input.pad_at(px)
 
 func _guest_at(px: Vector2) -> String:
-    for gid in guest_nodes:
-        var g: Node2D = guest_nodes[gid]
-        # 64px sprite sits above the feet anchor; the label hangs below
-        if Rect2(g.global_position - Vector2(40, 64),
-                Vector2(80, 100)).has_point(px):
-            return gid
-    return ""
-
+    return _input.guest_at(px)
 
 func _unhandled_input(event: InputEvent) -> void:
-    var st: Dictionary = Game.site_state()
-    # --- view pan (D-ARCH-8): touch drag on the map; middle/right
-    # drag on desktop.  A card press owns its finger first — panning
-    # never steals a guest drag, and panning cancels a pending card
-    # press so release can't tap it.
-    if event is InputEventScreenTouch:
-        return                         # taps ride the emulated mouse
-    if event is InputEventScreenDrag:
-        if _drag_ghost != null or not _press.is_empty():
-            return                     # a card/guest owns the gesture
-        _cam -= event.relative
-        _fit_stage()
-        return
-    if event is InputEventMouseButton \
-            and event.button_index in [MOUSE_BUTTON_MIDDLE,
-                MOUSE_BUTTON_RIGHT]:
-        _mb_pan = event.pressed
-        return
-    if event is InputEventMouseMotion:
-        _wake_chrome()
-        if _mb_pan:
-            _cam -= event.relative
-            _fit_stage()
-            return
-        var sp: Vector2 = event.position              # viewport px (cards)
-        var px: Vector2 = event.position - stage.position
-        _fire_near(px.distance_to(_fire_pos) <= 56.0)
-        if _build_on and not _build_item.is_empty() \
-                and Game.phase == Game.Phase.PREP:
-            _ghost_to(px)
-        if not evening_open:
-            return                                    # night: watch the fire
-        # a card press that travels >7px becomes a drag (UI-020)
-        if not _press.is_empty() and _drag_ghost == null \
-                and not hud.tray.is_seated(_press["gid"]) \
-                and sp.distance_to(_press["pos"]) > TAP_SLOP:
-            _begin_drag(_press["gid"])
-            _press = {}
-        var pid := _pad_at(px)
-        var ok: bool = pid != "" \
-            and st["pads"].get(pid, {}).get("open", false) == true \
-            and not _pad_occupied(pid) and selected != ""
-        hover.visible = ok
-        if ok:
-            hover.position = pad_cells[pid].position
-        if _drag_ghost != null:
-            # §5.9: no spring to settle — round every frame so the
-            # ghost keeps texel phase and sub-px pointer creep holds
-            _drag_ghost.position = (px + Vector2(0, 4)).round()
-        _update_strip(px)
-        return
-    # --- tap lane (D-ARCH-8): NOTHING commits on press.  A press arms
-    # a candidate tap; release inside TAP_SLOP commits it, travel past
-    # slop (a pan, a card drag) eats it.  This is the platform's own
-    # law — the emulated-mouse press lands before the first drag event,
-    # so deferring is the only place a tap-vs-pan can be told apart.
-    if event is InputEventMouseButton \
-            and event.button_index == MOUSE_BUTTON_LEFT:
-        # event.position IS the pointer — the canvas-transformed view
-        # coord on every platform (mouse, emulated touch, synthetic
-        # tests); get_global_mouse_position() can't see synthetic input
-        var sp: Vector2 = event.position              # viewport px (cards)
-        var mpx := sp                                 # viewport px (world)
-        var px := mpx - stage.position
-        _fire_near(px.distance_to(_fire_pos) <= 56.0)
-        if event.pressed:
-            _tap_armed = true
-            _tap_origin = sp
-            # card presses defer to release — they may become drags
-            if evening_open:
-                var card_gid := hud.tray.card_at(sp)
-                if card_gid != "":
-                    _press = {"gid": card_gid, "pos": sp}
-            # press-time FEEDBACK stays instant: hover ring under the
-            # finger, like a button highlight (commit rides release)
-            if evening_open and selected != "":
-                var hpid := _pad_at(px)
-                var hok: bool = hpid != "" \
-                    and st["pads"].get(hpid, {}).get("open", false) \
-                        == true and not _pad_occupied(hpid)
-                hover.visible = hok
-                if hok:
-                    hover.position = pad_cells[hpid].position
-            return
-        # release ------------------------------------------------------------
-        var was_tap := _tap_armed \
-            and sp.distance_to(_tap_origin) <= TAP_SLOP
-        _tap_armed = false
-        if _drag_ghost != null:
-            _end_drag(px)
-            return
-        if not _press.is_empty():
-            var p: Dictionary = _press
-            _press = {}
-            if hud.tray.card_at(sp) == p["gid"]:
-                if _meal_sel >= 0 \
-                        and hud.tray.is_seated(p["gid"]):
-                    _serve_tap(p["gid"])     # card lane serves too
-                else:
-                    _tap_card(p["gid"])
-            return
-        if was_tap:
-            _commit_map_tap(sp, mpx, px)
-        return
-    if event is InputEventKey and event.pressed:
-        if event.keycode == KEY_ENTER:
-            _advance_phase()
-        elif event.keycode == KEY_F1:
-            hud.toggle_dev()
-
+    _input.unhandled(event)
 
 ## The commit side of the tap lane — runs only on release inside
 ## TAP_SLOP.  Same hit-test order the old press path used: morning +
 ## prep answer board/hut/camp work; the evening lane answers meal
 ## chips, seated guests, then pad seating; night stays a spectator.
 func _commit_map_tap(sp: Vector2, mpx: Vector2, px: Vector2) -> void:
-    var st: Dictionary = Game.site_state()
-    if Game.phase in [Game.Phase.MORNING, Game.Phase.PREP]:
-        # the notice board stays readable (tonight's favourites steer
-        # what you gather); prep adds errand taps
-        if _board_rect.has_point(px):
-            _open_booking()
-            return
-        if _hut_tap(px):                    # the hut answers in any phase
-            return
-        if Game.phase == Game.Phase.PREP:
-            # build mode owns prep taps; armed ghost = every tap is a
-            # drop attempt, unarmed = piece menus / errand pass
-            if _build_on:
-                _build_tap(px)
-            else:
-                _prep_tap(px)
-        else:
-            # morning: locked pads still answer taps — camp work is a
-            # Prep job, said out loud instead of silence
-            var mpid := _pad_at(px)
-            if mpid != "" and not st["pads"].get(mpid, {})\
-                    .get("open", false):
-                _float_chip(pads_node.get_node("mark_" + mpid),
-                    tr("bld_not_prep"), "lock")
-        return
-    if not evening_open:
-        return                                        # night: watch the fire
-    var mi := hud.tray.meal_at(sp)
-    if mi >= 0:
-        _tap_meal(mi)
-        return
-    var gid := _guest_at(mpx)
-    if gid != "" and st["assignments"].has(gid):
-        if _meal_sel >= 0:
-            _serve_tap(gid)                  # armed meal beats unseat
-        else:
-            _do_unseat(gid)                  # tap seated guest = undo
-        return
-    var pid := _pad_at(px)
-    if pid != "" and selected != "":
-        _try_seat(pid)
-    elif _hut_tap(px):               # crew sheet from the world too
-        pass
-    elif _meal_sel >= 0:
-        _tap_meal(-1)                        # empty ground disarms
-
+    _input.commit_map_tap(sp, mpx, px)
 
 # ------------------------------------------------------------- classes
 
@@ -4462,32 +3130,3 @@ class BuildGrid:
                     Vector2(cell_px, cell_px)), cc, true)
 
 
-## Mask-drawn ground for sites without a baked render (UI-034 v1
-## dressing): flat cells with seeded brightness jitter so the field
-## doesn't band, and a dark rim where grass meets water — the shore
-## edge cue the painted map carries baked-in.  Props/scatter do the
-## rest of the dressing on top.
-class GroundPaint:
-    extends Node2D
-
-    var mask: Array = []
-    var t := 32.0
-
-    const PAL := {"G": Color(0.42, 0.55, 0.34),
-                  "D": Color(0.58, 0.47, 0.31),
-                  "W": Color(0.28, 0.44, 0.50)}
-
-    func _draw() -> void:
-        var rng := RandomNumberGenerator.new()
-        rng.seed = 41
-        for y in mask.size():
-            var row := String(mask[y])
-            for x in row.length():
-                var c: Color = PAL.get(row[x], PAL["G"])
-                c = c.lightened(rng.randf_range(-0.035, 0.035))
-                draw_rect(Rect2(x * t, y * t, t, t), c, true)
-                # water reads a bank edge on its north rim
-                if row[x] == "W" and (y == 0
-                        or String(mask[y - 1])[x] != "W"):
-                    draw_rect(Rect2(x * t, y * t, t, 5.0),
-                        Color(0.15, 0.22, 0.20, 0.55), true)

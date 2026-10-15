@@ -1,0 +1,25 @@
+{
+  "id": "travel_day",
+  "title": "Travel: morning trip swaps site state cleanly",
+  "site": "pinewatch",
+  "seed": 17,
+  "setup": {
+    "coins": 200,
+    "day": 3,
+    "phase": 2,
+    "sites_visited": { "pinewatch": 0, "whisper_river": 0 }
+  },
+  "steps": [
+    { "op": "expect", "site_id": "pinewatch" },
+    { "op": "travel", "site": "whisper_river" },
+    { "op": "expect", "site_id": "whisper_river",
+        "site.guests.count": 0, "site.assignments.count": 0 },
+    { "op": "travel", "site": "pinewatch" },
+    { "op": "expect", "site_id": "pinewatch" }
+  ],
+  "expect": {
+    "site_id": "pinewatch",
+    "coins": 200
+  },
+  "twice": true
+}
