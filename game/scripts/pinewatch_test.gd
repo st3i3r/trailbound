@@ -20,6 +20,9 @@ extends Node2D
 const A := "res://assets/pinewatch/"
 const T := 32                                # tile px
 const CELL := 64                             # pad cell px
+const TAP_SLOP := 7.0                        # px of finger travel that
+                                             # turns a press into a pan —
+                                             # ~Android scaledTouchSlop
 var GW := 20                                 # ground dims follow the
 var GH := 12                                 # active site mask (pinewatch
                                              # is 22x14; river/valley 20x12)
@@ -242,6 +245,8 @@ var stage: Node2D                            # all world layers — centred on
                                              # wide viewports (aspect=expand)
 var _cam := Vector2.ZERO                     # view offset into the stage px
 var _mb_pan := false                         # mid/right mouse drag owns it
+var _tap_armed := false                      # a press is a candidate tap
+var _tap_origin := Vector2.ZERO              # until finger-up clears slop
 var scatter: Node2D
 var pads_node: Node2D
 var shadows: Node2D                          # Phase 5.0 light model —
@@ -4238,7 +4243,7 @@ func _unhandled_input(event: InputEvent) -> void:
             _fit_stage()
             return
         var sp: Vector2 = event.position              # viewport px (cards)
-        var px := get_global_mouse_position() - stage.position
+        var px: Vector2 = event.position - stage.position
         _fire_near(px.distance_to(_fire_pos) <= 56.0)
         if _build_on and not _build_item.is_empty() \
                 and Game.phase == Game.Phase.PREP:
@@ -4248,7 +4253,7 @@ func _unhandled_input(event: InputEvent) -> void:
         # a card press that travels >7px becomes a drag (UI-020)
         if not _press.is_empty() and _drag_ghost == null \
                 and not hud.tray.is_seated(_press["gid"]) \
-                and sp.distance_to(_press["pos"]) > 7.0:
+                and sp.distance_to(_press["pos"]) > TAP_SLOP:
             _begin_drag(_press["gid"])
             _press = {}
         var pid := _pad_at(px)
@@ -4264,82 +4269,116 @@ func _unhandled_input(event: InputEvent) -> void:
             _drag_ghost.position = (px + Vector2(0, 4)).round()
         _update_strip(px)
         return
-    if event is InputEventMouseButton and event.pressed \
-            and Game.phase in [Game.Phase.MORNING, Game.Phase.PREP]:
-        # morning + prep: the notice board stays readable (tonight's
-        # favourites steer what you gather); prep adds errand taps
-        var px0 := get_global_mouse_position() - stage.position
-        if _board_rect.has_point(px0):
+    # --- tap lane (D-ARCH-8): NOTHING commits on press.  A press arms
+    # a candidate tap; release inside TAP_SLOP commits it, travel past
+    # slop (a pan, a card drag) eats it.  This is the platform's own
+    # law — the emulated-mouse press lands before the first drag event,
+    # so deferring is the only place a tap-vs-pan can be told apart.
+    if event is InputEventMouseButton \
+            and event.button_index == MOUSE_BUTTON_LEFT:
+        # event.position IS the pointer — the canvas-transformed view
+        # coord on every platform (mouse, emulated touch, synthetic
+        # tests); get_global_mouse_position() can't see synthetic input
+        var sp: Vector2 = event.position              # viewport px (cards)
+        var mpx := sp                                 # viewport px (world)
+        var px := mpx - stage.position
+        _fire_near(px.distance_to(_fire_pos) <= 56.0)
+        if event.pressed:
+            _tap_armed = true
+            _tap_origin = sp
+            # card presses defer to release — they may become drags
+            if evening_open:
+                var card_gid := hud.tray.card_at(sp)
+                if card_gid != "":
+                    _press = {"gid": card_gid, "pos": sp}
+            # press-time FEEDBACK stays instant: hover ring under the
+            # finger, like a button highlight (commit rides release)
+            if evening_open and selected != "":
+                var hpid := _pad_at(px)
+                var hok: bool = hpid != "" \
+                    and st["pads"].get(hpid, {}).get("open", false) \
+                        == true and not _pad_occupied(hpid)
+                hover.visible = hok
+                if hok:
+                    hover.position = pad_cells[hpid].position
+            return
+        # release ------------------------------------------------------------
+        var was_tap := _tap_armed \
+            and sp.distance_to(_tap_origin) <= TAP_SLOP
+        _tap_armed = false
+        if _drag_ghost != null:
+            _end_drag(px)
+            return
+        if not _press.is_empty():
+            var p: Dictionary = _press
+            _press = {}
+            if hud.tray.card_at(sp) == p["gid"]:
+                if _meal_sel >= 0 \
+                        and hud.tray.is_seated(p["gid"]):
+                    _serve_tap(p["gid"])     # card lane serves too
+                else:
+                    _tap_card(p["gid"])
+            return
+        if was_tap:
+            _commit_map_tap(sp, mpx, px)
+        return
+    if event is InputEventKey and event.pressed:
+        if event.keycode == KEY_ENTER:
+            _advance_phase()
+        elif event.keycode == KEY_F1:
+            hud.toggle_dev()
+
+
+## The commit side of the tap lane — runs only on release inside
+## TAP_SLOP.  Same hit-test order the old press path used: morning +
+## prep answer board/hut/camp work; the evening lane answers meal
+## chips, seated guests, then pad seating; night stays a spectator.
+func _commit_map_tap(sp: Vector2, mpx: Vector2, px: Vector2) -> void:
+    var st: Dictionary = Game.site_state()
+    if Game.phase in [Game.Phase.MORNING, Game.Phase.PREP]:
+        # the notice board stays readable (tonight's favourites steer
+        # what you gather); prep adds errand taps
+        if _board_rect.has_point(px):
             _open_booking()
             return
-        if _hut_tap(px0):                # the hut answers in any phase
+        if _hut_tap(px):                    # the hut answers in any phase
             return
         if Game.phase == Game.Phase.PREP:
             # build mode owns prep taps; armed ghost = every tap is a
             # drop attempt, unarmed = piece menus / errand pass
             if _build_on:
-                _build_tap(px0)
+                _build_tap(px)
             else:
-                _prep_tap(px0)
+                _prep_tap(px)
         else:
-            # morning: locked pads still answer taps — camp work is
-            # a Prep job, said out loud instead of silence
-            var mpid := _pad_at(px0)
+            # morning: locked pads still answer taps — camp work is a
+            # Prep job, said out loud instead of silence
+            var mpid := _pad_at(px)
             if mpid != "" and not st["pads"].get(mpid, {})\
                     .get("open", false):
                 _float_chip(pads_node.get_node("mark_" + mpid),
                     tr("bld_not_prep"), "lock")
         return
-    if not evening_open and event is InputEventMouseButton:
+    if not evening_open:
         return                                        # night: watch the fire
-    if event is InputEventMouseButton \
-            and event.button_index == MOUSE_BUTTON_LEFT:
-        var sp: Vector2 = event.position              # viewport px (cards)
-        var mpx := get_global_mouse_position()
-        var px := mpx - stage.position
-        _fire_near(px.distance_to(_fire_pos) <= 56.0)
-        if event.pressed:
-            # meal chips arm a serve — press-handled, no drag pass
-            var mi := hud.tray.meal_at(sp)
-            if mi >= 0:
-                _tap_meal(mi)
-                return
-            # card presses defer to release — they may become drags
-            var card_gid := hud.tray.card_at(sp)
-            if card_gid != "":
-                _press = {"gid": card_gid, "pos": sp}
-                return
-            var gid := _guest_at(mpx)
-            if gid != "" and st["assignments"].has(gid):
-                if _meal_sel >= 0:
-                    _serve_tap(gid)          # armed meal beats unseat
-                else:
-                    _do_unseat(gid)          # tap seated guest = undo
-                return
-            var pid := _pad_at(px)
-            if pid != "" and selected != "":
-                _try_seat(pid)
-            elif _hut_tap(px):           # crew sheet from the world too
-                pass
-            elif _meal_sel >= 0:
-                _tap_meal(-1)                # empty ground disarms
+    var mi := hud.tray.meal_at(sp)
+    if mi >= 0:
+        _tap_meal(mi)
+        return
+    var gid := _guest_at(mpx)
+    if gid != "" and st["assignments"].has(gid):
+        if _meal_sel >= 0:
+            _serve_tap(gid)                  # armed meal beats unseat
         else:
-            if _drag_ghost != null:
-                _end_drag(px)
-            elif not _press.is_empty():
-                var p: Dictionary = _press
-                _press = {}
-                if hud.tray.card_at(sp) == p["gid"]:
-                    if _meal_sel >= 0 \
-                            and hud.tray.is_seated(p["gid"]):
-                        _serve_tap(p["gid"]) # card lane serves too
-                    else:
-                        _tap_card(p["gid"])
-    elif event is InputEventKey and event.pressed:
-        if event.keycode == KEY_ENTER:
-            _advance_phase()
-        elif event.keycode == KEY_F1:
-            hud.toggle_dev()
+            _do_unseat(gid)                  # tap seated guest = undo
+        return
+    var pid := _pad_at(px)
+    if pid != "" and selected != "":
+        _try_seat(pid)
+    elif _hut_tap(px):               # crew sheet from the world too
+        pass
+    elif _meal_sel >= 0:
+        _tap_meal(-1)                        # empty ground disarms
 
 
 # ------------------------------------------------------------- classes
