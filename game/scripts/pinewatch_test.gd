@@ -25,68 +25,14 @@ var GH := 12                                 # active site mask (pinewatch
                                              # is 22x14; river/valley 20x12)
 # ---------------------------------------------------------------- terrain
 # Painted ground (PixelLab map-base export, terrain only): zones and
-# transitions are baked art, no wang tilemap at runtime.  MASK mirrors
-# the baked zones for gameplay/scatter logic only.
+# transitions are baked art, no wang tilemap at runtime.  The mask that
+# mirrors the baked zones for gameplay/scatter logic lives in the site
+# layout JSON (layouts/<site>.json "mask"; tools/import_map.tscn
+# regenerates it from a PixelLab export).
 #   D = packed earth (road band, court plaza, yard)
 #   G = fresh grass   W = pond water
 # Per-site: sites without a baked ground draw _mask procedurally
 # (_build_ground fallback), so the mask IS the map there.
-## Pinewatch v17 — PixelLab map 819843d7 crop x0..21,y0..13 (22x14):
-## pond west with waterfall notch top-left, packed-earth road band
-## north-east to the gate + east lane down to the south exit, fire
-## court plaza centre-south with an interior grass island, canopy wall
-## along the north edge, hut anchored inside the court's east lobe.
-const MASK_PINEWATCH := [
-    "GGGGWWWWGGGGGGGGGGGGGG",
-    "GGGGWWWWGGGGGGGGGGGGGG",
-    "GGGWWWWWGGGDDDDDDDDDDD",
-    "GGGWWWWWGGDDDDDDDDDDDD",
-    "GGWWWWWGGGGGGGGGGGGGDD",
-    "WWWWWWWGGGGGGGGGGGGGDD",
-    "WWWWWWWGGGGGGGGGGGGGDD",
-    "WWWWWWGGGGGGGGGGGGGGDD",
-    "WWWWWGGDDDDGDDDDGGGGDD",
-    "WWWWWGGDDDDDDDDDGGGGDD",
-    "WWWGGGGDDDDDDDDDGGGGDD",
-    "WWGGGGDGGDDDDDDDGGGGDD",
-    "GGGGGDDDDDDDDDDDGGGGDD",
-    "GGGGGGGDDDDDDDDDGGGGDD",
-]
-
-## Whisper River (v1 dressing): pads ring a north fire yard; the river
-## fills the south edge under the bank-row pads; no hut yard — the
-## boathouse plot is the crew structure anchor for vol 2.
-const MASK_WHISPER := [
-    "GGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGDDDDDGGGGGGGGG",
-    "GGGGGGDDDDDGGGGGGGGG",
-    "GGGGGGGDDDGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGG",
-    "WWWWWWWWWWWWWWWWWWWW",
-    "WWWWWWWWWWWWWWWWWWWW",
-]
-
-## Lantern Valley (v1 dressing): compact north camp, terraces fall away
-## to the south — the last two tile rows read as the rocky drop edge.
-const MASK_LANTERN := [
-    "GGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGDDDDDGGGGGGGGG",
-    "GGGGGGDDDDDGGGGGGGGG",
-    "GGGGGGGDDDGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGG",
-    "DDDDDDDDDDDDDDDDDDDD",
-    "DDDDDDDDDDDDDDDDDDDD",
-]
 
 ## Site stage anchors: the fire/dog/notice-board positions are authored
 ## against each site's dressing — the layout supplies cells + errand
@@ -98,12 +44,6 @@ const SITE_STAGE := {
         "board": Rect2(46, 222, 40, 46)},
     "lantern_valley": {"fire": Vector2(288, 192), "dog": Vector2(352, 238),
         "board": Rect2(500, 284, 40, 46)},
-}
-
-const SITE_MASKS := {
-    "pinewatch": MASK_PINEWATCH,
-    "whisper_river": MASK_WHISPER,
-    "lantern_valley": MASK_LANTERN,
 }
 
 # ------------------------------------------------------------- prop comp
@@ -289,7 +229,8 @@ var pad_cells := {}                          # pid -> Rect2 (px)
 # site: layout/mask/props/stage anchors all key off Game.site_id, and
 # travel_to() lands through a scene reload (Transition.to_scene).
 var _site_id := "pinewatch"
-var _mask: Array = MASK_PINEWATCH            # scatter/placement guard
+var _mask: Array = []                      # scatter/placement guard —
+                                           # set from layout in _ready
 var _props: Array = PROPS_PINEWATCH          # dressing table
 var _fire_pos := Vector2(368, 236)           # fire-loop anchor
 var _dog_pos := Vector2(420, 322)            # stray's lounge spot
@@ -472,7 +413,9 @@ func _ready() -> void:
     layout = Catalog.data["layouts"].get(_site_id,
         Catalog.data["layouts"]["pinewatch"])
     _site_id = String(layout.get("site_id", "pinewatch"))
-    _mask = SITE_MASKS.get(_site_id, MASK_PINEWATCH)
+    _mask = layout.get("mask", [])
+    assert(not _mask.is_empty(),
+        "layout %s has no mask rows" % _site_id)
     GW = _mask[0].length()                   # frame dims come from the
     GH = _mask.size()                        # site's mask, not constants
     _props = SITE_PROPS.get(_site_id, PROPS_PINEWATCH)

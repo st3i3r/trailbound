@@ -1,84 +1,487 @@
 {
- "site_id": "pinewatch",
- "camp_core_max_cells": [11, 7],
- "camp_core_origin_px": [0, 0],
- "pads": {
-  "total": 8,
-  "start_open": 2,
-  "spots": {
-   "p1": [4, 3],
-   "p2": [5, 3],
-   "p3": [3, 5],
-   "p4": [3, 6],
-   "p5": [6, 5],
-   "p6": [6, 6],
-   "p7": [9, 5],
-   "p8": [9, 6]
-  },
-  "open": ["p1", "p2"],
-  "neighbours": {
-   "p1": ["p2", "p3"],
-   "p2": ["p1"],
-   "p3": ["p1", "p4"],
-   "p4": ["p3"],
-   "p5": ["p6"],
-   "p6": ["p5"],
-   "p7": ["p8"],
-   "p8": ["p7"]
-  }
- },
- "campfire": { "cell": [5, 4], "radius": 2 },
- "decor_cells": [
-  [3, 2], [2, 4], [1, 5], [0, 6], [2, 6],
-  [4, 6], [5, 6], [7, 6], [6, 4],
-  [6, 2], [7, 2], [8, 2], [9, 2], [9, 3], [9, 4]
- ],
- "nav": {
-  "blocked": [
-   [2, 0], [3, 0], [2, 1], [3, 1],
-   [1, 2], [2, 2],
-   [0, 3], [1, 3], [2, 3],
-   [0, 4], [1, 4],
-   [0, 5],
-   [0, 0], [1, 0], [0, 1], [1, 1], [0, 2],
-   [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0],
-   [4, 1], [5, 1], [4, 2], [5, 2],
-   [3, 4], [4, 4],
-   [5, 4],
-   [7, 4], [8, 4], [7, 5], [8, 5]
+  "camp_core_max_cells": [
+    11,
+    7
   ],
-  "road": [
-   [6, 1], [7, 1], [8, 1], [9, 1], [10, 1],
-   [10, 2], [10, 3], [10, 4], [10, 5], [10, 6]
+  "camp_core_origin_px": [
+    0,
+    0
   ],
-  "road_cost": 0.7,
-  "pad_cost": 3.0
- },
- "errand_spots": {
-  "forage": [416, 160],
-  "pond": [217, 324],
-  "lookout": [608, 224]
- },
- "crew_plots": [
-  {
-   "id": "crew_structure",
-   "structure": "wardens_hut",
-   "kind": "structure",
-   "cells": [],
-   "px": [507, 390]
+  "campfire": {
+    "cell": [
+      5,
+      4
+    ],
+    "radius": 2
   },
-  {
-   "id": "vol2_plot_a",
-   "kind": "reserved_overgrown",
-   "cells": [],
-   "px": [480, 140]
+  "crew_plots": [
+    {
+      "cells": [],
+      "id": "crew_structure",
+      "kind": "structure",
+      "px": [
+        507,
+        390
+      ],
+      "structure": "wardens_hut"
+    },
+    {
+      "cells": [],
+      "id": "vol2_plot_a",
+      "kind": "reserved_overgrown",
+      "px": [
+        480,
+        140
+      ]
+    },
+    {
+      "cells": [],
+      "id": "vol2_plot_b",
+      "kind": "reserved_overgrown",
+      "px": [
+        120,
+        420
+      ]
+    }
+  ],
+  "decor_cells": [
+    [
+      3,
+      2
+    ],
+    [
+      2,
+      4
+    ],
+    [
+      1,
+      5
+    ],
+    [
+      0,
+      6
+    ],
+    [
+      2,
+      6
+    ],
+    [
+      4,
+      6
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      7,
+      6
+    ],
+    [
+      6,
+      4
+    ],
+    [
+      6,
+      2
+    ],
+    [
+      7,
+      2
+    ],
+    [
+      8,
+      2
+    ],
+    [
+      9,
+      2
+    ],
+    [
+      9,
+      3
+    ],
+    [
+      9,
+      4
+    ]
+  ],
+  "errand_spots": {
+    "forage": [
+      416,
+      160
+    ],
+    "lookout": [
+      608,
+      224
+    ],
+    "pond": [
+      217,
+      324
+    ]
   },
-  {
-   "id": "vol2_plot_b",
-   "kind": "reserved_overgrown",
-   "cells": [],
-   "px": [120, 420]
+  "map_rev": "819843d7@2026-10-15",
+  "mask": [
+    "GGGGWWWWGGGGGGGGGGGGGG",
+    "GGGGWWWWGGGGGGGGGGGGGG",
+    "GGGWWWWWGGGDDDDDDDDDDD",
+    "GGGWWWWWGGDDDDDDDDDDDD",
+    "GGWWWWWGGGGGGGGGGGGGDD",
+    "WWWWWWWGGGGGGGGGGGGGDD",
+    "WWWWWWWGGGGGGGGGGGGGDD",
+    "WWWWWWGGGGGGGGGGGGGGDD",
+    "WWWWWGGDDDDGDDDDGGGGDD",
+    "WWWWWGGDDDDDDDDDGGGGDD",
+    "WWWGGGGDDDDDDDDDGGGGDD",
+    "WWGGGGDGGDDDDDDDGGGGDD",
+    "GGGGGDDDDDDDDDDDGGGGDD",
+    "GGGGGGGDDDDDDDDDGGGGDD"
+  ],
+  "nav": {
+    "blocked": [
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        2,
+        0
+      ],
+      [
+        3,
+        0
+      ],
+      [
+        4,
+        0
+      ],
+      [
+        5,
+        0
+      ],
+      [
+        6,
+        0
+      ],
+      [
+        7,
+        0
+      ],
+      [
+        8,
+        0
+      ],
+      [
+        9,
+        0
+      ],
+      [
+        10,
+        0
+      ],
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        3,
+        1
+      ],
+      [
+        4,
+        1
+      ],
+      [
+        5,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        2,
+        2
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        5,
+        2
+      ],
+      [
+        0,
+        3
+      ],
+      [
+        1,
+        3
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        0,
+        4
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        3,
+        4
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        5,
+        4
+      ],
+      [
+        7,
+        4
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        0,
+        5
+      ],
+      [
+        7,
+        5
+      ],
+      [
+        8,
+        5
+      ]
+    ],
+    "overrides": {
+      "add": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          0
+        ],
+        [
+          4,
+          0
+        ],
+        [
+          5,
+          0
+        ],
+        [
+          6,
+          0
+        ],
+        [
+          7,
+          0
+        ],
+        [
+          8,
+          0
+        ],
+        [
+          9,
+          0
+        ],
+        [
+          10,
+          0
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          4,
+          2
+        ],
+        [
+          5,
+          4
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          8,
+          5
+        ]
+      ],
+      "remove": [
+        [
+          1,
+          6
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          7,
+          3
+        ],
+        [
+          8,
+          3
+        ]
+      ]
+    },
+    "pad_cost": 3,
+    "road": [
+      [
+        6,
+        1
+      ],
+      [
+        7,
+        1
+      ],
+      [
+        8,
+        1
+      ],
+      [
+        9,
+        1
+      ],
+      [
+        10,
+        1
+      ],
+      [
+        10,
+        2
+      ],
+      [
+        10,
+        3
+      ],
+      [
+        10,
+        4
+      ],
+      [
+        10,
+        5
+      ],
+      [
+        10,
+        6
+      ]
+    ],
+    "road_cost": 0.7
+  },
+  "note": "v17 painted-map layout from PixelLab map 819843d7 (crop x0..21,y0..13 = 704x448 = 11x7 cells of 64px; game cell g covers map tiles 2g,2g+1). Pond west with waterfall notch; half-water shore cells (3,2)/(3,3)/(2,4) stay walkable as the bank. Dirt road band enters from the EAST edge at row 1 (cells 6..10,1) and the east lane x10 runs gate-to-south-exit = nav.road spine. Court plaza centre-south: tent platforms at p1/p2 (4,3)/(5,3), boulder cluster (3,4)/(4,4), swing (4,5)/(5,5) walkable amenity, lantern post on the (5,4)/(6,5) seam, hut footprint (7,4)-(8,5). Fire is the runtime prop at campfire cell (5,4) so it keeps its upgrade states. Canopy wall blocks row 0 + west corner; coop yard (4,1)-(5,2) fenced. Pads ring the fire: platform pair p1/p2, bank pair p3/p4, plaza-south pair p5/p6, east-meadow pair p7/p8.",
+  "pads": {
+    "neighbours": {
+      "p1": [
+        "p2",
+        "p3"
+      ],
+      "p2": [
+        "p1"
+      ],
+      "p3": [
+        "p1",
+        "p4"
+      ],
+      "p4": [
+        "p3"
+      ],
+      "p5": [
+        "p6"
+      ],
+      "p6": [
+        "p5"
+      ],
+      "p7": [
+        "p8"
+      ],
+      "p8": [
+        "p7"
+      ]
+    },
+    "open": [
+      "p1",
+      "p2"
+    ],
+    "spots": {
+      "p1": [
+        4,
+        3
+      ],
+      "p2": [
+        5,
+        3
+      ],
+      "p3": [
+        3,
+        5
+      ],
+      "p4": [
+        3,
+        6
+      ],
+      "p5": [
+        6,
+        5
+      ],
+      "p6": [
+        6,
+        6
+      ],
+      "p7": [
+        9,
+        5
+      ],
+      "p8": [
+        9,
+        6
+      ]
+    },
+    "start_open": 2,
+    "total": 8
+  },
+  "site_id": "pinewatch",
+  "terrain_letters": {
+    "1": "D",
+    "2": "G",
+    "3": "W"
   }
- ],
- "note": "v17 painted-map layout from PixelLab map 819843d7 (crop x0..21,y0..13 = 704x448 = 11x7 cells of 64px; game cell g covers map tiles 2g,2g+1). Pond west with waterfall notch; half-water shore cells (3,2)/(3,3)/(2,4) stay walkable as the bank. Dirt road band enters from the EAST edge at row 1 (cells 6..10,1) and the east lane x10 runs gate-to-south-exit = nav.road spine. Court plaza centre-south: tent platforms at p1/p2 (4,3)/(5,3), boulder cluster (3,4)/(4,4), swing (4,5)/(5,5) walkable amenity, lantern post on the (5,4)/(6,5) seam, hut footprint (7,4)-(8,5). Fire is the runtime prop at campfire cell (5,4) so it keeps its upgrade states. Canopy wall blocks row 0 + west corner; coop yard (4,1)-(5,2) fenced. Pads ring the fire: platform pair p1/p2, bank pair p3/p4, plaza-south pair p5/p6, east-meadow pair p7/p8."
 }
