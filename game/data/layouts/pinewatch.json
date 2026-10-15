@@ -662,11 +662,6 @@
     "road_cost": 0.7
   },
   "note": "Pinewatch v22 â€” PixelLab-painted: pond west with masonry rim, canopy terrace + stone retaining wall north (fenced upper field), cabin on the court's north lip, court centre, SE van entrance.",
-  "objects": {
-    "hide": [
-      "5a841acf-38b6-4c66-86ca-a9423f063760"
-    ]
-  },
   "pads": {
     "neighbours": {
       "p1": [
