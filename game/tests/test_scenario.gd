@@ -80,7 +80,7 @@ func _run_scenario(file: String) -> void:
 # One full playthrough; returns the canonical end-state Dictionary.
 func _play(scn: Dictionary, id: String) -> Dictionary:
 	var state := Save.default_state()
-	_merge(state, scn.get("setup", {}))
+	_merge(state, _intify(scn.get("setup", {})))
 	Game.load_state(state)
 	Game.visit_site(StringName(scn.get("site", "pinewatch")))
 	for i in (scn.get("steps", []) as Array).size():
@@ -124,19 +124,41 @@ func _do(step: Dictionary, id: String) -> void:
 		"crew_start": Game.crew_start(StringName(step["structure"]))
 		"crew_collect": Game.crew_collect()
 		"crew_tick": Game.crew_tick(int(step["now"]))
-		"crew_set": Game.crew[String(step["key"])] = step.get("value")
+		"crew_set": Game.crew[String(step["key"])] = _intify(step.get("value"))
 		"dog_pet": ok = Game.dog_pet()
 		"inject_guest": _inj_guest(step)
 		"inject_decor": _inj_decor(step)
 		"site_set": Game.site_state()[String(step["key"])] = \
-			step.get("value")
+			_intify(step.get("value"))
 		"expect": ok = _expect(step, id)
+		"probe":
+			print("    .. probe unlock(%s)=%s pantry=%d/%d row=%s pages=%s" % [
+				step.get("unlock", "P1"),
+				Game._is_unlocked(String(step.get("unlock", "P1"))),
+				Game.pantry_count(), Game.pantry_capacity(),
+				Game._row("ingredients", String(step.get("id", "tea"))),
+				Game.site_state().get("pages_done")])
 		"log": print("    .. %s" % step.get("msg", ""))
 		_: ok = false
 	if ok == bool(step.get("must_fail", false)):
 		_op_fail += 1
 		print("  XX %s %s" % [_step,
 			"expected to fail but passed" if ok else "failed"])
+
+
+func _intify(v: Variant) -> Variant:
+	## JSON numbers are all float; engine state wants ints for whole
+	## values — `1 in [1.0]` fails the unlock ladder otherwise.
+	if v is float:
+		return int(v) if v == floorf(v) else v
+	if v is Dictionary:
+		var d := {}
+		for k in v:
+			d[k] = _intify(v[k])
+		return d
+	if v is Array:
+		return v.map(func(e): return _intify(e))
+	return v
 
 
 func _inj_guest(step: Dictionary) -> void:
@@ -162,7 +184,7 @@ func _inj_decor(step: Dictionary) -> void:
 func _gid(v: Variant) -> String:
 	## "hiker" is a literal id; "#0" is the Nth guest (sorted ids).
 	var s := String(v)
-	var keys := Game.site_state()["guests"].keys()
+	var keys: Array = Game.site_state()["guests"].keys()
 	keys.sort()
 	if s.begins_with("#"):
 		var i := int(s.trim_prefix("#"))
@@ -245,14 +267,17 @@ func _compare(got: Variant, want: Variant, op: String) -> bool:
 		"<": return got is int and got < int(want) \
 			or got is float and got < float(want)
 		".has":
+			var w: Array = want if want is Array else [want]
 			if got is Array:
-				var w = want if want is Array else [want]
 				for x in w:
 					if x not in got:
 						return false
 				return true
 			if got is Dictionary:
-				return got.has(want)
+				for x in w:
+					if not got.has(x):
+						return false
+				return true
 			return false
 	return false
 
@@ -264,7 +289,7 @@ func _canon(v: Variant) -> Variant:
 	## JSON.stringify on it is a stable serialization for hashing.
 	if v is Dictionary:
 		var d := {}
-		var keys := v.keys()
+		var keys: Array = v.keys()
 		keys.sort()
 		for k in keys:
 			d[String(k)] = _canon(v[k])

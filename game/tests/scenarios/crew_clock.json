@@ -1,27 +1,52 @@
 {
-  "id": "crew_clock",
-  "title": "Crew clock: hut starts -> clock catches up -> stage collects",
-  "site": "pinewatch",
-  "seed": 13,
-  "setup": {
-    "coins": 300,
-    "day": 4,
-    "phase": 3,
-    "sites_visited": { "pinewatch": 0 }
-  },
-  "steps": [
-    { "op": "crew_start", "structure": "wardens_hut" },
-    { "op": "expect", "crew.structure": "wardens_hut",
-        "crew.stage": 0 },
-    { "op": "crew_set", "key": "last_seen_utc", "value": 1000000 },
-    { "op": "crew_tick", "now": 2000000000 },
-    { "op": "expect", "crew.seconds_left": 0.0 },
-    { "op": "crew_collect" },
-    { "op": "expect", "crew.stage": 1,
-        "crew.collected.count": 1 }
-  ],
+  "_file": "crew_clock.json",
   "expect": {
-    "crew.stage": 1,
-    "crew.collected.count": 1
-  }
+    "crew.collected.count": 1.0,
+    "crew.stage": 1.0
+  },
+  "hash": 1160306884,
+  "id": "crew_clock",
+  "seed": 13.0,
+  "setup": {
+    "coins": 300.0,
+    "day": 4.0,
+    "phase": 3.0,
+    "sites_visited": {
+      "pinewatch": 0.0
+    }
+  },
+  "site": "pinewatch",
+  "steps": [
+    {
+      "op": "crew_start",
+      "structure": "wardens_hut"
+    },
+    {
+      "crew.stage": 0.0,
+      "crew.structure": "wardens_hut",
+      "op": "expect"
+    },
+    {
+      "key": "last_seen_utc",
+      "op": "crew_set",
+      "value": 1000000.0
+    },
+    {
+      "now": 2000000000.0,
+      "op": "crew_tick"
+    },
+    {
+      "crew.seconds_left": 0.0,
+      "op": "expect"
+    },
+    {
+      "op": "crew_collect"
+    },
+    {
+      "crew.collected.count": 1.0,
+      "crew.stage": 1.0,
+      "op": "expect"
+    }
+  ],
+  "title": "Crew clock: hut starts -> clock catches up -> stage collects"
 }

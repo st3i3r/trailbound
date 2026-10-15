@@ -1,31 +1,78 @@
 {
-  "id": "pad_unlock",
-  "title": "Pad economy: locked pad -> pay -> clear -> seat on it",
-  "site": "pinewatch",
-  "seed": 5,
-  "setup": {
-    "coins": 600,
-    "day": 1,
-    "phase": 3,
-    "sites_visited": { "pinewatch": 0 }
-  },
-  "steps": [
-    { "op": "expect", "site.pads.p5.open": false },
-    { "op": "inject_guest", "id": "pair", "arch": "hiker", "fee": 30,
-        "pads": 1 },
-    { "op": "seat", "guest": "pair", "pads": ["p5"], "must_fail": true },
-    { "op": "unlock_pad", "pad": "p5" },
-    { "op": "expect", "site.pads.p5.paid": true,
-        "site.pads.p5.open": false },
-    { "op": "seat", "guest": "pair", "pads": ["p5"], "must_fail": true },
-    { "op": "clear_pad", "pad": "p5" },
-    { "op": "expect", "site.pads.p5.open": true },
-    { "op": "seat", "guest": "pair", "pads": ["p5"] },
-    { "op": "expect", "site.assignments.pair.has": "p5" }
-  ],
+  "_file": "pad_unlock.json",
   "expect": {
-    "site.pads.p5.open": true,
-    "site.assignments.count": 1
+    "site.assignments.count": 1.0,
+    "site.pads.p5.open": true
   },
+  "hash": 2481940882,
+  "id": "pad_unlock",
+  "seed": 5.0,
+  "setup": {
+    "coins": 600.0,
+    "day": 1.0,
+    "phase": 3.0,
+    "sites_visited": {
+      "pinewatch": 0.0
+    }
+  },
+  "site": "pinewatch",
+  "steps": [
+    {
+      "op": "expect",
+      "site.pads.p5.open": false
+    },
+    {
+      "arch": "hiker",
+      "fee": 30.0,
+      "id": "pair",
+      "op": "inject_guest",
+      "pads": 1.0
+    },
+    {
+      "guest": "pair",
+      "must_fail": true,
+      "op": "seat",
+      "pads": [
+        "p5"
+      ]
+    },
+    {
+      "op": "unlock_pad",
+      "pad": "p5"
+    },
+    {
+      "op": "expect",
+      "site.pads.p5.open": false,
+      "site.pads.p5.paid": true
+    },
+    {
+      "guest": "pair",
+      "must_fail": true,
+      "op": "seat",
+      "pads": [
+        "p5"
+      ]
+    },
+    {
+      "op": "clear_pad",
+      "pad": "p5"
+    },
+    {
+      "op": "expect",
+      "site.pads.p5.open": true
+    },
+    {
+      "guest": "pair",
+      "op": "seat",
+      "pads": [
+        "p5"
+      ]
+    },
+    {
+      "op": "expect",
+      "site.assignments.pair.has": "p5"
+    }
+  ],
+  "title": "Pad economy: locked pad -> pay -> clear -> seat on it",
   "twice": true
 }

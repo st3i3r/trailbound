@@ -45,10 +45,13 @@ func _ready() -> void:
 	# a bare tap on a pad with nobody selected commits nothing
 	var px: Vector2 = s.pad_cells["p1"].position + s.stage.position
 	_press(px)
-	check("press arms a candidate tap", s._tap_armed)
+	# NB: `_input` the script var shadows Node._input the method —
+	# reach it through get(), not dot access.
+	var inp: RefCounted = s.get("_input")
+	check("press arms a candidate tap", inp._tap_armed)
 	_release(px)
 	check("idle tap is inert", s._cam == cam0
-		and st["seats"] == seats0 and not s._tap_armed)
+		and st["seats"] == seats0 and not inp._tap_armed)
 
 	# press -> drag -> release: the travel eats the tap, view pans
 	_press(px)

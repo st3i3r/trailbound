@@ -1,24 +1,45 @@
 {
-  "id": "dog_day",
-  "title": "The stray: pet once a day, bond grows, second pet refused",
-  "site": "pinewatch",
-  "seed": 19,
-  "setup": {
-    "coins": 100,
-    "day": 2,
-    "phase": 3,
-    "sites_visited": { "pinewatch": 0 },
-    "dog": { "name": "Bean", "bond": 0, "met": true,
-      "adopted": false, "pet_today": false }
-  },
-  "steps": [
-    { "op": "dog_pet" },
-    { "op": "expect", "dog.pet_today": true, "dog.bond>=": 1 },
-    { "op": "dog_pet", "must_fail": true },
-    { "op": "expect", "dog.bond>=": 1 }
-  ],
+  "_file": "dog_day.json",
   "expect": {
     "dog.pet_today": true
   },
+  "hash": 2382297727,
+  "id": "dog_day",
+  "seed": 19.0,
+  "setup": {
+    "coins": 100.0,
+    "day": 2.0,
+    "dog": {
+      "adopted": false,
+      "bond": 0.0,
+      "met": true,
+      "name": "Bean",
+      "pet_today": false
+    },
+    "phase": 3.0,
+    "sites_visited": {
+      "pinewatch": 0.0
+    }
+  },
+  "site": "pinewatch",
+  "steps": [
+    {
+      "op": "dog_pet"
+    },
+    {
+      "dog.bond>=": 1.0,
+      "dog.pet_today": true,
+      "op": "expect"
+    },
+    {
+      "must_fail": true,
+      "op": "dog_pet"
+    },
+    {
+      "dog.bond>=": 1.0,
+      "op": "expect"
+    }
+  ],
+  "title": "The stray: pet once a day, bond grows, second pet refused",
   "twice": true
 }

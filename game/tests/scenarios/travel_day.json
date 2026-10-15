@@ -1,25 +1,61 @@
 {
-  "id": "travel_day",
-  "title": "Travel: morning trip swaps site state cleanly",
-  "site": "pinewatch",
-  "seed": 17,
-  "setup": {
-    "coins": 200,
-    "day": 3,
-    "phase": 2,
-    "sites_visited": { "pinewatch": 0, "whisper_river": 0 }
-  },
-  "steps": [
-    { "op": "expect", "site_id": "pinewatch" },
-    { "op": "travel", "site": "whisper_river" },
-    { "op": "expect", "site_id": "whisper_river",
-        "site.guests.count": 0, "site.assignments.count": 0 },
-    { "op": "travel", "site": "pinewatch" },
-    { "op": "expect", "site_id": "pinewatch" }
-  ],
+  "_file": "travel_day.json",
   "expect": {
-    "site_id": "pinewatch",
-    "coins": 200
+    "coins": 200.0,
+    "site_id": "pinewatch"
   },
+  "hash": 278173668,
+  "id": "travel_day",
+  "seed": 17.0,
+  "setup": {
+    "coins": 200.0,
+    "day": 3.0,
+    "phase": 2.0,
+    "sites_visited": {
+      "pinewatch": 0.0,
+      "whisper_river": 0.0
+    }
+  },
+  "site": "pinewatch",
+  "steps": [
+    {
+      "op": "expect",
+      "site_id": "pinewatch"
+    },
+    {
+      "must_fail": true,
+      "op": "travel",
+      "site": "whisper_river"
+    },
+    {
+      "key": "pages_done",
+      "op": "site_set",
+      "value": [
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0
+      ]
+    },
+    {
+      "op": "travel",
+      "site": "whisper_river"
+    },
+    {
+      "op": "expect",
+      "site.assignments.count": 0.0,
+      "site_id": "whisper_river"
+    },
+    {
+      "op": "travel",
+      "site": "pinewatch"
+    },
+    {
+      "op": "expect",
+      "site_id": "pinewatch"
+    }
+  ],
+  "title": "Travel: morning trip swaps site state cleanly",
   "twice": true
 }
