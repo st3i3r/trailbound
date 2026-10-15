@@ -108,6 +108,18 @@ asleep at the fire (`assignments.is_empty()`), and the morning
 after an all-5★ night `cast_day(prev_perfect)` opens its rounds
 with a play+heart wag.
 
+### E2. Foreground drape — runtime occluder layer *(queued)*
+
+Eastward's camera-space fog/edge layers, adapted to runtime:
+a camera-follow `CanvasLayer` (above world, below UI) carrying
+(a) a parallax strip of dark value-shifted canopy silhouettes
+along the screen's bottom edge at ~1.04× camera drift, and
+(b) a ~48px Bayer-dithered depth fade above it. Seeded
+placement (game seed), so the drape is deterministic and
+always frames the shot regardless of pan position — a baked
+prop only occludes when looking at the map's south edge.
+Build after the ground bake is wired (last visual pass).
+
 ### E. Elevation cue — the 2.5D height read *(queued)*
 
 Eastward's verticality trick (a cliff/stone stripe + stairs

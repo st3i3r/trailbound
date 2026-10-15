@@ -8,8 +8,8 @@ const Postcard := preload("res://scripts/systems/postcard.gd")
 func _ready() -> void:
 	print("=== postcard codec (§33.5) ===")
 	var decor := [
-		{"id": "stools", "cells": [Vector2i(3, 3)]},
-		{"id": "picnic_table", "cells": [Vector2i(7, 3), Vector2i(8, 3)]},
+		{"id": "stools", "cells": [Vector2i(3, 2)]},
+		{"id": "picnic_table", "cells": [Vector2i(4, 6), Vector2i(5, 6)]},
 	]
 	var code: String = Postcard.encode("pinewatch", 421337, decor)
 	print("code: %s (%d chars)" % [code, code.length()])
@@ -29,9 +29,9 @@ func _ready() -> void:
 	for r in bd:
 		by_id[String(r["id"])] = r["cells"]
 	check("1x1 cell survives",
-		by_id.get("stools", []) == [Vector2i(3, 3)])
+		by_id.get("stools", []) == [Vector2i(3, 2)])
 	check("2x1 cell survives + footprint re-derived",
-		by_id.get("picnic_table", []) == [Vector2i(7, 3), Vector2i(8, 3)])
+		by_id.get("picnic_table", []) == [Vector2i(4, 6), Vector2i(5, 6)])
 
 	# typos: every single-char mutation must fail the checksum
 	var bad := 0
@@ -52,7 +52,7 @@ func _ready() -> void:
 	# the code still decodes — shares never carry illegal state
 	var weird := [{"id": "nope", "cells": [Vector2i(0, 0)]},
 		{"id": "stools", "cells": [Vector2i(-9, -9)]},
-		{"id": "stools", "cells": [Vector2i(3, 3)]}]
+		{"id": "stools", "cells": [Vector2i(3, 2)]}]
 	var back2: Dictionary = Postcard.decode(
 		Postcard.encode("pinewatch", 1, weird))
 	check("unplaceable items dropped, legal kept",

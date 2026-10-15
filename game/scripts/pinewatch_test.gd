@@ -20,35 +20,37 @@ extends Node2D
 const A := "res://assets/pinewatch/"
 const T := 32                                # tile px
 const CELL := 64                             # pad cell px
-const GW := 20                               # ground width  (tiles)
-const GH := 12                               # ground height (tiles)
+var GW := 20                                 # ground dims follow the
+var GH := 12                                 # active site mask (pinewatch
+                                             # is 22x14; river/valley 20x12)
 # ---------------------------------------------------------------- terrain
-# Painted ground (PixelLab map render, dressed by tools/tb_ground_dress.py
-# --light): terrain/ground_painted.png is drawn as ONE sprite — zones are
-# painted art, no wang tilemap at runtime.  MASK mirrors the painted
-# zones for gameplay/scatter logic only; macro colour still comes from
-# the fx/ground_tintmap.png overlay (tile-swap zones stay forbidden).
-#   D = golden dirt (forest band, fire yard, spine, hut yard)
+# Painted ground (PixelLab map-base export, terrain only): zones and
+# transitions are baked art, no wang tilemap at runtime.  MASK mirrors
+# the baked zones for gameplay/scatter logic only.
+#   D = packed earth (road band, court plaza, yard)
 #   G = fresh grass   W = pond water
-# Per-site: sites without a baked ground_painted.png draw _mask
-# procedurally (_build_ground fallback), so the mask IS the map there.
-## Pinewatch v2 — Eastward-composition redesign: a waterfall-fed stream
-## enters top-left and widens into the west pond; the guest road exits
-## the right edge at the gate (pull-in apron for the van), the dirt
-## court sits at the junction as the fire plaza, hut yard top-right.
+# Per-site: sites without a baked ground draw _mask procedurally
+# (_build_ground fallback), so the mask IS the map there.
+## Pinewatch v17 — PixelLab map 819843d7 crop x0..21,y0..13 (22x14):
+## pond west with waterfall notch top-left, packed-earth road band
+## north-east to the gate + east lane down to the south exit, fire
+## court plaza centre-south with an interior grass island, canopy wall
+## along the north edge, hut anchored inside the court's east lobe.
 const MASK_PINEWATCH := [
-    "GWWGGGGGGGGGGGGGDDDD",
-    "GGWWGGGGGGGGGGGGDDDD",
-    "GWWWGGGGGGGGGGGGDDDD",
-    "GWWWWGGGGGGGGGGGDDDG",
-    "WWWWWGGGGGGGGGGGGGGG",
-    "WWWWWWGGGGGGDDDDGGGG",
-    "WWWWWWGGGGDDDDDDDDDD",
-    "WWWWWGGGGGGGGGGDDDDD",
-    "WWWWGGGGGGGGDDDDGGGG",
-    "GWWWGGGGGGGGDDDDGGGG",
-    "GGGGGGGGGGGGDDDDGGGG",
-    "GGGGGGGGGGGGDDDDGGGG",
+    "GGGGWWWWGGGGGGGGGGGGGG",
+    "GGGGWWWWGGGGGGGGGGGGGG",
+    "GGGWWWWWGGGDDDDDDDDDDD",
+    "GGGWWWWWGGDDDDDDDDDDDD",
+    "GGWWWWWGGGGGGGGGGGGGDD",
+    "WWWWWWWGGGGGGGGGGGGGDD",
+    "WWWWWWWGGGGGGGGGGGGGDD",
+    "WWWWWWGGGGGGGGGGGGGGDD",
+    "WWWWWGGDDDDGDDDDGGGGDD",
+    "WWWWWGGDDDDDDDDDGGGGDD",
+    "WWWGGGGDDDDDDDDDGGGGDD",
+    "WWGGGGDGGDDDDDDDGGGGDD",
+    "GGGGGDDDDDDDDDDDGGGGDD",
+    "GGGGGGGDDDDDDDDDGGGGDD",
 ]
 
 ## Whisper River (v1 dressing): pads ring a north fire yard; the river
@@ -90,8 +92,8 @@ const MASK_LANTERN := [
 ## against each site's dressing — the layout supplies cells + errand
 ## anchors, these land the interactables inside it.
 const SITE_STAGE := {
-    "pinewatch": {"fire": Vector2(440, 304), "dog": Vector2(392, 340),
-        "board": Rect2(468, 244, 36, 52)},
+    "pinewatch": {"fire": Vector2(352, 320), "dog": Vector2(416, 416),
+        "board": Rect2(632, 176, 64, 64)},
     "whisper_river": {"fire": Vector2(288, 192), "dog": Vector2(352, 238),
         "board": Rect2(46, 222, 40, 46)},
     "lantern_valley": {"fire": Vector2(288, 192), "dog": Vector2(352, 238),
@@ -114,49 +116,17 @@ const SITE_MASKS := {
 # leans the prop ±2-4° about its base — loose freestanding props only,
 # never anchored/large ones (van, cabin, trees).
 const PROPS_PINEWATCH := [
-    # ===== TREELINE — broadleaf wall, gap over the stream inlet so
-    # the water reads as coming THROUGH the forest (waterfall notch) =====
-    ["fx", "tree_broadleaf_sunlit",    158,  76, 0.0, 0.52],
-    ["fx", "tree_broadleaf_sunlit",    246,  70, 0.0, 0.56],
-    ["fx", "tree_broadleaf_sunlit",    336,  78, 0.0, 0.52],
-    ["props_large",  "flamboyant_tree",   416,  74, 0.0, 0.58],  # accent
-    ["fx", "tree_broadleaf_sunlit",    476,  70, 0.0, 0.60],
-    # ===== STREAM INLET — boulders where the falls drop in =====
-    ["props_medium", "prop_boulder_0",     58,  62, 0.0, 1.10],
-    ["props_small",  "rock_mossy_s",       30,  82],
-    ["props_small",  "rock_mossy_s",       96,  72],
-    # ===== HUT YARD — homestead in the dirt pocket (top-right) =====
-    ["props_large",  "cabin",             560, 100, 0.0, 1.05],
-    ["props_medium", "chicken_coop",      612, 122, 0.0, 0.95],
-    ["props_small",  "clothesline",       512, 130, 0.0, 1.10],
-    # ===== GATE — flower arch over the road where guests walk in;
-    # fences flank the opening; the board/signpost sits at the junction =====
-    ["props_large",  "flower_arch",       606, 214, 0.0, 1.10],
-    ["props_small",  "fence_wood",        600, 158],
-    ["props_small",  "fence_wood",        600, 272],
-    ["props_small",  "signpost",          486, 258],
-    # ===== VAN PULL-IN — parked on the road apron =====
-    ["props_large",  "outfitter_bus",     556, 242, 0.0, 1.35],
-    ["props_medium", "prop_supply_crate_0", 610, 282],
-    ["props_medium", "moped_cub",         512, 252, 0.0, 1.05],
-    # ===== FIRE COURT — plaza at the junction; animated fire at
-    # _fire_pos(440,304) =====
-    ["props_medium", "tripod_cauldron",   440, 296],
-    ["props_small",  "log_stool",         398, 322],
-    ["props_small",  "log_stool",         422, 336],
-    ["props_medium", "lantern_post",      394, 268, -3.0, 1.10],
-    ["props_medium", "woodpile",          382, 334],
-    ["props_medium", "dirt_patch",        440, 312],
-    # ===== POND EAST BANK — willow + fishing vignette =====
-    ["fx", "tree_feathery_sunlit",     236, 292, 0.0, 0.80],
-    ["props_small",  "fishing_rod",       250, 296, -6.0],
-    ["props_small",  "tackle_box",        262, 306],
-    ["props_medium", "reed_shore",        290, 258],
-    # ===== OPEN FIELD — one sage pitch + tea corner, kept sparse =====
-    ["props_medium", "dome_tent_sage",     92, 336, 0.0, 1.12],
-    ["props_medium", "tea_table",         540, 306, 0.0, 0.95],
-    ["props_medium", "picnic_basket",     318, 214],
-    ["props_medium", "fern_bank",         170,  96],
+    # ===== v17 painted map — terrain + static dressing are baked into
+    # fx/ground_sunlit.png (PixelLab map-base + objects); runtime keeps
+    # only the stateful/live pieces =====
+    # crew hut — sits over the baked homestead on the court's east lobe;
+    # _sync_crew_hut swaps its texture through the restore stages
+    ["props_large",  "cabin",             507, 392, 0.0, 1.05],
+    # scorched dirt under the runtime fire ring at cell (5,4)
+    ["props_medium", "dirt_patch",        352, 318],
+    # junction signpost where the east lane meets the court — the
+    # baked reception board sits below the frame edge
+    ["props_small",  "signpost",          672, 210],
     # ===== BOUNDARY marks =====
 ]
 
@@ -246,9 +216,9 @@ const AmbientFX := preload("res://scripts/ambient_fx.gd")
 # Stage anchors moved per-site into SITE_STAGE (UI-034): _fire_pos,
 # _dog_pos and _board_rect are set from it in _ready once site_id is
 # known.  Pinewatch keeps the authored values every tool references.
-const WARDEN_POS := Vector2(404, 322)
-const MAI_POS := Vector2(540, 320)           # tea corner, east of court
-const BOARD_POS := Vector2(486, 258)         # signpost at road junction (UI-023)
+const WARDEN_POS := Vector2(416, 330)
+const MAI_POS := Vector2(608, 290)           # east meadow edge, by the lane
+const BOARD_POS := Vector2(672, 210)         # signpost at the lane junction (UI-023)
 
 # scatter decal groups by visual family — a cluster commits to ONE so it
 # reads as a patch of something (tuft / flowers / dry grass / pebbles /
@@ -503,6 +473,8 @@ func _ready() -> void:
         Catalog.data["layouts"]["pinewatch"])
     _site_id = String(layout.get("site_id", "pinewatch"))
     _mask = SITE_MASKS.get(_site_id, MASK_PINEWATCH)
+    GW = _mask[0].length()                   # frame dims come from the
+    GH = _mask.size()                        # site's mask, not constants
     _props = SITE_PROPS.get(_site_id, PROPS_PINEWATCH)
     var sst: Dictionary = SITE_STAGE.get(_site_id,
         SITE_STAGE["pinewatch"])
@@ -537,14 +509,19 @@ func _ready() -> void:
     # (props and characters stay unaffected) — replaces tile-swap zones.
     # Baked for pinewatch; other sites get it with their painted ground.
     if _site_id == "pinewatch":
-        var tint := Sprite2D.new()
-        tint.name = "GroundTint"
-        tint.texture = _tex("fx/ground_tintmap")
-        tint.centered = false
-        tint.modulate = Color(1, 1, 1, 0.15) # whisper — the baked dapple
-                                             # now carries the pools;
-                                             # tintmap was a flat dim
-        stage.add_child(tint)                # of zones, not a film
+        var ttex: Texture2D = _tex("fx/ground_tintmap")
+        # tintmap is baked per-frame-size (tb_tintmap.py) — the 640x360
+        # bake predates the 704x448 map; skip until a matching re-bake
+        # lands, never shade the wrong cells
+        if ttex and ttex.get_width() == GW * T:
+            var tint := Sprite2D.new()
+            tint.name = "GroundTint"
+            tint.texture = ttex
+            tint.centered = false
+            tint.modulate = Color(1, 1, 1, 0.15) # whisper — the baked dapple
+                                                # now carries the pools;
+                                                # tintmap was a flat dim
+            stage.add_child(tint)                # of zones, not a film
     pads_node = Node2D.new()
     pads_node.name = "Pads"
     stage.add_child(pads_node)

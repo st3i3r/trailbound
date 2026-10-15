@@ -125,7 +125,7 @@ func _ready() -> void:
 	g2["gathering"] = "p_quiet_corner"
 	g2["favourite"] = "trail_stew"
 	Game.seat("qc_0", ["p2"])
-	Game.seat("qc_1", ["p7"])
+	Game.seat("qc_1", ["p6"])
 	Game.meals = [{"id": "trail_stew", "price": 18},
 		{"id": "trail_stew", "price": 18}]
 	var coins0 := Game.coins
@@ -162,7 +162,8 @@ func _ready() -> void:
 	# --- Vol II night pages --------------------------------------------
 	# P9: six parties, every one 5-star. Chilly guests need warmth —
 	# only the six pads inside the (upgraded) fire's r3 can hit 5★;
-	# p1/p8 sit outside even the Stone Fire Pit's reach.
+	# p7/p8 on the east meadow sit outside even the Stone Fire Pit's
+	# reach.
 	st["weather"] = "clear"
 	st["decor"] = []
 	st["assignments"] = {}
@@ -170,7 +171,7 @@ func _ready() -> void:
 	for pid in ["p4", "p5"]:
 		st["pads"][pid]["open"] = true
 		st["pads"][pid]["shelter"] = "platform"
-	var six := ["p2", "p3", "p4", "p5", "p6", "p7"]
+	var six := ["p1", "p2", "p3", "p4", "p5", "p6"]
 	for i in six.size():
 		var gg := _inject("pf_%d" % i, "hiker", ["chilly"])
 		gg["favourite"] = "trail_stew"

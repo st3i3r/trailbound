@@ -95,8 +95,12 @@ func _ready() -> void:
 			calm_seed = s
 	check("rare beat rolls on some seeds", beat_seed >= 0)
 	check("rare beat absent on calm seeds", calm_seed >= 0)
+	# the east pad to the west bank is a ~12-cell walk — past the
+	# shared 10s replay window, so give this world more ticks
+	for i in 80:
+		w1.tick(0.25)
 	check("angler goes to bank",
-		float(w1.getc(1, "pos")["x"]) < 200.0 or
+		float(w1.getc(1, "pos")["x"]) < 280.0 or
 		String(w1.getc(1, "anim")["name"]) == "fish")
 
 	# --- persona pick: seeded draw from actors.json pools ----------------
@@ -225,22 +229,24 @@ func _ready() -> void:
 	# generality: a NEW stimulus pair with zero new code — an
 	# oddity entity spawns near the patrol; the dog leaves its
 	# route to investigate (respond -> goto percept -> sniff)
-	w9.spawn({"pos": {"x": 300.0, "y": 380.0},
+	w9.spawn({"pos": {"x": 600.0, "y": 340.0},
 		"tags": {"tags": ["oddity"]}})
 	var investigated := false
 	for i in 40:
 		w9.tick(0.25)
 		var dp: Dictionary = w9.getc(dog9, "pos", {})
 		if not dp.is_empty() and Vector2(dp["x"], dp["y"]) \
-				.distance_to(Vector2(300, 380)) < 40.0:
+				.distance_to(Vector2(600, 340)) < 40.0:
 			investigated = true
 	check("dog investigates oddity", investigated)
 
 	# --- cast-time routing: detour around blocked cells ------------------
-	# (32,368) cell(0,5) -> (224,176) cell(3,2): the straight line
-	# climbs into the blocked NW mass (x0-2 rows 2-4); detour required.
-	var pts := SimDirector._route(layout, Vector2(32, 368),
-		Vector2(224, 176))
+	# (32,416) cell(0,6) -> (608,224) cell(9,3): the straight line
+	# runs through the hut/fire blocked mass (x4-8 rows 3-5); the only
+	# clean corridor is the south lane into the east road, or the pad
+	# row over gy3 — either way a detour is required.
+	var pts := SimDirector._route(layout, Vector2(32, 416),
+		Vector2(608, 224))
 	var blocked := {}
 	for c in layout["nav"]["blocked"]:
 		blocked["%d,%d" % [c[0], c[1]]] = true
@@ -258,21 +264,22 @@ func _ready() -> void:
 		Vector2(352, 176))
 	check("clear line fast path", pts2 == [Vector2(352, 176)])
 
-	# road preference: east-lane -> west court crosses the blocked
-	# fire cell, so A* must detour; the path it picks should spend
-	# its hops on discounted road cells, not the open lawn
+	# road preference: south court -> east gate.  The x10 lane is the
+	# discounted route; cutting NW through the grass corridor is more
+	# hops, so A* should ride the lane down then west along y6's
+	# south lane — i.e. the picked path spends its run on road cells
 	var road_cells := {}
 	for c in layout["nav"].get("road", []):
 		road_cells["%d,%d" % [c[0], c[1]]] = true
-	var pts3 := SimDirector._route(layout, Vector2(672, 352),
-		Vector2(320, 352))
+	var pts3 := SimDirector._route(layout, Vector2(352, 416),
+		Vector2(672, 160))
 	var on_road := 0
 	for p in pts3:
 		var c := SimDirector._px_cell(p)
 		if road_cells.has("%d,%d" % [c.x, c.y]):
 			on_road += 1
 	check("route prefers the road",
-		on_road >= 3 and pts3[pts3.size() - 1] == Vector2(320, 352),
+		on_road >= 4 and pts3[pts3.size() - 1] == Vector2(672, 160),
 		str(pts3))
 
 	# --- storm divert (§14): every program selects huddle in a gale ---
