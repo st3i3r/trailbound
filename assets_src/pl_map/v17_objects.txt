@@ -1,0 +1,62 @@
+49 objects placed on trailbound_pinewatch_v16_fresh
+
+placed more than once (asset_id -> count):
+  7e5bbc75-3326-4942-91d3-86962187a3cd  base  x10
+  2daa8671-9a5b-4830-91cd-da15473c91f0  base  x4
+  16f2219f-e770-4041-9750-ffd62b045f08  base (Copy)  x3
+  5dfe6b5c-e881-4933-a669-af5fcff44737  base  x3
+  db6d70e8-88ff-4555-9cda-86695c0c5a8f  base  x2
+hint: remove_map_object(map_id="819843d7-50f6-4883-a357-421c66027a59", asset_id="<one above>") clears every placement of one asset in a single call
+
+placement_id                          asset_id                              name                  stands_on  size_cells  layer  status
+841b08bb-2719-40df-aa98-a818d66559bf  89c7cef0-b320-49db-9c71-406a6a48dff6  birdhouse on a short… (1,4)      1.3x1.3     45     ok
+2beb32d2-c37c-41d0-a2e9-7285adfb8080  929a352d-aa7f-4c11-b388-900ac5cbdae0  clothesline with two… (17,4)     1.3x1.3     28     ok
+6d98cdef-17a2-4739-8545-0b11edb6ef1f  4f40354b-9903-4920-a203-924f09626a76  small wooden chicken… (9,3)      2x2         60     ok
+8b9404f0-7015-422d-a90c-b0a79f0887ed  8d32b54c-3939-470c-81ba-e1a8934ec8c1  reception_board       (19,14)    2x2         80     ok
+1a58c7dc-0267-47a4-8889-4abbd9bf4361  9cbd19f4-dc24-4183-acc7-a6ae4f58e0ee  woven bamboo basket … (15,4)     1x1         90     ok
+48258750-6597-462a-ac17-0c2df15758a6  086e3ef4-c5bc-4bd4-9210-4ea590b1ab33  woven bamboo basket … (14,4)     1x1         90     ok
+b8f9b470-b6de-4140-8bc7-649b548a444f  f91277ee-0b83-44de-a74f-221b5441504a  wooden lantern post … (11,8)     2x2         90     ok
+93f0d7c0-3926-4e63-9f48-38c50543c2a9  ffc2d52b-4ec4-4912-9c90-f60263d45870  raised wooden tent p… (8,6)      2x2         70     ok
+cb9342d4-cb54-4bed-ba1a-111ce7790ec8  5d0ca814-2f06-47a3-a6fa-836814c62f62  clump of shore reeds… (2,4)      2.7x2.7     33     ok
+824d4c8f-9406-46d5-887f-1eb5b0f95f6b  24bf3073-2a1b-4259-aaf9-748a193eaae6  wooden fishing stool… (7,12)     2x2         100    ok
+23cabaee-1e9c-44a5-a72b-3475118feadb  71c6c441-dca6-4fd0-92e8-701599f92cc4  heron                 (7,6)      1x1         100    ok
+0997ad7f-4def-4f58-827d-85e6aab2dc00  8a0700fa-4902-44da-b7b4-d50fce0e5254  kingfisher            (1,3)      1x1         50     ok
+2897259d-c4a1-486d-8510-d5aa73e622a5  56212a17-9410-47af-b418-8ea248a9207c  forage bush with rip… (10,4)     2x2         120    ok
+78fd1b44-2c8d-4f8e-bc4c-4b4bb2024536  6a854c29-e5aa-427c-82e5-891d07877e12  kite_stake            (3,10)     2x2         50     ok
+f4db96e9-0cd1-4ade-bd1a-ca3b8cf07071  32fa8627-2dc3-4968-a1e8-b67cc319d8e0  wooden picnic table … (9,5)      2x2         60     ok
+984d7003-74ea-4d85-aa19-96c2de8fd007  d29b2ede-f5fb-4ed6-a057-aed6cc813b5c  pink wildflowers      (6,13)     0.5x0.5     130    ok
+233cc46f-af17-476b-8206-22d063042972  21d69e8b-41ba-477e-8992-6d7a02ef5394  tiny white wildflowe… (19,9)     0.5x0.5     100    ok
+3296772f-cf88-41ed-8f4d-00e0e32c46d6  0655b192-803a-49be-a94f-d299313cdf76  scatter of brown pin… (15,3)     0.5x0.5     30     ok
+24cf31db-fe27-425e-9519-f81d1340c270  45b77774-b4c4-4a3f-8ca6-5784d0c42c41  short grass tuft      (11,12)    0.5x0.5     120    ok
+b110c333-b4ed-40c4-87bf-4491e9a24d9e  7a9292b3-fd1e-4785-8d48-41dbd41bcac5  tall grass tuft       (19,14)    0.5x0.5     130    ok
+a425cee0-df59-4cfe-a81a-a42dead483e1  3d04bd46-872c-4caf-8d30-6023b3b951ed  base                  (14,9)     4x4         6      ok
+2ae181c0-3e22-40d0-b3e4-1618842f8052  3f53b577-fa05-4ad3-b042-e673d7b7ffba  base                  (19,4)     2x2         32     ok
+968f3859-979c-4991-b5a5-407497f6bcfa  2e5d5ea9-756c-4137-a7e4-d358bde4489b  base                  (2,11)     2x2         27     ok
+ccec12f6-cb09-46ed-80b6-411615b2780f  16f2219f-e770-4041-9750-ffd62b045f08  base (Copy)           (15,2)     2.7x2.7     13     ok
+d8f041da-a5dd-46f4-be54-caf10cb596d3  16f2219f-e770-4041-9750-ffd62b045f08  base (Copy 2)         (9,2)      2.7x2.7     2      ok
+eb9dbe23-ed6b-4cbe-9d0e-8ec65e4aa064  16f2219f-e770-4041-9750-ffd62b045f08  base (Copy 5)         (23,14)    2.7x2.7     3      ok
+9ee557a0-bea3-46d2-8c5a-9f8c1975c8c0  a1c7533e-f914-4763-8a59-dc87774ae2d0  base                  (9,9)      1.3x1.3     34     ok
+cd5c3987-4a17-4f2c-a020-8d79ba0c3cdd  8ae7ba3e-7c4d-4753-9d76-fc3fd3f96f01  base                  (13,13)    2x2         37     ok
+00c816c8-0a1c-4a85-a327-0128ececc368  5dfe6b5c-e881-4933-a669-af5fcff44737  base                  (0,5)      1.3x1.3     1      ok
+92dacd07-f725-49df-ab87-5b5b0bb16b9d  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 6)         (1,5)      1.3x1.3     1      ok
+77f772a3-f9fc-41e6-803b-54956c56f732  5dfe6b5c-e881-4933-a669-af5fcff44737  base                  (3,10)     1.3x1.3     35     ok
+ade4f51c-7cb5-483b-ad16-397a550a79cb  db6d70e8-88ff-4555-9cda-86695c0c5a8f  base                  (6,7)      2x2         42     ok
+6970d795-6488-4c78-9274-9e925cd1fb19  7e5bbc75-3326-4942-91d3-86962187a3cd  base                  (19,2)     3.0x3.3     35     ok
+00f2c0f9-6b1c-4c34-8df8-5df9da6a8b2a  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 4)         (10,1)     3.0x3.3     3      ok
+d38f68be-6638-4278-8a6a-bf00d935dc2c  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 7)         (8,1)      3.0x3.3     1      ok
+8302f5ba-3990-47b5-ab69-ffac252a4d9b  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 9)         (11,2)     3.0x3.3     24     ok
+6a21a279-bdfc-4f8d-a5c4-0ece6ed08593  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 10)        (16,2)     3.0x3.3     4      ok
+6beafae3-2d3a-4706-822e-dbfa17ef2d78  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 13)        (0,1)      3.0x3.3     2      ok
+341638ed-854c-440c-bd0a-559aff6f145f  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 11)        (1,2)      3.0x3.3     2      ok
+cf04b644-1464-4dcf-838a-afbfcc4b5ba9  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 12)        (3,1)      3.0x3.3     2      ok
+fd9ff228-fc21-4cc2-a69e-2390f64a1a1a  2daa8671-9a5b-4830-91cd-da15473c91f0  base                  (12,1)     2.7x2.7     1      ok
+e8c48519-c697-42bf-aca0-ceae782bb5e2  2daa8671-9a5b-4830-91cd-da15473c91f0  base (Copy 3)         (21,1)     2.7x2.7     1      ok
+44ed7286-fcfc-421b-a42a-79c21c029f6c  2daa8671-9a5b-4830-91cd-da15473c91f0  base (Copy 8)         (14,1)     2.7x2.7     1      ok
+80dfdfc4-f778-464c-9d97-064c52d2a3b5  2daa8671-9a5b-4830-91cd-da15473c91f0  base (Copy 14)        (17,1)     2.7x2.7     1      ok
+e7288e5c-4b19-4947-b33e-4d3c5da752e3  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 15)        (14,2)     3.0x3.3     24     ok
+865d5a68-d538-4f76-b28c-ddc58a4643b6  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 16)        (22,1)     3.0x3.3     35     ok
+6edde35b-365e-41b8-976a-437695f563b3  29ba916e-298b-4250-8581-7257b0d356e6  base                  (20,1)     1.2x1.2     48     ok
+baa48f50-2cd6-4999-b9cc-5c733c06b96c  db6d70e8-88ff-4555-9cda-86695c0c5a8f  base (Copy 17)        (5,8)      2x2         42     ok
+852273eb-0a7c-481f-99a6-ec9bab492b37  8fe50b37-d661-4f51-ac31-5f0d7431ae76  base                  (6,7)      1.2x1.2     49     ok
+
+hint: move_map_object(map_id="819843d7-50f6-4883-a357-421c66027a59", placement_id="<id above>", x=..., y=...)

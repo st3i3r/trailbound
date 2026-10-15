@@ -1,0 +1,20 @@
+{
+  "transitions": [
+    {
+      "from": "smooth flat saturated teal pond water, calm teal wash with very subtle broad tonal bands, nearly no texture, painterly pixel art, warm sunlight, Eastward style",
+      "to": "flat fresh spring-green grass wash, bright clean yellow-green, soft broad tonal patches only, nearly no interior texture, no speckles no blade clusters no repeating pattern, painterly pixel art, warm sunlight upper-left, Eastward style",
+      "fromId": 3,
+      "toId": 2,
+      "tilesetId": "8f15db3f-f1d4-40e3-a5be-389b3c31b149",
+      "transitionSize": 0
+    },
+    {
+      "from": "smooth flat golden-tan packed earth, warm ochre wash with broad soft tonal patches, almost no interior texture, very few subtle marks, no speckles, painterly pixel art, warm sunlight upper-left, Eastward style",
+      "to": "flat fresh spring-green grass wash, bright clean yellow-green, soft broad tonal patches only, nearly no interior texture, no speckles no blade clusters no repeating pattern, painterly pixel art, warm sunlight upper-left, Eastward style",
+      "fromId": 1,
+      "toId": 2,
+      "tilesetId": "1c8796b4-19f7-43bf-9f6a-3c14cde4a9eb",
+      "transitionSize": 0
+    }
+  ]
+}

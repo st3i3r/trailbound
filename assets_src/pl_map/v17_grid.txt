@@ -1,0 +1,24 @@
+map: trailbound_pinewatch_v16_fresh  (819843d7-50f6-4883-a357-421c66027a59)
+bounds: x -1..23, y -2..15   tile size: 32px   painted cells: 414
+legend: s=smooth flat saturated teal pond water, calm teal wash with very subtle broad tonal bands, nearly no texture, painterly pixel art, warm sunlight, Eastward style | f=flat fresh spring-green grass wash, bright clean yellow-green, soft broad tonal patches only, nearly no interior texture, no speckles no blade clusters no repeating pattern, painterly pixel art, warm sunlight upper-left, Eastward style | m=smooth flat golden-tan packed earth, warm ochre wash with broad soft tonal patches, almost no interior texture, very few subtle marks, no speckles, painterly pixel art, warm sunlight upper-left, Eastward style | .=empty
+overview:
+  -2 ...F.....................
+  -1 FFFFFSFSFFFFFFFFFFFFFFFFF
+   0 FFFFFSSSSFFFFFFFFFFFFFFFF
+   1 .FFFFSSSSFFFFFFFFFFFFFFFF
+   2 .FFFSSSSSFFFMMMMMMMMMMMMF
+   3 .FFFSSSSSFFMMMMMMMMMMMMMF
+   4 .FFSSSSSFFFFFFFFFFFFFMMMF
+   5 .SSSSSSSFFFFFFFFFFFFFMMMF
+   6 .SSSSSSSFFFFFFFFFFFFFMMMF
+   7 .SSSSSSFFFFFFFFFFFFFFMMMF
+   8 .SSSSSFFMMMMFMMMMFFFFMMMF
+   9 .SSSSSFFMMMMMMMMMFFFFMMMF
+  10 .SSSFFFFMMMMMMMMMFFFFMMMF
+  11 .SSFFFFMFFMMMMMMMFFFFMMMF
+  12 .FFFFFMMMMMMMMMMMFFFFMMMF
+  13 FFFFFFFFMMMMMMMMMFFFFMMMF
+  14 FFFFFFFFFFFFFFFFFFFFFMMMF
+  15 FFFFFFFFFFFFFFFFFFFFFMMMF
+
+hint: edit_map(map_id="819843d7-50f6-4883-a357-421c66027a59", ops=[{"op":"path","terrain":"smooth flat saturated teal pond water, calm teal wash with very subtle broad tonal bands, nearly no texture, painterly pixel art, warm sunlight, Eastward style","points":[[x1,y1],[x2,y2]],"width":3}])

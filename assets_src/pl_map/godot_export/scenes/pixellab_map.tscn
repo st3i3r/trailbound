@@ -1,0 +1,899 @@
+[gd_scene load_steps=100 format=3]
+[ext_resource type="Script" path="res://scripts/pixellab_map_builder.gd" id="Script_builder"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/841b08bb-2719-40df-aa98-a818d66559bf.png" id="Texture_object_0_0"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/2beb32d2-c37c-41d0-a2e9-7285adfb8080.png" id="Texture_object_1_1"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/6d98cdef-17a2-4739-8545-0b11edb6ef1f.png" id="Texture_object_2_2"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/8b9404f0-7015-422d-a90c-b0a79f0887ed.png" id="Texture_object_3_3"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/1a58c7dc-0267-47a4-8889-4abbd9bf4361.png" id="Texture_object_4_4"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/48258750-6597-462a-ac17-0c2df15758a6.png" id="Texture_object_5_5"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/b8f9b470-b6de-4140-8bc7-649b548a444f.png" id="Texture_object_6_6"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/93f0d7c0-3926-4e63-9f48-38c50543c2a9.png" id="Texture_object_7_7"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/cb9342d4-cb54-4bed-ba1a-111ce7790ec8.png" id="Texture_object_8_8"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/93eafee9-0d4c-45bb-8409-a52aeb680cdd.png" id="Texture_object_9_9"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/824d4c8f-9406-46d5-887f-1eb5b0f95f6b.png" id="Texture_object_10_10"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/23cabaee-1e9c-44a5-a72b-3475118feadb.png" id="Texture_object_11_11"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/0997ad7f-4def-4f58-827d-85e6aab2dc00.png" id="Texture_object_12_12"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/2897259d-c4a1-486d-8510-d5aa73e622a5.png" id="Texture_object_13_13"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/78fd1b44-2c8d-4f8e-bc4c-4b4bb2024536.png" id="Texture_object_14_14"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/f4db96e9-0cd1-4ade-bd1a-ca3b8cf07071.png" id="Texture_object_15_15"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/984d7003-74ea-4d85-aa19-96c2de8fd007.png" id="Texture_object_16_16"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/233cc46f-af17-476b-8206-22d063042972.png" id="Texture_object_17_17"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/3296772f-cf88-41ed-8f4d-00e0e32c46d6.png" id="Texture_object_18_18"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/24cf31db-fe27-425e-9519-f81d1340c270.png" id="Texture_object_19_19"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/b110c333-b4ed-40c4-87bf-4491e9a24d9e.png" id="Texture_object_20_20"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/a425cee0-df59-4cfe-a81a-a42dead483e1.png" id="Texture_object_21_21"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/2ae181c0-3e22-40d0-b3e4-1618842f8052.png" id="Texture_object_22_22"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/968f3859-979c-4991-b5a5-407497f6bcfa.png" id="Texture_object_23_23"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/ccec12f6-cb09-46ed-80b6-411615b2780f.png" id="Texture_object_24_24"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/d8f041da-a5dd-46f4-be54-caf10cb596d3.png" id="Texture_object_25_25"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/eb9dbe23-ed6b-4cbe-9d0e-8ec65e4aa064.png" id="Texture_object_26_26"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/9ee557a0-bea3-46d2-8c5a-9f8c1975c8c0.png" id="Texture_object_27_27"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/cd5c3987-4a17-4f2c-a020-8d79ba0c3cdd.png" id="Texture_object_28_28"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/00c816c8-0a1c-4a85-a327-0128ececc368.png" id="Texture_object_29_29"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/92dacd07-f725-49df-ab87-5b5b0bb16b9d.png" id="Texture_object_30_30"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/77f772a3-f9fc-41e6-803b-54956c56f732.png" id="Texture_object_31_31"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/ade4f51c-7cb5-483b-ad16-397a550a79cb.png" id="Texture_object_32_32"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/6970d795-6488-4c78-9274-9e925cd1fb19.png" id="Texture_object_33_33"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/00f2c0f9-6b1c-4c34-8df8-5df9da6a8b2a.png" id="Texture_object_34_34"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/d38f68be-6638-4278-8a6a-bf00d935dc2c.png" id="Texture_object_35_35"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/8302f5ba-3990-47b5-ab69-ffac252a4d9b.png" id="Texture_object_36_36"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/6a21a279-bdfc-4f8d-a5c4-0ece6ed08593.png" id="Texture_object_37_37"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/6beafae3-2d3a-4706-822e-dbfa17ef2d78.png" id="Texture_object_38_38"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/341638ed-854c-440c-bd0a-559aff6f145f.png" id="Texture_object_39_39"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/cf04b644-1464-4dcf-838a-afbfcc4b5ba9.png" id="Texture_object_40_40"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/fd9ff228-fc21-4cc2-a69e-2390f64a1a1a.png" id="Texture_object_41_41"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/e8c48519-c697-42bf-aca0-ceae782bb5e2.png" id="Texture_object_42_42"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/44ed7286-fcfc-421b-a42a-79c21c029f6c.png" id="Texture_object_43_43"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/80dfdfc4-f778-464c-9d97-064c52d2a3b5.png" id="Texture_object_44_44"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/e7288e5c-4b19-4947-b33e-4d3c5da752e3.png" id="Texture_object_45_45"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/865d5a68-d538-4f76-b28c-ddc58a4643b6.png" id="Texture_object_46_46"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/6edde35b-365e-41b8-976a-437695f563b3.png" id="Texture_object_47_47"]
+[ext_resource type="Texture2D" path="res://pixellab/source/objects/baa48f50-2cd6-4999-b9cc-5c733c06b96c.png" id="Texture_object_48_48"]
+
+[sub_resource type="RectangleShape2D" id="ObjectShape_0"]
+size = Vector2(26.88, 18.48)
+[sub_resource type="RectangleShape2D" id="ObjectShape_1"]
+size = Vector2(26.88, 18.48)
+[sub_resource type="RectangleShape2D" id="ObjectShape_2"]
+size = Vector2(40.96, 28.16)
+[sub_resource type="RectangleShape2D" id="ObjectShape_3"]
+size = Vector2(40.96, 28.16)
+[sub_resource type="RectangleShape2D" id="ObjectShape_4"]
+size = Vector2(20.48, 14.08)
+[sub_resource type="RectangleShape2D" id="ObjectShape_5"]
+size = Vector2(20.48, 14.08)
+[sub_resource type="RectangleShape2D" id="ObjectShape_6"]
+size = Vector2(40.96, 28.16)
+[sub_resource type="RectangleShape2D" id="ObjectShape_7"]
+size = Vector2(40.96, 28.16)
+[sub_resource type="RectangleShape2D" id="ObjectShape_8"]
+size = Vector2(54.4, 37.4)
+[sub_resource type="RectangleShape2D" id="ObjectShape_9"]
+size = Vector2(54.4, 37.4)
+[sub_resource type="RectangleShape2D" id="ObjectShape_10"]
+size = Vector2(40.96, 28.16)
+[sub_resource type="RectangleShape2D" id="ObjectShape_11"]
+size = Vector2(20.48, 14.08)
+[sub_resource type="RectangleShape2D" id="ObjectShape_12"]
+size = Vector2(20.48, 14.08)
+[sub_resource type="RectangleShape2D" id="ObjectShape_13"]
+size = Vector2(40.96, 28.16)
+[sub_resource type="RectangleShape2D" id="ObjectShape_14"]
+size = Vector2(40.96, 28.16)
+[sub_resource type="RectangleShape2D" id="ObjectShape_15"]
+size = Vector2(40.96, 28.16)
+[sub_resource type="RectangleShape2D" id="ObjectShape_16"]
+size = Vector2(12, 12)
+[sub_resource type="RectangleShape2D" id="ObjectShape_17"]
+size = Vector2(12, 12)
+[sub_resource type="RectangleShape2D" id="ObjectShape_18"]
+size = Vector2(12, 12)
+[sub_resource type="RectangleShape2D" id="ObjectShape_19"]
+size = Vector2(12, 12)
+[sub_resource type="RectangleShape2D" id="ObjectShape_20"]
+size = Vector2(12, 12)
+[sub_resource type="RectangleShape2D" id="ObjectShape_21"]
+size = Vector2(81.92, 56.32)
+[sub_resource type="RectangleShape2D" id="ObjectShape_22"]
+size = Vector2(40.96, 28.16)
+[sub_resource type="RectangleShape2D" id="ObjectShape_23"]
+size = Vector2(40.96, 28.16)
+[sub_resource type="RectangleShape2D" id="ObjectShape_24"]
+size = Vector2(54.4, 37.4)
+[sub_resource type="RectangleShape2D" id="ObjectShape_25"]
+size = Vector2(54.4, 37.4)
+[sub_resource type="RectangleShape2D" id="ObjectShape_26"]
+size = Vector2(54.4, 37.4)
+[sub_resource type="RectangleShape2D" id="ObjectShape_27"]
+size = Vector2(26.88, 18.48)
+[sub_resource type="RectangleShape2D" id="ObjectShape_28"]
+size = Vector2(40.96, 28.16)
+[sub_resource type="RectangleShape2D" id="ObjectShape_29"]
+size = Vector2(26.88, 18.48)
+[sub_resource type="RectangleShape2D" id="ObjectShape_30"]
+size = Vector2(26.88, 18.48)
+[sub_resource type="RectangleShape2D" id="ObjectShape_31"]
+size = Vector2(26.88, 18.48)
+[sub_resource type="RectangleShape2D" id="ObjectShape_32"]
+size = Vector2(40.96, 28.16)
+[sub_resource type="RectangleShape2D" id="ObjectShape_33"]
+size = Vector2(60.8, 46.2)
+[sub_resource type="RectangleShape2D" id="ObjectShape_34"]
+size = Vector2(60.8, 46.2)
+[sub_resource type="RectangleShape2D" id="ObjectShape_35"]
+size = Vector2(60.8, 46.2)
+[sub_resource type="RectangleShape2D" id="ObjectShape_36"]
+size = Vector2(60.8, 46.2)
+[sub_resource type="RectangleShape2D" id="ObjectShape_37"]
+size = Vector2(60.8, 46.2)
+[sub_resource type="RectangleShape2D" id="ObjectShape_38"]
+size = Vector2(60.8, 46.2)
+[sub_resource type="RectangleShape2D" id="ObjectShape_39"]
+size = Vector2(60.8, 46.2)
+[sub_resource type="RectangleShape2D" id="ObjectShape_40"]
+size = Vector2(60.8, 46.2)
+[sub_resource type="RectangleShape2D" id="ObjectShape_41"]
+size = Vector2(54.4, 37.4)
+[sub_resource type="RectangleShape2D" id="ObjectShape_42"]
+size = Vector2(54.4, 37.4)
+[sub_resource type="RectangleShape2D" id="ObjectShape_43"]
+size = Vector2(54.4, 37.4)
+[sub_resource type="RectangleShape2D" id="ObjectShape_44"]
+size = Vector2(54.4, 37.4)
+[sub_resource type="RectangleShape2D" id="ObjectShape_45"]
+size = Vector2(60.8, 46.2)
+[sub_resource type="RectangleShape2D" id="ObjectShape_46"]
+size = Vector2(60.8, 46.2)
+[sub_resource type="RectangleShape2D" id="ObjectShape_47"]
+size = Vector2(25.6, 17.6)
+[sub_resource type="RectangleShape2D" id="ObjectShape_48"]
+size = Vector2(40.96, 28.16)
+
+[node name="trailbound_pinewatch_v16_fresh" type="Node2D"]
+metadata/pixellab_format = "pixellab-engine-map"
+metadata/pixellab_version = "2.1.0"
+script = ExtResource("Script_builder")
+
+[node name="Objects" type="Node2D" parent="."]
+
+[node name="birdhouse on a short pole, woo 1" type="StaticBody2D" parent="Objects"]
+position = Vector2(66, 159)
+z_index = 45
+visible = true
+metadata/pixellab_id = "841b08bb-2719-40df-aa98-a818d66559bf"
+metadata/pixellab_source = "{\"id\":\"841b08bb-2719-40df-aa98-a818d66559bf\",\"name\":\"birdhouse on a short pole, woo\",\"filename\":\"841b08bb-2719-40df-aa98-a818d66559bf.png\",\"boundingBox\":{\"x\":34,\"y\":95,\"width\":42,\"height\":42},\"groundBounds\":{\"x\":42.0,\"y\":126.0,\"width\":24.0,\"height\":11.0},\"layer\":45,\"visible\":true,\"locked\":false,\"description\":\"Object: birdhouse on a short pole, woo (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:30:41.887265+00:00\",\"generatedAt\":\"2026-10-14T17:30:41.887257+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/birdhouse on a short pole, woo 1"]
+texture = ExtResource("Texture_object_0_0")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/birdhouse on a short pole, woo 1"]
+position = Vector2(21, 32.76)
+shape = SubResource("ObjectShape_0")
+
+[node name="clothesline with two small tow 2" type="StaticBody2D" parent="Objects"]
+position = Vector2(555, 169)
+z_index = 28
+visible = true
+metadata/pixellab_id = "2beb32d2-c37c-41d0-a2e9-7285adfb8080"
+metadata/pixellab_source = "{\"id\":\"2beb32d2-c37c-41d0-a2e9-7285adfb8080\",\"name\":\"clothesline with two small tow\",\"filename\":\"2beb32d2-c37c-41d0-a2e9-7285adfb8080.png\",\"boundingBox\":{\"x\":523,\"y\":105,\"width\":42,\"height\":42},\"groundBounds\":{\"x\":524.0,\"y\":132.0,\"width\":40.0,\"height\":11.0},\"layer\":28,\"visible\":true,\"locked\":false,\"description\":\"Object: clothesline with two small tow (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:30:42.880950+00:00\",\"generatedAt\":\"2026-10-14T17:30:42.880942+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/clothesline with two small tow 2"]
+texture = ExtResource("Texture_object_1_1")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/clothesline with two small tow 2"]
+position = Vector2(21, 32.76)
+shape = SubResource("ObjectShape_1")
+
+[node name="small wooden chicken coop with 3" type="StaticBody2D" parent="Objects"]
+position = Vector2(303, 127)
+z_index = 60
+visible = true
+metadata/pixellab_id = "6d98cdef-17a2-4739-8545-0b11edb6ef1f"
+metadata/pixellab_source = "{\"id\":\"6d98cdef-17a2-4739-8545-0b11edb6ef1f\",\"name\":\"small wooden chicken coop with\",\"filename\":\"6d98cdef-17a2-4739-8545-0b11edb6ef1f.png\",\"boundingBox\":{\"x\":271,\"y\":63,\"width\":64,\"height\":64},\"groundBounds\":{\"x\":274.0,\"y\":108.0,\"width\":59.0,\"height\":16.0},\"layer\":60,\"visible\":true,\"locked\":false,\"description\":\"Object: small wooden chicken coop with (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:30:51.085341+00:00\",\"generatedAt\":\"2026-10-14T17:30:51.085332+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/small wooden chicken coop with 3"]
+texture = ExtResource("Texture_object_2_2")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/small wooden chicken coop with 3"]
+position = Vector2(32, 49.92)
+shape = SubResource("ObjectShape_2")
+
+[node name="reception_board 4" type="StaticBody2D" parent="Objects"]
+position = Vector2(615, 475)
+z_index = 80
+visible = true
+metadata/pixellab_id = "8b9404f0-7015-422d-a90c-b0a79f0887ed"
+metadata/pixellab_source = "{\"id\":\"8b9404f0-7015-422d-a90c-b0a79f0887ed\",\"name\":\"reception_board\",\"filename\":\"8b9404f0-7015-422d-a90c-b0a79f0887ed.png\",\"boundingBox\":{\"x\":583,\"y\":411,\"width\":64,\"height\":64},\"groundBounds\":{\"x\":592.0,\"y\":447.0,\"width\":46.0,\"height\":16.0},\"layer\":80,\"visible\":true,\"locked\":false,\"description\":\"Object: reception_board (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:30:58.628686+00:00\",\"generatedAt\":\"2026-10-14T17:30:58.628678+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/reception_board 4"]
+texture = ExtResource("Texture_object_3_3")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/reception_board 4"]
+position = Vector2(32, 49.92)
+shape = SubResource("ObjectShape_3")
+
+[node name="woven bamboo basket of mushroo 5" type="StaticBody2D" parent="Objects"]
+position = Vector2(501, 178)
+z_index = 90
+visible = true
+metadata/pixellab_id = "1a58c7dc-0267-47a4-8889-4abbd9bf4361"
+metadata/pixellab_source = "{\"id\":\"1a58c7dc-0267-47a4-8889-4abbd9bf4361\",\"name\":\"woven bamboo basket of mushroo\",\"filename\":\"1a58c7dc-0267-47a4-8889-4abbd9bf4361.png\",\"boundingBox\":{\"x\":469,\"y\":114,\"width\":32,\"height\":32},\"groundBounds\":{\"x\":474.0,\"y\":135.0,\"width\":22.0,\"height\":8.0},\"layer\":90,\"visible\":true,\"locked\":false,\"description\":\"Object: woven bamboo basket of mushroo (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:30:59.672598+00:00\",\"generatedAt\":\"2026-10-14T17:30:59.672590+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/woven bamboo basket of mushroo 5"]
+texture = ExtResource("Texture_object_4_4")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/woven bamboo basket of mushroo 5"]
+position = Vector2(16, 24.96)
+shape = SubResource("ObjectShape_4")
+
+[node name="woven bamboo basket of red ber 6" type="StaticBody2D" parent="Objects"]
+position = Vector2(473, 179)
+z_index = 90
+visible = true
+metadata/pixellab_id = "48258750-6597-462a-ac17-0c2df15758a6"
+metadata/pixellab_source = "{\"id\":\"48258750-6597-462a-ac17-0c2df15758a6\",\"name\":\"woven bamboo basket of red ber\",\"filename\":\"48258750-6597-462a-ac17-0c2df15758a6.png\",\"boundingBox\":{\"x\":441,\"y\":115,\"width\":32,\"height\":32},\"groundBounds\":{\"x\":447.0,\"y\":135.0,\"width\":20.0,\"height\":8.0},\"layer\":90,\"visible\":true,\"locked\":false,\"description\":\"Object: woven bamboo basket of red ber (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:31:00.771967+00:00\",\"generatedAt\":\"2026-10-14T17:31:00.771959+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/woven bamboo basket of red ber 6"]
+texture = ExtResource("Texture_object_5_5")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/woven bamboo basket of red ber 6"]
+position = Vector2(16, 24.96)
+shape = SubResource("ObjectShape_5")
+
+[node name="wooden lantern post with a han 7" type="StaticBody2D" parent="Objects"]
+position = Vector2(357, 278)
+z_index = 90
+visible = true
+metadata/pixellab_id = "b8f9b470-b6de-4140-8bc7-649b548a444f"
+metadata/pixellab_source = "{\"id\":\"b8f9b470-b6de-4140-8bc7-649b548a444f\",\"name\":\"wooden lantern post with a han\",\"filename\":\"b8f9b470-b6de-4140-8bc7-649b548a444f.png\",\"boundingBox\":{\"x\":325,\"y\":214,\"width\":64,\"height\":64},\"groundBounds\":{\"x\":348.0,\"y\":258.0,\"width\":24.0,\"height\":16.0},\"layer\":90,\"visible\":true,\"locked\":false,\"description\":\"Object: wooden lantern post with a han (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:31:02.581777+00:00\",\"generatedAt\":\"2026-10-14T17:31:02.581768+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/wooden lantern post with a han 7"]
+texture = ExtResource("Texture_object_6_6")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/wooden lantern post with a han 7"]
+position = Vector2(32, 49.92)
+shape = SubResource("ObjectShape_6")
+
+[node name="raised wooden tent platform de 8" type="StaticBody2D" parent="Objects"]
+position = Vector2(284, 210)
+z_index = 70
+visible = true
+metadata/pixellab_id = "93f0d7c0-3926-4e63-9f48-38c50543c2a9"
+metadata/pixellab_source = "{\"id\":\"93f0d7c0-3926-4e63-9f48-38c50543c2a9\",\"name\":\"raised wooden tent platform de\",\"filename\":\"93f0d7c0-3926-4e63-9f48-38c50543c2a9.png\",\"boundingBox\":{\"x\":252,\"y\":146,\"width\":64,\"height\":64},\"groundBounds\":{\"x\":255.0,\"y\":185.0,\"width\":55.0,\"height\":16.0},\"layer\":70,\"visible\":true,\"locked\":false,\"description\":\"Object: raised wooden tent platform de (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:31:13.286805+00:00\",\"generatedAt\":\"2026-10-14T17:31:13.286798+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/raised wooden tent platform de 8"]
+texture = ExtResource("Texture_object_7_7")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/raised wooden tent platform de 8"]
+position = Vector2(32, 49.92)
+shape = SubResource("ObjectShape_7")
+
+[node name="clump of shore reeds with thin 9" type="StaticBody2D" parent="Objects"]
+position = Vector2(71, 115)
+z_index = 33
+visible = true
+metadata/pixellab_id = "cb9342d4-cb54-4bed-ba1a-111ce7790ec8"
+metadata/pixellab_source = "{\"id\":\"cb9342d4-cb54-4bed-ba1a-111ce7790ec8\",\"name\":\"clump of shore reeds with thin\",\"filename\":\"cb9342d4-cb54-4bed-ba1a-111ce7790ec8.png\",\"boundingBox\":{\"x\":39,\"y\":51,\"width\":85,\"height\":85},\"groundBounds\":{\"x\":57.0,\"y\":104.0,\"width\":46.0,\"height\":21.0},\"layer\":33,\"visible\":true,\"locked\":false,\"description\":\"Object: clump of shore reeds with thin (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:31:28.073065+00:00\",\"generatedAt\":\"2026-10-14T17:31:28.073057+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/clump of shore reeds with thin 9"]
+texture = ExtResource("Texture_object_8_8")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/clump of shore reeds with thin 9"]
+position = Vector2(42.5, 66.3)
+shape = SubResource("ObjectShape_8")
+
+[node name="clump of shore reeds with thin 10" type="StaticBody2D" parent="Objects"]
+position = Vector2(167, 256)
+z_index = 110
+visible = true
+metadata/pixellab_id = "93eafee9-0d4c-45bb-8409-a52aeb680cdd"
+metadata/pixellab_source = "{\"id\":\"93eafee9-0d4c-45bb-8409-a52aeb680cdd\",\"name\":\"clump of shore reeds with thin\",\"filename\":\"93eafee9-0d4c-45bb-8409-a52aeb680cdd.png\",\"boundingBox\":{\"x\":135,\"y\":192,\"width\":85,\"height\":85},\"groundBounds\":{\"x\":153.0,\"y\":245.0,\"width\":46.0,\"height\":21.0},\"layer\":110,\"visible\":true,\"locked\":false,\"description\":\"Object: clump of shore reeds with thin (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:31:33.371077+00:00\",\"generatedAt\":\"2026-10-14T17:31:33.371069+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/clump of shore reeds with thin 10"]
+texture = ExtResource("Texture_object_9_9")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/clump of shore reeds with thin 10"]
+position = Vector2(42.5, 66.3)
+shape = SubResource("ObjectShape_9")
+
+[node name="wooden fishing stool with a bu 11" type="StaticBody2D" parent="Objects"]
+position = Vector2(249, 388)
+z_index = 100
+visible = true
+metadata/pixellab_id = "824d4c8f-9406-46d5-887f-1eb5b0f95f6b"
+metadata/pixellab_source = "{\"id\":\"824d4c8f-9406-46d5-887f-1eb5b0f95f6b\",\"name\":\"wooden fishing stool with a bu\",\"filename\":\"824d4c8f-9406-46d5-887f-1eb5b0f95f6b.png\",\"boundingBox\":{\"x\":217,\"y\":324,\"width\":64,\"height\":64},\"groundBounds\":{\"x\":223.0,\"y\":365.0,\"width\":54.0,\"height\":16.0},\"layer\":100,\"visible\":true,\"locked\":false,\"description\":\"Object: wooden fishing stool with a bu (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:31:34.832942+00:00\",\"generatedAt\":\"2026-10-14T17:31:34.832935+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/wooden fishing stool with a bu 11"]
+texture = ExtResource("Texture_object_10_10")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/wooden fishing stool with a bu 11"]
+position = Vector2(32, 49.92)
+shape = SubResource("ObjectShape_10")
+
+[node name="heron 12" type="StaticBody2D" parent="Objects"]
+position = Vector2(251, 242)
+z_index = 100
+visible = true
+metadata/pixellab_id = "23cabaee-1e9c-44a5-a72b-3475118feadb"
+metadata/pixellab_source = "{\"id\":\"23cabaee-1e9c-44a5-a72b-3475118feadb\",\"name\":\"heron\",\"filename\":\"23cabaee-1e9c-44a5-a72b-3475118feadb.png\",\"boundingBox\":{\"x\":219,\"y\":178,\"width\":32,\"height\":32},\"groundBounds\":{\"x\":230.0,\"y\":202.0,\"width\":9.0,\"height\":8.0},\"layer\":100,\"visible\":true,\"locked\":false,\"description\":\"Object: heron (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:31:36.122474+00:00\",\"generatedAt\":\"2026-10-14T17:31:36.122466+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/heron 12"]
+texture = ExtResource("Texture_object_11_11")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/heron 12"]
+position = Vector2(16, 24.96)
+shape = SubResource("ObjectShape_11")
+
+[node name="kingfisher 13" type="StaticBody2D" parent="Objects"]
+position = Vector2(72, 132)
+z_index = 50
+visible = true
+metadata/pixellab_id = "0997ad7f-4def-4f58-827d-85e6aab2dc00"
+metadata/pixellab_source = "{\"id\":\"0997ad7f-4def-4f58-827d-85e6aab2dc00\",\"name\":\"kingfisher\",\"filename\":\"0997ad7f-4def-4f58-827d-85e6aab2dc00.png\",\"boundingBox\":{\"x\":40,\"y\":68,\"width\":32,\"height\":32},\"groundBounds\":{\"x\":44.0,\"y\":91.0,\"width\":22.0,\"height\":8.0},\"layer\":50,\"visible\":true,\"locked\":false,\"description\":\"Object: kingfisher (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:31:37.396042+00:00\",\"generatedAt\":\"2026-10-14T17:31:37.396034+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/kingfisher 13"]
+texture = ExtResource("Texture_object_12_12")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/kingfisher 13"]
+position = Vector2(16, 24.96)
+shape = SubResource("ObjectShape_12")
+
+[node name="forage bush with ripe red berr 14" type="StaticBody2D" parent="Objects"]
+position = Vector2(330, 136)
+z_index = 120
+visible = true
+metadata/pixellab_id = "2897259d-c4a1-486d-8510-d5aa73e622a5"
+metadata/pixellab_source = "{\"id\":\"2897259d-c4a1-486d-8510-d5aa73e622a5\",\"name\":\"forage bush with ripe red berr\",\"filename\":\"2897259d-c4a1-486d-8510-d5aa73e622a5.png\",\"boundingBox\":{\"x\":298,\"y\":72,\"width\":64,\"height\":64},\"groundBounds\":{\"x\":311.0,\"y\":113.0,\"width\":38.0,\"height\":16.0},\"layer\":120,\"visible\":true,\"locked\":false,\"description\":\"Object: forage bush with ripe red berr (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:31:38.769483+00:00\",\"generatedAt\":\"2026-10-14T17:31:38.769475+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/forage bush with ripe red berr 14"]
+texture = ExtResource("Texture_object_13_13")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/forage bush with ripe red berr 14"]
+position = Vector2(32, 49.92)
+shape = SubResource("ObjectShape_13")
+
+[node name="kite_stake 15" type="StaticBody2D" parent="Objects"]
+position = Vector2(105, 335)
+z_index = 50
+visible = true
+metadata/pixellab_id = "78fd1b44-2c8d-4f8e-bc4c-4b4bb2024536"
+metadata/pixellab_source = "{\"id\":\"78fd1b44-2c8d-4f8e-bc4c-4b4bb2024536\",\"name\":\"kite_stake\",\"filename\":\"78fd1b44-2c8d-4f8e-bc4c-4b4bb2024536.png\",\"boundingBox\":{\"x\":73,\"y\":271,\"width\":64,\"height\":64},\"groundBounds\":{\"x\":100.0,\"y\":316.0,\"width\":8.0,\"height\":16.0},\"layer\":50,\"visible\":true,\"locked\":false,\"description\":\"Object: kite_stake (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:31:48.616429+00:00\",\"generatedAt\":\"2026-10-14T17:31:48.616421+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/kite_stake 15"]
+texture = ExtResource("Texture_object_14_14")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/kite_stake 15"]
+position = Vector2(32, 49.92)
+shape = SubResource("ObjectShape_14")
+
+[node name="wooden picnic table with attac 16" type="StaticBody2D" parent="Objects"]
+position = Vector2(319, 182)
+z_index = 60
+visible = true
+metadata/pixellab_id = "f4db96e9-0cd1-4ade-bd1a-ca3b8cf07071"
+metadata/pixellab_source = "{\"id\":\"f4db96e9-0cd1-4ade-bd1a-ca3b8cf07071\",\"name\":\"wooden picnic table with attac\",\"filename\":\"f4db96e9-0cd1-4ade-bd1a-ca3b8cf07071.png\",\"boundingBox\":{\"x\":287,\"y\":118,\"width\":64,\"height\":64},\"groundBounds\":{\"x\":290.0,\"y\":157.0,\"width\":57.0,\"height\":16.0},\"layer\":60,\"visible\":true,\"locked\":false,\"description\":\"Object: wooden picnic table with attac (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:31:50.300890+00:00\",\"generatedAt\":\"2026-10-14T17:31:50.300881+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/wooden picnic table with attac 16"]
+texture = ExtResource("Texture_object_15_15")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/wooden picnic table with attac 16"]
+position = Vector2(32, 49.92)
+shape = SubResource("ObjectShape_15")
+
+[node name="pink wildflowers 17" type="StaticBody2D" parent="Objects"]
+position = Vector2(239, 474)
+z_index = 130
+visible = true
+metadata/pixellab_id = "984d7003-74ea-4d85-aa19-96c2de8fd007"
+metadata/pixellab_source = "{\"id\":\"984d7003-74ea-4d85-aa19-96c2de8fd007\",\"name\":\"pink wildflowers\",\"filename\":\"984d7003-74ea-4d85-aa19-96c2de8fd007.png\",\"boundingBox\":{\"x\":207,\"y\":410,\"width\":16,\"height\":16},\"groundBounds\":{\"x\":210.0,\"y\":419.0,\"width\":10.0,\"height\":4.0},\"layer\":130,\"visible\":true,\"locked\":false,\"description\":\"Object: pink wildflowers (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:31:55.502538+00:00\",\"generatedAt\":\"2026-10-14T17:31:55.502531+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/pink wildflowers 17"]
+texture = ExtResource("Texture_object_16_16")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/pink wildflowers 17"]
+position = Vector2(8, 10)
+shape = SubResource("ObjectShape_16")
+
+[node name="tiny white wildflowers 18" type="StaticBody2D" parent="Objects"]
+position = Vector2(650, 360)
+z_index = 100
+visible = true
+metadata/pixellab_id = "233cc46f-af17-476b-8206-22d063042972"
+metadata/pixellab_source = "{\"id\":\"233cc46f-af17-476b-8206-22d063042972\",\"name\":\"tiny white wildflowers\",\"filename\":\"233cc46f-af17-476b-8206-22d063042972.png\",\"boundingBox\":{\"x\":618,\"y\":296,\"width\":16,\"height\":16},\"groundBounds\":{\"x\":621.0,\"y\":306.0,\"width\":11.0,\"height\":4.0},\"layer\":100,\"visible\":true,\"locked\":false,\"description\":\"Object: tiny white wildflowers (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:31:57.957479+00:00\",\"generatedAt\":\"2026-10-14T17:31:57.957471+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/tiny white wildflowers 18"]
+texture = ExtResource("Texture_object_17_17")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/tiny white wildflowers 18"]
+position = Vector2(8, 10)
+shape = SubResource("ObjectShape_17")
+
+[node name="scatter of brown pine needles 19" type="StaticBody2D" parent="Objects"]
+position = Vector2(520, 176)
+z_index = 30
+visible = true
+metadata/pixellab_id = "3296772f-cf88-41ed-8f4d-00e0e32c46d6"
+metadata/pixellab_source = "{\"id\":\"3296772f-cf88-41ed-8f4d-00e0e32c46d6\",\"name\":\"scatter of brown pine needles\",\"filename\":\"3296772f-cf88-41ed-8f4d-00e0e32c46d6.png\",\"boundingBox\":{\"x\":488,\"y\":112,\"width\":16,\"height\":16},\"groundBounds\":{\"x\":492.0,\"y\":122.0,\"width\":8.0,\"height\":4.0},\"layer\":30,\"visible\":true,\"locked\":false,\"description\":\"Object: scatter of brown pine needles (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:32:00.428520+00:00\",\"generatedAt\":\"2026-10-14T17:32:00.428508+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/scatter of brown pine needles 19"]
+texture = ExtResource("Texture_object_18_18")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/scatter of brown pine needles 19"]
+position = Vector2(8, 10)
+shape = SubResource("ObjectShape_18")
+
+[node name="short grass tuft 20" type="StaticBody2D" parent="Objects"]
+position = Vector2(392, 464)
+z_index = 120
+visible = true
+metadata/pixellab_id = "24cf31db-fe27-425e-9519-f81d1340c270"
+metadata/pixellab_source = "{\"id\":\"24cf31db-fe27-425e-9519-f81d1340c270\",\"name\":\"short grass tuft\",\"filename\":\"24cf31db-fe27-425e-9519-f81d1340c270.png\",\"boundingBox\":{\"x\":360,\"y\":400,\"width\":16,\"height\":16},\"groundBounds\":{\"x\":363.0,\"y\":410.0,\"width\":10.0,\"height\":4.0},\"layer\":120,\"visible\":true,\"locked\":false,\"description\":\"Object: short grass tuft (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:32:01.588614+00:00\",\"generatedAt\":\"2026-10-14T17:32:01.588602+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/short grass tuft 20"]
+texture = ExtResource("Texture_object_19_19")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/short grass tuft 20"]
+position = Vector2(8, 10)
+shape = SubResource("ObjectShape_19")
+
+[node name="tall grass tuft 21" type="StaticBody2D" parent="Objects"]
+position = Vector2(633, 517)
+z_index = 130
+visible = true
+metadata/pixellab_id = "b110c333-b4ed-40c4-87bf-4491e9a24d9e"
+metadata/pixellab_source = "{\"id\":\"b110c333-b4ed-40c4-87bf-4491e9a24d9e\",\"name\":\"tall grass tuft\",\"filename\":\"b110c333-b4ed-40c4-87bf-4491e9a24d9e.png\",\"boundingBox\":{\"x\":601,\"y\":453,\"width\":16,\"height\":16},\"groundBounds\":{\"x\":604.0,\"y\":463.0,\"width\":10.0,\"height\":4.0},\"layer\":130,\"visible\":true,\"locked\":false,\"description\":\"Object: tall grass tuft (unknown)\",\"metadata\":{\"lastEdited\":\"2026-10-14T17:32:02.615296+00:00\",\"generatedAt\":\"2026-10-14T17:32:02.615288+00:00\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/tall grass tuft 21"]
+texture = ExtResource("Texture_object_20_20")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/tall grass tuft 21"]
+position = Vector2(8, 10)
+shape = SubResource("ObjectShape_20")
+
+[node name="base 22" type="StaticBody2D" parent="Objects"]
+position = Vector2(440, 255)
+z_index = 6
+visible = true
+metadata/pixellab_id = "a425cee0-df59-4cfe-a81a-a42dead483e1"
+metadata/pixellab_source = "{\"id\":\"a425cee0-df59-4cfe-a81a-a42dead483e1\",\"name\":\"base\",\"filename\":\"a425cee0-df59-4cfe-a81a-a42dead483e1.png\",\"boundingBox\":{\"x\":408,\"y\":191,\"width\":128,\"height\":128},\"groundBounds\":{\"x\":430.0,\"y\":282.0,\"width\":82.0,\"height\":32.0},\"layer\":6,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-14T18:27:30.834Z\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base 22"]
+texture = ExtResource("Texture_object_21_21")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base 22"]
+position = Vector2(64, 99.84)
+shape = SubResource("ObjectShape_21")
+
+[node name="base 23" type="StaticBody2D" parent="Objects"]
+position = Vector2(613, 159)
+z_index = 32
+visible = true
+metadata/pixellab_id = "2ae181c0-3e22-40d0-b3e4-1618842f8052"
+metadata/pixellab_source = "{\"id\":\"2ae181c0-3e22-40d0-b3e4-1618842f8052\",\"name\":\"base\",\"filename\":\"2ae181c0-3e22-40d0-b3e4-1618842f8052.png\",\"boundingBox\":{\"x\":581,\"y\":95,\"width\":64,\"height\":64},\"groundBounds\":{\"x\":587.0,\"y\":135.0,\"width\":50.0,\"height\":16.0},\"layer\":32,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-14T18:29:37.514Z\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base 23"]
+texture = ExtResource("Texture_object_22_22")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base 23"]
+position = Vector2(32, 49.92)
+shape = SubResource("ObjectShape_22")
+
+[node name="base 24" type="StaticBody2D" parent="Objects"]
+position = Vector2(72, 361)
+z_index = 27
+visible = true
+metadata/pixellab_id = "968f3859-979c-4991-b5a5-407497f6bcfa"
+metadata/pixellab_source = "{\"id\":\"968f3859-979c-4991-b5a5-407497f6bcfa\",\"name\":\"base\",\"filename\":\"968f3859-979c-4991-b5a5-407497f6bcfa.png\",\"boundingBox\":{\"x\":40,\"y\":297,\"width\":64,\"height\":64},\"groundBounds\":{\"x\":52.0,\"y\":332.0,\"width\":38.0,\"height\":16.0},\"layer\":27,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-14T18:30:23.985Z\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base 24"]
+texture = ExtResource("Texture_object_23_23")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base 24"]
+position = Vector2(32, 49.92)
+shape = SubResource("ObjectShape_23")
+
+[node name="base (Copy) 25" type="StaticBody2D" parent="Objects"]
+position = Vector2(488, 60)
+z_index = 13
+visible = true
+metadata/pixellab_id = "ccec12f6-cb09-46ed-80b6-411615b2780f"
+metadata/pixellab_source = "{\"id\":\"ccec12f6-cb09-46ed-80b6-411615b2780f\",\"name\":\"base (Copy)\",\"filename\":\"ccec12f6-cb09-46ed-80b6-411615b2780f.png\",\"boundingBox\":{\"x\":455.5,\"y\":-4.5,\"width\":85,\"height\":85},\"groundBounds\":{\"x\":467.5,\"y\":46.5,\"width\":63.0,\"height\":21.0},\"layer\":13,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-14T18:32:46.744Z\",\"duplicatedFromObjectId\":\"16f2219f-e770-4041-9750-ffd62b045f08\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy) 25"]
+texture = ExtResource("Texture_object_24_24")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy) 25"]
+position = Vector2(42, 65.8)
+shape = SubResource("ObjectShape_24")
+
+[node name="base (Copy 2) 26" type="StaticBody2D" parent="Objects"]
+position = Vector2(283, 67)
+z_index = 2
+visible = true
+metadata/pixellab_id = "d8f041da-a5dd-46f4-be54-caf10cb596d3"
+metadata/pixellab_source = "{\"id\":\"d8f041da-a5dd-46f4-be54-caf10cb596d3\",\"name\":\"base (Copy 2)\",\"filename\":\"d8f041da-a5dd-46f4-be54-caf10cb596d3.png\",\"boundingBox\":{\"x\":250.5,\"y\":2.5,\"width\":85,\"height\":85},\"groundBounds\":{\"x\":262.5,\"y\":53.5,\"width\":63.0,\"height\":21.0},\"layer\":2,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-14T18:32:47.458Z\",\"duplicatedFromObjectId\":\"16f2219f-e770-4041-9750-ffd62b045f08\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 2) 26"]
+texture = ExtResource("Texture_object_25_25")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 2) 26"]
+position = Vector2(42, 65.8)
+shape = SubResource("ObjectShape_25")
+
+[node name="base (Copy 5) 27" type="StaticBody2D" parent="Objects"]
+position = Vector2(739, 453)
+z_index = 3
+visible = true
+metadata/pixellab_id = "eb9dbe23-ed6b-4cbe-9d0e-8ec65e4aa064"
+metadata/pixellab_source = "{\"id\":\"eb9dbe23-ed6b-4cbe-9d0e-8ec65e4aa064\",\"name\":\"base (Copy 5)\",\"filename\":\"eb9dbe23-ed6b-4cbe-9d0e-8ec65e4aa064.png\",\"boundingBox\":{\"x\":706.5,\"y\":388.5,\"width\":85,\"height\":85},\"groundBounds\":{\"x\":718.5,\"y\":439.5,\"width\":63.0,\"height\":21.0},\"layer\":3,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-14T18:32:48.088Z\",\"duplicatedFromObjectId\":\"16f2219f-e770-4041-9750-ffd62b045f08\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 5) 27"]
+texture = ExtResource("Texture_object_26_26")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 5) 27"]
+position = Vector2(42, 65.8)
+shape = SubResource("ObjectShape_26")
+
+[node name="base 28" type="StaticBody2D" parent="Objects"]
+position = Vector2(299, 337)
+z_index = 34
+visible = true
+metadata/pixellab_id = "9ee557a0-bea3-46d2-8c5a-9f8c1975c8c0"
+metadata/pixellab_source = "{\"id\":\"9ee557a0-bea3-46d2-8c5a-9f8c1975c8c0\",\"name\":\"base\",\"filename\":\"9ee557a0-bea3-46d2-8c5a-9f8c1975c8c0.png\",\"boundingBox\":{\"x\":267,\"y\":273,\"width\":42,\"height\":42},\"groundBounds\":{\"x\":268.0,\"y\":302.0,\"width\":39.0,\"height\":11.0},\"layer\":34,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-14T18:33:58.741Z\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base 28"]
+texture = ExtResource("Texture_object_27_27")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base 28"]
+position = Vector2(21, 32.76)
+shape = SubResource("ObjectShape_27")
+
+[node name="base 29" type="StaticBody2D" parent="Objects"]
+position = Vector2(446, 430)
+z_index = 37
+visible = true
+metadata/pixellab_id = "cd5c3987-4a17-4f2c-a020-8d79ba0c3cdd"
+metadata/pixellab_source = "{\"id\":\"cd5c3987-4a17-4f2c-a020-8d79ba0c3cdd\",\"name\":\"base\",\"filename\":\"cd5c3987-4a17-4f2c-a020-8d79ba0c3cdd.png\",\"boundingBox\":{\"x\":414,\"y\":366,\"width\":64,\"height\":64},\"groundBounds\":{\"x\":422.0,\"y\":407.0,\"width\":52.0,\"height\":16.0},\"layer\":37,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-14T18:40:32.218Z\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base 29"]
+texture = ExtResource("Texture_object_28_28")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base 29"]
+position = Vector2(32, 49.92)
+shape = SubResource("ObjectShape_28")
+
+[node name="base 30" type="StaticBody2D" parent="Objects"]
+position = Vector2(28, 195)
+z_index = 1
+visible = true
+metadata/pixellab_id = "00c816c8-0a1c-4a85-a327-0128ececc368"
+metadata/pixellab_source = "{\"id\":\"00c816c8-0a1c-4a85-a327-0128ececc368\",\"name\":\"base\",\"filename\":\"00c816c8-0a1c-4a85-a327-0128ececc368.png\",\"boundingBox\":{\"x\":-4,\"y\":131,\"width\":42,\"height\":42},\"groundBounds\":{\"x\":-4.0,\"y\":156.0,\"width\":42.0,\"height\":11.0},\"layer\":1,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T03:38:43.044Z\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base 30"]
+texture = ExtResource("Texture_object_29_29")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base 30"]
+position = Vector2(21, 32.76)
+shape = SubResource("ObjectShape_29")
+
+[node name="base (Copy 6) 31" type="StaticBody2D" parent="Objects"]
+position = Vector2(57, 193)
+z_index = 1
+visible = true
+metadata/pixellab_id = "92dacd07-f725-49df-ab87-5b5b0bb16b9d"
+metadata/pixellab_source = "{\"id\":\"92dacd07-f725-49df-ab87-5b5b0bb16b9d\",\"name\":\"base (Copy 6)\",\"filename\":\"92dacd07-f725-49df-ab87-5b5b0bb16b9d.png\",\"boundingBox\":{\"x\":25,\"y\":129,\"width\":42,\"height\":42},\"groundBounds\":{\"x\":25.0,\"y\":154.0,\"width\":42.0,\"height\":11.0},\"layer\":1,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T03:42:06.308Z\",\"duplicatedFromObjectId\":\"5dfe6b5c-e881-4933-a669-af5fcff44737\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 6) 31"]
+texture = ExtResource("Texture_object_30_30")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 6) 31"]
+position = Vector2(21, 32.76)
+shape = SubResource("ObjectShape_30")
+
+[node name="base 32" type="StaticBody2D" parent="Objects"]
+position = Vector2(131, 356)
+z_index = 35
+visible = true
+metadata/pixellab_id = "77f772a3-f9fc-41e6-803b-54956c56f732"
+metadata/pixellab_source = "{\"id\":\"77f772a3-f9fc-41e6-803b-54956c56f732\",\"name\":\"base\",\"filename\":\"77f772a3-f9fc-41e6-803b-54956c56f732.png\",\"boundingBox\":{\"x\":99,\"y\":291.56666564941406,\"width\":42,\"height\":42},\"groundBounds\":{\"x\":99.0,\"y\":316.56666564941406,\"width\":42.0,\"height\":11.0},\"layer\":35,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T04:29:20.337Z\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base 32"]
+texture = ExtResource("Texture_object_31_31")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base 32"]
+position = Vector2(21, 32.3267)
+shape = SubResource("ObjectShape_31")
+
+[node name="base 33" type="StaticBody2D" parent="Objects"]
+position = Vector2(205, 247)
+z_index = 42
+visible = true
+metadata/pixellab_id = "ade4f51c-7cb5-483b-ad16-397a550a79cb"
+metadata/pixellab_source = "{\"id\":\"ade4f51c-7cb5-483b-ad16-397a550a79cb\",\"name\":\"base\",\"filename\":\"ade4f51c-7cb5-483b-ad16-397a550a79cb.png\",\"boundingBox\":{\"x\":173,\"y\":183,\"width\":64,\"height\":64},\"groundBounds\":{\"x\":181.0,\"y\":221.0,\"width\":48.0,\"height\":16.0},\"layer\":42,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T04:31:18.358Z\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base 33"]
+texture = ExtResource("Texture_object_32_32")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base 33"]
+position = Vector2(32, 49.92)
+shape = SubResource("ObjectShape_32")
+
+[node name="base 34" type="StaticBody2D" parent="Objects"]
+position = Vector2(614, 28)
+z_index = 35
+visible = true
+metadata/pixellab_id = "6970d795-6488-4c78-9274-9e925cd1fb19"
+metadata/pixellab_source = "{\"id\":\"6970d795-6488-4c78-9274-9e925cd1fb19\",\"name\":\"base\",\"filename\":\"6970d795-6488-4c78-9274-9e925cd1fb19.png\",\"boundingBox\":{\"x\":581.5,\"y\":-36.5,\"width\":95,\"height\":105},\"groundBounds\":{\"x\":610.5,\"y\":42.5,\"width\":33.0,\"height\":26.0},\"layer\":35,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T04:33:50.226Z\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base 34"]
+texture = ExtResource("Texture_object_33_33")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base 34"]
+position = Vector2(47, 81.4)
+shape = SubResource("ObjectShape_33")
+
+[node name="base (Copy 4) 35" type="StaticBody2D" parent="Objects"]
+position = Vector2(325, 13)
+z_index = 3
+visible = true
+metadata/pixellab_id = "00f2c0f9-6b1c-4c34-8df8-5df9da6a8b2a"
+metadata/pixellab_source = "{\"id\":\"00f2c0f9-6b1c-4c34-8df8-5df9da6a8b2a\",\"name\":\"base (Copy 4)\",\"filename\":\"00f2c0f9-6b1c-4c34-8df8-5df9da6a8b2a.png\",\"boundingBox\":{\"x\":292.5,\"y\":-51.5,\"width\":95,\"height\":105},\"groundBounds\":{\"x\":321.5,\"y\":27.5,\"width\":33.0,\"height\":26.0},\"layer\":3,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T04:33:52.747Z\",\"duplicatedFromObjectId\":\"7e5bbc75-3326-4942-91d3-86962187a3cd\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 4) 35"]
+texture = ExtResource("Texture_object_34_34")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 4) 35"]
+position = Vector2(47, 81.4)
+shape = SubResource("ObjectShape_34")
+
+[node name="base (Copy 7) 36" type="StaticBody2D" parent="Objects"]
+position = Vector2(261, 0)
+z_index = 1
+visible = true
+metadata/pixellab_id = "d38f68be-6638-4278-8a6a-bf00d935dc2c"
+metadata/pixellab_source = "{\"id\":\"d38f68be-6638-4278-8a6a-bf00d935dc2c\",\"name\":\"base (Copy 7)\",\"filename\":\"d38f68be-6638-4278-8a6a-bf00d935dc2c.png\",\"boundingBox\":{\"x\":228.5,\"y\":-64.5,\"width\":95,\"height\":105},\"groundBounds\":{\"x\":257.5,\"y\":14.5,\"width\":33.0,\"height\":26.0},\"layer\":1,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T04:33:54.628Z\",\"duplicatedFromObjectId\":\"7e5bbc75-3326-4942-91d3-86962187a3cd\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 7) 36"]
+texture = ExtResource("Texture_object_35_35")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 7) 36"]
+position = Vector2(47, 81.4)
+shape = SubResource("ObjectShape_35")
+
+[node name="base (Copy 9) 37" type="StaticBody2D" parent="Objects"]
+position = Vector2(352, 32)
+z_index = 24
+visible = true
+metadata/pixellab_id = "8302f5ba-3990-47b5-ab69-ffac252a4d9b"
+metadata/pixellab_source = "{\"id\":\"8302f5ba-3990-47b5-ab69-ffac252a4d9b\",\"name\":\"base (Copy 9)\",\"filename\":\"8302f5ba-3990-47b5-ab69-ffac252a4d9b.png\",\"boundingBox\":{\"x\":319.5,\"y\":-32.5,\"width\":95,\"height\":105},\"groundBounds\":{\"x\":348.5,\"y\":46.5,\"width\":33.0,\"height\":26.0},\"layer\":24,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T04:33:54.949Z\",\"duplicatedFromObjectId\":\"7e5bbc75-3326-4942-91d3-86962187a3cd\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 9) 37"]
+texture = ExtResource("Texture_object_36_36")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 9) 37"]
+position = Vector2(47, 81.4)
+shape = SubResource("ObjectShape_36")
+
+[node name="base (Copy 10) 38" type="StaticBody2D" parent="Objects"]
+position = Vector2(516, 28)
+z_index = 4
+visible = true
+metadata/pixellab_id = "6a21a279-bdfc-4f8d-a5c4-0ece6ed08593"
+metadata/pixellab_source = "{\"id\":\"6a21a279-bdfc-4f8d-a5c4-0ece6ed08593\",\"name\":\"base (Copy 10)\",\"filename\":\"6a21a279-bdfc-4f8d-a5c4-0ece6ed08593.png\",\"boundingBox\":{\"x\":483.5,\"y\":-36.5,\"width\":95,\"height\":105},\"groundBounds\":{\"x\":512.5,\"y\":42.5,\"width\":33.0,\"height\":26.0},\"layer\":4,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T04:33:55.118Z\",\"duplicatedFromObjectId\":\"7e5bbc75-3326-4942-91d3-86962187a3cd\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 10) 38"]
+texture = ExtResource("Texture_object_37_37")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 10) 38"]
+position = Vector2(47, 81.4)
+shape = SubResource("ObjectShape_37")
+
+[node name="base (Copy 13) 39" type="StaticBody2D" parent="Objects"]
+position = Vector2(-2, -7)
+z_index = 2
+visible = true
+metadata/pixellab_id = "6beafae3-2d3a-4706-822e-dbfa17ef2d78"
+metadata/pixellab_source = "{\"id\":\"6beafae3-2d3a-4706-822e-dbfa17ef2d78\",\"name\":\"base (Copy 13)\",\"filename\":\"6beafae3-2d3a-4706-822e-dbfa17ef2d78.png\",\"boundingBox\":{\"x\":-34.5,\"y\":-71.5,\"width\":95,\"height\":105},\"groundBounds\":{\"x\":-5.5,\"y\":7.5,\"width\":33.0,\"height\":26.0},\"layer\":2,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T04:47:26.805Z\",\"duplicatedFromObjectId\":\"7e5bbc75-3326-4942-91d3-86962187a3cd\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 13) 39"]
+texture = ExtResource("Texture_object_38_38")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 13) 39"]
+position = Vector2(47, 81.4)
+shape = SubResource("ObjectShape_38")
+
+[node name="base (Copy 11) 40" type="StaticBody2D" parent="Objects"]
+position = Vector2(42, 28)
+z_index = 2
+visible = true
+metadata/pixellab_id = "341638ed-854c-440c-bd0a-559aff6f145f"
+metadata/pixellab_source = "{\"id\":\"341638ed-854c-440c-bd0a-559aff6f145f\",\"name\":\"base (Copy 11)\",\"filename\":\"341638ed-854c-440c-bd0a-559aff6f145f.png\",\"boundingBox\":{\"x\":9.5,\"y\":-36.5,\"width\":95,\"height\":105},\"groundBounds\":{\"x\":38.5,\"y\":42.5,\"width\":33.0,\"height\":26.0},\"layer\":2,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T04:47:56.231Z\",\"duplicatedFromObjectId\":\"7e5bbc75-3326-4942-91d3-86962187a3cd\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 11) 40"]
+texture = ExtResource("Texture_object_39_39")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 11) 40"]
+position = Vector2(47, 81.4)
+shape = SubResource("ObjectShape_39")
+
+[node name="base (Copy 12) 41" type="StaticBody2D" parent="Objects"]
+position = Vector2(91, 2)
+z_index = 2
+visible = true
+metadata/pixellab_id = "cf04b644-1464-4dcf-838a-afbfcc4b5ba9"
+metadata/pixellab_source = "{\"id\":\"cf04b644-1464-4dcf-838a-afbfcc4b5ba9\",\"name\":\"base (Copy 12)\",\"filename\":\"cf04b644-1464-4dcf-838a-afbfcc4b5ba9.png\",\"boundingBox\":{\"x\":58.5,\"y\":-62.5,\"width\":95,\"height\":105},\"groundBounds\":{\"x\":87.5,\"y\":16.5,\"width\":33.0,\"height\":26.0},\"layer\":2,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T04:47:56.399Z\",\"duplicatedFromObjectId\":\"7e5bbc75-3326-4942-91d3-86962187a3cd\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 12) 41"]
+texture = ExtResource("Texture_object_40_40")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 12) 41"]
+position = Vector2(47, 81.4)
+shape = SubResource("ObjectShape_40")
+
+[node name="base 42" type="StaticBody2D" parent="Objects"]
+position = Vector2(395, 32)
+z_index = 1
+visible = true
+metadata/pixellab_id = "fd9ff228-fc21-4cc2-a69e-2390f64a1a1a"
+metadata/pixellab_source = "{\"id\":\"fd9ff228-fc21-4cc2-a69e-2390f64a1a1a\",\"name\":\"base\",\"filename\":\"fd9ff228-fc21-4cc2-a69e-2390f64a1a1a.png\",\"boundingBox\":{\"x\":362.5,\"y\":-31.616668701171875,\"width\":85,\"height\":85},\"groundBounds\":{\"x\":378.5,\"y\":32.383331298828125,\"width\":53.0,\"height\":21.0},\"layer\":1,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T04:53:49.268Z\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base 42"]
+texture = ExtResource("Texture_object_41_41")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base 42"]
+position = Vector2(42, 66.6833)
+shape = SubResource("ObjectShape_41")
+
+[node name="base (Copy 3) 43" type="StaticBody2D" parent="Objects"]
+position = Vector2(665, 18)
+z_index = 1
+visible = true
+metadata/pixellab_id = "e8c48519-c697-42bf-aca0-ceae782bb5e2"
+metadata/pixellab_source = "{\"id\":\"e8c48519-c697-42bf-aca0-ceae782bb5e2\",\"name\":\"base (Copy 3)\",\"filename\":\"e8c48519-c697-42bf-aca0-ceae782bb5e2.png\",\"boundingBox\":{\"x\":632.5,\"y\":-45.616668701171875,\"width\":85,\"height\":85},\"groundBounds\":{\"x\":648.5,\"y\":18.383331298828125,\"width\":53.0,\"height\":21.0},\"layer\":1,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T05:00:52.771Z\",\"duplicatedFromObjectId\":\"2daa8671-9a5b-4830-91cd-da15473c91f0\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 3) 43"]
+texture = ExtResource("Texture_object_42_42")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 3) 43"]
+position = Vector2(42, 66.6833)
+shape = SubResource("ObjectShape_42")
+
+[node name="base (Copy 8) 44" type="StaticBody2D" parent="Objects"]
+position = Vector2(466, 20)
+z_index = 1
+visible = true
+metadata/pixellab_id = "44ed7286-fcfc-421b-a42a-79c21c029f6c"
+metadata/pixellab_source = "{\"id\":\"44ed7286-fcfc-421b-a42a-79c21c029f6c\",\"name\":\"base (Copy 8)\",\"filename\":\"44ed7286-fcfc-421b-a42a-79c21c029f6c.png\",\"boundingBox\":{\"x\":433.5,\"y\":-43.616668701171875,\"width\":85,\"height\":85},\"groundBounds\":{\"x\":449.5,\"y\":20.383331298828125,\"width\":53.0,\"height\":21.0},\"layer\":1,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T05:00:53.382Z\",\"duplicatedFromObjectId\":\"2daa8671-9a5b-4830-91cd-da15473c91f0\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 8) 44"]
+texture = ExtResource("Texture_object_43_43")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 8) 44"]
+position = Vector2(42, 66.6833)
+shape = SubResource("ObjectShape_43")
+
+[node name="base (Copy 14) 45" type="StaticBody2D" parent="Objects"]
+position = Vector2(560, 25)
+z_index = 1
+visible = true
+metadata/pixellab_id = "80dfdfc4-f778-464c-9d97-064c52d2a3b5"
+metadata/pixellab_source = "{\"id\":\"80dfdfc4-f778-464c-9d97-064c52d2a3b5\",\"name\":\"base (Copy 14)\",\"filename\":\"80dfdfc4-f778-464c-9d97-064c52d2a3b5.png\",\"boundingBox\":{\"x\":527.5,\"y\":-38.616668701171875,\"width\":85,\"height\":85},\"groundBounds\":{\"x\":543.5,\"y\":25.383331298828125,\"width\":53.0,\"height\":21.0},\"layer\":1,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T05:00:54.293Z\",\"duplicatedFromObjectId\":\"2daa8671-9a5b-4830-91cd-da15473c91f0\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 14) 45"]
+texture = ExtResource("Texture_object_44_44")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 14) 45"]
+position = Vector2(42, 66.6833)
+shape = SubResource("ObjectShape_44")
+
+[node name="base (Copy 15) 46" type="StaticBody2D" parent="Objects"]
+position = Vector2(443, 32)
+z_index = 24
+visible = true
+metadata/pixellab_id = "e7288e5c-4b19-4947-b33e-4d3c5da752e3"
+metadata/pixellab_source = "{\"id\":\"e7288e5c-4b19-4947-b33e-4d3c5da752e3\",\"name\":\"base (Copy 15)\",\"filename\":\"e7288e5c-4b19-4947-b33e-4d3c5da752e3.png\",\"boundingBox\":{\"x\":410.5,\"y\":-32.5,\"width\":95,\"height\":105},\"groundBounds\":{\"x\":439.5,\"y\":46.5,\"width\":33.0,\"height\":26.0},\"layer\":24,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T05:01:54.090Z\",\"duplicatedFromObjectId\":\"7e5bbc75-3326-4942-91d3-86962187a3cd\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 15) 46"]
+texture = ExtResource("Texture_object_45_45")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 15) 46"]
+position = Vector2(47, 81.4)
+shape = SubResource("ObjectShape_45")
+
+[node name="base (Copy 16) 47" type="StaticBody2D" parent="Objects"]
+position = Vector2(711, 15)
+z_index = 35
+visible = true
+metadata/pixellab_id = "865d5a68-d538-4f76-b28c-ddc58a4643b6"
+metadata/pixellab_source = "{\"id\":\"865d5a68-d538-4f76-b28c-ddc58a4643b6\",\"name\":\"base (Copy 16)\",\"filename\":\"865d5a68-d538-4f76-b28c-ddc58a4643b6.png\",\"boundingBox\":{\"x\":678.5,\"y\":-49.5,\"width\":95,\"height\":105},\"groundBounds\":{\"x\":707.5,\"y\":29.5,\"width\":33.0,\"height\":26.0},\"layer\":35,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T05:05:19.585Z\",\"duplicatedFromObjectId\":\"7e5bbc75-3326-4942-91d3-86962187a3cd\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 16) 47"]
+texture = ExtResource("Texture_object_46_46")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 16) 47"]
+position = Vector2(47, 81.4)
+shape = SubResource("ObjectShape_46")
+
+[node name="base 48" type="StaticBody2D" parent="Objects"]
+position = Vector2(683, 86)
+z_index = 48
+visible = true
+metadata/pixellab_id = "6edde35b-365e-41b8-976a-437695f563b3"
+metadata/pixellab_source = "{\"id\":\"6edde35b-365e-41b8-976a-437695f563b3\",\"name\":\"base\",\"filename\":\"6edde35b-365e-41b8-976a-437695f563b3.png\",\"boundingBox\":{\"x\":651,\"y\":21.883331298828125,\"width\":40,\"height\":40},\"groundBounds\":{\"x\":657.0,\"y\":43.883331298828125,\"width\":26.0,\"height\":10.0},\"layer\":48,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T05:06:27.556Z\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base 48"]
+texture = ExtResource("Texture_object_47_47")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base 48"]
+position = Vector2(20, 31.0833)
+shape = SubResource("ObjectShape_47")
+
+[node name="base (Copy 17) 49" type="StaticBody2D" parent="Objects"]
+position = Vector2(184, 267)
+z_index = 42
+visible = true
+metadata/pixellab_id = "baa48f50-2cd6-4999-b9cc-5c733c06b96c"
+metadata/pixellab_source = "{\"id\":\"baa48f50-2cd6-4999-b9cc-5c733c06b96c\",\"name\":\"base (Copy 17)\",\"filename\":\"baa48f50-2cd6-4999-b9cc-5c733c06b96c.png\",\"boundingBox\":{\"x\":152,\"y\":203,\"width\":64,\"height\":64},\"groundBounds\":{\"x\":160.0,\"y\":241.0,\"width\":48.0,\"height\":16.0},\"layer\":42,\"visible\":true,\"locked\":false,\"description\":\"Object: base (unknown)\",\"metadata\":{\"generatedAt\":\"2026-10-15T05:20:21.191Z\",\"duplicatedFromObjectId\":\"db6d70e8-88ff-4555-9cda-86695c0c5a8f\"},\"isProgress\":false}"
+
+[node name="Visual" type="Sprite2D" parent="Objects/base (Copy 17) 49"]
+texture = ExtResource("Texture_object_48_48")
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/base (Copy 17) 49"]
+position = Vector2(32, 49.92)
+shape = SubResource("ObjectShape_48")
+
+[node name="Gameplay" type="Node2D" parent="."]
+position = Vector2(16, 16)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(400, 288)
+enabled = true
