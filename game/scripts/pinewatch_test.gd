@@ -573,10 +573,13 @@ func _ready() -> void:
     _build_actors()
     # Phase 5.6 — canopy crowns hanging INTO the frame top: the
     # forest reads as continuing past the camera (Eastward edge cue)
+    # — fallback maps only; painted maps author their own canopy
     var front := Node2D.new()
     front.name = "FrontCanopy"
     stage.add_child(front)
-    for fp in [[34.0, 84.0, 1.45], [342.0, 74.0, 1.30]]:
+    var painted := FileAccess.file_exists(
+        "res://assets/%s/objects.json" % _site_id)
+    for fp in [] if painted else [[34.0, 84.0, 1.45], [342.0, 74.0, 1.30]]:
         var cr := _anchored("props_large", "tree_broadleaf",
                             Vector2(fp[0], fp[1]))
         cr.scale = Vector2(fp[2], fp[2])
@@ -1115,7 +1118,12 @@ func _build_ground() -> void:
     ## (UI-034 v1 dressing — a painted map replaces it when art lands).
     if _site_id == "pinewatch":
         var gs := Sprite2D.new()
-        gs.texture = _tex("fx/ground_sunlit")
+        # importer writes this PNG; a non-editor launch can serve a
+        # stale ctex (no filesystem rescan) — load the file directly
+        var gi := Image.load_from_file(ProjectSettings.globalize_path(
+            "res://assets/pinewatch/fx/ground_sunlit.png"))
+        gs.texture = ImageTexture.create_from_image(gi) \
+            if gi != null else _tex("fx/ground_sunlit")
         gs.centered = false
         ground = gs
         print("ground: sunlit variant (fx/ground_sunlit)")
@@ -1170,18 +1178,21 @@ func _build_backdrop() -> void:
         [OVR_BOT, OVR_BOT, OVR_DEEP, OVR_DEEP])
     bd.add_child(ovs_bot)
     # thin sky sliver first — Eastward forest edges are CANOPY, not
-    # open sky; only a pale line peeks above the far tree mass
-    var sky := Polygon2D.new()
-    sky.polygon = PackedVector2Array([
-        Vector2(0, 0), Vector2(GW * T, 0),
-        Vector2(GW * T, SKY_H), Vector2(0, SKY_H)])
-    sky.vertex_colors = PackedColorArray(
-        [SKY_TOP, SKY_TOP, SKY_BOT, SKY_BOT])
-    bd.add_child(sky)
-    # far canopy wall — dense overlapping broadleaf silhouettes in
-    # 3 depth rows (cool dark tints); crowns overlap into a mass so
-    # the top band reads as deep forest, never flat ground
-    var rows: Array = [
+    # open sky; only a pale line peeks above the far tree mass.
+    # Painted maps carry their own authored canopy and trees (the
+    # PixelLab object layer) — sky sliver and procedural treeline
+    # over them would wash/double-draw, so both stay fallback-only.
+    var painted := FileAccess.file_exists(
+        "res://assets/%s/objects.json" % _site_id)
+    if not painted:
+        var sky := Polygon2D.new()
+        sky.polygon = PackedVector2Array([
+            Vector2(0, 0), Vector2(GW * T, 0),
+            Vector2(GW * T, SKY_H), Vector2(0, SKY_H)])
+        sky.vertex_colors = PackedColorArray(
+            [SKY_TOP, SKY_TOP, SKY_BOT, SKY_BOT])
+        bd.add_child(sky)
+    var rows: Array = [] if painted else [
         {"y": 46.0,  "dx": 52.0,  "x0": -30.0, "tint": TREE_FAR,  "s": 0.42},
         {"y": 58.0,  "dx": 60.0,  "x0": 8.0,   "tint": TREE_MID,  "s": 0.50},
         {"y": 70.0,  "dx": 66.0,  "x0": -14.0, "tint": TREE_NEAR, "s": 0.58},
