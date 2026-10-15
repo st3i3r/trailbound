@@ -63,6 +63,9 @@ func _ready() -> void:
 			get_tree().quit(2); return
 		tid2letter[tid] = letter
 	var def := str(int(tmap.get("defaultTerrain", 0)))
+	if not tid2letter.has(def):
+		_fail("defaultTerrain id %s has no terrain_letters entry" % def)
+		get_tree().quit(2); return
 	var grid: Array = []            # [y][x] letters over bbox
 	for y in mh:
 		grid.append(tid2letter.get(def, "?").repeat(mw))
