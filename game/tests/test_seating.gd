@@ -240,32 +240,35 @@ func _ready() -> void:
 		and Game.coins == 780)
 	check("cabin unavailable at pinewatch",
 		not Game.upgrade_pad("p3", "cabin"))
-	check("buy lantern", Game.buy_decor("lantern", [Vector2i(6, 4)])
+	var legal := _legal_decor_cells()
+	var blocked0 := _blocked_cell()
+	check("buy lantern", Game.buy_decor("lantern", [legal[0]])
 		and Game.coins == 730)
 	check("decor cell legality",
-		not Game.buy_decor("lantern", [Vector2i(5, 1)])
-		and not Game.buy_decor("lantern", [Vector2i(8, 3)])
-		and not Game.buy_decor("lantern", [Vector2i(4, 4)])
+		not Game.buy_decor("lantern", [blocked0])
+		and not Game.buy_decor("lantern",
+			[_nondecor_walkable_cell()])
 		and Game.coins == 730)
 	check("2x1 needs a pair", not Game.buy_decor("picnic_table",
-		[Vector2i(6, 2)]))
+		[_legal_decor_cells()[0]]))
 	# --- build verbs: move / store / return (§6.1, §5.8) ------------
-	check("move to legal cell", Game.move_decor(0, [Vector2i(7, 2)])
-		and Game.site_state()["decor"][0]["cells"][0] == Vector2i(7, 2))
-	# (2,2) is blocked pond — sealing a walkable cell on the open
-	# court can't strand, so the rejection rides on the blocked cell.
-	check("stranding move rejected",
-		not Game.move_decor(0, [Vector2i(2, 2)])
-		and Game.site_state()["decor"][0]["cells"][0] == Vector2i(7, 2))
+	var legal2 := _legal_decor_cells()
+	var move_to: Vector2i = legal2[legal2.size() - 1]
+	check("move to legal cell", Game.move_decor(0, [move_to])
+		and Game.site_state()["decor"][0]["cells"][0] == move_to)
+	# moving onto a blocked cell can't strand anything — the rejection
+	# rides on legality itself.
 	check("move to blocked cell fails",
-		not Game.move_decor(0, [Vector2i(3, 1)]))
-	check("buy stools", Game.buy_decor("stools", [Vector2i(5, 6)])
+		not Game.move_decor(0, [blocked0])
+		and Game.site_state()["decor"][0]["cells"][0] == move_to)
+	var stool_cell: Vector2i = _legal_decor_cells()[0]
+	check("buy stools", Game.buy_decor("stools", [stool_cell])
 		and Game.coins == 705)
 	check("store frees the cell", Game.store_decor(1)
 		and Game.site_state()["decor"].size() == 1
 		and Game.site_state()["stored"].size() == 1)
 	check("re-place stored", Game.place_stored("stools",
-		[Vector2i(5, 6)]) and Game.site_state()["decor"].size() == 2)
+		[stool_cell]) and Game.site_state()["decor"].size() == 2)
 	check("today's buy returns", Game.return_decor(1)
 		and Game.coins == 730
 		and Game.site_state()["decor"].size() == 1)
@@ -367,7 +370,7 @@ func _ready() -> void:
 		and back["pads"]["p4"]["open"]
 		and back["campfire"]["radius"] == 3
 		and back["decor"].size() == 1
-		and back["decor"][0]["cells"][0] == Vector2i(7, 2)
+		and back["decor"][0]["cells"][0] == move_to
 		and back["pages_done"].has(1)
 		and back["counters"]["guests_welcomed"] == 20
 		and Game.coins == 230)
@@ -483,7 +486,8 @@ func _ready() -> void:
 		func(b): return b.get("regular") == "hung"))
 	Game.coins = 100
 	check("pennant unlocks on story", Game._is_unlocked("S:hung")
-		and Game.buy_decor("scout_pennant", [Vector2i(8, 2)]))
+		and Game.buy_decor("scout_pennant",
+			[_legal_decor_cells()[0]]))
 
 	# The D-UI-8 engagement gate held morning mail until a guest
 	# stayed (welcomed ≥ 1 since §5.4). Flush the pending queue now —

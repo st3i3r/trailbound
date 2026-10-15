@@ -3,7 +3,9 @@ extends Node
 ##
 ##   godot --headless --path game tools/import_map.tscn -- \
 ##     --export=../assets_src/pl_map/godot_export \
-##     --site=pinewatch --crop=0,0,21,13 [--write]
+##     --site=pinewatch --crop=0,0,22,14 [--write]
+##   (--crop x0,y0,x1,y1 is the map-cell window, end-exclusive:
+##    0,0,22,14 = 22 wide x 14 tall)
 ##
 ## Reads the export's structured data and DERIVES the mechanical parts
 ## of data/layouts/<site>.json — never touches authored intent:
@@ -53,8 +55,11 @@ func _ready() -> void:
 	var mw := int(bb["maxX"]) - minx + 1
 	var mh := int(bb["maxY"]) - miny + 1
 	var tid2letter: Dictionary = {}
-	for t in smap.get("terrains", []):
+	var twalk := {}                  # terrain id -> bool when the
+	for t in smap.get("terrains", []):   # editor's walkable flag is set
 		var tid := str(int(t["id"]))
+		if t.get("walkable") != null:
+			twalk[tid] = bool(t["walkable"])
 		var letter := String(layout.get("terrain_letters",
 			{}).get(tid, ""))
 		if letter == "":
@@ -66,32 +71,45 @@ func _ready() -> void:
 	if not tid2letter.has(def):
 		_fail("defaultTerrain id %s has no terrain_letters entry" % def)
 		get_tree().quit(2); return
-	var grid: Array = []            # [y][x] letters over bbox
+	var tgrid: Array = []            # [y][x] terrain id strings, bbox
 	for y in mh:
-		grid.append(tid2letter.get(def, "?").repeat(mw))
+		var row: Array = []
+		row.resize(mw); row.fill(def)
+		tgrid.append(row)
 	for c in tmap.get("cells", []):
 		var gx := int(c["x"]) - minx; var gy := int(c["y"]) - miny
-		if gx < 0 or gy < 0 or gx >= mw or gy >= mh:
-			continue
-		var row: String = grid[gy]
-		grid[gy] = row.left(gx) \
-			+ tid2letter[str(int(c["terrainId"]))] \
-			+ row.substr(gx + 1)
+		if gx >= 0 and gy >= 0 and gx < mw and gy < mh:
+			tgrid[gy][gx] = str(int(c["terrainId"]))
 
-	# --- mask over the crop ---------------------------------------------
+	# --- mask + solidity over the crop -----------------------------------
+	# mask is the letter grid; solidity is a parallel bool grid — a tile
+	# is solid when the editor marked its terrain walkable=false, or the
+	# letter heuristic says so (W = water).  walkable=true suppresses the
+	# letter heuristic (a painted "water" ford stays passable).
 	var mask: Array = []
-	for my in range(crop.position.y, crop.end.y + 1):
+	var solid: Array = []
+	for my in range(crop.position.y, crop.end.y):
 		var ry := my - miny
 		if ry < 0 or ry >= mh:
-			mask.append("G".repeat(crop.size.x + 1)); continue
-		var row: String = grid[ry]
-		var x0 := crop.position.x - minx
-		mask.append(row.substr(x0, crop.size.x + 1))
-	print("mask %dx%d" % [crop.size.x + 1, crop.size.y + 1])
+			mask.append("G".repeat(crop.size.x))
+			solid.append(".".repeat(crop.size.x)); continue
+		var row := ""
+		var srow := ""
+		for mx in range(crop.position.x, crop.end.x):
+			var gx := mx - minx
+			var tid: String = tgrid[ry][gx] if gx >= 0 and gx < mw \
+				else def
+			var letter: String = tid2letter[tid]
+			row += letter
+			srow += "#" if (twalk.has(tid) and not twalk[tid]) \
+				or (not twalk.has(tid) and letter == "W") else "."
+		mask.append(row)
+		solid.append(srow)
+	print("mask %dx%d" % [crop.size.x, crop.size.y])
 	for r in mask: print("   " + r)
 
-	var core := [int(ceil((crop.size.x + 1) / 2.0)),
-		int(ceil((crop.size.y + 1) / 2.0))]
+	var core := [int(ceil(crop.size.x / 2.0)),
+		int(ceil(crop.size.y / 2.0))]
 
 	# --- derived nav.blocked --------------------------------------------
 	var derived := {}
@@ -101,9 +119,10 @@ func _ready() -> void:
 			for dy in 2:
 				for dx in 2:
 					var mx: int = gx * 2 + dx; var my: int = gy * 2 + dy
-					if mx < mask[my].length() and mask[my][mx] == "W":
+					if mx < solid[my].length() \
+							and solid[my][mx] == "#":
 						w += 1
-			if w >= 3:   # >=3 of 4 map tiles are water -> solid pond
+			if w >= 3:   # >=3 of 4 map tiles solid -> impassable cell
 				derived[Vector2i(gx, gy)] = true
 	var n_water: int = derived.size()
 	# Object px are in cell-0-origin space (px/32 = map cell); the crop
@@ -120,7 +139,8 @@ func _ready() -> void:
 		reserved[Vector2i(c[0], c[1])] = true
 	for o in emap.get("objects", []):
 		var col: Dictionary = o.get("collider", {})
-		if col.is_empty():
+		if col.is_empty() or String(col.get("role", "blocker")) \
+				!= "blocker":
 			continue
 		var cc := Vector2(col["x"], col["y"]) \
 			+ Vector2(col["width"], col["height"]) * 0.5 \
@@ -192,8 +212,8 @@ func _ready() -> void:
 			var px := Rect2i(
 				(crop.position.x - minx) * int(TILE),
 				(crop.position.y - miny) * int(TILE),
-				(crop.size.x + 1) * int(TILE),
-				(crop.size.y + 1) * int(TILE))
+				crop.size.x * int(TILE),
+				crop.size.y * int(TILE))
 			var out: Image = base.get_region(px)
 			var gpath := "res://assets/%s/fx/ground_sunlit.png" % site
 			out.save_png(ProjectSettings.globalize_path(gpath))

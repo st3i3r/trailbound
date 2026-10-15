@@ -166,6 +166,86 @@ func _ready() -> void:
 			resume_ok = false
 	check("kill+resume holds at every phase", resume_ok)
 
+	# --- §22 map drift: a repaint orphans placed decor ----------------
+	# A save stamped with an older map_rev gets its decor re-validated
+	# against today's placement law: illegal pieces return to storage
+	# (never deleted), seats unwind, the move lands in day_log, and
+	# restoration auras — which follow their structure, not the decor
+	# grid — stay put.
+	Game.load_state(Save.default_state())
+	Game.visit_site(&"pinewatch")
+	Game.sites_visited["pinewatch"] = 0
+	Game.day = 0
+	Game.new_day()
+	var st2: Dictionary = Game.site_state()
+	var good_cell: Vector2i = _legal_decor_cells()[0]
+	Game.coins = 500
+	check("drift fixture: legal buy lands",
+		Game.buy_decor("stools", [good_cell]))
+	var seats0: int = int(st2["seats"])
+	# the ghost mirrors what a repaint orphans: it had been bought, so
+	# its seat count is already folded into st2["seats"]
+	st2["decor"].append({"id": "stools", "effect": "seats",
+		"reach": 1, "cells": [_blocked_cell()]})
+	st2["seats"] = int(st2["seats"]) + 1
+	st2["decor"].append({"id": "restored_glow", "aura": true,
+		"effect": "", "reach": 0, "cells": [_blocked_cell()]})
+	st2["map_rev"] = "pre-repaint"
+	var blob: Dictionary = Game.state_dict()
+	Game.load_state(blob)
+	var st3: Dictionary = Game.site_state()
+	var stools_kept := false
+	var aura_kept := false
+	for d in st3["decor"]:
+		if d["id"] == "stools" and d["cells"] == [good_cell]:
+			stools_kept = true
+		if d.get("aura", false):
+			aura_kept = true
+	var stored_meta_ok := false
+	for s in st3["stored"]:
+		if s["id"] == "stools" and s.get("effect", "") == "seats" \
+				and int(s.get("reach", 0)) == 1:
+			stored_meta_ok = true
+	check("stale rev keeps legal decor", stools_kept)
+	check("illegal decor returns to storage",
+		st3["decor"].size() == 2
+		and st3["stored"].any(func(s): return s["id"] == "stools"))
+	check("stored piece keeps its metadata", stored_meta_ok)
+	check("aura exempt from reconcile", aura_kept)
+	check("seats unwound on the moved piece",
+		int(st3["seats"]) == seats0)
+	check("map_shift journaled", Game.day_log.any(
+		func(e): return e.get("kind") == "map_shift"))
+	check("map_rev re-stamped to current layout",
+		String(st3["map_rev"]) == String(
+			Game._layout().get("map_rev", ""))
+		and String(st3["map_rev"]) != "pre-repaint")
+	# and a same-rev save is a no-op — reconcile never touches it
+	var before_decor: Array = st3["decor"].duplicate(true)
+	Game.load_state(Game.state_dict())
+	check("same rev is a no-op",
+		Game.site_state()["decor"] == before_decor
+		and Game.site_state()["stored"].size()
+			== st3["stored"].size())
+	# lazy path: an off-site drifted save reconciles on arrival, not at
+	# load — load_state only touches the current site
+	Game.load_state(Save.default_state())
+	Game.visit_site(&"pinewatch")
+	var w_st: Dictionary = Game.site_state(&"whisper_river")
+	w_st["decor"] = [{"id": "stools", "effect": "seats",
+		"reach": 1, "cells": [Vector2i(0, 3)]}]
+	w_st["map_rev"] = "pre-repaint"
+	Game.load_state(Game.state_dict())
+	check("off-site drift untouched at load",
+		String(Game.sites["whisper_river"].get("map_rev", ""))
+			== "pre-repaint")
+	Game.visit_site(&"whisper_river")
+	check("off-site drift reconciles on arrival",
+		String(Game.site_state().get("map_rev", ""))
+			== String(Game._layout().get("map_rev", ""))
+		and Game.site_state()["decor"].is_empty()
+		and Game.site_state()["stored"].size() == 1)
+
 	# --- §23 budget: payload <100KB, load <100ms ----------------------
 	var payload := JSON.stringify(Game.state_dict())
 	var t0 := Time.get_ticks_msec()

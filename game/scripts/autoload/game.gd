@@ -432,6 +432,10 @@ func advance_day() -> void:
 
 func visit_site(site: StringName) -> void:
 	site_id = site
+	if sites.has(site):
+		_reconcile_map(site)             # lazy map-drift check on
+		                                 # arrival — no-op when map_rev
+		                                 # still matches the layout
 	if site not in sites_visited:
 		sites_visited[site] = day
 		_try_start_next()
@@ -890,6 +894,7 @@ func _fresh_site(site: StringName) -> Dictionary:
 		{"cell": [0, 0], "radius": 2})
 	var fcell: Array = fire.get("cell", [0, 0])
 	return {"pads": pads, "decor": [], "stored": [],
+		"map_rev": String(layout.get("map_rev", "")),
 		"campfire": {"cell": Vector2i(fcell[0], fcell[1]),
 			"radius": int(fire.get("radius", 2))},
 		"seats": 0, "reviews": [], "weather": "clear",
@@ -2407,6 +2412,44 @@ func _sites_from_json(raw: Dictionary) -> Dictionary:
 	return out
 
 
+## §22 map drift — a repaint can orphan placed decor: a save written
+## against an older map may hold pieces on cells that are now water,
+## wall, or outside the core.  st["map_rev"] stamps the layout the save
+## was written against; on mismatch (or missing — pre-stamp saves) we
+## re-run placement law on every placed piece and illegal ones move to
+## storage, never deleted.  Restoration auras are exempt — they follow
+## their restored structure, not the decor grid.
+func _reconcile_map(site: StringName) -> void:
+	var st: Dictionary = sites[site]
+	var layout: Dictionary = _layout(site)
+	var rev := String(layout.get("map_rev", ""))
+	if rev == "" or String(st.get("map_rev", "")) == rev:
+		return            # unstamped layout has no opinion / already ok
+	if not st.has("stored"):
+		st["stored"] = []
+	var moved := []
+	for i in range(st.get("decor", []).size() - 1, -1, -1):
+		var d: Dictionary = st["decor"][i]
+		var row: Dictionary = _row("decor", String(d.get("id", "")))
+		if d.get("aura", false) or (not row.is_empty()
+				and _footprint_ok(row, d["cells"], i)):
+			continue
+		var kept := {"id": d["id"], "effect": d.get("effect", ""),
+			"reach": int(d.get("reach", 1))}
+		if d.get("variant", "") != "":
+			kept["variant"] = d["variant"]
+		st["stored"].append(kept)
+		st["seats"] = maxi(0, int(st.get("seats", 0))
+			- int(row.get("seats", 0)))
+		st["decor"].remove_at(i)
+		moved.append(d["id"])
+		_log("map_shift", {"site": site, "id": d["id"]})
+	if not moved.is_empty():
+		print("map reconcile %s: %d decor back to storage %s" % [
+			site, moved.size(), moved])
+	st["map_rev"] = rev
+
+
 func load_state(state: Dictionary) -> void:
 	day = int(state.get("day", day))
 	site_id = StringName(state.get("site", site_id))
@@ -2445,6 +2488,11 @@ func load_state(state: Dictionary) -> void:
 	passport_stamps = state.get("passport", passport_stamps)
 	if state.has("sites"):
 		sites = _sites_from_json(state["sites"])
+		# Only the CURRENT site reconciles here — _footprint_ok reads
+		# site_state() (the current site); others reconcile lazily on
+		# visit_site().  site_id was set above, so the check is honest.
+		if sites.has(site_id):
+			_reconcile_map(site_id)
 	for k in state.get("settings", {}):
 		settings[k] = state["settings"][k]
 	apply_settings()

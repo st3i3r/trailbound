@@ -115,7 +115,9 @@ func _ready() -> void:
 	st["guests"] = {}
 	st["campfire"]["radius"] = 3
 	st["blogger_bonus"] = false
-	for pid in ["p1", "p2", "p3", "p6", "p7", "p8"]:
+	var ring := _pads_in_ring(3)     # upgraded fire reach — the only
+	var far := _pads_outside_ring(3) # pads that can grant warmth
+	for pid in ring + far:
 		st["pads"][pid]["open"] = true
 		st["pads"][pid]["shelter"] = "platform"
 	var g1 := _inject("qc_0", "couple", ["chilly"])
@@ -124,8 +126,8 @@ func _ready() -> void:
 	var g2 := _inject("qc_1", "hiker", ["chilly"])
 	g2["gathering"] = "p_quiet_corner"
 	g2["favourite"] = "trail_stew"
-	Game.seat("qc_0", ["p2"])
-	Game.seat("qc_1", ["p6"])
+	Game.seat("qc_0", [ring[0]])
+	Game.seat("qc_1", [ring[ring.size() - 1]])
 	Game.meals = [{"id": "trail_stew", "price": 18},
 		{"id": "trail_stew", "price": 18}]
 	var coins0 := Game.coins
@@ -150,9 +152,13 @@ func _ready() -> void:
 	var g4 := _inject("qc_3", "van_lifer", [], true)
 	g4["gathering"] = "p_quiet_corner"
 	_inject("qc_loud", "van_lifer", [], true)
-	Game.seat("qc_loud", ["p2"])
-	Game.seat("qc_2", ["p7"])
-	Game.seat("qc_3", ["p1"])
+	# qc_2 sleeps light — park the loud lifer on its neighbour pad so
+	# the aversion fires; qc_3 has no favourite and misses on its own.
+	var qc2_pad: String = far[0] if not far.is_empty() else ring[1]
+	Game.seat("qc_2", [qc2_pad])
+	Game.seat("qc_loud", [_pad_neighbour(qc2_pad)
+		if _pad_neighbour(qc2_pad) != "" else ring[0]])
+	Game.seat("qc_3", [ring[0]])
 	var met0: int = st["counters"].get("gatherings_met", 0)
 	Game.set_phase(Game.Phase.EVENING)
 	rep = Game.goodnight()
@@ -161,17 +167,16 @@ func _ready() -> void:
 
 	# --- Vol II night pages --------------------------------------------
 	# P9: six parties, every one 5-star. Chilly guests need warmth —
-	# only the six pads inside the (upgraded) fire's r3 can hit 5★;
-	# p7/p8 on the east meadow sit outside even the Stone Fire Pit's
-	# reach.
+	# only the pads inside the (upgraded) fire's r3 can hit 5★.
 	st["weather"] = "clear"
 	st["decor"] = []
 	st["assignments"] = {}
 	st["guests"] = {}
-	for pid in ["p4", "p5"]:
+	var six := _pads_in_ring(3).slice(0, 6)
+	check("fire ring holds six pads", six.size() == 6)
+	for pid in six:
 		st["pads"][pid]["open"] = true
 		st["pads"][pid]["shelter"] = "platform"
-	var six := ["p1", "p2", "p3", "p4", "p5", "p6"]
 	for i in six.size():
 		var gg := _inject("pf_%d" % i, "hiker", ["chilly"])
 		gg["favourite"] = "trail_stew"

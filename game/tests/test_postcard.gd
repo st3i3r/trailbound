@@ -7,9 +7,13 @@ const Postcard := preload("res://scripts/systems/postcard.gd")
 
 func _ready() -> void:
 	print("=== postcard codec (§33.5) ===")
+	var stool_cell: Variant = _legal_decor_cells()[0]
+	var pair := _legal_decor_pair()
+	check("layout has legal decor cells + a 2x1 pair",
+		stool_cell != null and pair.size() == 2)
 	var decor := [
-		{"id": "stools", "cells": [Vector2i(3, 2)]},
-		{"id": "picnic_table", "cells": [Vector2i(4, 6), Vector2i(5, 6)]},
+		{"id": "stools", "cells": [stool_cell]},
+		{"id": "picnic_table", "cells": pair},
 	]
 	var code: String = Postcard.encode("pinewatch", 421337, decor)
 	print("code: %s (%d chars)" % [code, code.length()])
@@ -29,9 +33,9 @@ func _ready() -> void:
 	for r in bd:
 		by_id[String(r["id"])] = r["cells"]
 	check("1x1 cell survives",
-		by_id.get("stools", []) == [Vector2i(3, 2)])
+		by_id.get("stools", []) == [stool_cell])
 	check("2x1 cell survives + footprint re-derived",
-		by_id.get("picnic_table", []) == [Vector2i(4, 6), Vector2i(5, 6)])
+		by_id.get("picnic_table", []) == pair)
 
 	# typos: every single-char mutation must fail the checksum
 	var bad := 0
@@ -52,7 +56,7 @@ func _ready() -> void:
 	# the code still decodes — shares never carry illegal state
 	var weird := [{"id": "nope", "cells": [Vector2i(0, 0)]},
 		{"id": "stools", "cells": [Vector2i(-9, -9)]},
-		{"id": "stools", "cells": [Vector2i(3, 2)]}]
+		{"id": "stools", "cells": [stool_cell]}]
 	var back2: Dictionary = Postcard.decode(
 		Postcard.encode("pinewatch", 1, weird))
 	check("unplaceable items dropped, legal kept",
