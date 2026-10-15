@@ -268,22 +268,22 @@ func _ready() -> void:
 		Vector2(352, 176))
 	check("clear line fast path", pts2 == [Vector2(352, 176)])
 
-	# road preference: court pad -> SE gate.  The x11-13 lane is the
-	# discounted route; dropping straight south through the meadow is
-	# more hops at full cost, so A* should ride the lane south-east —
-	# i.e. the picked path spends its run on road cells
+	# road preference: gate column -> east apron exit.  The x8 descent
+	# + row4 lane is the discounted route; the grass row5 detour is
+	# full-cost, so A* rides the L — the picked path spends its run
+	# on road cells
 	var road_cells := {}
 	for c in layout["nav"].get("road", []):
 		road_cells["%d,%d" % [c[0], c[1]]] = true
-	var pts3 := SimDirector._route(layout, Vector2(672, 416),
-		Vector2(864, 608))
+	var pts3 := SimDirector._route(layout, Vector2(544, 288),
+		Vector2(928, 288))
 	var on_road := 0
 	for p in pts3:
 		var c := SimDirector._px_cell(p)
 		if road_cells.has("%d,%d" % [c.x, c.y]):
 			on_road += 1
 	check("route prefers the road",
-		on_road >= 4 and pts3[pts3.size() - 1] == Vector2(864, 608),
+		on_road >= 4 and pts3[pts3.size() - 1] == Vector2(928, 288),
 		str(pts3))
 
 	# --- storm divert (§14): every program selects huddle in a gale ---
