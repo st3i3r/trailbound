@@ -28,3 +28,8 @@ game/build/
 
 # local agent workspace
 .secwright/
+
+# art-pipeline scratch (_-prefix convention) & review galleries
+assets_src/_*
+assets_src/backup/
+assets_src/cleanup/

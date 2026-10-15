@@ -1,0 +1,77 @@
+[
+ {
+  "id": "m01",
+  "text": "Pad 3 floods in a hard rain. I raised it in '98. Check it before the wet season."
+ },
+ {
+  "id": "m02",
+  "text": "Rain by Thursday — my knee has never lied.\n(Grandpa's forecast is noted.)",
+  "hint": {
+   "kind": "weather"
+  }
+ },
+ {
+  "id": "m03",
+  "text": "Hùng's scouts. Seat them near the noise — they'll complain either way, but happier near it."
+ },
+ {
+  "id": "m04",
+  "text": "Old Ba takes the water bank every time. Never once the hill. Some men are a river."
+ },
+ {
+  "id": "m05",
+  "text": "Chè trôi nước — sweet milk on rice, the offering bowl. He'd want it right on the night.",
+  "hint": {
+   "kind": "recipe",
+   "pair": [
+    "rice",
+    "sweet_milk"
+   ],
+   "recipe": "che_troi_nuoc"
+  }
+ },
+ {
+  "id": "m06",
+  "text": "The dog found me before I found the camp. Feed a stray once and it decides for you."
+ },
+ {
+  "id": "m07",
+  "text": "Lan's mother photographed the valley every dusk. The girl has her eye — show her the good pads."
+ },
+ {
+  "id": "m08",
+  "text": "Tết at the river. Bánh chưng wraps better cold. Remember that when the kitchen rushes."
+ },
+ {
+  "id": "m09",
+  "text": "Three days of rain makes a camp of mud and friends. The fourth day makes storytellers."
+ },
+ {
+  "id": "m10",
+  "text": "A guest who asks for the water is telling you who they are. Read the card; seat the person."
+ },
+ {
+  "id": "m11",
+  "text": "The Minh family camps as one pad. Never split them — they came to be together, not to be guests."
+ },
+ {
+  "id": "m12",
+  "text": "Stoke the coals before they sit. A warm camp tips honest — I measured it once, 10 percent."
+ },
+ {
+  "id": "m13",
+  "text": "Cá kho: rice water, a slow fire, patience. Ba taught it to me — I taught the stove.",
+  "hint": {
+   "kind": "recipe",
+   "pair": [
+    "catfish",
+    "honey"
+   ],
+   "recipe": "ca_kho"
+  }
+ },
+ {
+  "id": "m14",
+  "text": "Sign your name in the back like I did. This book is a relay, not a grave."
+ }
+]

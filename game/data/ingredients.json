@@ -1,21 +1,161 @@
 [
-  {"id": "mushroom", "name": "Mushroom", "kind": "forage", "sites": ["pinewatch", "whisper_river"], "weight": 3},
-  {"id": "herb", "name": "Herb", "kind": "forage", "sites": ["pinewatch", "whisper_river", "lantern_valley"], "weight": 3},
-  {"id": "berries", "name": "Berries", "kind": "forage", "sites": ["pinewatch", "whisper_river", "lantern_valley"], "weight": 3},
-  {"id": "goldcap", "name": "Goldcap", "kind": "forage", "sites": ["pinewatch"], "weight": 1, "rare": true},
-  {"id": "honey", "name": "Honey", "kind": "forage", "sites": ["lantern_valley"], "weight": 3},
-
-  {"id": "perch", "name": "Perch", "kind": "fish", "sites": ["pinewatch"], "weight": 1},
-  {"id": "carp", "name": "Carp", "kind": "fish", "sites": ["pinewatch", "whisper_river"], "weight": 1},
-  {"id": "trout", "name": "Trout", "kind": "fish", "sites": ["whisper_river", "lantern_valley"], "weight": 1},
-  {"id": "catfish", "name": "Catfish", "kind": "fish", "sites": ["whisper_river"], "weight": 1},
-
-  {"id": "bread", "name": "Bread", "kind": "staple", "price": 5, "unlock": "P1"},
-  {"id": "rice", "name": "Rice", "kind": "staple", "price": 5, "unlock": "P2"},
-  {"id": "eggs", "name": "Eggs", "kind": "staple", "price": 5, "unlock": "P3"},
-  {"id": "tea", "name": "Tea", "kind": "staple", "price": 5, "unlock": "P1"},
-  {"id": "marshmallow", "name": "Marshmallow", "kind": "staple", "price": 5, "unlock": "P1"},
-  {"id": "noodles", "name": "Noodles", "kind": "staple", "price": 5, "unlock": "W0"},
-  {"id": "coffee", "name": "Coffee", "kind": "staple", "price": 5, "unlock": "L0"},
-  {"id": "sweet_milk", "name": "Sweet Milk", "kind": "staple", "price": 5, "unlock": "L0"}
+ {
+  "id": "mushroom",
+  "name": "Mushroom",
+  "kind": "forage",
+  "sites": [
+   "pinewatch",
+   "whisper_river"
+  ],
+  "weight": 3,
+  "note": "The damp north slope hides them. Cut, don't pull — Ông insists."
+ },
+ {
+  "id": "herb",
+  "name": "Herb",
+  "kind": "forage",
+  "sites": [
+   "pinewatch",
+   "whisper_river",
+   "lantern_valley"
+  ],
+  "weight": 3,
+  "note": "Wild and forgiving. A handful fixes any pot that went sideways."
+ },
+ {
+  "id": "berries",
+  "name": "Berries",
+  "kind": "forage",
+  "sites": [
+   "pinewatch",
+   "whisper_river",
+   "lantern_valley"
+  ],
+  "weight": 3,
+  "note": "Ripen fast, stain faster. The birds always get the best ones first."
+ },
+ {
+  "id": "goldcap",
+  "name": "Goldcap",
+  "kind": "forage",
+  "sites": [
+   "pinewatch"
+  ],
+  "weight": 1,
+  "rare": true,
+  "note": "The rare one. Glows faintly under pine shade; cooks like a celebration."
+ },
+ {
+  "id": "honey",
+  "name": "Honey",
+  "kind": "forage",
+  "sites": [
+   "lantern_valley"
+  ],
+  "weight": 3,
+  "note": "Valley hives work the lantern blossoms. Sweet enough to quiet a table."
+ },
+ {
+  "id": "perch",
+  "name": "Perch",
+  "kind": "fish",
+  "sites": [
+   "pinewatch"
+  ],
+  "weight": 1
+ },
+ {
+  "id": "carp",
+  "name": "Carp",
+  "kind": "fish",
+  "sites": [
+   "pinewatch",
+   "whisper_river"
+  ],
+  "weight": 1
+ },
+ {
+  "id": "trout",
+  "name": "Trout",
+  "kind": "fish",
+  "sites": [
+   "whisper_river",
+   "lantern_valley"
+  ],
+  "weight": 1
+ },
+ {
+  "id": "catfish",
+  "name": "Catfish",
+  "kind": "fish",
+  "sites": [
+   "whisper_river"
+  ],
+  "weight": 1
+ },
+ {
+  "id": "bread",
+  "name": "Bread",
+  "kind": "staple",
+  "price": 5,
+  "unlock": "P1"
+ },
+ {
+  "id": "rice",
+  "name": "Rice",
+  "kind": "staple",
+  "price": 5,
+  "unlock": "P2"
+ },
+ {
+  "id": "eggs",
+  "name": "Eggs",
+  "kind": "staple",
+  "price": 5,
+  "unlock": "P3"
+ },
+ {
+  "id": "tea",
+  "name": "Tea",
+  "kind": "staple",
+  "price": 5,
+  "unlock": "P1"
+ },
+ {
+  "id": "marshmallow",
+  "name": "Marshmallow",
+  "kind": "staple",
+  "price": 5,
+  "unlock": "P1"
+ },
+ {
+  "id": "noodles",
+  "name": "Noodles",
+  "kind": "staple",
+  "price": 5,
+  "unlock": "W0"
+ },
+ {
+  "id": "coffee",
+  "name": "Coffee",
+  "kind": "staple",
+  "price": 5,
+  "unlock": "L0"
+ },
+ {
+  "id": "sweet_milk",
+  "name": "Sweet Milk",
+  "kind": "staple",
+  "price": 5,
+  "unlock": "L0"
+ },
+ {
+  "id": "loach",
+  "name": "Loach",
+  "kind": "fish",
+  "sites": [
+   "whisper_river"
+  ],
+  "note": "Wriggles under the shallows stones. Old Ba baited them with river mud."
+ }
 ]

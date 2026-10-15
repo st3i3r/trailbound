@@ -1,0 +1,22 @@
+{
+ "tiers": [
+  {
+   "coins": 500,
+   "event": "fund_tier_1",
+   "grant": "trail_bench",
+   "label": "The fund buys a bench for the pass"
+  },
+  {
+   "coins": 2000,
+   "event": "fund_tier_2",
+   "grant": "way_marker",
+   "label": "A carved way-marker, in Grandpa's style"
+  },
+  {
+   "coins": 5000,
+   "event": "fund_tier_3",
+   "grant": "memorial_stone",
+   "label": "The memorial stone — his name on the trail he mapped"
+  }
+ ]
+}

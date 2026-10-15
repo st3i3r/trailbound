@@ -35,9 +35,14 @@ func _ready() -> void:
 		Game.day += 1
 		Game.new_day()
 		sp = Game.spot()
+	# field_notes now spans birds + forage + fish (§8.3) — count birds
+	var bird_notes := Game.field_notes.filter(
+		func(id): return Catalog.data.get("birds", []).any(
+			func(b): return b["id"] == id))
 	check("all site birds logged", sp.get("all_logged", false)
-		and Game.field_notes.size() == 4,
+		and bird_notes.size() == 4,
 		"got %s" % [Game.field_notes])
+	check("forage finds also noted", Game.field_notes.size() > 4)
 	Game.day += 1
 	Game.new_day()
 	sp = Game.spot()
@@ -46,6 +51,7 @@ func _ready() -> void:
 		and st_sp["forage_nodes"].any(
 			func(n): return n.get("bonus", false)))
 	check("field notes persist",
-		Game.state_dict()["field_notes"].size() == 4)
+		Game.state_dict()["field_notes"].size() ==
+			Game.field_notes.size())
 
 	finish()

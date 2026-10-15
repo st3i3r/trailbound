@@ -1,7 +1,10 @@
 # Spec 004 — Camp systems audit (six-system design input)
 
-Status: **Partially landed** — item A shipped 2026-10-13; B folded
-into spec 003; D folded into PLAN D4; C and E are open design calls.
+Status: **Landed** — item A shipped 2026-10-13; B folded into spec
+003 (sockets/sit-spots live); C landed as decor `attract` rows +
+board-roll bonus weights (cap ≈50% of base mix); D landed as
+cast-time rare-beat rolls in `SimDirector.cast_night` (meteor +
+night-swim rows, rolled off `w.rng`); E rejected with reasons below.
 Source: `systems.txt` (six stitched systems), audited against code.
 
 ## Verdicts

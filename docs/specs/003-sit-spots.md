@@ -1,8 +1,11 @@
 # Spec 003 — Sit spots (benches as sim affordances)
 
-Status: **Decided** — blocked on the actor view presenter
-(PLAN_gameplay "Actor view presenter", D4). Source: design input
-`bench.txt`, audited 2026-10-13.
+Status: **Landed** — sockets in `decor.json` (stools/bench/
+picnic_table/swing), cast-time claims + sit programs in
+`SimDirector.cast_night` (`_spawn_sockets`/`_sit_program`), sockets
+are bare `pos`+`tags` entities so `ActorView` never renders them
+(renderable = `pos`+`persona`). Checks live in `test_sim.gd`.
+Source: design input `bench.txt`, audited 2026-10-13.
 
 ## Problem
 

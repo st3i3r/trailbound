@@ -58,7 +58,10 @@ func _ready() -> void:
 	game.day = 5
 	var chunk: float = game.crew_speedup()
 	check("chunk = stage/6 = 40 min", chunk == 2400.0, "got %.0f" % chunk)
-	check("chunk applied", game.crew["seconds_left"] == 12000.0
+	# crew_tick bills real seconds between calls — assert the window,
+	# not the instant (a 1s boundary mid-test is a flake, not a bug)
+	check("chunk applied", game.crew["seconds_left"] <= 12000.0
+		and game.crew["seconds_left"] >= 11990.0
 		and game.crew["speedups_stage"] == 1
 		and game.crew["speedups_today"] == 1)
 
@@ -66,7 +69,8 @@ func _ready() -> void:
 	game.crew_speedup()
 	game.crew_speedup()
 	check("stage cap 3", not game.crew_can_speedup()
-		and game.crew["seconds_left"] == 7200.0,
+		and game.crew["seconds_left"] <= 7200.0
+		and game.crew["seconds_left"] >= 7190.0,
 		"got %.0fs" % game.crew["seconds_left"])
 
 	# Per-day cap survives the stage reset on collect.

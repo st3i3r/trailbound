@@ -1,0 +1,34 @@
+[
+ {
+  "id": "tet_eve",
+  "name": "Tết Eve",
+  "site": "whisper_river",
+  "site_day": 5,
+  "line": "Firecrackers somewhere downriver. Tonight everyone eats together.",
+  "dish": "banh_chung",
+  "archetype_boost": {
+   "family": 8,
+   "couple": 6
+  }
+ },
+ {
+  "id": "mid_autumn",
+  "name": "Mid-Autumn Lanterns",
+  "site": "lantern_valley",
+  "site_day": 6,
+  "line": "The valley fills itself tonight — bring mooncakes, watch the lanterns rise.",
+  "dish": "mooncakes",
+  "archetype_boost": {
+   "photographer": 8,
+   "family": 6
+  }
+ },
+ {
+  "id": "memorial_night",
+  "site": "pinewatch",
+  "name": "Grandpa's Memorial Night",
+  "site_day": 7,
+  "dish": "che_troi_nuoc",
+  "note": "Gentle arc festival: story payload, no demand spike (§13.5)"
+ }
+]

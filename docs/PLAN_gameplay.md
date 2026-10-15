@@ -32,6 +32,134 @@ chips).  Remaining in D2: outfitter, build mode, pad clearing, dinner.
 The remaining structural gap: build/outfitter/map still have no
 interaction surface — the camp can be *prepped* but not yet *changed*.
 
+## Phase D0.5 — authored depth (DONE 2026-10-14)
+
+Backend-complete engine got its vertical/horizontal texture pass —
+the levers SOTA cozy games use for *attachment*, not more machinery:
+
+- **Evening care gestures** — `stoke_fire` (+10% tips, once/night)
+  and `tuck_in` (+1 star to one seated guest, once/night), both
+  undoable until Goodnight, both reset at `new_day`, unseating
+  frees a dangling tuck. Bounded so their absence never reads
+  as a loss — presence, not chores.
+- **Recipe mastery** — `cook_counts` per recipe (`camp_mash`
+  excluded); Practiced at 5 / Signature at 15 via `cook_tier`;
+  a mastered plate that lands on a guest tips +6/+15. `cook_plan`
+  surfaces the tier per craving.
+- **Familiar faces** — `arch_visits` counts stays per archetype;
+  at ≥2 prior visits a non-regular board card reads `returning`,
+  tips +10, logs `days_log.returners`, dialogue has `returning_min`.
+  Regulars are never tagged (they have their own arc).
+- **WR fishing depth** — `errand_spots.fish_tables` weighted
+  per-bank catches (the bend = catfish, the run = the new `loach`);
+  stream sequencing preserved (Nth cast draws N rolls).
+- **LV Field Camera** — `camera` gear (L2 unlock), `take_photo`
+  once/site-day for print-sale coins, 5 shots → `photo_wall`
+  journal event; `photos.json` is the shot catalog.
+- **Grandpa's Fund** — the post-arc prestige sink: `donate_fund`
+  banks coins forever; each tier emits `fund_tier_N`, drops a
+  grant decor into `stored`, and brings a wandering-mail letter
+  (`site:"any"`, globally deduped). `E:` unlock prefix gates
+  the grant rows for a second copy.
+- **Decor variants** — `decor.variants` cosmetic re-skins,
+  `buy_decor_variant` undoable, survives store/place round-trips.
+- **Pinewatch memorial** — the site's festival is Grandpa's
+  Memorial Night (site day 7): no demand spike, a one-night dish
+  (chè trôi nước), vignette, hint letter, Mai's `last_event`
+  morning line. Flavor-forward like a first festival should be.
+
+Plumbing that made it work: the letter `trigger.event` arm is now
+open-vocabulary (any journal event, checked across all sites), and
+`journal_event` is the universal completion signal for page checks,
+letter triggers, and `E:` unlocks.
+
+Coverage: `test_depth` 47 checks (all verbs, guards, undo paths,
+day-resets, determinism), `test_content` lint grew photos/fund/
+variants/E-unlock/any-letter families (~640 checks), full suite
+15/15 green, sim guardrails hold (the tip bonuses stay inside the
+75% fees+tips band; the fund sinks post-arc so arc pacing is
+untouched).
+
+**UI surface owed (handoff to the UI agent):** live and tested —
+presentation only.
+
+| Surface | Reads | Calls |
+|---|---|---|
+| Care buttons (evening) | `can_stoke_fire()`, `can_tuck_in(gid)`, `st.fire_stoked`, `st.tucked_in` | `stoke_fire()`, `tuck_in(gid)` — undoable |
+| Mastery tier in cook plan | `cook_plan()[].mastery` → 0/1/2 | — |
+| Returning badge | `card.returning` on board cards; `days_log.back().returners` for the summary | — |
+| Photo shutter | `can_photo()` gates; `take_photo()` → `{id, name}`; `st.photos` = collection | `take_photo()` |
+| Fund panel | `Game.fund_total`, `fund_status()` tiers | `donate_fund(coins)` |
+| Variant picker | `decor.variants` rows on catalog data; `decor[i].variant` placed state | `buy_decor_variant(i, skin)` — undoable |
+| Festival card | `st.event == "memorial_night"` on PW day 7; `festival().dish` = the one-night recipe | — |
+| Photo wall decor | `stored` gains the grant rows; `photo_wall` event already in journal | `place_stored(i, cells)` |
+
+## Phase D0.6 — depth II (DONE 2026-10-14)
+
+The second SOTA wave — the last core-loop lever plus the texture
+systems around it:
+
+- **Seating wishes** — board cards carry a stated wish
+  (`WISH_BY_TRAIT`/`WISH_BY_ARCH`/generic ~50%): "by the fire",
+  "quiet", "company", "solo", tag-wishes `water`/`view` only where
+  pads carry the tag, `together` for multi-pad parties (adjacency,
+  since `can_seat` doesn't require it). Regulars carry authored
+  wishes (`old_ba` → water, `lan` → view). `wish_met` resolves
+  against `_pad_ctx`; met = +1 star capped at 5, the review line
+  rekeys to `wish`/`wish_bad`, `days_log.wishes_met` counts and
+  feeds the `wishes_met_min` dialogue arm. `wishes.json` holds the
+  kind labels for the UI card chip. **No broken promises**:
+  `WISH_CAP_KINDS` + `Game._wish_kinds` gate every kind by what
+  tonight's open pads can actually grant (tags, fire-ring, placed
+  light, open sky, a free adjacent pair) — spec 006 Rule 1.
+- **Grandpa's Margins** — Pinewatch's signature mechanic, closing
+  the site-identity triangle (WR banks, LV camera): `margins.json`,
+  14 sequential once/site-day reads on `read_margin`, no gear
+  needed (it teaches the idiom before the player owns equipment).
+  Hints write real state — `weather` peeks tomorrow's seeded roll,
+  `recipe` writes the pair into `pairs_tried`.
+- **Weather streaks** — `weather_streak {kind, days}` in site
+  state, updated on the seeded `_weather_at` roll; ≥3 same-weather
+  days emit `soggy_camp`/`heat_wave`/`wild_storm` journal events,
+  which feed a `weather_streak` dialogue arm, new rows, and a
+  `w_soggy` wandering-mail letter (the any-site mailbag again).
+- **Dog fetch** — `dog_fetch(kind)` once/site-day post-adoption:
+  the *directed* half of the morning dig (you pick forage vs fish;
+  he swims, rod or no rod). +1 bond, pantry-add through the normal
+  capacity cap.
+- **Sim cast beats** — the Director reads the night's care: tucked
+  or wish-met guests open with a heart emote, returners with a
+  `!`, and `ctx.stoked` flags the banked fire for the view.
+- **sim.py parity** — the twin now models wishes (skill-scaled
+  meet rate), care (~40% nights), the mastery ramp, returners,
+  LV print sales, and the fund as a post-arc wallet sink
+  (`FUND_KEEP`/`FUND_STEP`); all guardrails still hold.
+
+Consistency fixes found while wiring: `default_state()` was
+missing `fund_total`/`journal.letters_any` (a New Game would leak
+them — same class as the journal leak the fuzzer caught), the new
+verbs emitted no analytics (`gesture`/`photo`/`fund_donate`/
+`margin`/`dog_fetch` catalogued now), and the fuzzer's cook/fish
+arms were silently dead on stale field shapes — fixed and extended
+with wishes-side coverage. The follow-on SOTA audit (spec 006)
+caught and fixed the broken-promise gap above — trait wishes for
+`lit`/`sky`/`fire` and the generic pool's `fire` could be dealt
+where the camp couldn't grant them.
+
+**UI surface owed (handoff to the UI agent):** every contract
+below is already live and tested — the work is presentation only.
+
+| Surface | Reads | Calls |
+|---|---|---|
+| Wish chip on board cards | `card.wish`, `card.wish_label` (already baked on the card — no catalog join), `card.returning` badge | — |
+| Review line | `result.comment_key == "wish"/"wish_bad"`, `result.wish_met` | — |
+| Margin book | `Game.read_margin()` → `{id, text, hint?}`; `can_read_margin()` gates the tab; `st.margins_read` = progress | `read_margin()` |
+| Streak dialogue/letter | engine-side rows + `w_soggy` mail — nothing to wire | — |
+| Fetch button | `can_dog_fetch()` gates; result `{id, name}` for the toast | `dog_fetch("forage"/"fish")` |
+| Care buttons | `can_stoke_fire()`, `st.tucked_in`, `st.fire_stoked` | `stoke_fire()`, `tuck_in(gid)` — both undoable |
+| Night visuals | `ctx.stoked` (bright fire), guest programs already prepend heart/`!` emotes for tucked/wish-met/returning — presenter draws them | — |
+| Weather streak feedback | `st.weather_streak {kind, days}` ≥3 — e.g. a small status icon | — |
+
 ## Phase D1 — backend close-out (DONE 2026-10-13)
 
 - `decor_cells` authored in all 3 layouts (14/23/26 cells — legal
@@ -200,14 +328,16 @@ property, and it is already live.
 
 ### Director casting (scenario tables deferred)
 
-`cast_night(st, vignette)` / `cast_morning(st)` map seated
-archetypes + placed items → entity programs. v1 casts a minimal
-in-code table (guest idle at pad, dog patrol, angler→bank); the
-full archetype/weather/item scenario matrix is a data file later.
-That file also carries **rare-beat rows** — the 1%-night-swim
-principle: low-weight scenario picks rolled from `w.rng` at cast
-time, so outlier behaviour stays inside the determinism contract
-(spec 004 item D).
+`cast_night(st, vignette)` / `cast_day(st, …)` map seated
+archetypes + placed items → entity programs. The in-code table
+now covers sockets/sit-spots, storm wraps, duets, queue wanderers
+and the dog presence beats (spec 005-D: storm shelter, quiet-night
+curl, morning-after-5★ wag via `cast_day`'s `prev_perfect` flag);
+the full archetype/weather/item scenario matrix stays a data-file
+lift for site 2/3 choreography. **Rare beats landed** (spec 004-D):
+a low-weight roll off `w.rng` at cast time picks meteor/night-swim/
+raccoon entities — outlier behaviour inside the determinism
+contract.
 
 **Authored beats ride the same machinery** (spec 005): vignette
 rows gain a `cue` light term (`track_emit` on play, untrack on
@@ -289,11 +419,15 @@ hooks. Each phase declares:
 Verbs called out-of-phase return `{"ok":false,"err":"phase"}` —
 the gate lives in `game.gd`, so UI can never create illegal state.
 
-### 2. Commands + day action log (undo model)
+### 2. Commands + day action log (undo model) — **Landed**
 
 SOTA: every mutation is a command record, which gives undo and
 the "nothing is final until Goodnight" pillar for free. Replaces
-`bought_today` (superset of it):
+`bought_today` (superset of it). Shipped: `Game.action_log` +
+`_record`/`_dispatch` inverse table, `Game.undo()`/`can_undo()`,
+`action_log_changed` signal for the UI seam; terminal verbs (cook,
+gather) record with `inverse: null` and drop out on undo rather
+than wedging the log. Persisted in the save (`actions` key).
 
 ```gdscript
 st["actions"]  # [{verb, params, inverse}, ...] — day-scoped log
@@ -335,7 +469,7 @@ ghost ──cancel──▶ idle
   [Pet]. The scene reads as passive-until-touched, which is the
   cozy contract's tactility rule made concrete.
 
-### 4. EventLog — one ordered stream per day
+### 4. EventLog — one ordered stream per day — **Landed**
 
 ```gdscript
 st["log"]  # [{phase, kind, payload}] — append-only
@@ -391,8 +525,9 @@ the real answer to sprite stacking (visual offsets are only
 the residual fix). Data shape: `sockets` block per item —
 `{id, kind, px_offset, facing}` (`kind` types the slot —
 seat/surface/hang; spec 004 item B) — anchors bind to a
-socket, not just an item. **First consumer beyond pads: the
-`bench` decor (sit-spot cast) — spec `specs/003-sit-spots.md`.**
+socket, not just an item. **Landed: `sockets` on stools/bench/
+picnic_table/swing; `_spawn_sockets` + seeded claims + `_sit_program`
+in `cast_night` — spec `specs/003-sit-spots.md`.**
 
 ### Ambient audio beds
 
@@ -408,10 +543,11 @@ distance — the campsite mix moves as the view pans.
 | Aspect | Verdict | Action |
 |---|---|---|
 | Sim boundary | `seating`/`econ`/`game` logic is nearly pure; ECS sim joins it | Keep Nodes out of `systems/` — lint: no `Node` types below `ui/` |
-| Commit boundary | `bought_today` covers purchases only | Extend to a **day action log**: move/store/return/unlock/clear all undoable-until-Goodnight |
-| Event flow | signals + trigger dicts today | `EventLog` for night summary/journal/analytics — one ordered list per day |
-| Content lint | ~~hand-authored~~ **in-test lint shipped**: decor⊆walkable, no dead cells, pads walkable+reachable, fire solid, errands grounded | Extend to: neighbours symmetric; r-reach ≤ ~3 pads; MASK↔nav cross-check (water cells ⊆ blocked) when a MASK parser lands |
-| Save/migration | `state_dict`+`_migrate` works | Actors excluded by design; add migration matrix to tests when schema bumps |
+| Commit boundary | `bought_today` covers purchases only | **Landed** — day action log: buy/move/store/return/unlock/clear/upgrade all carry inverses, undoable-until-Goodnight; `undo()` + `action_log_changed` |
+| Event flow | signals + trigger dicts today | **Landed** — `day_log` ordered `{phase,kind,payload}` per day, cleared at morning roll; analytics mirrors verbs via `Analytics.track` call sites |
+| Content lint | ~~hand-authored~~ **in-test lint shipped**: decor⊆walkable, no dead cells, pads walkable+reachable, fire solid, errands grounded; **+dialogue contract** — rows must name a real site/anchor, use known `when` keys, and every site must have rows (caught a dead `warden_fav_served` row); **+letter triggers** (`morning`/`event` vocab incl. `regular_done:`/`page:` forms), **+regular refs** (site/cadence/archetype/favourite∈recipes/traits), **+chapter check vocab** (`restored`∈crew, `night`∈Goodnight keys, `metric`∈counters) + page continuity, **+festival site_day**, **+fish site/note**, **+ingredient kinds** | Extend to: neighbours symmetric; r-reach ≤ ~3 pads; MASK↔nav cross-check (water cells ⊆ blocked) when a MASK parser lands |
+| Verb fuzz | none | **Landed** — `test_fuzz`: 4 seeds × 60 random public-verb steps (seat/serve/buy/pantry/cook/spot/fish/dog/day-cycle/save-reload/invalid ops) with per-step invariants (coins ≥ 0, assignments ⊆ open pads, JSON round-trip), **undo-inverse round-trips** (verb→undo → identical state), same-seed replay equality. Caught: `default_state()` was missing journal/dialogue/field_notes/passport — "New Game" leaked the old run's journal |
+| Save/migration | `state_dict`+`_migrate` works | **v2 exercised** — nested default fill (incl. type drift: v1 `personas_met` Array→Dictionary), version stamping, frozen fixture `tests/fixtures/save_v1.json` + round-trip + golden replay + byte/ms budget in `test_save.tscn`; actors excluded by design |
 | Pathfinding | **Cast-time static cost routing** — the map dictates the path, not the actor: `nav.blocked` cells (water/fire/treeline) + soft pad cost in layout JSON; LOS fast path else A* on the cell grid, emitted as `goto` chains. Deterministic, pure-data, no runtime navmesh/physics | Done — `_route`/`_goto_legs` in SimDirector; dynamic targets (flee home, goto tag/percept) stay straight-line, noted limitation |
 | Tile-as-data | Our split-list version of their per-tile record: `nav.blocked` (nav layer), `decor_cells`/`pads`/`bank_cells` (gameplay layer). Same substance | **Placement deadlock guard added** — `_strands_any` flood-fills walkable cells before/after a drop; sealing a reachable region rejects the placement (covers buy/move/place_stored). Occupant-per-tile for movers rejected — pos queries suffice |
 | Map layers | Painterly equivalent of the L0/L1/L2 tilemap model: baked ground PNG + tintmap (terrain), `PROPS` table (static env), layout JSON (interactive). No runtime TileMapLayer — that's the Eastward approach; Terrains auto-tiler is authoring-tool material, not runtime | **Layout-integrity lint added** (test_seating): decor⊆walkable, no dead cells, pads walkable+mutually reachable, fire solid, errands on/near ground. FastNoiseLite procedural maps rejected for runtime — sites are authored content; possible offline tool role later |
@@ -419,7 +555,7 @@ distance — the campsite mix moves as the view pans.
 | Site portability | Engine layer is site-agnostic: no Pinewatch refs in `sim/`. Site = layout JSON contract (`pads.spots`, `errand_spots`, `nav`, `decor_cells`) + scenario table. `cast_night` is hand-authored Pinewatch content pending the scenario matrix | Done — `_bank` returns null without `errand_spots.pond` (angler falls back to idle); remaining site data is the planned JSON matrix |
 | Staff AI | Not in v1 | If staffing lands: per-agent task queue, not a job-board system |
 | Smell audit (2026-10-13) | **SimGrid** now the single home of CELL + nav/walkable/reachable parsing (was duplicated in director + game.gd + test) | Program **labels** replace magic jump indexes (`goto:"flee"` resolves at schedule build — `goto:5/7/11`, `-1` patch, `flee_i+4` are gone). Dead keys removed (`lookout` dup, `bank_cells`). Stale `[96,72]` fallbacks in errands.gd gated — no forage spot → no nodes |
-| Remaining smells | `cast_night` ~150 lines = content in engine (by design; scenario JSON is the fix). `pinewatch_test.gd` 1525 lines is a testbed becoming the real scene — split when it ships. `game.gd` 1.6k-line autoload — watch it. `visit=spots.keys().slice(0,3)` leans on dict order | Patrol `emit bark` is untagged (ambient) vs investigate `["alarm","noise"]` — semantic asymmetry, keep. Git history has one cosmetic duplicate commit |
+| Remaining smells | `cast_night` ~150 lines = content in engine (by design; scenario JSON is the fix). `pinewatch_test.gd` is a testbed becoming the real scene — split when it ships (UI agent's call). | `game.gd` split landed (build + journal leaf subsystems); dict-order smells fixed — pad-id iteration sorts everywhere; patrol `emit bark` is untagged (ambient) vs investigate `["alarm","noise"]` — semantic asymmetry, keep |
 
 ## The cozy UX contract (cross-cutting, applies to every phase)
 

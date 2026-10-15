@@ -42,6 +42,15 @@ static func effects_at(pad_cell: Vector2i, world: Dictionary) -> Dictionary:
 	if fire and chebyshev(fire.get("cell", Vector2i.ZERO), pad_cell) \
 			<= int(fire.get("radius", 2)):
 		eff["warmth"] = true
+	# §13.5 Music Night: the singalong is loudest in the fire circle —
+	# the pad-side "music" term only lands within one cell past the
+	# radius, so Light Sleepers near the fire pay for it while music
+	# farther out stays celebratory (the global cheer for Music
+	# Lovers is applied in eval_guest off world.music_night).
+	if world.get("music_night", false) and fire \
+			and chebyshev(fire.get("cell", Vector2i.ZERO), pad_cell) \
+				<= int(fire.get("radius", 2)) + 1:
+		eff["music"] = true
 	return eff
 
 
@@ -93,7 +102,8 @@ static func eval_guest(guest: Dictionary, pad_ids: Array,
 						or not ctx["occupied"]
 				"nature_lover": met = met or ctx["eff"].has("nature")
 				"night_owl": met = met or ctx["eff"].has("light")
-				"music_lover": met = met or ctx["eff"].has("music")
+				"music_lover": met = met or ctx["eff"].has("music") \
+						or world.get("music_night", false)
 				"dog_lover": met = met or ctx["eff"].has("dog")
 				"kids": met = met or ctx["eff"].has("play")
 				"angler": met = met or "water" in ctx["tags"]
@@ -159,7 +169,7 @@ const TRAIT_KEYS := {"chilly": "warmth", "social": "company",
 	"shutterbug": "view", "stargazer": "stars"}
 
 static func _comment_key(ev: Dictionary, comfort: int, meal_term: int,
-		weather_term: int) -> String:
+		weather_term: int, wish := "") -> String:
 	for d in ev["detail"]:                       # aversions dominate
 		if d["tripped"]:
 			var c: String = d.get("cause", "")
@@ -168,6 +178,8 @@ static func _comment_key(ev: Dictionary, comfort: int, meal_term: int,
 		return "rain"
 	if meal_term > 0:
 		return "favourite"
+	if wish == "met":
+		return "wish"                   # a request read back is personal
 	for d in ev["detail"]:
 		if d["met"]:
 			return TRAIT_KEYS.get(d["trait"], "neutral")
@@ -175,6 +187,8 @@ static func _comment_key(ev: Dictionary, comfort: int, meal_term: int,
 		return "comfort"
 	if meal_term < 0:
 		return "no_meal"
+	if wish == "missed" and comfort == 0:
+		return "wish_bad"               # they asked, and got a bare pad
 	if comfort == 0:
 		return "bare"
 	return "neutral"
@@ -190,8 +204,13 @@ static func resolve_guest(guest: Dictionary, pad_ids: Array,
 		weather_term = -1                       # storm is worse rain, not clear
 	var stars := Econ.stars(comfort, meal_term, ev["needs_met"],
 		ev["aversions"], weather_term)
+	var met := wish_met(guest, pad_ids, world)
+	if met:
+		stars = mini(5, stars + 1)      # §wish: they asked, you listened
 	var fee := int(guest.get("fee", 0))
-	var key := _comment_key(ev, comfort, meal_term, weather_term)
+	var has_wish := String(guest.get("wish", "")) != ""
+	var wflag := "met" if met else ("missed" if has_wish else "")
+	var key := _comment_key(ev, comfort, meal_term, weather_term, wflag)
 	var lines: Array = world.get("comments", {}).get(key,
 		["A fine night."])
 	return {"id": guest.get("id", ""), "stars": stars, "fee": fee,
@@ -199,6 +218,7 @@ static func resolve_guest(guest: Dictionary, pad_ids: Array,
 		"weather": weather_term, "meal": meal_term,
 		"needs_met": ev["needs_met"], "aversions": ev["aversions"],
 		"detail": ev["detail"], "comment_key": key,
+		"wish": has_wish, "wish_met": met,
 		"comment": lines[(String(guest.get("id", "")).hash()
 			+ int(world.get("day", 0))) % lines.size()]}
 
@@ -273,10 +293,99 @@ static func _draw_traits(arch: Dictionary, pool: Dictionary, count: int,
 				pick = trait_id
 				break
 		if pick == "":
-			pick = bag.keys().back()
+			# float-rounding underflow — take the heaviest remaining
+			# weight rather than leaning on dict order
+			var best_w := -1.0
+			for trait_id in bag:
+				var w := float(bag[trait_id]) \
+					* (2.0 if trait_id in signature else 1.0)
+				if w > best_w:
+					best_w = w
+					pick = trait_id
 		out.append(pick)
 		bag.erase(pick)
 	return out
+
+
+## §Wishes (SOTA "request" depth): a card may ask for a kind of spot —
+## trait-derived first, archetype second, generic pool last. The kind
+## id doubles as the reviews.json key; satisfaction is +1★ at resolve.
+## Capability kinds only appear where tonight's open pads can carry
+## them — an unsatisfiable wish is a broken promise, not a challenge.
+## `kinds` is the set the camp can actually grant tonight (tags on
+## open pads, fire-ring coverage, placed light, open sky, a free
+## adjacent pair), computed by Game._wish_kinds.
+const WISH_BY_TRAIT := {"light_sleeper": "quiet", "chilly": "fire",
+	"stargazer": "sky", "social": "company", "introvert": "solo",
+	"angler": "water", "shutterbug": "view", "night_owl": "lit",
+	"dog_lover": "company", "nature_lover": "view",
+	"music_lover": "company", "kids": "together",
+	"dog_wary": "quiet"}
+const WISH_BY_ARCH := {"couple": "together", "family": "together",
+	"angler": "water", "shutterbug": "view", "photographer": "view"}
+const WISH_GENERIC := ["fire", "quiet", "company", "solo"]
+const WISH_CAP_KINDS := ["water", "view", "fire", "lit", "sky",
+	"together"]
+const WISH_CHANCE := 0.5
+
+
+static func _wish_pick(req: Dictionary, kinds: Array,
+		rng: RandomNumberGenerator) -> String:
+	var wish := ""
+	for t: String in req.get("traits", []):
+		wish = WISH_BY_TRAIT.get(t, "")
+		if wish != "" and (wish not in WISH_CAP_KINDS
+				or wish in kinds):
+			break
+		wish = ""
+	if wish == "":
+		wish = WISH_BY_ARCH.get(String(req.get("archetype", "")), "")
+		if wish in WISH_CAP_KINDS and wish not in kinds:
+			wish = ""
+	if wish == "":
+		var pool: Array = WISH_GENERIC.filter(
+			func(w): return w not in WISH_CAP_KINDS or w in kinds)
+		if not pool.is_empty():
+			wish = pool[rng.randi() % pool.size()]
+	return wish
+
+
+## A card's request, evaluated against tonight's seating — the same
+## geography eval_guest reads: neighbours, loud flags, effects, tags,
+## cover, and the guests' own pads (for "together").
+static func wish_met(guest: Dictionary, pad_ids: Array,
+		world: Dictionary) -> bool:
+	var wish := String(guest.get("wish", ""))
+	if wish == "" or pad_ids.is_empty():
+		return false
+	var ctxs: Array = pad_ids.map(
+		func(pid): return _pad_ctx(pid, String(guest["id"]), world))
+	match wish:
+		"fire":
+			return ctxs.any(func(c): return c["eff"].has("warmth"))
+		"lit":
+			return ctxs.any(func(c): return c["eff"].has("light"))
+		"water", "view":
+			return ctxs.any(func(c): return wish in c["tags"])
+		"sky":
+			return ctxs.any(func(c): return not c["covered"])
+		"quiet":
+			return not ctxs.any(func(c): return c["loud"])
+		"solo":
+			return not ctxs.any(func(c): return c["occupied"])
+		"company":
+			return ctxs.any(func(c): return c["occupied"])
+		"together":
+			if pad_ids.size() < 2:
+				return true
+			var nbrs: Dictionary = world["layout"]["pads"] \
+				.get("neighbours", {})
+			for i in pad_ids.size():
+				for j in range(i + 1, pad_ids.size()):
+					if pad_ids[j] in nbrs.get(pad_ids[i], []):
+						return true
+			return false
+	return false
 
 
 static func _request(arch: Dictionary, site_id: String, traits: Array,
@@ -314,7 +423,7 @@ static func _has_conflict(board: Array) -> bool:
 static func board(site: Dictionary, archetypes: Array, site_day: int,
 		open_pads: Array, rating: float,
 		rng: RandomNumberGenerator, has_free_pair := false,
-		favourites: Array = []) -> Array:
+		favourites: Array = [], wish_kinds: Array = []) -> Array:
 	var site_id: String = site.get("id", "")
 	var reqs := []
 	if site_day == 1:
@@ -392,6 +501,14 @@ static func board(site: Dictionary, archetypes: Array, site_day: int,
 				req["elite"] = true
 				reqs[reqs.size() - 1] = req
 				break
+
+	# §Wishes: about half the board asks for a kind of spot — elite
+	# critics never do (they judge, they don't request), and tag
+	# wishes only appear where tonight's open pads carry the tag.
+	for req in reqs:
+		if req.get("elite", false) or rng.randf() > WISH_CHANCE:
+			continue
+		req["wish"] = _wish_pick(req, wish_kinds, rng)
 	return reqs
 
 

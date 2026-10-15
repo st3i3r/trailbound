@@ -187,6 +187,34 @@ COOKABLE = {1: 7, 2: 9, 3: 13}
 CONFLICTS = (('Social', 'Introvert'), ('LOUD', 'LightSleeper'),
              ('NightOwl', 'Stargazer'))
 
+# §13.5 fixed arc-date festivals — mirror of data/festivals.json
+# (keep in sync). Boost leans the night's board mix; the limited
+# dish lifts favourite coverage one notch (a cookable recipe).
+FESTIVALS = {2: {5: dict(id='tet_eve', boost={'Family': 8, 'Couple': 6})},
+             3: {6: dict(id='mid_autumn',
+                         boost={'Photographer': 8, 'Family': 6})}}
+# §13.5 Music Night: 150c evening buy, tips +20% that night. The bot
+# hosts when the wallet is comfortable (the purchase is a treat, not
+# a critical-path spend).
+MUSIC_PRICE, MUSIC_TIPS = 150, 0.20
+# §33.3 Vol II gatherings (post-arc): a gathering may replace the
+# night's board; meeting the brief pays +25% of its fees.
+GATHER_P, GATHER_BONUS = 0.40, 0.25
+# Depth systems (mirrors, keep in sync with game.gd/seating.gd):
+# wishes — ~half the board asks; skill meets them at 25-80% like any
+# other seat term. Care — stoke (+10% tips) and tuck (+1 star, one
+# guest) are ~40%-night verbs for an engaged player. Mastery — the
+# top recipe tiers Practiced by ~day 25 (+6/plate), Signature ~day 60
+# (+15). Returners — arch_visits>=2 badges roughly one a night once
+# the site's churned (+10). Fund — post-arc the wallet drains into
+# it at 500/day while the purse is fat.
+WISH_P, WISH_SKILL = 0.5, lambda k: 0.25 + 0.35 * k
+CARE_P, STOKE_TIPS = 0.40, 0.10
+MASTERY = lambda day: 15 if day > 60 else (6 if day > 25 else 0)
+RETURNER_DAY, RETURNER_TIP = 12, 10
+FUND_KEEP, FUND_STEP = 2000, 500
+PHOTO_COINS = 10                              # LV field camera print
+
 
 # ---------------------------------------------------------------- helpers
 def rng_for(seed, site, day, salt=''):
@@ -223,6 +251,7 @@ def run(seed=1, K=1.25, A=0.0, show=False, max_day=120, post_arc=0):
             five3=False, starg5=False, oven_recipes=0, order=list(S['order']),
             full8=False, reg_visits=0, reg_done=False, blogger5=False,
             bought_cos=[], cover={i: set() for i in range(8)}, seats=0,
+            music_nights=0, gathers_met=0, fund=0,
         )
         for i in range(3):                   # built-in campfire Warmth r2 (5.1)
             t['cover'][i].add('Warmth')
@@ -230,7 +259,8 @@ def run(seed=1, K=1.25, A=0.0, show=False, max_day=120, post_arc=0):
     st[1] = new_site(1)
     unlock_day = {1: 1}
     ppd = {1: [], 2: [], 3: []}
-    agg = dict(host=0, walk=0, reward=0, ad=0, spend=0, staples=0)
+    agg = dict(host=0, walk=0, reward=0, ad=0, spend=0, staples=0,
+               gather=0)
     site_inc = {1: 0.0, 2: 0.0, 3: 0.0}
     order_empty = {}
     wmax, done, arc_agg = 0, None, None
@@ -286,6 +316,9 @@ def run(seed=1, K=1.25, A=0.0, show=False, max_day=120, post_arc=0):
         # ----- weather (5.7): never on site day 1; P day 4 scripted
         rain = (site == 1 and k == 4) or (k > 1 and rw.random() < S['rain'])
 
+        # ----- §13.5 festival night: fixed arc date per site
+        fest = FESTIVALS.get(site, {}).get(k)
+
         # ----- booking board (5.2)
         board_size = pads + 1 + (1 if day % 7 in (6, 0) else 0)
         if site == 1 and k == 1:
@@ -294,9 +327,15 @@ def run(seed=1, K=1.25, A=0.0, show=False, max_day=120, post_arc=0):
         blogger = len(t['reviews']) == 15 and \
             sum(t['reviews']) / len(t['reviews']) >= 4.5 and rng.random() < 0.25
         n_cards = board_size
+        mix = list(MIX[S['key']])
+        if fest:
+            # archetype_boost leans demand for one night (never more
+            # headcount — the mix shift is the whole effect)
+            for aid, w in fest['boost'].items():
+                mix.append((aid, w))
         parties = []
         for _ in range(n_cards):
-            parties.append(dict(arch=weighted(rng, MIX[S['key']]),
+            parties.append(dict(arch=weighted(rng, mix),
                                 traits=[], regular=None))
         if weekend_fam:
             i = rng.randrange(len(parties))
@@ -453,11 +492,23 @@ def run(seed=1, K=1.25, A=0.0, show=False, max_day=120, post_arc=0):
                 occupied[i] = (p, idxs, bool(ARCHETYPES[p['arch']][3]))
             seated.append((p, idxs))
 
+        # ----- §13.5 Music Night: host when the wallet is healthy —
+        # priced off tomorrow's buys only (a treat, not a sink)
+        music = coins > MUSIC_PRICE * 3
+        if music:
+            coins -= MUSIC_PRICE
+            agg['spend'] += MUSIC_PRICE
+            t['music_nights'] += 1
+
         # ----- night: stars per party (5.4), reviews, income
         inc, tips, parties_n, five, fam = 0.0, 0.0, 0, 0, False
         starg5_night, anglers_w = False, 0
-        pf = min(0.8, 0.3 + 0.1 * k)              # favourite-meal chance
+        # the festival's limited dish is one more cookable recipe —
+        # favourite coverage lifts for that night only
+        pf = min(1.0, min(0.8, 0.3 + 0.1 * k) + (0.2 if fest else 0.0))
         ad_night = (day >= 3 and rng_for(seed, site, k, 'ad').random() < A)
+        care_night = rng_for(seed, site, day, 'care').random() < CARE_P
+        tucked = False            # one tuck a night, first guest in line
         for p, idxs in seated:
             arch = p['arch']
             fee = (MINH_FEE if p['regular'] == 'Minh'
@@ -467,6 +518,13 @@ def run(seed=1, K=1.25, A=0.0, show=False, max_day=120, post_arc=0):
             meal = 1 if meal_r < pf else (-1 if meal_r > 0.97 else 0)
             raw = est(p, idxs, final=True) - 0.5 + meal
             stars = max(1, min(5, round(raw)))
+            # §wishes: ~half of cards ask; skill meets them like any
+            # seat term (+1 star, capped, same ceiling as tuck)
+            if rng.random() < WISH_P * WISH_SKILL(K):
+                stars = min(5, stars + 1)
+            if care_night and not tucked:
+                stars = min(5, stars + 1)
+                tucked = True
             t['reviews'].append(stars)
             inc += fee
             tips += fee * 0.10 * max(0, stars - 2)
@@ -492,15 +550,48 @@ def run(seed=1, K=1.25, A=0.0, show=False, max_day=120, post_arc=0):
         walk = min(walk, t['seats'])
         t['blogger5'] = False
         wi = walk * S['meal']
+        if music:
+            tips *= 1.0 + MUSIC_TIPS           # §13.5 singalong
+        if care_night:
+            tips *= 1.0 + STOKE_TIPS           # §care stoked fire
+        # §mastery: the kitchen's top plates tier Practiced ~day 25,
+        # Signature ~day 60 — the bonus rides meals that landed.
+        tips += MASTERY(day) * min(parties_n, 3)
+        # §returners: a familiar face on most boards once the site's
+        # churned through the archetype pool
+        if day > RETURNER_DAY:
+            tips += RETURNER_TIP
+        # §photos: the LV field camera (a chapter grant ~site-day 3)
+        # sells one print a day
+        if site == 3 and day > 3:
+            inc += PHOTO_COINS
         ad_extra = tips * (1 if ad_night else 0)
+
+        # ----- §33.3 Vol II gathering (post-arc only): an offer may
+        # replace the night's board; meeting the brief pays +25% of
+        # its fees. Brief solvability scales with seating skill (K).
+        gather = 0.0
+        if post_arc and done and day > done \
+                and rng_for(seed, site, k, 'gather').random() < GATHER_P:
+            if rng.random() < min(1.0, K * 0.8):
+                gather = inc * GATHER_BONUS
+                t['gathers_met'] += 1
+
         stp = (parties_n + walk) * 5
-        coins += inc + tips + ad_extra + wi - stp
-        night_inc = inc + tips + ad_extra + wi
+        coins += inc + tips + ad_extra + gather + wi - stp
+        night_inc = inc + tips + ad_extra + gather + wi
         agg['host'] += inc + tips
         agg['ad'] += ad_extra
         agg['walk'] += wi
+        agg['gather'] += gather
         agg['spend'] += stp
         agg['staples'] += stp
+        # §fund: post-arc the surplus drains into Grandpa's Fund —
+        # the prestige sink keeps the sandbox wallet from ballooning
+        if post_arc and coins > FUND_KEEP + FUND_STEP:
+            coins -= FUND_STEP
+            t['fund'] += FUND_STEP
+            agg['spend'] += FUND_STEP
         site_inc[site] += night_inc
         t['guests'] += parties_n
         t['anglers_water'] += anglers_w
@@ -655,9 +746,11 @@ def run(seed=1, K=1.25, A=0.0, show=False, max_day=120, post_arc=0):
             order_empty[site] = day
         daily.append(dict(d=day, s=site, k=k, pads=pads, parties=parties_n,
                           stars=[r for r in t['reviews']][-parties_n:],
-                          net=round(inc + tips + ad_extra + wi - stp),
+                          net=round(inc + tips + ad_extra + gather + wi - stp),
                           coins=round(coins), pages=''.join(map(str, sorted(pg))),
-                          bought=bought, rain=rain, walk=walk))
+                          bought=bought, rain=rain, walk=walk,
+                          music=music, fest=fest['id'] if fest else '',
+                          gather=round(gather)))
         if show:
             stt = [r for r in t['reviews']][-parties_n:]
             print(day, site, k, pads,
@@ -716,10 +809,15 @@ def run(seed=1, K=1.25, A=0.0, show=False, max_day=120, post_arc=0):
             return n, total, len(t2['order'])
 
         last_buy = max((e['d'] for e in daily if e['bought']), default=None)
+        gathers = sum(e['gather'] > 0 for e in post)
+        gather_pay = sum(e['gather'] for e in post)
+        musics = sum(1 for e in post if e['music'])
         post_stats = dict(
             window=len(post),
             net_per_day=(round(statistics.mean(e['net'] for e in post))
                          if post else 0),
+            gathers_met=gathers, gather_pay=round(gather_pay),
+            music_nights=musics,
             last_buy_offset=(last_buy - done) if last_buy else None,
             balance_at={n: by_day[done + n]['coins']
                         for n in (0, 10, 20, 30, 60)
@@ -874,9 +972,12 @@ def post_report(runs, label):
                                       - statistics.median(
                                           r['done'] for r in runs if r['done'])))
     mp = mid['post']
+    gathers = [p['gathers_met'] for p in stats]
     print(f'  post-arc {label}: net/day med {statistics.median(nets):.0f} '
           f'({min(nets)}–{max(nets)}) | last buy {statistics.median(lastb):+.0f}d | '
           f'bal +30 med {statistics.median(b30):.0f} | '
+          f'gathers met med {statistics.median(gathers):.0f} '
+          f'(+{statistics.median([p["gather_pay"] for p in stats]):.0f}c) | '
           f'P+W leftover med {statistics.median(lefts):.0f} '
           f'({min(lefts)}–{max(lefts)})')
     print(f'    mid seed {mid["seed"]}: bal {mp["balance_at"]} | '

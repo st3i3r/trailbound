@@ -10,6 +10,9 @@ signal crew_stage_ready(structure: StringName)
 signal crew_collected(structure: StringName, keepsake: StringName, finished: bool)
 signal page_completed(site: StringName, page: int, gift: int, unlocks: Array)
 signal letter_delivered(letter: Dictionary)
+## UI seam (D2.2): the Undo button's enabled state tracks this —
+## emitted whenever the day-scoped action log changes shape.
+signal action_log_changed(can_undo: bool)
 
 enum Phase { BOOT, TITLE, MORNING, PREP, EVENING, NIGHT }
 
@@ -21,6 +24,8 @@ const SysDog := preload("res://scripts/systems/dog.gd")
 const SysDaily := preload("res://scripts/systems/daily.gd")
 const SysRestore := preload("res://scripts/systems/restore.gd")
 const SysGatherings := preload("res://scripts/systems/gatherings.gd")
+const SysBuild := preload("res://scripts/systems/build.gd")
+const SysJournal := preload("res://scripts/systems/journal.gd")
 
 const SPEEDUP_MIN_CHUNK := 900.0   # §6.10: chunk = max(15 min, stage / 6)
 const SPEEDUPS_PER_STAGE := 3
@@ -48,6 +53,9 @@ var tips_doubled_day := -1                  # §24.3: in-game day the tip-double
 var pantry := {}                            # ingredient id -> count (§7.4, global)
 var gear: Array = []                        # owned gear ids (global, §6.7)
 var recipes_cooked: Array = []              # recipe ids cooked ≥once — the book
+var cook_counts := {}                       # recipe id -> times cooked (mastery)
+var fund_total := 0                         # §fund: lifetime coins banked
+var letters_delivered_any: Array = []       # site:"any" mail — global dedupe
 var pairs_tried := {}                       # "a+b" -> recipe id | "camp_mash" | "oven_hint"
 var _next_structure := 0
 var _tick_accum := 0.0
@@ -57,10 +65,16 @@ var dog_sys: RefCounted
 var daily_sys: RefCounted
 var restore: RefCounted
 var gatherings: RefCounted
+var build: RefCounted
+var journal: RefCounted
 var passport_stamps: Array = []             # §33.5: one per scored Daily
 var days_log: Array = []                    # §8.3 journal — one row/day
 var personas_met := {}                      # archetype -> display name
 var settings := {}                          # §17.4 — see Save.default_state
+var action_log: Array = []                  # §6.1 undo spine: [{verb,params,inverse}]
+var day_log: Array = []                     # §17.2 event stream: [{phase,kind,payload}]
+var ads: Dictionary = {}                    # §24 pacing + entitlement (mock layer)
+var _applying_inverse := false              # undo() replays without re-logging
 
 
 func _ready() -> void:
@@ -69,13 +83,19 @@ func _ready() -> void:
 	daily_sys = SysDaily.new(self)
 	restore = SysRestore.new(self)
 	gatherings = SysGatherings.new(self)
+	build = SysBuild.new(self)
+	journal = SysJournal.new(self)
 	_crew_reset()
 	# settings live outside the run state — read them off disk at boot
 	# so prefs apply on the title screen too (UI-036)
 	settings = Save.default_state()["settings"]
 	for k in Save.load_state().get("settings", {}):
 		settings[k] = Save.load_state()["settings"][k]
+	ads = Save.default_state()["ads"]
+	ads.merge(Save.load_state().get("ads", {}), true)
 	apply_settings()
+	Analytics.log_event(&"app_open", {"kind": "cold",
+		"via": Platform.launch_source()})        # §25
 
 
 # ------------------------------------------------------------- settings (§17.4)
@@ -90,6 +110,11 @@ const _BUS := {"music": "Music", "ambience": "Ambience", "sfx": "SFX"}
 func setting(key: String, value: Variant) -> void:
 	settings[key] = value
 	apply_settings()
+	Analytics.log_event(&"settings_change", {"key": key})
+	if key in ["daily_reminder", "crew_notification"]:
+		Platform.note_notification_opt_in(
+			"crew" if key == "crew_notification" else "daily_reminder",
+			bool(value))
 	Save.save_state(state_dict())
 
 
@@ -155,6 +180,8 @@ func _input(event: InputEvent) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_IN:
 		crew_tick()                          # catch up after backgrounding
+		Analytics.log_event(&"app_open", {"kind": "warm",
+			"via": Platform.launch_source()})
 	elif what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		commit()                             # Android may reclaim us backgrounded
 
@@ -172,6 +199,190 @@ func touch() -> void:
 func commit() -> void:
 	Save.save_state(state_dict())
 	_save_dirty = false
+	Platform.cloud_save_push(Save.last_json())
+
+
+## §23 budget read: ms since engine start at call time — the --bench
+## flag calls this once the title screen has presented, so the number
+## covers autoloads + first scene, not a warm scene-switch.
+func boot_ms() -> int:
+	return Time.get_ticks_msec()
+
+
+# --------------------------------------------------- day spines (D2.2/D2.4)
+#
+# Two append-only, day-scoped streams, both serialized so a mid-day
+# reload keeps them:
+#   action_log — undoable verbs with pre-baked inverses (§6.1's
+#     "nothing is final until Goodnight" made structural). undo()
+#     reverses the newest entry whose inverse still applies.
+#   day_log — one ordered {phase, kind, payload} event stream; the
+#     night summary, analytics and Then/Now all read it instead of
+#     re-deriving the day from scattered counters.
+
+func _log(kind: String, payload: Dictionary = {}) -> void:
+	day_log.append({"phase": int(phase), "kind": kind,
+		"payload": payload})
+	if day_log.size() > 240:                     # paranoia cap
+		day_log.pop_front()
+
+
+func _record(verb: String, params: Dictionary,
+		inverse: Variant = null) -> void:
+	if _applying_inverse:
+		return
+	action_log.append({"verb": verb, "params": params,
+		"inverse": inverse})
+	_refresh_bought()
+	action_log_changed.emit(can_undo())
+
+
+## §6.1 refund eligibility derives from the action log — buys append,
+## returns consume the newest matching entry, and undo() popping a
+## return makes the buy refundable again for free. `bought_today` is
+## a read cache of this; nothing else may write it.
+func _refresh_bought() -> void:
+	var out := []
+	for e in action_log:
+		var p: Dictionary = e.get("params", {})
+		match String(e["verb"]):
+			"buy_decor":
+				out.append(String(p.get("item_id", "")))
+			"return_decor", "return_bought":
+				var iid := String(p.get("item_id",
+					p.get("expect", "")))
+				var i := out.rfind(iid)
+				if i >= 0:
+					out.remove_at(i)
+	bought_today = out
+
+
+func can_undo() -> bool:
+	for i in range(action_log.size() - 1, -1, -1):
+		if action_log[i].get("inverse") != null:
+			return true
+	return false
+
+
+## §6.1 undo: pops the newest entry whose inverse still applies —
+## terminal entries (cook, gather, a cleared pad's spent unlock)
+## are dropped, so one irreversible act can't wedge the log.
+func undo() -> bool:
+	var done := false
+	while not action_log.is_empty():
+		var e: Dictionary = action_log.pop_back()
+		var inv: Variant = e.get("inverse")
+		if inv == null:
+			continue
+		_applying_inverse = true
+		var ok := _dispatch(String(inv["verb"]),
+			Dictionary(inv["params"]))
+		_applying_inverse = false
+		if ok:
+			_log("undo", {"verb": e["verb"]})
+			touch()
+			done = true
+			break
+	_refresh_bought()
+	action_log_changed.emit(can_undo())
+	return done
+
+
+func _dispatch(verb: String, p: Dictionary) -> bool:
+	match verb:
+		"return_bought": return return_bought(String(p["item_id"]))
+		"move_decor": return _move_checked(
+			int(p["idx"]), p["cells"], String(p.get("expect", "")))
+		"place_stored": return place_stored(String(p["item_id"]),
+			p["cells"])
+		"store_last": return _store_last(String(p["expect"]))
+		"seat": return seat(String(p["guest_id"]), p["pad_ids"])
+		"unseat":
+			unseat(String(p["guest_id"]))
+			return true
+		"serve_meal": return serve_meal(String(p["guest_id"]),
+			String(p["meal_id"]))
+		"unserve":
+			unserve(String(p["guest_id"]))
+			return true
+		"unlock_refund": return _unlock_refund(String(p["pad_id"]),
+			int(p["price"]))
+		"unclear_pad": return _unclear_pad(String(p["pad_id"]))
+		"downgrade_pad": return _downgrade_pad(String(p["pad_id"]),
+			int(p["price"]))
+		"refund_gear": return _refund_gear(String(p["item_id"]),
+			int(p["price"]))
+		"refund_staple": return _refund_staple(String(p["item_id"]),
+			int(p["price"]))
+		"rebuy": return _rebuy(String(p["item_id"]), p["cells"],
+			int(p["price"]))
+		"rebuy_stored": return _rebuy_stored(String(p["item_id"]),
+			int(p["price"]))
+		"rebuy_pit": return _rebuy_pit(int(p["price"]))
+		"cancel_music_night": return _cancel_music_night(
+			int(p["price"]))
+		"unstoke":
+			site_state()["fire_stoked"] = false
+			return true
+		"untuck":
+			site_state()["tucked_in"] = ""
+			return true
+		"unbuy_variant":
+			var st_v: Dictionary = site_state()
+			if int(p["idx"]) < st_v["decor"].size():
+				var dd: Dictionary = st_v["decor"][int(p["idx"])]
+				if String(p["prev"]) == "":
+					dd.erase("variant")
+				else:
+					dd["variant"] = String(p["prev"])
+				coins += int(p["price"])
+			return true
+	return false
+
+
+## Inverse helpers — the half of §6.1 no public verb needs.
+## Index-addressed inverses verify the item id first: a later
+## removal shifts decor indices, and undoing into the wrong piece
+## is worse than skipping.  Bodies live in systems/build.gd beside
+## their forward verbs; _dispatch addresses them by name here.
+func _move_checked(idx: int, cells: Array, expect: String) -> bool:
+	return build._move_checked(idx, cells, expect)
+
+
+func _store_last(item_id: String) -> bool:
+	return build._store_last(item_id)
+
+
+func _unlock_refund(pad_id: String, price: int) -> bool:
+	return build._unlock_refund(pad_id, price)
+
+
+func _unclear_pad(pad_id: String) -> bool:
+	return build._unclear_pad(pad_id)
+
+
+func _downgrade_pad(pad_id: String, price: int) -> bool:
+	return build._downgrade_pad(pad_id, price)
+
+
+func _refund_gear(item_id: String, price: int) -> bool:
+	return build._refund_gear(item_id, price)
+
+
+func _refund_staple(item_id: String, price: int) -> bool:
+	return build._refund_staple(item_id, price)
+
+
+func _rebuy(item_id: String, cells: Array, price: int) -> bool:
+	return build._rebuy(item_id, cells, price)
+
+
+func _rebuy_stored(item_id: String, price: int) -> bool:
+	return build._rebuy_stored(item_id, price)
+
+
+func _rebuy_pit(price: int) -> bool:
+	return build._rebuy_pit(price)
 
 
 # --------------------------------------------------- authored cues (spec 005)
@@ -214,6 +425,8 @@ func advance_day() -> void:
 		crew_start(&"wardens_hut")           # §8.4: Mai's van on day 2
 	new_day()
 	set_phase(Phase.MORNING)
+	Analytics.log_event(&"day_start", {"day": day,
+		"site": String(site_id)})
 	commit()                                   # the rolled morning is state
 
 
@@ -233,14 +446,51 @@ func travel_to(site: StringName) -> bool:
 	if not site_reachable(site):
 		return false
 	visit_site(site)
+	_log("travel", {"to": String(site)})
+	Analytics.log_event(&"site_unlock", {"site": String(site)})
 	new_day()
 	commit()
 	return true
 
 
+## §Wishes: the kinds tonight's camp can actually grant — the board never
+## deals a wish the seating can't satisfy. Tags on open pads (with
+## restoration grants already overlaid by _world), fire-ring and
+## light coverage from effects_at, open sky on unsheltered pads, and
+## `together` only while a free adjacent pair exists.
+func _wish_kinds(st: Dictionary) -> Array:
+	var world := _world()
+	var spots: Dictionary = world["layout"]["pads"].get("spots", {})
+	var tags: Dictionary = world["layout"]["pads"].get("tags", {})
+	var nbrs: Dictionary = world["layout"]["pads"].get("neighbours", {})
+	var open := _open_pads(st)
+	var out := {}
+	for pid in open:
+		for t in tags.get(pid, []):
+			out[t] = true
+		var c: Array = spots.get(pid, [])
+		if c.size() >= 2:
+			var eff := Seating.effects_at(
+				Vector2i(int(c[0]), int(c[1])), world)
+			if eff.has("warmth"):
+				out["fire"] = true
+			if eff.has("light"):
+				out["lit"] = true
+			var shelter := String(
+				st["pads"].get(pid, {}).get("shelter", "bare"))
+			if shelter != "cabin" and not eff.has("cover"):
+				out["sky"] = true
+	for a in open:
+		for b in nbrs.get(a, []):
+			if b in open:
+				out["together"] = true
+	return out.keys()
+
+
 ## §12.3: regulars book about every third day at their site until
 ## their story ends (visit count reaching story_visits). They take a
-## normal request slot; an elite card is never displaced.
+## normal request slot; an elite card is never displaced. Regulars
+## carry authored wishes (Old Ba always wants the water).
 func _inject_regulars(st: Dictionary) -> void:
 	var d := site_day()
 	for reg: Dictionary in Catalog.data.get("regulars", []):
@@ -261,13 +511,14 @@ func _inject_regulars(st: Dictionary) -> void:
 		if not due:
 			continue
 		var req := {"id": "reg_" + rid,
-			"archetype": reg["archetype"], "name": reg["name"],
-			"card_name": reg.get("card_name", ""),
+			"archetype": reg["archetype"], "name": reg["name"],			"card_name": reg.get("card_name", ""),
 			"traits": reg.get("traits", []).duplicate(),
 			"loud": reg.get("loud", false),
 			"pads": int(reg.get("pads", 1)),
 			"fee": int(reg["fee"]), "regular": rid,
 			"favourite": reg.get("favourite", "")}
+		if String(reg.get("wish", "")) != "":
+			req["wish"] = reg["wish"]
 		var slotted := false
 		# Front-scan: the last two cards may carry the day-6+
 		# conflict pair (§5.2) — displacing them breaks the board.
@@ -284,178 +535,76 @@ func _inject_regulars(st: Dictionary) -> void:
 # ------------------------------------------------------------- letters (§8.2/§13)
 #
 # Letters arrive in order, at most one per morning; event-triggered
-# letters go first and unread ones wait in the journal.
+# letters go first and unread ones wait in the journal.  Bodies live
+# in systems/journal.gd — these stay the public surface.
 
 func _letters_for(site := site_id) -> Array:
-	return Catalog.data.get("letters", []).filter(
-		func(l): return l.get("site") == site)
+	return journal._letters_for(site)
 
 
 func _letter_due(l: Dictionary, st: Dictionary) -> bool:
-	var tr: Dictionary = l.get("trigger", {})
-	if tr.has("morning"):
-		# engagement pulse — nobody writes to a campground nobody
-		# visited: day-gated mail also needs a settled guest, so a
-		# sleep-binge can't hoover the correspondence (§8.2). The
-		# exception: a site's morning-1 letter is the *arrival*
-		# greeting — it welcomes the warden, not the guests, so it
-		# doesn't wait for a stay.
-		return site_day() >= int(tr["morning"]) \
-			and (int(st["counters"]["guests_welcomed"]) >= 1 \
-				or int(tr["morning"]) == 1)
-	var ev: String = tr.get("event", "")
-	match ev:
-		"family_booked":
-			return st["counters"]["events"].has("family_booked")
-		"chapter_done":
-			return chapter_done(site_id)
-		_:
-			if ev.begins_with("regular_done:"):
-				return _story_done(ev.get_slice(":", 1))
-			if ev.begins_with("page:"):
-				return page_done(int(ev.get_slice(":", 1)))
-	return false
+	return journal._letter_due(l, st)
 
 
-## One letter per morning, event triggers before morning triggers,
-## both in written order (§8.2).
 func _deliver_letter(st: Dictionary) -> void:
-	var delivered: Array = st["letters_delivered"]
-	for want_event in [true, false]:
-		for l in _letters_for():
-			if l["id"] in delivered:
-				continue
-			if (l.get("trigger", {}).has("event")) != want_event:
-				continue
-			if _letter_due(l, st):
-				delivered.append(l["id"])
-				letter_delivered.emit(l)
-				return
+	journal._deliver_letter(st)
 
 
-## Journal API: delivered-but-unread letters for this site.
 func unread_letters(site := site_id) -> Array:
-	var st := site_state(site)
-	return _letters_for(site).filter(func(l):
-		return l["id"] in st["letters_delivered"] \
-			and l["id"] not in letters_read)
+	return journal.unread_letters(site)
 
 
 func read_letter(id: String) -> void:
-	if id not in letters_read:
-		letters_read.append(id)
-		touch()
+	journal.read_letter(id)
 
 
-## Delivered letters for a site, unread first — the journal list.
 func letters_for(site := site_id) -> Array:
-	var st := site_state(site)
-	return _letters_for(site).filter(func(l):
-		return l["id"] in st["letters_delivered"])
+	return journal.letters_for(site)
 
 
-## One delivered letter by id (the reading view).
 func letter(id: String, site := site_id) -> Dictionary:
-	for l in _letters_for(site):
-		if l["id"] == id:
-			return l
-	return {}
+	return journal.letter(id, site)
 
 
-## spec 005: `when` blocks make a dialogue row conditional on last
-## night's resolution — the morning delivery pass prefers a matching
-## `when` row over a plain `day` row; unmatched rows stay silent and
-## every row remains once-ever via dialogue_seen.
 func dialogue_when_ok(when: Dictionary) -> bool:
-	var last: Dictionary = days_log.back() \
-		if not days_log.is_empty() else {}
-	for k in when:
-		match String(k):
-			"last_stars_min":
-				if int(last.get("best", 0)) < int(when[k]):
-					return false
-			"last_weather":
-				if String(last.get("weather", "")) != String(when[k]):
-					return false
-			"served_favourite":
-				if not bool(last.get("fav_served", false)):
-					return false
-			"regular_visit":
-				if String(when[k]) not in last.get("regulars", []):
-					return false
-			"first_night":
-				var n := days_log.filter(func(d): return \
-					d.get("site") == String(site_id)).size()
-				if n != 1:
-					return false
-			_:
-				return false
-	return true
+	return journal.dialogue_when_ok(when)
 
 
 # ------------------------------------------------------- journal UI (§8.3)
 
-const JOURNAL_SITES := [&"pinewatch", &"whisper_river", &"lantern_valley"]
+const JOURNAL_SITES := SysJournal.JOURNAL_SITES
 
 func chapter_pages(site := site_id) -> Array:
-	return _chapter(site).get("pages", [])
+	return journal.chapter_pages(site)
 
 
-## Keepsake catalog row by id — {label, art, note_key} + who held it.
 func keepsake(id: String) -> Dictionary:
-	for s in _structures():
-		for stage in s.get("stages", []):
-			var k: Dictionary = stage.get("keepsake", {})
-			if k.get("id") == id:
-				var out := k.duplicate()
-				out["site"] = s["id"]
-				return out
-	return {}
+	return journal.keepsake(id)
 
 
-## §8.3 cover count: collected / total over the five fill-in
-## sections (chapters v1 pages, guestbook, field notes, recipes,
-## keepsakes). Letters + days log don't count — they write
-## themselves.
 func journal_completion() -> Dictionary:
-	var done := 0
-	var total := 0
-	for s in JOURNAL_SITES:
-		var pd: Array = site_state(s)["pages_done"]
-		done += pd.filter(func(n): return int(n) <= 5).size()
-		total += 5
-	var archs: Array = Catalog.data.get("archetypes", [])
-	var regs: Array = Catalog.data.get("regulars", [])
-	total += archs.size() + regs.size()
-	done += mini(personas_met.size(), archs.size())
-	var met_regs: Dictionary = site_state()["counters"].get(
-		"regular_visits", {})
-	for s in JOURNAL_SITES:
-		var v: Dictionary = site_state(s)["counters"].get(
-			"regular_visits", {})
-		for k in v:
-			met_regs[k] = true
-	done += met_regs.size()
-	var birds: Array = Catalog.data.get("birds", [])
-	var fish: Array = Catalog.data.get("fish", [])
-	total += birds.size() + fish.size()
-	done += mini(field_notes.size(), birds.size() + fish.size())
-	var recipe_total: int = Catalog.data.get("recipes", []).size()
-	total += recipe_total
-	done += mini(recipes_cooked.size(), recipe_total)
-	var ks_total: int = Catalog.data.get("crew", {}).get(
-		"structures", []).size()
-	total += ks_total
-	done += mini(crew["collected"].size(), ks_total)
-	return {"done": done, "total": total}
+	return journal.journal_completion()
 
 
-## Site display name for journal headers.
+func field_notes_catalog() -> Dictionary:
+	return journal.field_notes_catalog()
+
+
+func _note_row(row: Dictionary) -> Dictionary:
+	return journal._note_row(row)
+
+
+func _field_note_rows() -> Array:
+	return journal._field_note_rows()
+
+
+func _note_find(id: String) -> void:
+	journal._note_find(id)
+
+
 func site_name(id: StringName) -> String:
-	for s in Catalog.data.get("sites", []):
-		if s.get("id") == id:
-			return s.get("name", String(id))
-	return String(id)
+	return journal.site_name(id)
+
 
 
 # ------------------------------------------------------------- crew (§8.4)
@@ -507,6 +656,8 @@ func crew_start(structure: StringName) -> void:
 	crew["last_seen_utc"] = int(Time.get_unix_time_from_system())
 	crew["speedups_stage"] = 0
 	_next_structure = _structures().find(s) + 1
+	Analytics.log_event(&"crew_stage_start",
+		{"structure": String(structure)})
 	crew_tick()
 	touch()
 
@@ -546,6 +697,8 @@ func crew_collect() -> Dictionary:
 	else:
 		crew["seconds_left"] = float(s["stages"][crew["stage"]]["seconds"])
 	crew_collected.emit(structure, keepsake, finished)
+	Analytics.log_event(&"crew_stage_collect",
+		{"structure": String(structure), "finished": finished})
 	touch()
 	return {"structure": structure, "keepsake": keepsake,
 		"finished": finished, "vignette": s.get("vignette", "")}
@@ -565,6 +718,9 @@ func crew_speedup() -> float:
 	crew["seconds_left"] = maxf(0.0, crew["seconds_left"] - chunk)
 	crew["speedups_stage"] += 1
 	crew["speedups_today"] += 1
+	ads["last_rewarded_utc"] = int(Time.get_unix_time_from_system())
+	Analytics.log_event(&"ad_rewarded_complete",
+		{"placement": "crew_speedup"})
 	touch()
 	return chunk
 
@@ -587,7 +743,6 @@ func crew_free_finish() -> bool:
 	crew["seconds_left"] = 0.0
 	touch()
 	return true
-
 
 # ------------------------------------------------- Volume II (§33.3)
 #
@@ -740,6 +895,10 @@ func _fresh_site(site: StringName) -> Dictionary:
 		"seats": 0, "reviews": [], "weather": "clear",
 		"board": [], "guests": {}, "assignments": {}, "served": {},
 		"blogger_bonus": false, "forage_nodes": [], "fish_taken": {},
+		"fire_stoked": false, "tucked_in": "", "photos": [],
+		"photo_day": -1, "margins_read": [], "margin_day": -1,
+		"fetch_day": -1,
+		"weather_streak": {"kind": "", "days": 0},
 		"spot_day": -1,
 		"pages_done": [], "letters_delivered": [],
 		"vignette_restored": "",
@@ -747,6 +906,8 @@ func _fresh_site(site: StringName) -> Dictionary:
 		"gathering_gifts": [],
 		"counters": {"guests_welcomed": 0, "families": 0,
 			"anglers_water": 0, "fish_kinds": [], "oven_recipes": 0,
+			"gatherings_met": 0,
+			"arch_visits": {},
 			"regular_visits": {}, "events": {}}}
 
 
@@ -789,16 +950,124 @@ func rating(site := site_id) -> float:
 	return Econ.rating(site_state(site)["reviews"])
 
 
+## Recipe mastery: 5 cooks = Practiced, 15 = Signature — served plates
+## tip +6/+15 at Goodnight. cook_plan surfaces the tier per craving.
+func cook_tier(recipe_id: String) -> int:
+	var n := int(cook_counts.get(recipe_id, 0))
+	return 2 if n >= 15 else (1 if n >= 5 else 0)
+
+
+## §Grandpa's Fund — the post-arc prestige sink (SOTA: sinks, never
+## taxes, in a cozy economy). Coins banked forever; each tier emits a
+## journal event, drops a grant decor into stored, and brings a letter
+## from the wandering mailbag. Data: data/fund.json tiers.
+func fund_status() -> Dictionary:
+	var tiers: Array = Catalog.data.get("fund", {}).get("tiers", [])
+	var next := {}
+	for t in tiers:
+		if fund_total < int(t["coins"]):
+			next = t
+			break
+	return {"total": fund_total, "next": next, "tiers": tiers.size()}
+
+
+func donate_fund(amount: int) -> Dictionary:
+	if amount < 25 or coins < amount:
+		return {}
+	coins -= amount
+	fund_total += amount
+	var unlocked := []
+	var st := site_state()
+	for t in Catalog.data.get("fund", {}).get("tiers", []):
+		var ev := String(t.get("event", ""))
+		if fund_total < int(t["coins"]) or ev == "" \
+				or st["counters"]["events"].has(ev):
+			continue
+		journal_event(ev)
+		var grant := String(t.get("grant", ""))
+		if grant != "":
+			var row: Dictionary = _row("decor", grant)
+			st["stored"].append({"id": grant,
+				"effect": row.get("effect", ""),
+				"reach": int(row.get("reach", 0))})
+			unlocked.append(grant)
+		unlocked.append(ev)
+	_log("fund", {"amount": amount, "total": fund_total,
+		"unlocked": unlocked})
+	Analytics.log_event(&"fund_donate",
+		{"amount": amount, "total": fund_total})
+	touch()
+	return {"total": fund_total, "unlocked": unlocked}
+
+
+## §10/§17.3 trailhead queue: tonight's board minus the seated —
+## the evening cast waits them at the trailhead and the board sheet
+## reads them as "still looking for a spot".
+func queue_waiting() -> Array:
+	var st := site_state()
+	return st["board"].filter(
+		func(r): return not st["assignments"].has(r["id"]))
+
+
+## §17.4 assist-mode read: tonight's cravings vs the stove —
+## {craved: {recipe: n}, cooked: {recipe: n}, missing: [recipe]}.
+## Pure read; the board never auto-plans.
+func cook_plan() -> Dictionary:
+	var st := site_state()
+	var craved := {}
+	var cooked := {}
+	for r in st["board"]:
+		var f := String(r.get("favourite", ""))
+		if f != "":
+			craved[f] = int(craved.get(f, 0)) + 1
+	for m in meals:
+		cooked[String(m["id"])] = int(cooked.get(m["id"], 0)) + 1
+	var missing := []
+	var mastery := {}
+	for rid in craved:
+		if int(cooked.get(rid, 0)) < int(craved[rid]):
+			missing.append(rid)
+		var tier := cook_tier(String(rid))
+		if tier > 0:
+			mastery[rid] = tier
+	return {"craved": craved, "cooked": cooked, "missing": missing,
+		"mastery": mastery}
+
+
 ## Morning: forecast + booking board, both deterministic per §5.2/§5.7.
 ## Errand tables (forage nodes, catches) seed off the same morning.
 func new_day() -> void:
 	var st := site_state()
 	st["weather"] = _roll_weather()
+	# §streaks: weather keeps count — three of a kind is a season,
+	# and the camp says so (letters/dialogue hook the journal event)
+	var ws: Dictionary = st["weather_streak"]
+	if ws.get("kind") == st["weather"]:
+		ws["days"] = int(ws.get("days", 0)) + 1
+	else:
+		st["weather_streak"] = {"kind": st["weather"], "days": 1}
+		ws = st["weather_streak"]
+	if int(ws["days"]) == 3:
+		journal_event({"rain": "soggy_camp", "clear": "heat_wave",
+			"storm": "wild_storm"}.get(st["weather"], "wet_streak"))
 	st["assignments"] = {}
 	st["served"] = {}
 	st["guests"] = {}
 	st["fish_taken"] = {}
+	st["music_night"] = false
+	st["fire_stoked"] = false
+	st["tucked_in"] = ""
 	bought_today = []
+	action_log = []
+	day_log = []
+	action_log_changed.emit(false)             # new day, clean slate
+	# §13.5: fixed arc dates land festival nights; the flag is day
+	# state so the board, the kitchen and the vignette all see it.
+	st["event"] = _festival_today()
+	if st["event"] != "":
+		_log("festival", {"id": st["event"]})
+		Analytics.log_event(&"festival", {"id": st["event"],
+			"site": String(site_id), "day": site_day()})
 	# No-pressure rule: ungathered nodes persist — the forest keeps
 	# offering; only a cap trims the oldest (wildlife fiction).
 	st["forage_nodes"] = st.get("forage_nodes", []) \
@@ -813,19 +1082,54 @@ func new_day() -> void:
 	st["board"] = Seating.board(srow,
 		Catalog.data.get("archetypes", []), site_day(), _open_pads(st),
 		rating(), _rng_for("board"), _has_free_pair(st),
-		_favourite_pool())
+		_favourite_pool(), _wish_kinds(st))
 	_inject_regulars(st)
 	gatherings.maybe_offer(st)                     # §33.3 Vol II board
-	if st["board"].any(func(b): return b.get("archetype") == "family") \
-			or int(st["counters"]["families"]) > 0:
+	# familiar faces (§memory): a guest whose archetype already stayed
+	# twice at this site reads as a returner — badged on the card,
+	# tipped a little extra at resolve
+	var av: Dictionary = st["counters"]["arch_visits"]
+	var wish_labels := {}
+	for w in Catalog.data.get("wishes", []):
+		wish_labels[String(w["id"])] = String(w.get("label", ""))
+	for r in st["board"]:
+		if String(r.get("regular", "")) == "" \
+				and int(av.get(r.get("archetype", ""), 0)) >= 2:
+			r["returning"] = true
+		var wk := String(r.get("wish", ""))
+		if wk != "":
+			r["wish_label"] = String(wish_labels.get(wk, wk))
+	if st["board"].any(func(b): return b.get("archetype") == "family") 			or int(st["counters"]["families"]) > 0:
 		st["counters"]["events"]["family_booked"] = true
 	_deliver_letter(st)
 	for r in st["board"]:
 		st["guests"][r["id"]] = r
 
-
 func _roll_weather() -> String:
 	return _weather_at(site_day())
+
+
+## §13.5 festivals: data/festivals.json pins a festival to one
+## (site, site_day). Fixed arc dates — never rolled, so forecast
+## and replays agree, and the day reads as authored not random.
+func _festival_today(site := site_id) -> String:
+	for f in Catalog.data.get("festivals", []):
+		if f.get("site") == site \
+				and int(f.get("site_day", -1)) == site_day(site):
+			return String(f["id"])
+	return ""
+
+
+## Today's festival row or {} — the board card and vignette read
+## name/line off it; the kitchen reads `dish`.
+func festival(site := site_id) -> Dictionary:
+	var id: String = site_state(site).get("event", "")
+	if id == "":
+		return {}
+	for f in Catalog.data.get("festivals", []):
+		if f.get("id") == id:
+			return f
+	return {}
 
 
 ## spec 004 C — decor→demand (Neko Atsume / lot-traits form): every
@@ -859,6 +1163,12 @@ func _attract_row(srow: Dictionary, st: Dictionary) -> Dictionary:
 	var out := srow.duplicate()
 	_merge_attract(out, "archetype_mix", tbonus)
 	_merge_attract(out, "trait_pool", pbonus)
+	# §13.5: a festival night leans the board toward its themed
+	# guests — same attract machinery, bigger weight budget.
+	var ev := festival()
+	if not ev.is_empty():
+		_merge_attract(out, "archetype_mix",
+			ev.get("archetype_boost", {}))
 	return out
 
 
@@ -937,12 +1247,12 @@ func _world() -> Dictionary:
 		"campfire": st["campfire"], "decor": st["decor"],
 		"pads": st["pads"], "occupants": occ,
 		"guests": st["guests"], "weather": st["weather"],
+		"music_night": st.get("music_night", false),
 		"trait_kinds": kinds,
 		"comments": Catalog.data.get("reviews", {}),
 		"day": site_day()}
 
 
-## §5 drag preview: what this party would score on those pads tonight.
 func preview(guest_id: String, pad_ids: Array) -> Dictionary:
 	var st := site_state()
 	var guest: Dictionary = st["guests"].get(guest_id, {})
@@ -970,13 +1280,26 @@ func seat(guest_id: String, pad_ids: Array) -> bool:
 	if not can_seat(guest_id, pad_ids):
 		return false
 	site_state()["assignments"][guest_id] = pad_ids
+	_record("seat", {"guest_id": guest_id, "pad_ids": pad_ids},
+		{"verb": "unseat", "params": {"guest_id": guest_id}})
+	_log("seat", {"guest": guest_id, "pads": pad_ids})
 	touch()
 	return true
 
 
 func unseat(guest_id: String) -> void:
-	site_state()["assignments"].erase(guest_id)
-	site_state()["served"].erase(guest_id)   # the plate goes back too
+	var st := site_state()
+	if st.get("tucked_in", "") == guest_id:
+		st["tucked_in"] = ""
+	if not st["assignments"].has(guest_id):
+		return
+	var pads: Array = st["assignments"][guest_id]
+	st["assignments"].erase(guest_id)
+	st["served"].erase(guest_id)   # the plate goes back too
+	_record("unseat", {"guest_id": guest_id},
+		{"verb": "seat",
+			"params": {"guest_id": guest_id, "pad_ids": pads}})
+	_log("unseat", {"guest": guest_id})
 	touch()
 
 
@@ -1000,14 +1323,58 @@ func serve_meal(guest_id: String, meal_id: String) -> bool:
 	if used >= cooked:
 		return false
 	st["served"][guest_id] = meal_id
+	_record("serve_meal", {"guest_id": guest_id, "meal_id": meal_id},
+		{"verb": "unserve", "params": {"guest_id": guest_id}})
 	touch()
 	return true
 
 
 func unserve(guest_id: String) -> void:
 	var st := site_state()
+	var mid: Variant = st["served"].get(guest_id)
 	if st["served"].erase(guest_id):
+		_record("unserve", {"guest_id": guest_id},
+			{"verb": "serve_meal", "params": {"guest_id": guest_id,
+				"meal_id": String(mid)}})
 		touch()
+
+
+## §Care gestures — two optional once-a-night verbs, bounded so their
+## absence never reads as a loss. Stoke bumps tonight's tips a little
+## (a warm camp loosens wallets); tuck-in raises one seated guest's
+## stars. Both undoable until Goodnight like every evening verb.
+func can_stoke_fire() -> bool:
+	return phase == Phase.EVENING \
+		and not bool(site_state().get("fire_stoked", false))
+
+
+func stoke_fire() -> bool:
+	if not can_stoke_fire():
+		return false
+	site_state()["fire_stoked"] = true
+	_record("stoke_fire", {}, {"verb": "unstoke", "params": {}})
+	_log("gesture", {"kind": "stoke_fire"})
+	Analytics.log_event(&"gesture", {"kind": "stoke_fire"})
+	touch()
+	return true
+
+
+func can_tuck_in(guest_id: String) -> bool:
+	return phase == Phase.EVENING \
+		and site_state()["assignments"].has(guest_id) \
+		and String(site_state().get("tucked_in", "")) == ""
+
+
+func tuck_in(guest_id: String) -> bool:
+	if not can_tuck_in(guest_id):
+		return false
+	site_state()["tucked_in"] = guest_id
+	_record("tuck_in", {"guest_id": guest_id},
+		{"verb": "untuck", "params": {}})
+	_log("gesture", {"kind": "tuck_in", "guest": guest_id})
+	Analytics.log_event(&"gesture", {"kind": "tuck_in"})
+	touch()
+	return true
 
 
 ## Goodnight (§5.4–5.6): resolve every seated party, take fees + tips,
@@ -1052,12 +1419,18 @@ func goodnight() -> Dictionary:
 	var cnt: Dictionary = st["counters"]
 	var night := {"five_stars": 0, "stargazer_five": 0,
 		"pads_filled": 0, "all5": 0, "full4": 0, "rain_full4": 0,
-		"min_stars": 6}
+		"returners": 0, "wishes_met": 0, "min_stars": 6}
 	var tags: Dictionary = _world()["layout"].get(
 		"pads", {}).get("tags", {})   # merged incl. §6.11 pad_tags
 	for s in seated:
 		var r := Seating.resolve_guest(s["guest"], s["pad_ids"],
 			_world(), int(plan["terms"].get(s["guest"]["id"], -1)))
+		# care gesture: a tucked-in guest sleeps a little easier —
+		# one star, and the tip follows the new rating
+		if s["guest"]["id"] == st.get("tucked_in", "") \
+				and int(r["stars"]) < 5:
+			r["stars"] += 1
+			r["tip"] = Econ.tip(r["fee"], r["stars"])
 		results.append(r)
 		fees += r["fee"]
 		tips += int(round(r["tip"]))
@@ -1072,6 +1445,13 @@ func goodnight() -> Dictionary:
 		if s["guest"].get("regular", "") != "":
 			regs.append(s["guest"]["regular"])
 		var arch: String = s["guest"].get("archetype", "")
+		if arch != "":
+			cnt["arch_visits"][arch] = int(
+				cnt["arch_visits"].get(arch, 0)) + 1
+		if s["guest"].get("returning", false):
+			night["returners"] += 1
+		if r.get("wish_met", false):
+			night["wishes_met"] += 1
 		if arch == "family":
 			cnt["families"] += 1
 		elif arch == "angler" and s["pad_ids"].any(
@@ -1112,6 +1492,12 @@ func goodnight() -> Dictionary:
 		+ int(st["walk_bonus"])
 	if st["blogger_bonus"]:
 		walk_ins += 1
+	if st.get("music_night", false):
+		tips = int(round(tips * (1.0 + float(Platform.remote(
+			"music_night_tip_bonus", MUSIC_NIGHT_TIP_BONUS)))))
+	if st.get("fire_stoked", false):
+		tips = int(round(tips * 1.1))     # care gesture: warm camp
+	tips += int(night["returners"]) * 10   # familiar faces tip loyal
 	var leftover: Array = plan["leftover"]
 	leftover.sort_custom(
 		func(a, b): return a.get("price", 0) > b.get("price", 0))
@@ -1119,6 +1505,17 @@ func goodnight() -> Dictionary:
 	var meal_sales := 0
 	for m in sold:
 		meal_sales += int(m.get("price", 0))
+	# recipe mastery: a Practiced/Signature plate tips a little extra
+	# per serving that actually reached a guest (walk-ins don't know)
+	var landed := {}
+	for m in meals:
+		landed[m["id"]] = int(landed.get(m["id"], 0)) + 1
+	for m in leftover:
+		landed[m["id"]] = int(landed.get(m["id"], 0)) - 1
+	for mid in landed:
+		var tier := cook_tier(String(mid))
+		if tier > 0 and int(landed[mid]) > 0:
+			tips += int(landed[mid]) * (15 if tier == 2 else 6)
 	dog_sys.eat(leftover.size() - sold.size())   # §9: stray + scraps
 	st["blogger_bonus"] = elite5
 	var vig := _pick_vignette(st, seated, night)
@@ -1139,7 +1536,21 @@ func goodnight() -> Dictionary:
 		"weather": st["weather"], "guests": seated.size(),
 		"best": int(best.get("stars", 0)),
 		"fav_served": fav_served, "regulars": regs,
-		"income": fees + tips + meal_sales + gather_bonus})
+		"income": fees + tips + meal_sales + gather_bonus,
+		"min_stars": night["min_stars"],
+		"returners": int(night["returners"]),
+		"wishes_met": int(night["wishes_met"]),
+		"event": st.get("event", "")})
+	# §17.6: the in-app-review gate watches for the first all-5★ night
+	if int(night["all5"]) > 0 and int(ads.get("first_all5_day", 0)) == 0:
+		ads["first_all5_day"] = day
+	_log("night", {"guests": seated.size(), "income": fees + tips
+		+ meal_sales + gather_bonus, "min_stars": night["min_stars"],
+		"vignette": vig, "walk_ins": sold.size()})
+	Analytics.log_event(&"day_end", {"day": day,
+		"site": String(site_id), "guests": seated.size(),
+		"income": fees + tips + meal_sales + gather_bonus,
+		"min_stars": night["min_stars"], "vignette": vig})
 	commit()                     # payout banked — phase saved as NIGHT, so a
 	                             # kill mid-summary resumes already-paid
 	return {"results": results, "fees": fees, "tips": tips,
@@ -1159,6 +1570,55 @@ func double_tips(tips: int) -> bool:
 		return false
 	tips_doubled_day = day
 	coins += tips
+	ads["last_rewarded_utc"] = int(Time.get_unix_time_from_system())
+	Analytics.log_event(&"ad_rewarded_complete",
+		{"placement": "double_tips"})
+	touch()
+	return true
+
+
+## §13.5 Music Night (§17.2 evening purchase): ~150c buys tonight's
+## singalong — every pad hears the music (Music Lovers cheer), the
+## campfire's circle stays the loud part (Light Sleepers there lose
+## a star), and tips ride +20%. Refundable until Goodnight like any
+## same-day buy; the star-delta preview is just preview() re-run.
+const MUSIC_NIGHT_PRICE := 150
+const MUSIC_NIGHT_TIP_BONUS := 0.2
+
+
+## The sticker reads what the verb charges — remote config can retune
+## pacing post-launch without a reship (§24.8).
+func music_night_price() -> int:
+	return int(Platform.remote("music_night_price", MUSIC_NIGHT_PRICE))
+
+
+func music_night_active() -> bool:
+	return bool(site_state().get("music_night", false))
+
+
+func buy_music_night() -> bool:
+	var st := site_state()
+	var price := music_night_price()
+	if phase != Phase.EVENING or st.get("music_night", false) \
+			or coins < price:
+		return false
+	coins -= price
+	st["music_night"] = true
+	_record("buy_music_night", {"price": price},
+		{"verb": "cancel_music_night", "params": {"price": price}})
+	_log("music_night", {"price": price})
+	Analytics.log_event(&"purchase_item",
+		{"kind": "event", "id": "music_night", "price": price})
+	touch()
+	return true
+
+
+func _cancel_music_night(price: int) -> bool:
+	var st := site_state()
+	if not st.get("music_night", false):
+		return false
+	st["music_night"] = false
+	coins += price
 	touch()
 	return true
 
@@ -1235,6 +1695,9 @@ func _vignette_weight(tr: Dictionary, seated: Array, st: Dictionary,
 			return -1
 	if tr.has("weather") and st["weather"] != tr["weather"]:
 		return -1
+	# §13.5: festival vignettes only play on their own night
+	if tr.has("event") and String(st.get("event", "")) != tr["event"]:
+		return -1
 	if tr.has("meal") and tr["meal"] not in meal_ids:
 		return -1
 	var dm: Dictionary = tr.get("decor_effect_min", {})
@@ -1264,514 +1727,199 @@ func _vignette_weight(tr: Dictionary, seated: Array, st: Dictionary,
 			return -1
 	return maxi(n, 1)
 
-
 # ------------------------------------------------------------- journal (§8)
 #
 # Each site's chapter holds five pages; a page's "check" is evaluated
 # against that site's counters plus whatever happened tonight. Pages
 # complete in any order, pay their gift, and register their unlocks.
+# Bodies live in systems/journal.gd — these stay the public surface.
 
 func _chapter(site := site_id) -> Dictionary:
-	for c in Catalog.data.get("chapters", []):
-		if c.get("id") == site:
-			return c
-	return {}
+	return journal._chapter(site)
 
 
-## Evaluate one page check. `night` carries same-night metrics
-## (five_stars, pads_filled, stargazer_five) from Goodnight.
 func _goal_met(check: Dictionary, st: Dictionary,
 		night: Dictionary) -> bool:
-	var cnt: Dictionary = st["counters"]
-	if check.has("event"):
-		return cnt["events"].has(check["event"])
-	if check.has("restored"):
-		return check["restored"] in st["restored"]
-	if check.has("night"):
-		return int(night.get(check["night"], 0)) >= int(check["target"])
-	var metric: String = check.get("metric", "")
-	var target := int(check.get("target", 1))
-	match metric:
-		"rating":
-			return st["reviews"].size() >= 15 \
-				and rating() >= float(check["target"])
-		"recipes":
-			return recipes_cooked.size() >= target
-		"fish_kinds":
-			return cnt["fish_kinds"].size() >= target
-		_:
-			if metric.begins_with("regular_visits:"):
-				return int(cnt["regular_visits"].get(
-					metric.get_slice(":", 1), 0)) >= target
-			return int(cnt.get(metric, 0)) >= target
+	return journal._goal_met(check, st, night)
 
 
-## External events (tutorial steps, scripted moments) — e.g.
-## journal_event("fire_lit") when the player relights the campfire.
 func journal_event(name: String) -> void:
-	site_state()["counters"]["events"][name] = true
-	_check_pages()
+	journal.journal_event(name)
 
 
 func _bump(metric: String, n := 1) -> void:
-	var cnt: Dictionary = site_state()["counters"]
-	cnt[metric] = int(cnt.get(metric, 0)) + n
+	journal._bump(metric, n)
 
 
-## Complete every met-but-undone page for the current site; returns
-## the pages finished this call so the report/UI can celebrate them.
 func _check_pages(night := {}) -> Array:
-	var st := site_state()
-	var open2 := vol2_open()
-	var done := []
-	for page in _chapter().get("pages", []):
-		var n := int(page["n"])
-		if n in st["pages_done"]:
-			continue
-		if int(page.get("vol", 1)) == 2 and not open2:
-			continue                               # §33.3: post-finale
-		if not _goal_met(page.get("check", {}), st, night):
-			continue
-		st["pages_done"].append(n)
-		coins += int(page.get("gift", 0))
-		page_completed.emit(site_id, n, int(page.get("gift", 0)),
-			page.get("unlocks", []))
-		done.append(page)
-	# The 15th Vol II page hides grandpa's last keepsake (§33.3).
-	if done.size() > 0 and vol2_done() \
-			and "the_second_volume" not in crew["collected"]:
-		crew["collected"].append("the_second_volume")
-	return done
+	return journal._check_pages(night)
 
 
-## §33.3: the player's own volume opens the morning after the finale
-## (all three v1 chapters stamped).
 func vol2_open() -> bool:
-	return chapter_done(&"lantern_valley")
+	return journal.vol2_open()
 
 
 func vol2_done() -> bool:
-	for site in [&"pinewatch", &"whisper_river", &"lantern_valley"]:
-		var pd: Array = site_state(site)["pages_done"]
-		for n in [6, 7, 8, 9, 10]:
-			if n not in pd:
-				return false
-	return true
+	return journal.vol2_done()
 
 
 func page_done(page: int, site := site_id) -> bool:
-	return page in site_state(site)["pages_done"]
+	return journal.page_done(page, site)
 
 
-## A chapter finishes when all five v1 pages are stamped — it opens
-## the next site (§8.1). Vol II pages (6-10) don't count toward it.
+func last_night_perfect() -> bool:
+	return journal.last_night_perfect()
+
+
 func chapter_done(site: StringName) -> bool:
-	return site_state(site)["pages_done"].filter(
-		func(n): return int(n) <= 5).size() >= 5
+	return journal.chapter_done(site)
 
 
-## Unlock strings: "P3" = Pinewatch page 3, "W0" = Whisper River
-## arrival (chapter 1 done), "W2" = its page 2, "L0" = chapter 2 done.
-## Public read of the §6.7 unlock ladder — shop/gallery rows ask
-## this instead of duplicating the letter-page rule.
 func is_unlocked(unlock: String) -> bool:
-	return _is_unlocked(unlock)
+	return journal.is_unlocked(unlock)
 
 
 func _is_unlocked(unlock: String) -> bool:
-	if unlock == "":
-		return true
-	if unlock.begins_with("S:"):
-		return _story_done(unlock.get_slice(":", 1))
-	var letter_sites := {"P": &"pinewatch", "W": &"whisper_river",
-		"L": &"lantern_valley"}
-	var site: StringName = letter_sites[unlock.left(1)]
-	var n := int(unlock.substr(1))
-	if n == 0:                                   # "arrival" unlocks
-		match site:
-			&"pinewatch": return true
-			&"whisper_river": return chapter_done(&"pinewatch")
-			&"lantern_valley": return chapter_done(&"whisper_river")
-	return n in site_state(site)["pages_done"]
+	return journal._is_unlocked(unlock)
 
 
 func site_reachable(site: StringName) -> bool:
-	match site:
-		&"pinewatch": return true
-		&"whisper_river": return chapter_done(&"pinewatch")
-		&"lantern_valley": return chapter_done(&"whisper_river")
-	return false
+	return journal.site_reachable(site)
 
 
-## §12.3: a regular's story ends after story_visits seated stays —
-## it unlocks the story gift (Hùng's Scout Pennant).
 func _story_done(reg_id: String) -> bool:
-	for reg: Dictionary in Catalog.data.get("regulars", []):
-		if reg.get("id") == reg_id:
-			var cnt: Dictionary = site_state(reg.get("site"))["counters"]
-			return int(cnt["regular_visits"].get(reg_id, 0)) \
-				>= int(reg.get("story_visits", 3))
-	return false
+	return journal._story_done(reg_id)
 
 
 # --- purchases (§6.1: one currency, no debt, refund until Goodnight) ---
-
-## Legal placement cells + footprint check (§5.8): decor lands only
-## on the layout's decor_cells, never on pads, the fire, water or a
-## cell another item already covers.
+# Verbs live in systems/build.gd; these stay the public surface the
+# UI and tests already call.
 func _layout(site := site_id) -> Dictionary:
-	return Catalog.data.get("layouts", {}).get(site, {})
+	return build._layout(site)
 
 
 func _decor_cell_set() -> Dictionary:
-	var out := {}
-	for c in _layout().get("decor_cells", []):
-		out[Vector2i(int(c[0]), int(c[1]))] = true
-	return out
+	return build._decor_cell_set()
 
 
 func _decor_blocked(ignore := -1) -> Dictionary:
-	var st := site_state()
-	var layout := _layout()
-	var out := {}
-	for pid in layout.get("pads", {}).get("spots", {}):
-		var c: Array = layout["pads"]["spots"][pid]
-		out[Vector2i(int(c[0]), int(c[1]))] = true
-	out[st["campfire"]["cell"]] = true
-	for i in st["decor"].size():
-		if i == ignore:
-			continue
-		for c in st["decor"][i]["cells"]:
-			out[c] = true
-	return out
+	return build._decor_blocked(ignore)
 
 
-## Walkable/reachability delegate to SimGrid — the single parser
-## for layout.nav (was a second, divergent implementation here).
 func _walk_cells(layout: Dictionary) -> Dictionary:
-	return SimGrid.walk_cells(layout)
+	return build._walk_cells(layout)
 
 
 func _reachable_set(cells: Dictionary) -> Dictionary:
-	return SimGrid.reachable(cells)
+	return build._reachable_set(cells)
 
 
-## Placement deadlock guard: dropping pts must not strand any
-## previously-reachable walkable cell.
 func _strands_any(free: Dictionary, pts: Array) -> bool:
-	var base := _reachable_set(free)
-	var left := free.duplicate()
-	for c in pts:
-		left.erase(c)
-	var after := _reachable_set(left)
-	for c in base:
-		if not pts.has(c) and not after.has(c):
-			return true
-	return false
+	return build._strands_any(free, pts)
 
 
 func _footprint_ok(row: Dictionary, cells: Array, ignore := -1) -> bool:
-	var size := String(row.get("size", "1x1"))
-	if size == "campfire":
-		return true                              # ring upgrade, no cells
-	var legal := _decor_cell_set()
-	var blocked := _decor_blocked(ignore)
-	var want := 1 if size == "1x1" else 2
-	if cells.size() != want:
-		return false
-	var pts := []
-	for c in cells:
-		var v: Vector2i = c if c is Vector2i \
-			else Vector2i(int(c[0]), int(c[1]))
-		if not legal.has(v) or blocked.has(v):
-			return false
-		pts.append(v)
-	if want == 2 and abs(pts[1].x - pts[0].x) != 1:
-		return false                             # 2x1 = horizontal pair
-	var occ := {}
-	for i in site_state()["decor"].size():
-		if i == ignore:
-			continue
-		for c in site_state()["decor"][i]["cells"]:
-			occ[c] = true
-	var free := {}
-	for c in _walk_cells(_layout()):
-		if not occ.has(c):
-			free[c] = true
-	for c in pts:
-		if not free.has(c):
-			return false                     # decor can't sit on water/solid
-	return not _strands_any(free, pts)
+	return build._footprint_ok(row, cells, ignore)
 
 
-## Presenter reads for build mode (UI-033): the grid overlay needs the
-## free legal cells; the ghost tint needs a dry-run of placement law —
-## both are reads, the verbs stay the only writers.
 func decor_cells_free(ignore := -1) -> Array:
-	var legal := _decor_cell_set()
-	var blocked := _decor_blocked(ignore)
-	var occ := {}
-	for i in site_state()["decor"].size():
-		if i == ignore:
-			continue
-		for c in site_state()["decor"][i]["cells"]:
-			occ[c] = true
-	var walk := _walk_cells(_layout())
-	var out := []
-	for c in legal:
-		if not blocked.has(c) and not occ.has(c) and walk.has(c):
-			out.append(c)
-	return out
+	return build.decor_cells_free(ignore)
 
 
 func decor_placement_ok(item_id: String, cells: Array,
 		ignore := -1) -> bool:
-	var row := _row("decor", item_id)
-	return not row.is_empty() and _footprint_ok(row, cells, ignore)
+	return build.decor_placement_ok(item_id, cells, ignore)
 
 
-## True once the Stone Fire Pit upgrade is in place — campfire-size
-## decor lives on the ring radius, not in st["decor"].
 func fire_pit_upgraded() -> bool:
-	var base := int(_layout().get("campfire", {}).get("radius", 2))
-	return int(site_state()["campfire"]["radius"]) > base
+	return build.fire_pit_upgraded()
 
 
 func buy_decor(item_id: String, cells: Array) -> bool:
-	var row := _row("decor", item_id)
-	var st := site_state()
-	if row.is_empty() or coins < int(row.get("price", 0)) \
-			or not _is_unlocked(row.get("unlock", "")) \
-			or not _footprint_ok(row, cells):
-		return false
-	coins -= int(row["price"])
-	if row.get("size") == "campfire":                # Stone Fire Pit
-		st["campfire"]["radius"] = 3
-	else:
-		st["decor"].append({"id": item_id,
-			"effect": row.get("effect", ""),
-			"reach": int(row.get("reach", 1)),
-			"cells": cells})
-		st["seats"] += int(row.get("seats", 0))
-	bought_today.append(item_id)
-	touch()
-	return true
+	return build.buy_decor(item_id, cells)
 
 
-## §6.1 build verbs: move and store are always free; today's buys
-## return for a full refund until Goodnight; older items store, not
-## sell.
 func move_decor(idx: int, cells: Array) -> bool:
-	var st := site_state()
-	if idx < 0 or idx >= st["decor"].size() \
-			or st["decor"][idx].get("aura", false):
-		return false                    # restoration auras are permanent
-	if not _footprint_ok(_row("decor", st["decor"][idx]["id"]),
-			cells, idx):
-		return false
-	st["decor"][idx]["cells"] = cells
-	touch()
-	return true
+	return build.move_decor(idx, cells)
 
 
 func store_decor(idx: int) -> bool:
-	var st := site_state()
-	if idx < 0 or idx >= st["decor"].size() \
-			or st["decor"][idx].get("aura", false):
-		return false
-	var d: Dictionary = st["decor"][idx]
-	st["seats"] -= int(_row("decor", d["id"]).get("seats", 0))
-	st["stored"].append({"id": d["id"], "effect": d["effect"],
-		"reach": d["reach"]})
-	st["decor"].remove_at(idx)
-	touch()
-	return true
+	return build.store_decor(idx)
 
 
 func place_stored(item_id: String, cells: Array) -> bool:
-	var st := site_state()
-	var i := -1
-	for j in st.get("stored", []).size():
-		if st["stored"][j]["id"] == item_id:
-			i = j
-			break
-	var row := _row("decor", item_id)
-	if i < 0 or row.is_empty() or not _footprint_ok(row, cells):
-		return false                    # rowless ids (auras) can't place
-	var d: Dictionary = st["stored"][i]
-	st["stored"].remove_at(i)
-	st["decor"].append({"id": d["id"], "effect": d["effect"],
-		"reach": d["reach"], "cells": cells})
-	st["seats"] += int(_row("decor", item_id).get("seats", 0))
-	touch()
-	return true
+	return build.place_stored(item_id, cells)
 
 
 func return_decor(idx: int) -> bool:
+	return build.return_decor(idx)
+
+
+## §variant: cosmetic re-skins of placed pieces — the catalog's endless
+## cosmetic sink. Replaces the piece's variant tag; fully undoable.
+func buy_decor_variant(idx: int, name: String) -> bool:
 	var st := site_state()
-	if idx < 0 or idx >= st["decor"].size() \
-			or st["decor"][idx].get("aura", false):
+	if idx < 0 or idx >= st["decor"].size():
 		return false
 	var d: Dictionary = st["decor"][idx]
-	if d["id"] not in bought_today:
-		return false                            # older items never sell
-	var row := _row("decor", d["id"])
-	coins += int(row.get("price", 0))
-	st["seats"] -= int(row.get("seats", 0))
-	st["decor"].remove_at(idx)
-	bought_today.erase(d["id"])
+	var row: Dictionary = _row("decor", String(d["id"]))
+	var variants: Dictionary = row.get("variants", {})
+	if name not in variants:
+		return false
+	if String(d.get("variant", "")) == name:
+		return false
+	var price := int(variants[name])
+	if coins < price:
+		return false
+	coins -= price
+	var prev := String(d.get("variant", ""))
+	d["variant"] = name
+	_record("buy_decor_variant", {"idx": idx, "variant": name},
+		{"verb": "unbuy_variant", "params": {"idx": idx, "prev": prev,
+			"price": price}})
+	_log("decor_variant", {"id": String(d["id"]), "variant": name,
+		"price": price})
+	Analytics.log_event(&"purchase_item",
+		{"kind": "variant", "id": "%s:%s" % [d["id"], name],
+			"price": price})
 	touch()
 	return true
 
 
-## §6.1 refund by id — covers today's buys the indexed return can't
-## reach: the Stone Fire Pit (it mutates campfire.radius instead of
-## entering st["decor"]) and pieces already packed into storage.
-## Removes the most recent placement of that id.
 func return_bought(item_id: String) -> bool:
-	var st := site_state()
-	var row := _row("decor", item_id)
-	if item_id not in bought_today or row.is_empty():
-		return false
-	if row.get("size") == "campfire":
-		st["campfire"]["radius"] = int(_layout().get(
-			"campfire", {}).get("radius", 2))
-	else:
-		var i: int = st["decor"].size() - 1
-		while i >= 0 and st["decor"][i]["id"] != item_id:
-			i -= 1
-		if i >= 0:
-			st["seats"] -= int(row.get("seats", 0))
-			st["decor"].remove_at(i)
-		else:
-			var si: int = st["stored"].size() - 1
-			while si >= 0 and st["stored"][si]["id"] != item_id:
-				si -= 1
-			if si < 0:
-				return false            # bought record, but no piece
-			st["stored"].remove_at(si)
-	bought_today.erase(item_id)
-	coins += int(row.get("price", 0))
-	touch()
-	return true
+	return build.return_bought(item_id)
 
 
-## §5.1 pad opening is two steps: pay the price (unlock_pad — the
-## spot stays overgrown and still blocks bookings), then Clear it
-## (clear_pad — free; the ~2s transform lives in the scene). The
-## price index counts owned spots (open OR paid), not just open.
 func unlock_pad(pad_id: String) -> bool:
-	var st := site_state()
-	var row := site_row()
-	var prices: Array = row.get("pad_prices", [])
-	var owned := 0
-	for pid in st["pads"]:
-		if st["pads"][pid]["open"] or st["pads"][pid].get("paid", false):
-			owned += 1
-	var idx := owned - int(row.get("start_pads", 0))
-	if idx < 0 or idx >= prices.size() \
-			or not st["pads"].has(pad_id) \
-			or st["pads"][pad_id]["open"] \
-			or st["pads"][pad_id].get("paid", false) \
-			or coins < int(prices[idx]):
-		return false
-	coins -= int(prices[idx])
-	st["pads"][pad_id]["paid"] = true
-	touch()
-	return true
+	return build.unlock_pad(pad_id)
 
 
 func clear_pad(pad_id: String) -> bool:
-	var st := site_state()
-	if not st["pads"].has(pad_id) or st["pads"][pad_id]["open"] \
-			or not st["pads"][pad_id].get("paid", false):
-		return false
-	st["pads"][pad_id]["open"] = true
-	touch()
-	return true
+	return build.clear_pad(pad_id)
 
 
-## One-shot convenience (tests/tools): pay and clear in one call.
 func open_pad(pad_id: String) -> bool:
-	return unlock_pad(pad_id) and clear_pad(pad_id)
+	return build.open_pad(pad_id)
 
 
-## Display-side reads for the pad menu (presenter-only; verbs write).
-## Price mirrors unlock_pad's ladder so the label can't lie.
 func pad_unlock_price(pad_id: String) -> int:
-	var st := site_state()
-	if not st["pads"].has(pad_id) or st["pads"][pad_id]["open"] \
-			or st["pads"][pad_id].get("paid", false):
-		return -1
-	var row := site_row()
-	var prices: Array = row.get("pad_prices", [])
-	var owned := 0
-	for pid in st["pads"]:
-		if st["pads"][pid]["open"] or st["pads"][pid].get("paid", false):
-			owned += 1
-	var idx := owned - int(row.get("start_pads", 0))
-	return int(prices[idx]) if idx >= 0 and idx < prices.size() else -1
+	return build.pad_unlock_price(pad_id)
 
 
-## Open + still-bare pad -> shelter offers ({shelter, price, unlocked}).
 func pad_shelter_options(pad_id: String) -> Array:
-	var st := site_state()
-	if not st["pads"].get(pad_id, {}).get("open", false) \
-			or st["pads"][pad_id].get("shelter", "bare") != "bare":
-		return []
-	var row := site_row()
-	var out := []
-	for spec in [["platform", "P2"], ["cabin", "W0"]]:
-		var raw: Variant = row.get(spec[0] + "_price")
-		if raw != null:
-			out.append({"shelter": spec[0], "price": int(raw),
-				"unlocked": _is_unlocked(spec[1])})
-	return out
+	return build.pad_shelter_options(pad_id)
 
 
 func upgrade_pad(pad_id: String, shelter: String) -> bool:
-	var st := site_state()
-	var row := site_row()
-	var raw: Variant = row.get("platform_price") \
-		if shelter == "platform" else row.get("cabin_price")
-	var price := int(raw) if raw != null else 0
-	var need := "P2" if shelter == "platform" else "W0"
-	if not st["pads"].get(pad_id, {}).get("open", false) \
-			or price <= 0 or coins < price or not _is_unlocked(need):
-		return false
-	coins -= price
-	st["pads"][pad_id]["shelter"] = shelter
-	touch()
-	return true
+	return build.upgrade_pad(pad_id, shelter)
 
 
 func buy_gear(item_id: String) -> bool:
-	var row := _row("gear", item_id)
-	if row.is_empty() or item_id in gear or coins < int(row.get("price", 0)) \
-			or not _is_unlocked(row.get("unlock", "")):
-		return false
-	coins -= int(row["price"])
-	gear.append(item_id)
-	touch()
-	return true
+	return build.buy_gear(item_id)
 
 
-## Staples are global, 5 coins each, gated by the site's staples
-## unlock rank (P1 < W0 < L0 — §6.7).
 func buy_staple(item_id: String) -> bool:
-	var row := _row("ingredients", item_id)
-	if row.get("kind") != "staple" or coins < int(row.get("price", 5)):
-		return false
-	if not _is_unlocked(row.get("unlock", "P1")):
-		return false
-	if pantry_add(item_id, 1) < 1:
-		return false                                   # pantry full
-	coins -= int(row.get("price", 5))
-	touch()
-	return true
-
-
-# ------------------------------------------------------------- kitchen (§7)
+	return build.buy_staple(item_id)
 
 const PANTRY_BASE := 20
 const PANTRY_COOLER := 30
@@ -1811,6 +1959,18 @@ func pantry_add(item_id: String, n := 1) -> int:
 	return take
 
 
+## Inverse of pantry_add — used by refund inverses; returns how many
+## came out (0 when the staple already went into a meal).
+func pantry_remove(item_id: String, n := 1) -> int:
+	var have := int(pantry.get(item_id, 0))
+	var take := mini(n, have)
+	if take > 0:
+		pantry[item_id] = have - take
+		if pantry[item_id] <= 0:
+			pantry.erase(item_id)
+	return take
+
+
 func _ingredients_of_kind(kind: String, site := site_id) -> Array:
 	var out := []
 	for i in Catalog.data.get("ingredients", []):
@@ -1827,6 +1987,7 @@ func _roll_forage() -> Array:
 func gather(node_id: String) -> Array:
 	var got: Array = errands.gather(node_id)
 	if not got.is_empty():
+		_log("gather", {"items": got})
 		touch()
 	return got
 
@@ -1834,8 +1995,103 @@ func gather(node_id: String) -> Array:
 func fish_catch(spot: String) -> String:
 	var pick: String = errands.fish_catch(spot)
 	if pick != "":
+		_log("catch", {"id": pick, "spot": spot})
+		Analytics.log_event(&"catch", {"id": pick})
 		touch()
 	return pick
+
+
+## Fishable spots for this site's layout, normalized to
+## [{id, px:[x,y]}] — pond (scalar), fishing (named banks) and
+## stream all read the same to presenters and the sim.
+func fish_spots() -> Array:
+	var es: Dictionary = _layout().get("errand_spots", {})
+	var out := []
+	for key in ["pond", "stream"]:
+		var p: Variant = es.get(key)
+		if p is Array and p.size() >= 2:
+			out.append({"id": key, "px": p})
+	var fishing: Dictionary = es.get("fishing", {})
+	var names := fishing.keys()
+	names.sort()                                 # deterministic order
+	for k in names:
+		var p: Variant = fishing[k]
+		if p is Array and p.size() >= 2:
+			out.append({"id": String(k), "px": p})
+	return out
+
+
+## §LV signature: the valley photographs itself — one shot a day with
+## the Field Camera (L2 unlock), a small print-board sale, and five
+## shots finish the Photo Wall (the L4 claim) as a journal event.
+func can_photo() -> bool:
+	return site_id == &"lantern_valley" and "camera" in gear \
+		and int(site_state().get("photo_day", -1)) != site_day()
+
+
+func take_photo() -> Dictionary:
+	if not can_photo():
+		return {}
+	var st := site_state()
+	var rows: Array = Catalog.data.get("photos", [])
+	if rows.is_empty():
+		return {}
+	var rng: RandomNumberGenerator = _rng_for("photo")
+	var shot: Dictionary = rows[rng.randi() % rows.size()]
+	st["photos"].append(String(shot["id"]))
+	st["photo_day"] = site_day()
+	var price := int(shot.get("coins", 10))
+	coins += price
+	_log("photo", {"id": String(shot["id"]), "coins": price})
+	Analytics.log_event(&"photo", {"id": String(shot["id"])})
+	if st["photos"].size() >= 5:
+		journal_event("photo_wall")
+	touch()
+	return {"id": String(shot["id"]), "name": String(shot.get("name", "")),
+		"note": String(shot.get("note", "")), "coins": price}
+
+
+## §PW signature: Grandpa's margins read front-to-back, one a day,
+## only at his camp — the tutorial the game never says out loud.
+## Hints carry real effects: tomorrow's weather, a written-down
+## recipe pair, or just his hand on the page.
+func can_read_margin() -> bool:
+	var st := site_state()
+	return site_id == &"pinewatch" \
+		and int(st.get("margin_day", -1)) != site_day() \
+		and st["margins_read"].size() < \
+			Catalog.data.get("margins", []).size()
+
+
+func read_margin() -> Dictionary:
+	if not can_read_margin():
+		return {}
+	var st := site_state()
+	var rows: Array = Catalog.data.get("margins", [])
+	var row: Dictionary = rows[st["margins_read"].size()]
+	st["margins_read"].append(String(row["id"]))
+	st["margin_day"] = site_day()
+	var out := {"id": String(row["id"]),
+		"text": String(row.get("text", ""))}
+	var hint: Dictionary = row.get("hint", {})
+	match String(hint.get("kind", "")):
+		"weather":
+			# Grandpa's knee called it in '87 — the stream knows
+			out["hint"] = {"kind": "weather",
+				"tomorrow": _weather_at(site_day() + 1)}
+		"recipe":
+			var pair: Array = hint.get("pair", [])
+			var rid := String(hint.get("recipe", ""))
+			if pair.size() == 2 and rid != "":
+				var key := "+".join(
+					[pair[0], pair[1]] if pair[0] < pair[1]
+					else [pair[1], pair[0]])
+				pairs_tried[key] = rid
+				out["hint"] = {"kind": "recipe", "recipe": rid}
+	_log("margin", {"id": String(row["id"])})
+	Analytics.log_event(&"margin", {"id": String(row["id"])})
+	touch()
+	return out
 
 
 func can_spot() -> bool:
@@ -1845,6 +2101,8 @@ func can_spot() -> bool:
 func spot() -> Dictionary:
 	var rep: Dictionary = errands.spot()
 	if not rep.is_empty():
+		_log("spot", {"bird": String(rep.get("bird", {})
+			.get("id", ""))})
 		touch()
 	return rep
 
@@ -1857,8 +2115,8 @@ func _favourite_pool(site := site_id) -> Array:
 	var fish := _ingredients_of_kind("fish", site)
 	var out := []
 	for r in Catalog.data.get("recipes", []):
-		if r.get("fallback", false):
-			continue
+		if r.get("fallback", false) or r.has("festival"):
+			continue                          # festival dishes are never craved
 		if r.get("station") == "oven" and rank < 2:
 			continue
 		var ok := true
@@ -1885,9 +2143,14 @@ func _slot(want: String, have_id: String) -> bool:
 
 
 func _match_recipe(a: String, b: String) -> Dictionary:
+	var ev := String(site_state().get("event", ""))
 	for r in Catalog.data.get("recipes", []):
 		var pair: Array = r.get("pair", [])
 		if pair.size() != 2:
+			continue
+		# §13.5: a festival dish only cooks on its own night —
+		# off-night the same pair falls through to fusion/mash.
+		if r.has("festival") and String(r["festival"]) != ev:
 			continue
 		if (_slot(pair[0], a) and _slot(pair[1], b)) \
 				or (_slot(pair[0], b) and _slot(pair[1], a)):
@@ -1947,9 +2210,16 @@ func cook(a: String, b: String) -> Dictionary:
 	meals.append(meal)
 	if not fused and r["id"] not in recipes_cooked:
 		recipes_cooked.append(r["id"])
+	if r["id"] != "camp_mash":
+		cook_counts[r["id"]] = int(cook_counts.get(r["id"], 0)) + 1
 	if r.get("station") == "oven":
 		_bump("oven_recipes")
 	_check_pages()                                   # e.g. P3 "5 recipes"
+	# meals are spent-food — the log records the act, no inverse
+	_record("cook", {"a": a, "b": b, "meal": r["id"]})
+	_log("cook", {"recipe": r["id"], "fused": fused})
+	Analytics.log_event(&"cook", {"recipe": r["id"],
+		"fused": fused})
 	touch()
 	return {"result": "ok", "recipe": r["id"], "meal": meal,
 		"name": r.get("name", "")}
@@ -1981,6 +2251,8 @@ func name_dog(n: String) -> void:
 func adopt_dog(n: String) -> void:
 	dog["adopted"] = true
 	dog_sys.rename(n)
+	_log("dog_adopt", {"name": n})
+	Analytics.log_event(&"dog_adopt", {})
 	touch()
 
 
@@ -1998,6 +2270,14 @@ func dog_trick() -> String:
 
 func dog_bed_placed() -> bool:
 	return dog_sys.bed_placed()
+
+
+func can_dog_fetch() -> bool:
+	return dog_sys.can_fetch()
+
+
+func dog_fetch(kind: String) -> Dictionary:
+	return dog_sys.fetch(kind)
 
 
 # ------------------------------------------------------------- Daily (§10)
@@ -2070,13 +2350,19 @@ func state_dict() -> Dictionary:
 		"coins": coins, "seed": seed, "meals": meals.duplicate(true),
 		"pantry": pantry.duplicate(), "gear": gear.duplicate(),
 		"recipes": recipes_cooked.duplicate(),
+		"cook_counts": cook_counts.duplicate(),
+		"fund_total": fund_total,
 		"pairs_tried": pairs_tried.duplicate(),
 		"letters": letters_read.duplicate(),
 		"dialogue": dialogue_seen.duplicate(),
 		"journal": {"vignettes_seen": vignettes_seen.duplicate(),
 			"days_log": days_log.duplicate(true),
-			"personas_met": personas_met.duplicate()},
+			"personas_met": personas_met.duplicate(),
+			"letters_any": letters_delivered_any.duplicate()},
 		"daily": daily_state.duplicate(),
+		"actions": action_log.duplicate(true),
+		"day_log": day_log.duplicate(true),
+		"ads": ads.duplicate(true),
 		"bought_today": bought_today.duplicate(),
 		"tips_doubled": tips_doubled_day,
 		"dog": dog.duplicate(),
@@ -2133,6 +2419,8 @@ func load_state(state: Dictionary) -> void:
 	pantry = state.get("pantry", pantry)
 	gear = state.get("gear", gear)
 	recipes_cooked = state.get("recipes", recipes_cooked)
+	cook_counts = state.get("cook_counts", cook_counts)
+	fund_total = int(state.get("fund_total", fund_total))
 	pairs_tried = state.get("pairs_tried", pairs_tried)
 	letters_read = state.get("letters", letters_read)
 	dialogue_seen = state.get("dialogue", dialogue_seen)
@@ -2141,8 +2429,16 @@ func load_state(state: Dictionary) -> void:
 	days_log = state.get("journal", {}).get("days_log", days_log)
 	personas_met = state.get("journal", {}).get(
 		"personas_met", personas_met)
+	letters_delivered_any = state.get("journal", {}).get(
+		"letters_any", letters_delivered_any)
 	daily_state = state.get("daily", daily_state)
+	action_log = state.get("actions", action_log)
+	day_log = state.get("day_log", day_log)
+	ads.merge(state.get("ads", {}), true)
 	bought_today = state.get("bought_today", bought_today)
+	if state.has("actions"):
+		_refresh_bought()            # the log is the truth (v1 saves
+		# without it keep the stored list — same-day refund stands)
 	tips_doubled_day = int(state.get("tips_doubled", tips_doubled_day))
 	dog = state.get("dog", dog)
 	field_notes = state.get("field_notes", field_notes)

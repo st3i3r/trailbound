@@ -49,6 +49,33 @@ func pet() -> bool:
 	return true
 
 
+## §fetch: the directed half of the morning dig — you send him, he
+## picks the pool. Forage anywhere; fish too (he swims, rod or no
+## rod). Once a day, and only after he's decided the camp is home.
+func can_fetch() -> bool:
+	return bool(g.dog.get("adopted", false)) \
+		and int(g.site_state().get("fetch_day", -1)) != g.site_day()
+
+
+func fetch(kind: String) -> Dictionary:
+	if kind not in ["forage", "fish"] or not can_fetch():
+		return {}
+	var pool: Array = g._ingredients_of_kind(kind)
+	if pool.is_empty():
+		return {}
+	var st: Dictionary = g.site_state()
+	st["fetch_day"] = g.site_day()
+	var rng: RandomNumberGenerator = g._rng_for("fetch_" + kind)
+	var pick: Dictionary = pool[rng.randi() % pool.size()]
+	g.pantry_add(String(pick["id"]), 1)
+	g.dog["bond"] += 1
+	g._log("dog_fetch", {"kind": kind, "id": String(pick["id"])})
+	Analytics.log_event(&"dog_fetch", {"kind": kind})
+	g.touch()
+	return {"id": String(pick["id"]),
+		"name": String(pick.get("name", ""))}
+
+
 func rename(n: String) -> void:
 	if n.strip_edges() != "":
 		g.dog["name"] = n

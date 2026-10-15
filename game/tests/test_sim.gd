@@ -13,6 +13,13 @@ func _snapshot(w: SimWorld) -> Dictionary:
 	return snap
 
 
+func _guest_eid(w: SimWorld, gid: String) -> int:
+	for eid in w.query(["persona"]):
+		if String(w.getc(eid, "persona").get("guest", "")) == gid:
+			return eid
+	return -1
+
+
 func _ready() -> void:
 	print("=== actor ECS (D4) ===")
 
@@ -66,7 +73,28 @@ func _ready() -> void:
 	check("deterministic replay",
 		_snapshot(w1) == _snapshot(w2),
 		str(_snapshot(w1)))
-	check("cast size", w1.query(["pos"]).size() == 3)   # 2 guests + dog
+	check("cast size", w1.query(["persona"]).size() >= 3)   # 2 guests + dog (+ beat)
+	# spec 004-D rare beats: seeded — find a beat seed and a calm
+	# seed, assert the stimulus lands only on the beat seed.
+	var beat_seed := -1
+	var calm_seed := -1
+	for s in 60:
+		var wb := SimDirector.cast_night(st, layout, s)
+		var has_sky := false
+		for eid in wb.query(["pos", "tags"]):
+			if wb.getc(eid, "tags").get("tags", []).has("sky"):
+				has_sky = true
+		var has_critter := false
+		for eid in wb.query(["persona"]):
+			if String(wb.getc(eid, "persona").get("guest",
+					"")) == "raccoon":
+				has_critter = true
+		if has_sky or has_critter:
+			beat_seed = s if beat_seed < 0 else beat_seed
+		elif calm_seed < 0:
+			calm_seed = s
+	check("rare beat rolls on some seeds", beat_seed >= 0)
+	check("rare beat absent on calm seeds", calm_seed >= 0)
 	check("angler goes to bank",
 		float(w1.getc(1, "pos")["x"]) < 200.0 or
 		String(w1.getc(1, "anim")["name"]) == "fish")
@@ -113,8 +141,9 @@ func _ready() -> void:
 		"dog": {"met": false},
 		"decor": [{"id": "swing", "cells": [[5, 5]]}]}
 	var w4 := SimDirector.cast_night(st2, layout, 5)
+	var kid_e := _guest_eid(w4, "g1")
 	check("kids bound to swing",
-		String(w4.getc(1, "anchor")["ref"]) == "swing")
+		String(w4.getc(kid_e, "anchor")["ref"]) == "swing")
 	check("ctx lists items",
 		Array(w4.ctx["items"]).has("swing"))
 
@@ -124,10 +153,11 @@ func _ready() -> void:
 			"traits": ["dog_wary"]}},
 		"dog": {"met": true}, "decor": []}
 	var w5 := SimDirector.cast_night(st3, layout, 9)
+	var wary_e := _guest_eid(w5, "g1")
 	var flinched := false
 	for i in 40:
 		w5.tick(0.25)
-		if w5.has(1, "emote"):
+		if w5.has(wary_e, "emote"):
 			flinched = true
 	check("dog_wary flinches at bark", flinched)
 
@@ -181,33 +211,36 @@ func _ready() -> void:
 		"guests": {"g1": {"archetype": "kids"}},
 		"dog": {"met": true}, "decor": []}
 	var w9 := SimDirector.cast_night(st4, layout, 6)
+	var kid9 := _guest_eid(w9, "g1")
+	var dog9 := _guest_eid(w9, "dog")
+	# (the storm select lands at step 0 on every guest program now)
 	check("kid program scored",
-		String(w9.getc(1, "schedule")["steps"][0]["op"]) ==
+		String(w9.getc(kid9, "schedule")["steps"][1]["op"]) ==
 			"respond")
 	check("kid has perceive weights",
-		float(w9.getc(1, "perceive")["weights"]["dog"]) > 0.0)
+		float(w9.getc(kid9, "perceive")["weights"]["dog"]) > 0.0)
 	check("dog has affordance tag",
-		Array(w9.getc(2, "tags")["tags"]).has("dog"))
+		Array(w9.getc(dog9, "tags")["tags"]).has("dog"))
 
 	# generality: a NEW stimulus pair with zero new code — an
 	# oddity entity spawns near the patrol; the dog leaves its
 	# route to investigate (respond -> goto percept -> sniff)
-	w9.spawn({"pos": {"x": 250.0, "y": 360.0},
+	w9.spawn({"pos": {"x": 300.0, "y": 380.0},
 		"tags": {"tags": ["oddity"]}})
 	var investigated := false
 	for i in 40:
 		w9.tick(0.25)
-		var dp: Dictionary = w9.getc(2, "pos", {})
+		var dp: Dictionary = w9.getc(dog9, "pos", {})
 		if not dp.is_empty() and Vector2(dp["x"], dp["y"]) \
-				.distance_to(Vector2(250, 360)) < 40.0:
+				.distance_to(Vector2(300, 380)) < 40.0:
 			investigated = true
 	check("dog investigates oddity", investigated)
 
 	# --- cast-time routing: detour around blocked cells ------------------
-	# (160,352) cell(2,5) -> (32,240) cell(0,3): the straight line
-	# crosses water cell (1,4)/(1,5); the route must go around.
-	var pts := SimDirector._route(layout, Vector2(160, 352),
-		Vector2(32, 240))
+	# (32,368) cell(0,5) -> (224,176) cell(3,2): the straight line
+	# climbs into the blocked NW mass (x0-2 rows 2-4); detour required.
+	var pts := SimDirector._route(layout, Vector2(32, 368),
+		Vector2(224, 176))
 	var blocked := {}
 	for c in layout["nav"]["blocked"]:
 		blocked["%d,%d" % [c[0], c[1]]] = true
@@ -219,9 +252,110 @@ func _ready() -> void:
 	check("route detours blocked cells",
 		pts.size() > 2 and clean, str(pts))
 
-	# straight line with no obstacles -> single waypoint fast path
-	var pts2 := SimDirector._route(layout, Vector2(224, 176),
+	# straight line, no obstacles and no road data -> fast path
+	var flat := {"nav": {"blocked": []}, "pads": {"spots": {}}}
+	var pts2 := SimDirector._route(flat, Vector2(224, 176),
 		Vector2(352, 176))
 	check("clear line fast path", pts2 == [Vector2(352, 176)])
+
+	# road preference: east-lane -> west court crosses the blocked
+	# fire cell, so A* must detour; the path it picks should spend
+	# its hops on discounted road cells, not the open lawn
+	var road_cells := {}
+	for c in layout["nav"].get("road", []):
+		road_cells["%d,%d" % [c[0], c[1]]] = true
+	var pts3 := SimDirector._route(layout, Vector2(672, 352),
+		Vector2(320, 352))
+	var on_road := 0
+	for p in pts3:
+		var c := SimDirector._px_cell(p)
+		if road_cells.has("%d,%d" % [c.x, c.y]):
+			on_road += 1
+	check("route prefers the road",
+		on_road >= 3 and pts3[pts3.size() - 1] == Vector2(320, 352),
+		str(pts3))
+
+	# --- storm divert (§14): every program selects huddle in a gale ---
+	var st_storm := {"assignments": {"g1": ["p7"]},
+		"guests": {"g1": {"archetype": "angler"}},
+		"dog": {"met": false}, "decor": [], "weather": "storm"}
+	var ws := SimDirector.cast_night(st_storm, layout, 11)
+	var sc_storm: Array = ws.getc(1, "schedule")["steps"]
+	check("storm select first",
+		String(sc_storm[0]["op"]) == "select")
+	for i in 30:
+		ws.tick(0.25)
+	check("storm huddle (no bank run)",
+		String(ws.getc(1, "anim")["name"]) == "sit")
+
+	# --- multi-bank (§7.2): Whisper River anglers pick a real bank ----
+	var wr: Dictionary = Catalog.data["layouts"]["whisper_river"]
+	var st_wr := {"assignments": {"g1": ["p1"]},
+		"guests": {"g1": {"archetype": "angler"}},
+		"dog": {"met": false}, "decor": []}
+	var w_wr := SimDirector.cast_night(st_wr, wr, 5)
+	var fishes := false
+	for stp in w_wr.getc(1, "schedule")["steps"]:
+		if stp.get("anim", {}).get("name") == "fish" \
+				or stp.get("name") == "fish":
+			fishes = true
+	check("whisper angler fishes", fishes)
+
+	# --- sit_spot sockets (spec 003): placed seats spawn claims -------
+	var st_sock := {"assignments": {"g1": ["p7"]},
+		"guests": {"g1": {"archetype": "hiker"}},
+		"dog": {"met": false},
+		"decor": [{"id": "stools", "cells": [[3, 4]]}]}
+	var w_sock := SimDirector.cast_night(st_sock, layout, 3)
+	var n_sockets := 0
+	for eid in w_sock.query(["pos", "tags"]):
+		if not w_sock.has(eid, "persona") and \
+				Array(w_sock.getc(eid, "tags")["tags"]) \
+					.has("sit_spot"):
+			n_sockets += 1
+	check("stool socket spawned", n_sockets >= 1)
+	# sockets are invisible: renderable = pos+persona
+	check("sockets invisible to view",
+		w_sock.query(["pos", "persona"]).size()
+			== w_sock.query(["persona"]).size())
+
+	# --- duet (§13.5): two couples + string lights -> await steps -----
+	var st_duet := {"assignments": {"g1": ["p7"], "g2": ["p1"]},
+		"guests": {"g1": {"archetype": "couple"},
+			"g2": {"archetype": "couple"}},
+		"dog": {"met": false},
+		"decor": [{"id": "string_lights", "cells": [[4, 3]]}]}
+	var w_duet := SimDirector.cast_night(st_duet, layout, 8)
+	var duets := 0
+	for eid in w_duet.query(["schedule"]):
+		for stp in w_duet.getc(eid, "schedule")["steps"]:
+			if stp.get("op") == "await":
+				duets += 1
+	check("couple duet awaits", duets == 2, "got %d" % duets)
+
+	# --- queue cast (§10): unseated board guests wander by the fire ---
+	var st_q := {"assignments": {"g1": ["p7"]},
+		"guests": {"g1": {"archetype": "hiker"}},
+		"board": [{"id": "g1", "archetype": "hiker"},
+			{"id": "g9", "archetype": "photographer"}],
+		"dog": {"met": false}, "decor": []}
+	var w_q := SimDirector.cast_night(st_q, layout, 4)
+	var queued := false
+	for eid in w_q.query(["persona"]):
+		if String(w_q.getc(eid, "persona").get("guest", "")) == "g9":
+			queued = true
+	check("queue guest wanders", queued)
+
+	# --- day cast (§3): ambience without a board ----------------------
+	var wd := SimDirector.cast_day(
+		{"dog": {"met": true}, "decor": [], "weather": "clear"},
+		layout, 21)
+	check("day cast casts locals + dog",
+		wd.query(["pos", "persona"]).size() >= 2)
+	var wd2 := SimDirector.cast_day(
+		{"dog": {"met": true}, "decor": [], "weather": "clear"},
+		layout, 21)
+	check("day cast deterministic",
+		wd.query(["schedule"]).size() == wd2.query(["schedule"]).size())
 
 	finish()

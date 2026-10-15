@@ -94,7 +94,9 @@ func _process(delta: float) -> void:
 
 func _sync() -> void:
 	var live := {}
-	for eid in sim.query(["pos"]):
+	# renderable = pos+persona — bare-pos entities (sit_spot sockets,
+	# stimuli) are sim furniture the view must never materialize.
+	for eid in sim.query(["pos", "persona"]):
 		live[eid] = true
 		var pos: Dictionary = sim.getc(eid, "pos")
 		var p := Vector2(float(pos["x"]), float(pos["y"]))

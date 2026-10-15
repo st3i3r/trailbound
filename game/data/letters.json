@@ -1,76 +1,292 @@
 [
-  {"id": "p01", "site": "pinewatch", "from": "Ông", "trigger": {"morning": 1},
-   "theme": "Finish the book for me",
-   "text": "Cháu — if you're reading this, the fire's lit again. This book was my map; now it's yours. Fill the pages I couldn't. The forest remembers me kindly — let it remember you. — Ông"},
-  {"id": "p02", "site": "pinewatch", "from": "Mai", "trigger": {"morning": 2},
-   "theme": "The trail remembers",
-   "text": "Morning! I'm Mai — ranger on this stretch. Your grandpa kept this camp thirty years. The board fills with travelers tonight; seat them well and I'll open the Outfitter. — Mai"},
-  {"id": "p03", "site": "pinewatch", "from": "Ông", "trigger": {"morning": 3},
-   "theme": "Some like company, some like quiet",
-   "text": "Some like company, some like quiet. Read the cards, cháu — a Social soul beside a shy one makes a long night for both. The pads remember where you place them. — Ông"},
-  {"id": "p04", "site": "pinewatch", "from": "Mai", "trigger": {"morning": 4},
-   "theme": "Rain on canvas",
-   "text": "Rain's coming day after tomorrow. Canvas sheds water; campers don't. A Tarp over the pads keeps the stars — and the reviews — dry. Forecast's pinned to the board. — Mai"},
-  {"id": "p05", "site": "pinewatch", "from": "Ông", "trigger": {"morning": 5},
-   "theme": "Nobody wants just one thing",
-   "text": "Nobody wants just one thing. Watch for the second wish — the quiet one. Feed it, and the fifth star follows. — Ông"},
-  {"id": "p06", "site": "pinewatch", "from": "Mai", "trigger": {"morning": 6},
-   "theme": "Grandpa's practice camp",
-   "text": "Grandpa ran a drill every day — one board, no retries. Called it practice camp. The Trail Daily's on the board if you want the same reps. — Mai"},
-  {"id": "p07", "site": "pinewatch", "from": "Ông", "trigger": {"morning": 7},
-   "theme": "A full pot is a full camp",
-   "text": "A full pot is a full camp. Two things in the pot, any two — the fire decides what they become. Write down what works, cháu. — Ông"},
-  {"id": "p08", "site": "pinewatch", "from": "Ông", "trigger": {"event": "family_booked"},
-   "theme": "Families and noise",
-   "text": "A family booked! Mind the little ones — they want room to run, and the noise carries. Light Sleepers don't forgive. — Ông"},
-  {"id": "p09", "site": "pinewatch", "from": "Mai", "trigger": {"morning": 9},
-   "theme": "Word of mouth",
-   "text": "Folks are talking — your rating's real. Walk-ins come for the leftovers when the word's good. More seats, more mouths, more coins. — Mai"},
-  {"id": "p10", "site": "pinewatch", "from": "Ông", "trigger": {"event": "chapter_done"},
-   "theme": "Further up the river…",
-   "text": "The page turns. Further up the river there's a camp I never finished — the water there sings different. Pack light. — Ông"},
-
-  {"id": "w01", "site": "whisper_river", "from": "Ông", "trigger": {"morning": 1},
-   "theme": "Arrival at the river",
-   "text": "You found the river. Old Ba still fishes the south bank — he knew me. Feed him well. — Ông"},
-  {"id": "w02", "site": "whisper_river", "from": "Mai", "trigger": {"morning": 3},
-   "theme": "The water pads",
-   "text": "Anglers want the bank pads — river sound does half the work. Keep the rod oiled; the fishing's honest here. — Mai"},
-  {"id": "w03", "site": "whisper_river", "from": "Ông", "trigger": {"event": "regular_done:old_ba"},
-   "theme": "The golden koi",
-   "text": "Ba told you about the koi? He never told anyone but me. The river keeps its promises, cháu — keep yours. — Ông"},
-  {"id": "w04", "site": "whisper_river", "from": "Ông", "trigger": {"morning": 6},
-   "theme": "A reveal",
-   "text": "Your grandmother painted lanterns here once. I never said that in the letters home. Some things belong to the trail. — Ông"},
-  {"id": "w05", "site": "whisper_river", "from": "Mai", "trigger": {"morning": 8},
-   "theme": "Word travels the water",
-   "text": "Word's out — the rating's real. River folk come a long way for a warm pad. — Mai"},
-  {"id": "w06", "site": "whisper_river", "from": "Ông", "trigger": {"morning": 9},
-   "theme": "High ground",
-   "text": "High ground next. The valley where the lanterns float — I left something burning there for you. — Ông"},
-  {"id": "w07", "site": "whisper_river", "from": "Ông", "trigger": {"event": "chapter_done"},
-   "theme": "Up the switchbacks",
-   "text": "The chapter closes. Up the switchbacks — Lantern Valley waits. — Ông"},
-
-  {"id": "l01", "site": "lantern_valley", "from": "Ông", "trigger": {"morning": 1},
-   "theme": "Arrival at the valley",
-   "text": "The valley at dusk — a hundred lanterns and one that's always dark. Light it for me. — Ông"},
-  {"id": "l02", "site": "lantern_valley", "from": "Mai", "trigger": {"morning": 3},
-   "theme": "The view pads",
-   "text": "Photographers come for the south terrace. Keep the sky clear and the lights low. — Mai"},
-  {"id": "l03", "site": "lantern_valley", "from": "Ông", "trigger": {"event": "regular_done:lan"},
-   "theme": "Lan's exhibition",
-   "text": "Lan's exhibition — she caught the camp at golden hour. Your grandmother would have wept, then asked for prints. — Ông"},
-  {"id": "l04", "site": "lantern_valley", "from": "Ông", "trigger": {"morning": 6},
-   "theme": "Under the arch",
-   "text": "I proposed here. Under the arch, before the lanterns rose. Some pages I wrote for you, cháu — some I wrote for myself. — Ông"},
-  {"id": "l05", "site": "lantern_valley", "from": "Mai", "trigger": {"morning": 8},
-   "theme": "Full house",
-   "text": "Full houses now — eight pads, all claimed by dark. The valley rewards the ready. — Mai"},
-  {"id": "l06", "site": "lantern_valley", "from": "Ông", "trigger": {"morning": 9},
-   "theme": "Last pages",
-   "text": "Last pages, cháu. Not the end of the book — the end of this one. — Ông"},
-  {"id": "finale", "site": "lantern_valley", "from": "Ông", "trigger": {"event": "chapter_done"},
-   "theme": "The trail continues",
-   "text": "There's a cove past the cape where the water stays glass. Glasscoast. When you're ready — the trail continues. — Ông"}
+ {
+  "id": "p01",
+  "site": "pinewatch",
+  "from": "Ông",
+  "trigger": {
+   "morning": 1
+  },
+  "theme": "Finish the book for me",
+  "text": "Cháu — if you're reading this, the fire's lit again. This book was my map; now it's yours. Fill the pages I couldn't. The forest remembers me kindly — let it remember you. — Ông"
+ },
+ {
+  "id": "p02",
+  "site": "pinewatch",
+  "from": "Mai",
+  "trigger": {
+   "morning": 2
+  },
+  "theme": "The trail remembers",
+  "text": "Morning! I'm Mai — ranger on this stretch. Your grandpa kept this camp thirty years. The board fills with travelers tonight; seat them well and I'll open the Outfitter. — Mai"
+ },
+ {
+  "id": "p03",
+  "site": "pinewatch",
+  "from": "Ông",
+  "trigger": {
+   "morning": 3
+  },
+  "theme": "Some like company, some like quiet",
+  "text": "Some like company, some like quiet. Read the cards, cháu — a Social soul beside a shy one makes a long night for both. The pads remember where you place them. — Ông"
+ },
+ {
+  "id": "p04",
+  "site": "pinewatch",
+  "from": "Mai",
+  "trigger": {
+   "morning": 4
+  },
+  "theme": "Rain on canvas",
+  "text": "Rain's coming day after tomorrow. Canvas sheds water; campers don't. A Tarp over the pads keeps the stars — and the reviews — dry. Forecast's pinned to the board. — Mai"
+ },
+ {
+  "id": "p05",
+  "site": "pinewatch",
+  "from": "Ông",
+  "trigger": {
+   "morning": 5
+  },
+  "theme": "Nobody wants just one thing",
+  "text": "Nobody wants just one thing. Watch for the second wish — the quiet one. Feed it, and the fifth star follows. — Ông"
+ },
+ {
+  "id": "p06",
+  "site": "pinewatch",
+  "from": "Mai",
+  "trigger": {
+   "morning": 6
+  },
+  "theme": "Grandpa's practice camp",
+  "text": "Grandpa ran a drill every day — one board, no retries. Called it practice camp. The Trail Daily's on the board if you want the same reps. — Mai"
+ },
+ {
+  "id": "p07",
+  "site": "pinewatch",
+  "from": "Ông",
+  "trigger": {
+   "morning": 7
+  },
+  "theme": "A full pot is a full camp",
+  "text": "A full pot is a full camp. Two things in the pot, any two — the fire decides what they become. Write down what works, cháu. — Ông"
+ },
+ {
+  "id": "p08",
+  "site": "pinewatch",
+  "from": "Ông",
+  "trigger": {
+   "event": "family_booked"
+  },
+  "theme": "Families and noise",
+  "text": "A family booked! Mind the little ones — they want room to run, and the noise carries. Light Sleepers don't forgive. — Ông"
+ },
+ {
+  "id": "p09",
+  "site": "pinewatch",
+  "from": "Mai",
+  "trigger": {
+   "morning": 9
+  },
+  "theme": "Word of mouth",
+  "text": "Folks are talking — your rating's real. Walk-ins come for the leftovers when the word's good. More seats, more mouths, more coins. — Mai"
+ },
+ {
+  "id": "p10",
+  "site": "pinewatch",
+  "from": "Ông",
+  "trigger": {
+   "event": "chapter_done"
+  },
+  "theme": "Further up the river…",
+  "text": "The page turns. Further up the river there's a camp I never finished — the water there sings different. Pack light. — Ông"
+ },
+ {
+  "id": "w01",
+  "site": "whisper_river",
+  "from": "Ông",
+  "trigger": {
+   "morning": 1
+  },
+  "theme": "Arrival at the river",
+  "text": "You found the river. Old Ba still fishes the south bank — he knew me. Feed him well. — Ông"
+ },
+ {
+  "id": "w02",
+  "site": "whisper_river",
+  "from": "Mai",
+  "trigger": {
+   "morning": 3
+  },
+  "theme": "The water pads",
+  "text": "Anglers want the bank pads — river sound does half the work. Keep the rod oiled; the fishing's honest here. — Mai"
+ },
+ {
+  "id": "w03",
+  "site": "whisper_river",
+  "from": "Ông",
+  "trigger": {
+   "event": "regular_done:old_ba"
+  },
+  "theme": "The golden koi",
+  "text": "Ba told you about the koi? He never told anyone but me. The river keeps its promises, cháu — keep yours. — Ông"
+ },
+ {
+  "id": "w04",
+  "site": "whisper_river",
+  "from": "Ông",
+  "trigger": {
+   "morning": 6
+  },
+  "theme": "A reveal",
+  "text": "Your grandmother painted lanterns here once. I never said that in the letters home. Some things belong to the trail. — Ông"
+ },
+ {
+  "id": "w05",
+  "site": "whisper_river",
+  "from": "Mai",
+  "trigger": {
+   "morning": 8
+  },
+  "theme": "Word travels the water",
+  "text": "Word's out — the rating's real. River folk come a long way for a warm pad. — Mai"
+ },
+ {
+  "id": "w06",
+  "site": "whisper_river",
+  "from": "Ông",
+  "trigger": {
+   "morning": 9
+  },
+  "theme": "High ground",
+  "text": "High ground next. The valley where the lanterns float — I left something burning there for you. — Ông"
+ },
+ {
+  "id": "w07",
+  "site": "whisper_river",
+  "from": "Ông",
+  "trigger": {
+   "event": "chapter_done"
+  },
+  "theme": "Up the switchbacks",
+  "text": "The chapter closes. Up the switchbacks — Lantern Valley waits. — Ông"
+ },
+ {
+  "id": "l01",
+  "site": "lantern_valley",
+  "from": "Ông",
+  "trigger": {
+   "morning": 1
+  },
+  "theme": "Arrival at the valley",
+  "text": "The valley at dusk — a hundred lanterns and one that's always dark. Light it for me. — Ông"
+ },
+ {
+  "id": "l02",
+  "site": "lantern_valley",
+  "from": "Mai",
+  "trigger": {
+   "morning": 3
+  },
+  "theme": "The view pads",
+  "text": "Photographers come for the south terrace. Keep the sky clear and the lights low. — Mai"
+ },
+ {
+  "id": "l03",
+  "site": "lantern_valley",
+  "from": "Ông",
+  "trigger": {
+   "event": "regular_done:lan"
+  },
+  "theme": "Lan's exhibition",
+  "text": "Lan's exhibition — she caught the camp at golden hour. Your grandmother would have wept, then asked for prints. — Ông"
+ },
+ {
+  "id": "l04",
+  "site": "lantern_valley",
+  "from": "Ông",
+  "trigger": {
+   "morning": 6
+  },
+  "theme": "Under the arch",
+  "text": "I proposed here. Under the arch, before the lanterns rose. Some pages I wrote for you, cháu — some I wrote for myself. — Ông"
+ },
+ {
+  "id": "l05",
+  "site": "lantern_valley",
+  "from": "Mai",
+  "trigger": {
+   "morning": 8
+  },
+  "theme": "Full house",
+  "text": "Full houses now — eight pads, all claimed by dark. The valley rewards the ready. — Mai"
+ },
+ {
+  "id": "l06",
+  "site": "lantern_valley",
+  "from": "Ông",
+  "trigger": {
+   "morning": 9
+  },
+  "theme": "Last pages",
+  "text": "Last pages, cháu. Not the end of the book — the end of this one. — Ông"
+ },
+ {
+  "id": "finale",
+  "site": "lantern_valley",
+  "from": "Ông",
+  "trigger": {
+   "event": "chapter_done"
+  },
+  "theme": "The trail continues",
+  "text": "There's a cove past the cape where the water stays glass. Glasscoast. When you're ready — the trail continues. — Ông"
+ },
+ {
+  "id": "p11",
+  "site": "pinewatch",
+  "from": "Mai",
+  "trigger": {
+   "morning": 7
+  },
+  "theme": "Tonight, for Grandpa",
+  "text": "Cháu — tonight is his memorial. I'll bring the lantern; you bring the camp. If the stove can manage chè trôi nước, he'd like that — it was his offering food. No pressure. Just come. — Mai"
+ },
+ {
+  "id": "fund_1",
+  "site": "any",
+  "from": "Mai",
+  "trigger": {
+   "event": "fund_tier_1"
+  },
+  "theme": "The Fund, first mile",
+  "text": "Cháu — the committee approved the first project: a bench at the overlook. It ships with this letter. Grandpa's fund, working again after all these years. — Mai"
+ },
+ {
+  "id": "fund_2",
+  "site": "any",
+  "from": "Mai",
+  "trigger": {
+   "event": "fund_tier_2"
+  },
+  "theme": "The Fund, second mile",
+  "text": "You won't believe what the fund found in his papers — the way-marker design he carved for the east fork. We had it made. It's yours now. — Mai"
+ },
+ {
+  "id": "fund_3",
+  "site": "any",
+  "from": "Mai",
+  "trigger": {
+   "event": "fund_tier_3"
+  },
+  "theme": "The last mile",
+  "text": "The committee asked me what the fund's last project should be. I said a stone, at the head of his trail, with his name on it. It arrived today. Take care placing it — it matters. — Mai"
+ },
+ {
+  "id": "mai_soggy",
+  "site": "any",
+  "from": "Mai",
+  "trigger": {
+   "event": "soggy_camp"
+  },
+  "theme": "Mud season",
+  "text": "Cháu — three days of rain means gutter season. Grandpa used to cut a channel behind pad 3. The shovel's by the shed if you want it. The guests won't mind the mud; they never do. — Mai"
+ }
 ]

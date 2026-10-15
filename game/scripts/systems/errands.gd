@@ -55,7 +55,8 @@ func _pick_weighted(pool: Array, rng: RandomNumberGenerator,
 
 
 ## §7.1: gather a node — items land in the pantry until it's full;
-## the node keeps whatever didn't fit.
+## the node keeps whatever didn't fit. First finds log to Field
+## Notes (§8.3) through Game._note_find.
 func gather(node_id: String) -> Array:
 	var st: Dictionary = g.site_state()
 	var got := []
@@ -66,6 +67,7 @@ func gather(node_id: String) -> Array:
 		for item in node["items"]:
 			if g.pantry_add(item, 1) > 0:
 				got.append(item)
+				g._note_find(item)
 			else:
 				left.append(item)
 		node["items"] = left
@@ -75,6 +77,9 @@ func gather(node_id: String) -> Array:
 
 
 ## §7.2: 3 catches per spot per day, +1 in rain; needs the rod.
+## The Golden Koi (§13.5, Old Ba's story): once his arc is done at
+## Whisper River it can show — caught, logged to Field Notes and
+## released, never pantry.
 func fish_catch(spot: String) -> String:
 	if "fishing_rod" not in g.gear:
 		return ""
@@ -84,10 +89,40 @@ func fish_catch(spot: String) -> String:
 	if taken >= limit:
 		return ""
 	var rng: RandomNumberGenerator = g._rng_for("fish_" + spot)
-	var kinds: Array = g._ingredients_of_kind("fish")
+	if g.site_id == &"whisper_river" \
+			and _regular_done("old_ba") \
+			and "golden_koi" not in g.field_notes \
+			and rng.randf() < 0.25:
+		st["fish_taken"][spot] = taken + 1         # the cast is spent
+		g.field_notes.append("golden_koi")
+		st["counters"]["events"]["golden_koi"] = true
+		g._log("catch", {"id": "golden_koi", "spot": spot})
+		g._check_pages()
+		return "golden_koi"
+	# §WR signature: a spot's authored table decides what bites there —
+	# the deep bend carries catfish, only the run holds loach. Spots
+	# with no table fall back to the site's uniform draw.
+	var table: Dictionary = g._layout().get("errand_spots", {}) \
+		.get("fish_tables", {}).get(spot, {})
 	var pick := ""
-	for i in taken + 1:
-		pick = kinds[rng.randi() % kinds.size()]["id"] if kinds else ""
+	if not table.is_empty():
+		var total := 0
+		for fid in table:
+			total += int(table[fid])
+		var roll := 0
+		for i in taken + 1:                  # stream sequencing: the
+			roll = rng.randi_range(0,        # Nth cast draws N times
+				maxi(0, total - 1))
+		for fid in table:
+			roll -= int(table[fid])
+			if roll < 0:
+				pick = String(fid)
+				break
+	else:
+		var kinds: Array = g._ingredients_of_kind("fish")
+		for i in taken + 1:
+			pick = kinds[rng.randi() % kinds.size()]["id"] \
+				if kinds else ""
 	st["fish_taken"][spot] = taken + 1
 	if g.pantry_add(pick, 1) == 0:
 		st["fish_taken"][spot] = taken               # full pantry: no catch
@@ -96,7 +131,18 @@ func fish_catch(spot: String) -> String:
 	if pick not in logged:
 		logged.append(pick)
 		g._check_pages()                             # e.g. W1 "3 kinds"
+	g._note_find(pick)
 	return pick
+
+
+func _regular_done(regular_id: String) -> bool:
+	for r in Catalog.data.get("regulars", []):
+		if r.get("id") == regular_id:
+			var cnt: Dictionary = g.site_state()["counters"][
+				"regular_visits"]
+			return int(cnt.get(regular_id, 0)) \
+				>= int(r.get("story_visits", 3))
+	return false
 
 
 ## §7.3: the lookout, once per site day, needs the Binoculars —

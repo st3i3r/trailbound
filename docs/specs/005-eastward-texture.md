@@ -101,8 +101,12 @@ player did tonight, which is the Eastward feel at lowest cost.
 
 `emote` comp on the dog entity in cast programs: wag on an all-5★
 night, whimper under a `flash`/`front` scalar, curl at the fire
-during `quiet_night`. Pure cast-time schedule rows — blocked on
-the actor presenter (spec 003 dependency).
+during `quiet_night`. Pure cast-time schedule rows — **landed**
+in `SimDirector`: storm nights shelter the dog at the fire's lee
+(cast-time `weather == "storm"` branch), an empty camp curls it
+asleep at the fire (`assignments.is_empty()`), and the morning
+after an all-5★ night `cast_day(prev_perfect)` opens its rounds
+with a play+heart wag.
 
 ## Rejected — with reasons
 

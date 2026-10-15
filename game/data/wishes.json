@@ -1,0 +1,38 @@
+[
+ {
+  "id": "fire",
+  "label": "asks for a spot by the fire"
+ },
+ {
+  "id": "water",
+  "label": "asks to sleep by the water"
+ },
+ {
+  "id": "view",
+  "label": "asks for a pad with a view"
+ },
+ {
+  "id": "sky",
+  "label": "asks to sleep under open sky"
+ },
+ {
+  "id": "lit",
+  "label": "asks to be near the lights"
+ },
+ {
+  "id": "quiet",
+  "label": "asks for a quiet corner"
+ },
+ {
+  "id": "solo",
+  "label": "asks for a spot alone"
+ },
+ {
+  "id": "company",
+  "label": "asks for company"
+ },
+ {
+  "id": "together",
+  "label": "asks to stay together"
+ }
+]

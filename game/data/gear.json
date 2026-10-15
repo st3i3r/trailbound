@@ -1,6 +1,37 @@
 [
-  {"id": "fishing_rod", "name": "Fishing Rod", "price": 150, "unlock": "P3", "effect": "fishing"},
-  {"id": "cooler", "name": "Cooler", "price": 200, "unlock": "W0", "effect": "meals"},
-  {"id": "binoculars", "name": "Binoculars", "price": 250, "unlock": "W3", "effect": "lookout"},
-  {"id": "oven", "name": "Dutch Oven", "price": 380, "unlock": "L0", "effect": "oven_recipes"}
+ {
+  "id": "fishing_rod",
+  "name": "Fishing Rod",
+  "price": 150,
+  "unlock": "P3",
+  "effect": "fishing"
+ },
+ {
+  "id": "cooler",
+  "name": "Cooler",
+  "price": 200,
+  "unlock": "W0",
+  "effect": "meals"
+ },
+ {
+  "id": "binoculars",
+  "name": "Binoculars",
+  "price": 250,
+  "unlock": "W3",
+  "effect": "lookout"
+ },
+ {
+  "id": "oven",
+  "name": "Dutch Oven",
+  "price": 380,
+  "unlock": "L0",
+  "effect": "oven_recipes"
+ },
+ {
+  "id": "camera",
+  "name": "Field Camera",
+  "price": 180,
+  "unlock": "L2",
+  "effect": "photo"
+ }
 ]

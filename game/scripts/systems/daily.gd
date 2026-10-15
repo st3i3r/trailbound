@@ -9,6 +9,8 @@ extends RefCounted
 const EPOCH := "2025-01-01"                  # N counts days since launch
 
 var g  # the Game autoload (untyped: circular ref)
+var _seen: Dictionary = {}    # date -> true; session-only so §25
+                              # daily_start fires once per open
 
 
 func _init(game) -> void:
@@ -41,6 +43,9 @@ func puzzle(date_str := "") -> Dictionary:
 	pz["n"] = n(d)
 	pz["attempted"] = g.daily_state["date"] == d \
 		and g.daily_state["score"] >= 0
+	if not _seen.has(d):                          # §25: one per open
+		_seen[d] = true
+		Analytics.log_event(&"daily_start", {"daily": n(d)})
 	return pz
 
 
@@ -116,6 +121,11 @@ func score(puzzle: Dictionary, assignments: Dictionary,
 			"share": share_text}
 		if puzzle["date"] not in g.passport_stamps:   # §33.5 stamp
 			g.passport_stamps.append(puzzle["date"])
+			Platform.unlock_achievement(&"first_stamp")
+			if g.passport_stamps.size() >= 7:
+				Platform.unlock_achievement(&"stamp_week")
+		Analytics.log_event(&"daily_complete",
+			{"daily": int(puzzle.get("n", 0)), "score": total})
 	return {"score": total, "results": results,
 		"share": share_text}
 

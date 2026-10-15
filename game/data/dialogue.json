@@ -1,77 +1,349 @@
 [
-  {
-    "id": "mai_d1",
-    "site": "pinewatch",
-    "day": 1,
-    "anchor": "mai",
-    "who": "Mai",
-    "lines": [
-      "Morning, cháu. Pinewatch is yours now.",
-      "Tonight the board fills — seat them well and the stars follow."
-    ]
+ {
+  "id": "mai_d1",
+  "site": "pinewatch",
+  "day": 1,
+  "anchor": "mai",
+  "who": "Mai",
+  "lines": [
+   "Morning, cháu. Pinewatch is yours now.",
+   "Tonight the board fills — seat them well and the stars follow."
+  ]
+ },
+ {
+  "id": "mai_d2",
+  "site": "pinewatch",
+  "day": 2,
+  "anchor": "mai",
+  "who": "Mai",
+  "lines": [
+   "I put the crew on the old warden's hut.",
+   "Watch the clock — a keepsake waits in every stage."
+  ]
+ },
+ {
+  "id": "mai_d4",
+  "site": "pinewatch",
+  "day": 4,
+  "anchor": "mai",
+  "who": "Mai",
+  "lines": [
+   "Rain tomorrow, the board says. A tarp keeps the reviews dry.",
+   "And cháu — the kettle's on if the morning runs long."
+  ]
+ },
+ {
+  "id": "warden_d1",
+  "site": "pinewatch",
+  "day": 1,
+  "anchor": "warden",
+  "who": "",
+  "lines": [
+   "The fire smells of pine resin. Home, then."
+  ]
+ },
+ {
+  "id": "mai_praise5",
+  "site": "pinewatch",
+  "anchor": "mai",
+  "who": "Mai",
+  "when": {
+   "last_stars_min": 5
   },
-  {
-    "id": "mai_d2",
-    "site": "pinewatch",
-    "day": 2,
-    "anchor": "mai",
-    "who": "Mai",
-    "lines": [
-      "I put the crew on the old warden's hut.",
-      "Watch the clock — a keepsake waits in every stage."
-    ]
+  "lines": [
+   "Five stars last night, cháu. I saw the reviews.",
+   "Grandpa would have framed the log for that one."
+  ]
+ },
+ {
+  "id": "mai_rain_follow",
+  "site": "pinewatch",
+  "anchor": "mai",
+  "who": "Mai",
+  "when": {
+   "last_weather": "rain"
   },
-  {
-    "id": "mai_d4",
-    "site": "pinewatch",
-    "day": 4,
-    "anchor": "mai",
-    "who": "Mai",
-    "lines": [
-      "Rain tomorrow, the board says. A tarp keeps the reviews dry.",
-      "And cháu — the kettle's on if the morning runs long."
-    ]
-  },
-  {
-    "id": "warden_d1",
-    "site": "pinewatch",
-    "day": 1,
-    "anchor": "warden",
-    "who": "",
-    "lines": [
-      "The fire smells of pine resin. Home, then."
-    ]
-  },
-  {
-    "id": "mai_praise5",
-    "site": "pinewatch",
-    "anchor": "mai",
-    "who": "Mai",
-    "when": {"last_stars_min": 5},
-    "lines": [
-      "Five stars last night, cháu. I saw the reviews.",
-      "Grandpa would have framed the log for that one."
-    ]
-  },
-  {
-    "id": "mai_rain_follow",
-    "site": "pinewatch",
-    "anchor": "mai",
-    "who": "Mai",
-    "when": {"last_weather": "rain"},
-    "lines": [
-      "Slept through the whole storm, I hope. Tarps earn their keep.",
-      "Wet nights make the best steam for morning tea, at least."
-    ]
-  },
-  {
-    "id": "warden_fav_served",
-    "site": "pinewatch",
-    "anchor": "warden",
-    "who": "",
-    "lines": [
-      "Someone got exactly what they were craving last night.",
-      "Grandpa always said a full pot reads the camp better than any review."
-    ]
+  "lines": [
+   "Slept through the whole storm, I hope. Tarps earn their keep.",
+   "Wet nights make the best steam for morning tea, at least."
+  ]
+ },
+ {
+  "id": "warden_fav_served",
+  "site": "pinewatch",
+  "anchor": "warden",
+  "who": "",
+  "lines": [
+   "Someone got exactly what they were craving last night.",
+   "Grandpa always said a full pot reads the camp better than any review."
+  ],
+  "when": {
+   "served_favourite": true
   }
+ },
+ {
+  "id": "mai_wr_d1",
+  "site": "whisper_river",
+  "day": 1,
+  "anchor": "mai",
+  "who": "Mai",
+  "lines": [
+   "Whisper River. The fishing spot Grandpa swore by.",
+   "The bank seats closer to the water — anglers will want those."
+  ]
+ },
+ {
+  "id": "warden_wr_first",
+  "site": "whisper_river",
+  "anchor": "warden",
+  "who": "",
+  "when": {
+   "first_night": true
+  },
+  "lines": [
+   "First night on the river. Different water, same kettle.",
+   "Grandpa fished this bank for thirty years. Watch the anglers."
+  ]
+ },
+ {
+  "id": "mai_wr_tet",
+  "site": "whisper_river",
+  "day": 5,
+  "anchor": "mai",
+  "who": "Mai",
+  "lines": [
+   "Tết Eve tonight, cháu — the river camps celebrate it.",
+   "Families will come. If the pantry can do bánh chưng, cook it."
+  ]
+ },
+ {
+  "id": "wr_tet_after",
+  "site": "whisper_river",
+  "anchor": "mai",
+  "who": "Mai",
+  "when": {
+   "last_event": "tet_eve"
+  },
+  "lines": [
+   "Everyone stayed for the midnight pour. Tết done right.",
+   "Grandpa never missed one on this river. He'd be pleased, cháu."
+  ]
+ },
+ {
+  "id": "warden_wr_regular",
+  "site": "whisper_river",
+  "anchor": "warden",
+  "who": "",
+  "when": {
+   "regular_visit": "old_ba"
+  },
+  "lines": [
+   "Old Ba again. He fishes the same spot Grandpa did.",
+   "Three visits and he'll tell you the story of the koi."
+  ]
+ },
+ {
+  "id": "mai_wr_rain",
+  "site": "whisper_river",
+  "anchor": "mai",
+  "who": "Mai",
+  "when": {
+   "last_weather": "rain"
+  },
+  "lines": [
+   "River fog this morning — the rain kept the bank empty.",
+   "Guests still wrote warm things. The river forgives."
+  ]
+ },
+ {
+  "id": "mai_lv_d1",
+  "site": "lantern_valley",
+  "day": 1,
+  "anchor": "mai",
+  "who": "Mai",
+  "lines": [
+   "Lantern Valley — the last stop on Grandpa's map.",
+   "The photographers come for the light. Shelter them well."
+  ]
+ },
+ {
+  "id": "warden_lv_first",
+  "site": "lantern_valley",
+  "anchor": "warden",
+  "who": "",
+  "when": {
+   "first_night": true
+  },
+  "lines": [
+   "Lantern Valley. The end of the road Grandpa drew.",
+   "Whatever he was walking toward — it ends here, or it doesn't."
+  ]
+ },
+ {
+  "id": "mai_lv_lantern",
+  "site": "lantern_valley",
+  "day": 6,
+  "anchor": "mai",
+  "who": "Mai",
+  "lines": [
+   "Mid-Autumn tonight — the valley lights its lanterns.",
+   "Mooncakes in the pantry if you can make them. Photographers",
+   "will want the long exposure — keep the lanterns lit."
+  ]
+ },
+ {
+  "id": "lv_lantern_after",
+  "site": "lantern_valley",
+  "anchor": "mai",
+  "who": "Mai",
+  "when": {
+   "last_event": "mid_autumn"
+  },
+  "lines": [
+   "The lanterns went up one by one. I cried a little, cháu.",
+   "This is what Grandpa was building toward. The whole arc."
+  ]
+ },
+ {
+  "id": "warden_lv_regular",
+  "site": "lantern_valley",
+  "anchor": "warden",
+  "who": "",
+  "when": {
+   "regular_visit": "lan"
+  },
+  "lines": [
+   "Lan again. She photographs the same bend every visit.",
+   "Patient one. Grandpa wrote about her family in the margins."
+  ]
+ },
+ {
+  "id": "mai_lv_storm",
+  "site": "lantern_valley",
+  "anchor": "mai",
+  "who": "Mai",
+  "when": {
+   "last_weather": "storm"
+  },
+  "lines": [
+   "That was a proper mountain storm. Everyone under cover?",
+   "Grandpa's notes say the valley floods in old memories too."
+  ]
+ },
+ {
+  "id": "warden_p_hung",
+  "site": "pinewatch",
+  "anchor": "warden",
+  "who": "",
+  "when": {
+   "regular_visit": "hung"
+  },
+  "lines": [
+   "Hùng again. Third stay, and he still checks the ridge first.",
+   "Whatever he's scouting for — Grandpa knew. The pennant waits."
+  ]
+ },
+ {
+  "id": "mai_p_memorial",
+  "site": "pinewatch",
+  "day": 7,
+  "anchor": "mai",
+  "who": "Mai",
+  "lines": [
+   "Tonight we remember him. Every year, same riverbank.",
+   "Cook chè trôi nước if the pantry allows — it was his",
+   "offering food. Mostly, just keep the fire high."
+  ]
+ },
+ {
+  "id": "p_memorial_after",
+  "site": "pinewatch",
+  "anchor": "warden",
+  "who": "",
+  "when": {
+   "last_event": "memorial_night"
+  },
+  "lines": [
+   "The lantern went out on its own, near morning.",
+   "The book feels lighter. Grandpa's camp is ours now."
+  ]
+ },
+ {
+  "id": "warden_p_returning",
+  "site": "pinewatch",
+  "anchor": "warden",
+  "who": "",
+  "when": {
+   "returning_min": 1
+  },
+  "lines": [
+   "A familiar face on the board this morning.",
+   "They came back. Grandpa was right — the camp keeps people."
+  ]
+ },
+ {
+  "id": "warden_wr_returning",
+  "site": "whisper_river",
+  "anchor": "warden",
+  "who": "",
+  "when": {
+   "returning_min": 1
+  },
+  "lines": [
+   "Someone from last week is back on the bank.",
+   "The river's starting to keep its own regulars."
+  ]
+ },
+ {
+  "id": "warden_lv_returning",
+  "site": "lantern_valley",
+  "anchor": "warden",
+  "who": "",
+  "when": {
+   "returning_min": 1
+  },
+  "lines": [
+   "A familiar tripod by the lanterns again.",
+   "Return visits are the valley's way of saying yes."
+  ]
+ },
+ {
+  "id": "warden_soggy",
+  "site": "pinewatch",
+  "anchor": "warden",
+  "who": "",
+  "when": {
+   "weather_streak": "rain"
+  },
+  "lines": [
+   "Three days of rain. The pads hold — Grandpa raised them right.",
+   "The guests are mud to the knees and smiling about it."
+  ]
+ },
+ {
+  "id": "mai_soggy",
+  "site": "whisper_river",
+  "anchor": "mai",
+  "who": "Mai",
+  "when": {
+   "weather_streak": "rain"
+  },
+  "lines": [
+   "The river's up again, cháu. Third day — the bank camps",
+   "know what it means. Keep the dry pads for the latecomers."
+  ]
+ },
+ {
+  "id": "warden_heat",
+  "site": "lantern_valley",
+  "anchor": "warden",
+  "who": "",
+  "when": {
+   "weather_streak": "clear"
+  },
+  "lines": [
+   "Three clear nights running. The valley never shows off",
+   "like this twice — the camera earns its keep this week."
+  ]
+ }
 ]

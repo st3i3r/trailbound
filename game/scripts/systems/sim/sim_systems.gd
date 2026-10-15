@@ -135,6 +135,28 @@ static func schedule(w: SimWorld, dt: float) -> void:
 								break
 					sc["i"] = to2
 					sc["started"] = false
+				"await":
+					# rendezvous: block until the entity named by
+					# `peer` (a persona.guest id) is within `r`, or
+					# `t` seconds pass — duets sync without a lock,
+					# and a no-show partner can't wedge the program.
+					var peer: Dictionary = _by_guest(w, eid,
+						String(step.get("peer", "")))
+					var aw_ok := false
+					if not peer.is_empty():
+						var ap: Dictionary = w.getc(eid, "pos", {})
+						var d_await := Vector2(float(ap.get("x", 0.0)),
+							float(ap.get("y", 0.0))).distance_to(
+								peer["pos"])
+						aw_ok = d_await <= float(step.get("r", 48.0))
+					if aw_ok or float(sc.get("await_t", 0.0)) >= \
+							float(step.get("t", 8.0)):
+						sc.erase("await_t")
+						_next(sc)
+					else:
+						sc["await_t"] = float(
+							sc.get("await_t", 0.0)) + dt
+					break
 				"respond":
 					# scored response (production path): consult
 					# the percept.by_tag map sys_sense built —
@@ -158,6 +180,19 @@ static func schedule(w: SimWorld, dt: float) -> void:
 					sc["started"] = false
 				_:
 					_next(sc)
+
+
+## Entity lookup by persona.guest id — program ops address actors
+## by their cast name (a guest/queue id), never by eid.
+static func _by_guest(w: SimWorld, self_eid: int, gid: String) -> Dictionary:
+	for other in w.query(["pos", "persona"]):
+		if other == self_eid:
+			continue
+		if String(w.getc(other, "persona").get("guest", "")) == gid:
+			var p: Dictionary = w.getc(other, "pos")
+			return {"eid": other, "pos": Vector2(float(p["x"]),
+				float(p["y"]))}
+	return {}
 
 
 static func _next(sc: Dictionary) -> void:

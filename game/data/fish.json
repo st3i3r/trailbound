@@ -1,1 +1,39 @@
-[]
+[
+ {
+  "id": "perch",
+  "name": "Perch",
+  "site": "pinewatch",
+  "note": "Strikes fast and sulks slow. Pinewatch water keeps it small and stubborn."
+ },
+ {
+  "id": "carp",
+  "name": "Carp",
+  "site": "pinewatch",
+  "note": "Bottom-feeder, says Ông. Patient fish for patient people."
+ },
+ {
+  "id": "trout",
+  "name": "Trout",
+  "site": "whisper_river",
+  "note": "Holds in the fast seam where the river forks. Flash of silver, gone."
+ },
+ {
+  "id": "catfish",
+  "name": "Catfish",
+  "site": "whisper_river",
+  "note": "Whiskers find the bait before eyes do. Old Ba swears by the dusk bite."
+ },
+ {
+  "id": "golden_koi",
+  "name": "Golden Koi",
+  "site": "whisper_river",
+  "note": "The one Ba chased for forty years. It looked at the camp, decided it was alright, and left.",
+  "rare": true
+ },
+ {
+  "id": "loach",
+  "name": "Loach",
+  "site": "whisper_river",
+  "note": "A whisker of a fish, all mud and nerve. Old Ba could hook one blindfolded — he called them 'the river's little accountants'."
+ }
+]

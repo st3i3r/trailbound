@@ -9,7 +9,18 @@
   "unlock": "P1",
   "attract": {
    "trait": "social"
-  }
+  },
+  "sockets": [
+   {
+    "id": "seat",
+    "kind": "sit_spot",
+    "px_offset": [
+     0,
+     10
+    ],
+    "facing": "north"
+   }
+  ]
  },
  {
   "id": "bench",
@@ -21,6 +32,20 @@
   "unlock": "P2",
   "attract": {
    "trait": "social"
+  },
+  "sockets": [
+   {
+    "id": "seat",
+    "kind": "sit_spot",
+    "px_offset": [
+     0,
+     10
+    ],
+    "facing": "north"
+   }
+  ],
+  "variants": {
+   "carved": 70
   }
  },
  {
@@ -33,7 +58,27 @@
   "unlock": "P3",
   "attract": {
    "trait": "social"
-  }
+  },
+  "sockets": [
+   {
+    "id": "seat_a",
+    "kind": "sit_spot",
+    "px_offset": [
+     0,
+     10
+    ],
+    "facing": "north"
+   },
+   {
+    "id": "seat_b",
+    "kind": "sit_spot",
+    "px_offset": [
+     64,
+     10
+    ],
+    "facing": "north"
+   }
+  ]
  },
  {
   "id": "lantern",
@@ -45,6 +90,10 @@
   "unlock": "P1",
   "attract": {
    "trait": "night_owl"
+  },
+  "variants": {
+   "paper_red": 45,
+   "brass": 90
   }
  },
  {
@@ -57,6 +106,10 @@
   "unlock": "P4",
   "attract": {
    "trait": "night_owl"
+  },
+  "variants": {
+   "warm_amber": 55,
+   "rainbow": 75
   }
  },
  {
@@ -81,6 +134,10 @@
   "unlock": "P1",
   "attract": {
    "trait": "nature_lover"
+  },
+  "variants": {
+   "glazed": 50,
+   "terracotta": 40
   }
  },
  {
@@ -165,6 +222,10 @@
   "unlock": "P2",
   "attract": {
    "trait": "music_lover"
+  },
+  "variants": {
+   "lacquered": 80,
+   "weathered": 60
   }
  },
  {
@@ -201,7 +262,18 @@
   "unlock": "P4",
   "attract": {
    "trait": "social"
-  }
+  },
+  "sockets": [
+   {
+    "id": "seat",
+    "kind": "sit_spot",
+    "px_offset": [
+     32,
+     14
+    ],
+    "facing": "north"
+   }
+  ]
  },
  {
   "id": "kite",
@@ -213,6 +285,10 @@
   "unlock": "L0",
   "attract": {
    "trait": "social"
+  },
+  "variants": {
+   "butterfly": 65,
+   "dragon": 85
   }
  },
  {
@@ -249,6 +325,10 @@
   "unlock": "S:hung",
   "attract": {
    "archetype": "scout"
+  },
+  "variants": {
+   "indigo": 30,
+   "crimson": 30
   }
  },
  {
@@ -276,5 +356,44 @@
   "attract": {
    "trait": "shutterbug"
   }
+ },
+ {
+  "id": "trail_bench",
+  "name": "Trail Bench",
+  "price": 0,
+  "effect": "comfort",
+  "reach": 1,
+  "size": "1x1",
+  "unlock": "E:fund_tier_1",
+  "attract": {
+   "trait": "social"
+  },
+  "note": "Donated by Grandpa's Trail Fund. The wood still smells of varnish."
+ },
+ {
+  "id": "way_marker",
+  "name": "Way Marker",
+  "price": 0,
+  "effect": "comfort",
+  "reach": 1,
+  "size": "1x1",
+  "unlock": "E:fund_tier_2",
+  "attract": {
+   "trait": "stargazer"
+  },
+  "note": "Carved in Grandpa's hand — the fund had it copied from his sketches."
+ },
+ {
+  "id": "memorial_stone",
+  "name": "Memorial Stone",
+  "price": 0,
+  "effect": "comfort",
+  "reach": 2,
+  "size": "1x1",
+  "unlock": "E:fund_tier_3",
+  "attract": {
+   "trait": "introvert"
+  },
+  "note": "His name, on the trail he mapped. The fund's last mile."
  }
 ]

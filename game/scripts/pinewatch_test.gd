@@ -32,19 +32,23 @@ const GH := 12                               # ground height (tiles)
 #   G = fresh grass   W = pond water
 # Per-site: sites without a baked ground_painted.png draw _mask
 # procedurally (_build_ground fallback), so the mask IS the map there.
+## Pinewatch v2 — Eastward-composition redesign: a waterfall-fed stream
+## enters top-left and widens into the west pond; the guest road exits
+## the right edge at the gate (pull-in apron for the van), the dirt
+## court sits at the junction as the fire plaza, hut yard top-right.
 const MASK_PINEWATCH := [
-    "GGGGGGGGGGGGGGGDDDDG",
-    "GGGGGGGGGGGGGGGDDDDG",
-    "GGGGGGGGGGGGGGGDDDDG",
-    "GGGGGGGGGGGGGGGDDDDG",
-    "GGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGGGGGGGGGGG",
-    "GGGGGGGGGGDDDDGGGGGG",
-    "WWWWGGGGGDDDDDDGGGGG",
-    "WWWWGGGGGGDDDDGGGGGG",
-    "WWWWGGGGGGGGGDDGGGGG",
-    "WWWWGGGGGGGGGDDGGGGG",
-    "WWWWGGGGGGGGGDDGGGGG",
+    "GWWGGGGGGGGGGGGGDDDD",
+    "GGWWGGGGGGGGGGGGDDDD",
+    "GWWWGGGGGGGGGGGGDDDD",
+    "GWWWWGGGGGGGGGGGDDDG",
+    "WWWWWGGGGGGGGGGGGGGG",
+    "WWWWWWGGGGGGDDDDGGGG",
+    "WWWWWWGGGGDDDDDDDDDD",
+    "WWWWWGGGGGGGGGGDDDDD",
+    "WWWWGGGGGGGGDDDDGGGG",
+    "GWWWGGGGGGGGDDDDGGGG",
+    "GGGGGGGGGGGGDDDDGGGG",
+    "GGGGGGGGGGGGDDDDGGGG",
 ]
 
 ## Whisper River (v1 dressing): pads ring a north fire yard; the river
@@ -86,8 +90,8 @@ const MASK_LANTERN := [
 ## against each site's dressing — the layout supplies cells + errand
 ## anchors, these land the interactables inside it.
 const SITE_STAGE := {
-    "pinewatch": {"fire": Vector2(368, 236), "dog": Vector2(420, 322),
-        "board": Rect2(384, 296, 36, 52)},
+    "pinewatch": {"fire": Vector2(440, 304), "dog": Vector2(392, 340),
+        "board": Rect2(468, 244, 36, 52)},
     "whisper_river": {"fire": Vector2(288, 192), "dog": Vector2(352, 238),
         "board": Rect2(46, 222, 40, 46)},
     "lantern_valley": {"fire": Vector2(288, 192), "dog": Vector2(352, 238),
@@ -110,48 +114,49 @@ const SITE_MASKS := {
 # leans the prop ±2-4° about its base — loose freestanding props only,
 # never anchored/large ones (van, cabin, trees).
 const PROPS_PINEWATCH := [
-    # ===== TREELINE — rounded broadleaf wall on GRASS (ref style),
-    # one species repeated, single flamboyant accent =====
-    ["fx", "tree_broadleaf_sunlit",     40,  76, 0.0, 0.50],
-    ["fx", "tree_broadleaf_sunlit",    112,  70, 0.0, 0.56],
-    ["fx", "tree_broadleaf_sunlit",    210,  78, 0.0, 0.52],
-    ["fx", "tree_broadleaf_sunlit",    296,  68, 0.0, 0.60],
-    ["props_large",  "flamboyant_tree",   252,  76, 0.0, 0.58],  # accent
-    ["fx", "tree_broadleaf_sunlit",    406,  78, 0.0, 0.58],
-    ["fx", "tree_broadleaf_sunlit",    466,  70, 0.0, 0.52],
-    ["fx", "tree_broadleaf_sunlit",    614,  76, 0.0, 0.60],
-    ["fx", "tree_broadleaf_sunlit",    632, 200, 0.0, 0.70],
-    ["fx", "tree_broadleaf_sunlit",    628, 300, 0.0, 0.55],
+    # ===== TREELINE — broadleaf wall, gap over the stream inlet so
+    # the water reads as coming THROUGH the forest (waterfall notch) =====
+    ["fx", "tree_broadleaf_sunlit",    158,  76, 0.0, 0.52],
+    ["fx", "tree_broadleaf_sunlit",    246,  70, 0.0, 0.56],
+    ["fx", "tree_broadleaf_sunlit",    336,  78, 0.0, 0.52],
+    ["props_large",  "flamboyant_tree",   416,  74, 0.0, 0.58],  # accent
+    ["fx", "tree_broadleaf_sunlit",    476,  70, 0.0, 0.60],
+    # ===== STREAM INLET — boulders where the falls drop in =====
+    ["props_medium", "prop_boulder_0",     58,  62, 0.0, 1.10],
+    ["props_small",  "rock_mossy_s",       30,  82],
+    ["props_small",  "rock_mossy_s",       96,  72],
     # ===== HUT YARD — homestead in the dirt pocket (top-right) =====
-    ["props_large",  "cabin",             530, 112, 0.0, 1.05],
-    ["props_medium", "chicken_coop",      578, 132, 0.0, 0.95],
-    ["props_small",  "clothesline",       494, 140, 0.0, 1.10],
-    # ===== NW — amber tent pitch =====
-    ["props_medium", "dome_tent_amber",    44, 150, 0.0, 1.12],
-    ["props_small",  "duffel_bag",         20, 168],
-    # ===== W — sage tent + tea corner =====
-    ["props_medium", "dome_tent_sage",    148, 218, 0.0, 1.12],
-    ["props_medium", "tea_table",         205, 232, 0.0, 0.95],
-    ["props_medium", "picnic_basket",     188, 246],
-    # ===== CAMPFIRE HUB — animated fire at _fire_pos(368,236) =====
-    ["props_medium", "tripod_cauldron",   368, 228],
-    ["props_small",  "log_stool",         312, 252],
-    ["props_small",  "log_stool",         332, 264],
-    ["props_medium", "lantern_post",      326, 206, -3.0, 1.10],
-    # ===== POND — smaller pond, willow + fishing vignette =====
-    ["fx", "tree_feathery_sunlit",     134, 288, 0.0, 0.80],
-    ["props_small",  "fishing_rod",       144, 300, -6.0],
-    ["props_small",  "tackle_box",        152, 310],
-    # ===== TRAILHEAD — van unloading at spine exit =====
-    ["props_large",  "outfitter_van",     440, 348, 0.0, 1.35],
-    ["props_small",  "signpost",          394, 342],
-    ["props_medium", "prop_supply_crate_0", 482, 372],
-    # ===== TREELINE FEET — one undergrowth tuft at a trunk foot only;
-    # the ref stands trees on bare grass, nothing floats mid-field =====
-    ["props_medium", "fern_bank",         118,  96],
-    # ===== CAMPFIRE HUB — cook support; one anchor + woodpile =====
-    ["props_medium", "woodpile",          296, 244],
-    ["props_medium", "dirt_patch",        368, 244],
+    ["props_large",  "cabin",             560, 100, 0.0, 1.05],
+    ["props_medium", "chicken_coop",      612, 122, 0.0, 0.95],
+    ["props_small",  "clothesline",       512, 130, 0.0, 1.10],
+    # ===== GATE — flower arch over the road where guests walk in;
+    # fences flank the opening; the board/signpost sits at the junction =====
+    ["props_large",  "flower_arch",       606, 214, 0.0, 1.10],
+    ["props_small",  "fence_wood",        600, 158],
+    ["props_small",  "fence_wood",        600, 272],
+    ["props_small",  "signpost",          486, 258],
+    # ===== VAN PULL-IN — parked on the road apron =====
+    ["props_large",  "outfitter_bus",     556, 242, 0.0, 1.35],
+    ["props_medium", "prop_supply_crate_0", 610, 282],
+    ["props_medium", "moped_cub",         512, 252, 0.0, 1.05],
+    # ===== FIRE COURT — plaza at the junction; animated fire at
+    # _fire_pos(440,304) =====
+    ["props_medium", "tripod_cauldron",   440, 296],
+    ["props_small",  "log_stool",         398, 322],
+    ["props_small",  "log_stool",         422, 336],
+    ["props_medium", "lantern_post",      394, 268, -3.0, 1.10],
+    ["props_medium", "woodpile",          382, 334],
+    ["props_medium", "dirt_patch",        440, 312],
+    # ===== POND EAST BANK — willow + fishing vignette =====
+    ["fx", "tree_feathery_sunlit",     236, 292, 0.0, 0.80],
+    ["props_small",  "fishing_rod",       250, 296, -6.0],
+    ["props_small",  "tackle_box",        262, 306],
+    ["props_medium", "reed_shore",        290, 258],
+    # ===== OPEN FIELD — one sage pitch + tea corner, kept sparse =====
+    ["props_medium", "dome_tent_sage",     92, 336, 0.0, 1.12],
+    ["props_medium", "tea_table",         540, 306, 0.0, 0.95],
+    ["props_medium", "picnic_basket",     318, 214],
+    ["props_medium", "fern_bank",         170,  96],
     # ===== BOUNDARY marks =====
 ]
 
@@ -166,7 +171,7 @@ const PROPS_WHISPER := [
     ["fx", "tree_broadleaf_sunlit",   400,  66, 0.0, 0.55],
     ["props_large",  "tree_maple",       500,  64, 0.0, 0.55],
     ["fx", "tree_broadleaf_sunlit",   600,  68, 0.0, 0.55],
-    ["props_large",  "outfitter_van",    560, 118, 0.0, 1.30],
+    ["props_large",  "outfitter_bus",    560, 118, 0.0, 1.30],
     ["props_small",  "signpost",          64, 258],
     ["props_medium", "dome_tent_slate",  150, 140, 0.0, 1.05],
     ["props_medium", "tripod_cauldron",  288, 188],
@@ -207,7 +212,7 @@ const PROPS_LANTERN := [
     ["props_small",  "step_stone_a",     180, 340],
     ["props_small",  "step_stone_b",     360, 344],
     ["props_medium", "moped_cub",        480, 330, 0.0, 1.05],
-    ["props_large",  "outfitter_van",    560, 330, 0.0, 1.30],
+    ["props_large",  "outfitter_bus",    560, 330, 0.0, 1.30],
     ["props_small",  "signpost",         520, 322],
 ]
 
@@ -241,9 +246,9 @@ const AmbientFX := preload("res://scripts/ambient_fx.gd")
 # Stage anchors moved per-site into SITE_STAGE (UI-034): _fire_pos,
 # _dog_pos and _board_rect are set from it in _ready once site_id is
 # known.  Pinewatch keeps the authored values every tool references.
-const WARDEN_POS := Vector2(392, 258)
-const MAI_POS := Vector2(512, 274)           # tea corner, east field
-const BOARD_POS := Vector2(396, 322)         # signpost = notice board (UI-023)
+const WARDEN_POS := Vector2(404, 322)
+const MAI_POS := Vector2(540, 320)           # tea corner, east of court
+const BOARD_POS := Vector2(486, 258)         # signpost at road junction (UI-023)
 
 # scatter decal groups by visual family — a cluster commits to ONE so it
 # reads as a patch of something (tuft / flowers / dry grass / pebbles /
@@ -334,7 +339,7 @@ var world: Node2D
 # so campers never vanish behind roofs/canopies (position rect,
 # no physics). Actors register in _build_actors.
 const FADEABLE := ["tree_feathery", "tree_broadleaf",
-                   "outfitter_van", "cabin"]
+                   "outfitter_bus", "cabin"]
 const FADE_ALPHA := 0.35
 const FADE_SPEED := 2.6                      # ~0.25s ramp — their spec
 var fade_zones := []                         # [{s: Sprite2D, r: Rect2}]
@@ -2860,6 +2865,7 @@ func _advance_phase() -> void:
     else:                                      # Night -> next Morning
         hud.set_report("")
         Game.advance_day()                     # set_phase(MORNING) inside
+        Ads.show_interstitial()                # §24.2 pacing-gated mock
         _start_morning()
 
 
@@ -2868,6 +2874,7 @@ func _advance_phase() -> void:
 func _start_morning() -> void:
     evening_open = false
     _clear_cast()                            # last night's cast is home
+    _cast_day()                              # morning ambience joins
     _set_build(false)                          # build tools stay out
     _clear_errands()                           # a new day re-rolls nodes
     _sync_crew_hut()                           # day-2 crew may start here
@@ -2933,7 +2940,7 @@ func _check_dialogue() -> void:
         if not w.is_empty():
             if Game.dialogue_when_ok(w):
                 when_rows.append(d)
-        elif int(d.get("day", -1)) == Game.day:
+        elif int(d.get("day", -1)) == Game.site_day():
             day_rows.append(d)
     _dlg_queue = when_rows + day_rows
     _run_dialogue()
@@ -3059,9 +3066,26 @@ func _cast_evening() -> void:
     _sync_seat_actors()
 
 
+## Day ambience (§3 "alive in ten seconds"): while the player reads
+## the board or works prep, locals + the dog drift the errand loop.
+## Same presenter, calmer cast — no guest parties until dusk.
+func _cast_day() -> void:
+    _sim = SimDirector.cast_day(Game.site_state(), layout,
+        _cast_seed(), _actors_data(), Game.last_night_perfect())
+    if _actor_view == null:
+        _actor_view = ActorView.new()
+        add_child(_actor_view)
+    _actor_view.clear()
+    _actor_view.configure(_sim, _actors_data(), world, _tex,
+        func() -> bool: return panel_mgr.top() != null,
+        WORLD_SCALE * 1.12, _emote_show, _emote_hide)
+
+
 func _recast_if_evening() -> void:
     if Game.phase == Game.Phase.EVENING:
         _cast_evening()
+    elif Game.phase in [Game.Phase.MORNING, Game.Phase.PREP]:
+        _cast_day()                            # build changed the set
 
 
 ## The sim actor IS the guest once cast — the stand-in seat sprite
@@ -3142,6 +3166,7 @@ func _open_booking() -> void:
 
 func _start_prep() -> void:
     Game.set_phase(Game.Phase.PREP)
+    _cast_day()                              # recast over any build edits
     _spawn_errands()
     _status()
 

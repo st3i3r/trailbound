@@ -1,65 +1,95 @@
 {
-  "warmth": [
-    "The fire kept me warm all night.",
-    "Cold camp, warm fire. Just right."],
-  "privacy": [
-    "A quiet corner, exactly what I needed.",
-    "Nobody bothered me. Bliss."],
-  "company": [
-    "Good company at the next pad.",
-    "Made a friend by the fire."],
-  "nature": [
-    "Woke up to birdsong and green.",
-    "The flowers by my tent made my morning."],
-  "light": [
-    "The lanterns made camp feel alive.",
-    "Lit paths, warm light — felt safe all night."],
-  "music": [
-    "Songs by the fire. I stayed up too late.",
-    "Someone played guitar. Best night on the trail."],
-  "dog": [
-    "Your dog visited my tent. Best part of the stay.",
-    "The camp dog slept by my pad. Ten stars."],
-  "play": [
-    "The kids didn't want to leave.",
-    "They played until the stars came out."],
-  "water": [
-    "Slept to the sound of the river.",
-    "Cast a line at dawn. Caught breakfast."],
-  "view": [
-    "That view. I'd pay double for it.",
-    "Sat outside until dark just watching the valley."],
-  "stars": [
-    "Counted constellations until I fell asleep.",
-    "The sky here is unreal."],
-  "favourite": [
-    "They cooked my favourite. I'm coming back.",
-    "You remembered what I like. That means a lot."],
-  "comfort": [
-    "Best sleep I've had on the trail.",
-    "A real bed. My back thanks you."],
-  "rain": [
-    "Everything got wet.",
-    "Rained all night and the pad leaked."],
-  "loud": [
-    "Too much noise next door.",
-    "My neighbours partied past midnight."],
-  "music_bad": [
-    "The music kept me up.",
-    "Charming songs, wrong hour."],
-  "light_bad": [
-    "Too bright to sleep.",
-    "The lantern outside my tent stayed lit all night."],
-  "dog_bad": [
-    "Not a dog person. The dog found me anyway.",
-    "The dog kept sniffing around my tent."],
-  "no_meal": [
-    "Went to bed hungry.",
-    "No dinner? The fire smelled nice at least."],
-  "bare": [
-    "A thin mat on hard ground.",
-    "Slept on roots. Literally on them."],
-  "neutral": [
-    "A fine night under the trees.",
-    "Nothing fancy, nothing wrong."]
+ "warmth": [
+  "The fire kept me warm all night.",
+  "Cold camp, warm fire. Just right."
+ ],
+ "privacy": [
+  "A quiet corner, exactly what I needed.",
+  "Nobody bothered me. Bliss."
+ ],
+ "company": [
+  "Good company at the next pad.",
+  "Made a friend by the fire."
+ ],
+ "nature": [
+  "Woke up to birdsong and green.",
+  "The flowers by my tent made my morning."
+ ],
+ "light": [
+  "The lanterns made camp feel alive.",
+  "Lit paths, warm light — felt safe all night."
+ ],
+ "music": [
+  "Songs by the fire. I stayed up too late.",
+  "Someone played guitar. Best night on the trail."
+ ],
+ "dog": [
+  "Your dog visited my tent. Best part of the stay.",
+  "The camp dog slept by my pad. Ten stars."
+ ],
+ "play": [
+  "The kids didn't want to leave.",
+  "They played until the stars came out."
+ ],
+ "water": [
+  "Slept to the sound of the river.",
+  "Cast a line at dawn. Caught breakfast."
+ ],
+ "view": [
+  "That view. I'd pay double for it.",
+  "Sat outside until dark just watching the valley."
+ ],
+ "stars": [
+  "Counted constellations until I fell asleep.",
+  "The sky here is unreal."
+ ],
+ "favourite": [
+  "They cooked my favourite. I'm coming back.",
+  "You remembered what I like. That means a lot."
+ ],
+ "comfort": [
+  "Best sleep I've had on the trail.",
+  "A real bed. My back thanks you."
+ ],
+ "rain": [
+  "Everything got wet.",
+  "Rained all night and the pad leaked."
+ ],
+ "loud": [
+  "Too much noise next door.",
+  "My neighbours partied past midnight."
+ ],
+ "music_bad": [
+  "The music kept me up.",
+  "Charming songs, wrong hour."
+ ],
+ "light_bad": [
+  "Too bright to sleep.",
+  "The lantern outside my tent stayed lit all night."
+ ],
+ "dog_bad": [
+  "Not a dog person. The dog found me anyway.",
+  "The dog kept sniffing around my tent."
+ ],
+ "no_meal": [
+  "Went to bed hungry.",
+  "No dinner? The fire smelled nice at least."
+ ],
+ "bare": [
+  "A thin mat on hard ground.",
+  "Slept on roots. Literally on them."
+ ],
+ "neutral": [
+  "A fine night under the trees.",
+  "Nothing fancy, nothing wrong."
+ ],
+ "wish": [
+  "You read the card — exactly the spot I hoped for.",
+  "I asked, and the warden listened. Rare, out here.",
+  "The spot they gave me felt chosen, not assigned."
+ ],
+ "wish_bad": [
+  "I asked for something a little different — still, the fire was kind.",
+  "Not quite the spot I'd hoped, but the night was gentle anyway."
+ ]
 }

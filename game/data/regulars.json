@@ -1,59 +1,75 @@
 [
-  {
-    "id": "hung",
-    "name": "Hùng",
-    "site": "pinewatch",
-    "archetype": "scout",
-    "pads": 1,
-    "fee": 35,
-    "traits": ["social", "dog_lover"],
-    "favourite": "herb_tea",
-    "every": 3,
-    "offset": 3,
-    "story_visits": 3,
-    "note": "§12.3: earns a camping badge over 3 visits → Scout Pennant"
-  },
-  {
-    "id": "minh_family",
-    "name": "The Minh family",
-    "card_name": "The Minhs",
-    "site": "pinewatch",
-    "archetype": "family",
-    "pads": 2,
-    "fee": 130,
-    "traits": ["kids", "social"],
-    "loud": true,
-    "favourite": "goi_cuon",
-    "weekend_only": true,
-    "story_visits": 3,
-    "note": "§12.3: weekend visitors (đá cầu kids); usually the first family (P4)"
-  },
-  {
-    "id": "old_ba",
-    "name": "Old Ba",
-    "site": "whisper_river",
-    "archetype": "angler",
-    "pads": 1,
-    "fee": 70,
-    "traits": ["angler", "social"],
-    "favourite": "ca_kho",
-    "every": 3,
-    "offset": 2,
-    "story_visits": 3,
-    "note": "§12.3: knew grandpa; after 3 visits the golden koi appears (W4)"
-  },
-  {
-    "id": "lan",
-    "name": "Lan",
-    "site": "lantern_valley",
-    "archetype": "photographer",
-    "pads": 1,
-    "fee": 95,
-    "traits": ["shutterbug", "introvert"],
-    "favourite": "honey_cakes",
-    "every": 3,
-    "offset": 3,
-    "story_visits": 3,
-    "note": "§12.3: 3 visits, then her photo exhibition (L4 + Photo Wall)"
-  }
+ {
+  "id": "hung",
+  "name": "Hùng",
+  "site": "pinewatch",
+  "archetype": "scout",
+  "pads": 1,
+  "fee": 35,
+  "traits": [
+   "social",
+   "dog_lover"
+  ],
+  "favourite": "herb_tea",
+  "every": 3,
+  "offset": 3,
+  "story_visits": 3,
+  "note": "§12.3: earns a camping badge over 3 visits → Scout Pennant",
+  "wish": "company"
+ },
+ {
+  "id": "minh_family",
+  "name": "The Minh family",
+  "card_name": "The Minhs",
+  "site": "pinewatch",
+  "archetype": "family",
+  "pads": 2,
+  "fee": 130,
+  "traits": [
+   "kids",
+   "social"
+  ],
+  "loud": true,
+  "favourite": "goi_cuon",
+  "weekend_only": true,
+  "story_visits": 3,
+  "note": "§12.3: weekend visitors (đá cầu kids); usually the first family (P4)",
+  "wish": "together"
+ },
+ {
+  "id": "old_ba",
+  "name": "Old Ba",
+  "site": "whisper_river",
+  "archetype": "angler",
+  "pads": 1,
+  "fee": 70,
+  "traits": [
+   "angler",
+   "social"
+  ],
+  "favourite": "ca_kho",
+  "every": 3,
+  "offset": 2,
+  "story_visits": 3,
+  "note": "§12.3: knew grandpa; after 3 visits the golden koi appears (W4)",
+  "wish": "water"
+ },
+ {
+  "id": "lan",
+  "name": "Lan",
+  "site": "lantern_valley",
+  "archetype": "photographer",
+  "pads": 1,
+  "fee": 95,
+  "traits": [
+   "shutterbug",
+   "introvert"
+  ],
+  "favourite": "honey_cakes",
+  "every": 3,
+  "offset": 3,
+  "story_visits": 3,
+  "note": "§12.3: 3 visits, then her photo exhibition (L4 + Photo Wall)",
+  "wish": "view"
+ }
 ]

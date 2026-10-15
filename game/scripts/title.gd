@@ -48,6 +48,13 @@ func _ready() -> void:
         Transition.snap_reveal()
         await get_tree().process_frame
         get_tree().quit()
+    if OS.get_cmdline_args().has("--bench"):
+        Transition.snap_reveal()
+        await get_tree().process_frame
+        await get_tree().process_frame
+        # cold-boot ms: engine start -> first presented title frame
+        print("BENCH boot_ms=%d" % Game.boot_ms())
+        get_tree().quit()
 
 
 func _build() -> void:

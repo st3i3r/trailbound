@@ -1,0 +1,14 @@
+{
+ "save_version": 1, "seed": 7, "day": 4,
+ "site": "pinewatch", "phase": 2, "coins": 90,
+ "sites": {"pinewatch": {"board": [], "decor": [],
+	"assignments": {}, "pads": {}, "counters": {},
+	"reviews": [], "stored": [], "served": {},
+	"campfire": {"cell": [6, 4], "radius": 2},
+	"weather": "clear", "pages_done": []}},
+ "pantry": {}, "meals": [], "gear": [], "recipes": [],
+ "letters": [], "journal": {"vignettes_seen": [],
+	"days_log": [], "personas_met": []},
+ "ads": {"remove_ads": false, "last_interstitial_day": 0,
+	"last_interstitial_utc": 0, "double_tips_used": false}
+}

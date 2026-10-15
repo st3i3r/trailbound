@@ -259,7 +259,9 @@
     "n": 2,
     "goal": "Cook 3 oven recipes",
     "gift": 50,
-    "unlocks": [],
+    "unlocks": [
+     "camera"
+    ],
     "check": {
      "metric": "oven_recipes",
      "target": 3

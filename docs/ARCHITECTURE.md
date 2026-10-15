@@ -15,25 +15,44 @@ One responsibility each; scenes never reach across boundaries.
 | Catalog | `autoload/catalog.gd` | Loads `data/*.json` into `Catalog.data` (untyped Dictionary — callers must declare types; warnings-as-errors). Adding data = drop a file in `data/` |
 | Econ | `autoload/econ.gd` | Pure economy functions (walk-ins, prices) — no state |
 | Seating | `autoload/seating.gd` | Board generation, meal allocation, `resolve_guest` → stars/fee/tip |
-| Save | `autoload/save.gd` | `user://save.json` + `.bak`; tmp-write → copy → rename; `SAVE_VERSION` migrations. Budgets: <100 KB, <100 ms load (§22) |
+| Save | `autoload/save.gd` | `user://save.json` + `.bak`; tmp-write → copy → rename (failure-checked, `report_nonfatal` on write/rename/corrupt paths); `SAVE_VERSION` migrations; `export_text`/`import_text` support seam. Budgets: <100 KB, <100 ms load (§22) |
 | Audio | `autoload/audio.gd` | Buses Music/Ambience/SFX; `play_music` (crossfade), `play_sfx` (pool), `set_ambience_mix(mix)` — N named live layers, caller owns the full mix (absent keys keep their level), deadbanded start/stop |
-| Analytics | `autoload/analytics.gd` | Event wrapper (Firebase when wired) |
-| Ads | `autoload/ads.gd` | Mock ads/consent — console-side work pending (§20) |
-| Platform | `autoload/platform.gd` | OS integration: `WM_CLOSE_REQUEST` → `close_requested` (camp saves then quits) |
+| Analytics | `autoload/analytics.gd` | Event wrapper (Firebase when wired); `CATALOG` is the §25 registry — uncataloged names warn in debug builds |
+| Ads | `autoload/ads.gd` | Mock ads/consent: real pacing gates (interstitial day/gap/skip-after-rewarded, rewarded floor), all §25 ad events emitted; constants read `Platform.remote()` so Remote Config slots in post-launch |
+| Platform | `autoload/platform.gd` | OS seams behind mocks: `remote(key, fallback)` config map, `report_nonfatal` crash capture, launch attribution (`launch_source()` → `app_open`), review/notification gates, entitlement + `iap_restore`, Play Games (achievements, `cloud_save_push/pull` fed by `Save.commit`) |
 | Transition | `autoload/transition.gd` | Scene veil: `reveal()` / `snap_reveal()` (QA) |
 
 ## 2. Systems layer — leaf subsystems (`scripts/systems/`)
 
-`daily`, `dog`, `errands`, `gatherings`, `restore`: each is a
-`RefCounted` owned by Game. **They hold no save state** — the state
-dict stays on Game (so `state_dict()` stays the one schema); the
-object reads `g.<state>` and mutates it; Game keeps one-line
-delegate methods as the public API. New subsystem = same pattern:
-state field on Game, logic file here, no autoload.
+`daily`, `dog`, `errands`, `gatherings`, `restore`, `build`,
+`journal`: each is a `RefCounted` owned by Game. **They hold no save
+state** — the state dict stays on Game (so `state_dict()` stays the
+one schema); the object reads `g.<state>` and mutates it; Game keeps
+one-line delegate methods as the public API. New subsystem = same
+pattern:
+state field on Game, logic file here, no autoload. `build` owns the
+purchase/footprint verbs + undo inverses (§5.8/§6.1); `journal` owns
+letters, Field Notes and page/chapter progression + the unlock ladder
+(§8/§6.7). `postcard` is
+the exception — pure static codec (§33.5 Camp Postcards): packs
+{version, site, seed, decor placements} into a Crockford-base32
+code with an FNV checksum, ~15 chars for a typical camp; decode
+rejects single-char typos and drops unplaceable items, so a typed
+code can never inject illegal state. `Postcard.materialize(code)`
+is the consumer half: code → sandbox site-state that `cast_night`
+accepts unchanged — wanderers at the shared camp, weather and
+rare beats seeded by the code.
 
 `systems/sim/` is the casting layer: Game state → SimWorld entity
-programs (guest idle-at-pad, dog patrol, angler bank-walk). Minimal
-in-code table today; becomes JSON when real scenarios land.
+programs. Two casts: `cast_day` (morning/prep ambience — locals
+drift the errand loop, dog patrols) and `cast_night` (guests at
+pads, dog rounds, queue wanderers at the fire). Programs compose
+op steps (`goto`/`anim`/`wait`/`emote`/`jump`/`select`/`if`/
+`react`/`respond`/`emit`/`await`); the Director wraps every guest
+with a storm select, claims `sockets` off placed decor into
+sit-spot programs, and pairs couples under string_lights for the
+duet (`await` rendezvous). Deterministic — seed-baked jitter,
+labels resolve once at schedule build.
 
 ## 3. Data contracts (`game/data/`)
 
@@ -44,12 +63,17 @@ Catalog loads every `.json` by stem name. Key consumers:
 | `archetypes`, `traits`, `reviews`, `regulars` | board rolls, resolve_guest, guest personas |
 | `sites`, `layouts/*.json` | world geometry, pad/economy rows (three sites defined; pinewatch built) |
 | `crew` | structures, stages, UTC durations |
-| `letters` | journal mail — `trigger.morning` (day-gate + `guests_welcomed>=1`, D-UI-8) or `trigger.event` |
-| `dialogue` | world bubbles keyed site+day, once-ever via `Game.dialogue_seen` |
+| `letters` | journal mail — `trigger.morning` (day-gate + `guests_welcomed>=1`, D-UI-8) or `trigger.event`; `site:"any"` = the wandering mailbag, deduped via `Game.letters_delivered_any` |
+| `dialogue` | world bubbles keyed site + *site-relative* `day` or a `when` gate (`last_stars_min`, `last_weather`, `served_favourite`, `regular_visit`, `first_night`, `last_event`, `returning_min`, `wishes_met_min`, `weather_streak`), once-ever via `Game.dialogue_seen` |
 | `recipes`, `ingredients`, `fusion` | pantry/cooking — `fusion` rows match ingredient *kind* pairs, the tier between exact recipe and `camp_mash` |
-| `decor`, `gear`, `upgrades` | outfitter/build (pending decisions) |
+| `decor`, `gear`, `upgrades` | outfitter/build; `decor.variants` = cosmetic re-skins (`buy_decor_variant`), `unlock:"E:<event>"` = journal-event-gated rows (fund grants) |
+| `fund` | Grandpa's Fund tiers — coins → `journal_event` + grant decor into `stored` + wandering-mail letters; the post-arc sink |
+| `photos` | LV Field Camera shots — `take_photo` once/site-day, print coins, 5 shots → `photo_wall` event |
+| `wishes` | board-card wish labels — `Seating.board` deals a `wish` kind (trait/arch/generic ~50%); `WISH_CAP_KINDS` kinds are dealt only where `Game._wish_kinds` says tonight's pads can grant them (tags, fire-ring, light, sky, adjacent pair); `wish_label` baked on the card; `wish_met` scores +1 star, `days_log.wishes_met` |
+| `margins` | Pinewatch's signature — `read_margin` once/site-day, sequential; `hint.weather` peeks tomorrow's roll, `hint.recipe` writes `pairs_tried` |
 | `chapters` | journal pages + gifts |
-| `birds`, `fish`, `vignettes` | field notes, errands, night vignettes |
+| `birds`, `fish`, `vignettes` | Field Notes catalogs (birds+fish+forage `note` rows), errands, night vignettes; `layouts.errand_spots.fish_tables` = weighted per-bank catches |
+| `festivals` | §13.5 arc-date events: `st["event"]` rolls at morning; `archetype_boost` leans the board, `dish` unlocks a one-night recipe, vignettes trigger on `event` |
 | `gatherings` | Vol II night offers |
 | `daily_seeds` | Trail Daily puzzles |
 | `strings/strings.csv` → `.translation` | EN/VI; regenerate via `godot --import` after edits |
@@ -58,13 +82,24 @@ Catalog loads every `.json` by stem name. Key consumers:
 ## 4. Save pipeline
 
 `Save.default_state()` is the §22 skeleton — **migrations fill keys,
-never remove them**; `_migrate` walks `save_version` up then
-back-fills. `Game.state_dict()` / `load_state()` own the payload:
-per-site dicts, pantry/meals/recipes, journal, letters/dialogue,
-settings, crew. `Vector2i` isn't JSON-safe — `campfire.cell` and
-`decor[].cells` flatten to `[x,y]` pairs on write, rebuild on load.
-`load_state` ends with `crew_tick()` → offline progress applies
-(§8.4). Settings apply at boot so prefs hold on the title screen.
+never remove them**; `_migrate` walks `save_version` up (v2: day
+spines + ads pacing + dog flags), stamps the version, then
+back-fills — top-level keys *and* missing or **type-drifted**
+sub-keys inside the dict-shaped blocks (`ads`, `settings`, `dog`,
+`crew`, `journal`).
+`Game.state_dict()` / `load_state()` own the payload: per-site
+dicts, pantry/meals/recipes, journal, letters/dialogue, settings,
+crew, the day spines (`actions` undo log + `day_log` event stream),
+and `ads` pacing/entitlement state. `Vector2i` isn't JSON-safe —
+`campfire.cell` and `decor[].cells` flatten to `[x,y]` pairs on
+write, rebuild on load. `load_state` ends with `crew_tick()` →
+offline progress applies (§8.4). Settings apply at boot so prefs
+hold on the title screen. Frozen-fixture + round-trip +
+golden-replay + <100KB/<100ms budget checks: `tests/test_save.tscn`
++ `tests/fixtures/save_v1.json`. Seeded verb-fuzz (random public-API
+sequences vs invariants, **undo-inverse round-trips**, same-seed
+replay equality): `tests/test_fuzz.tscn`. A 200-day completionist
+save is asserted under the 100 KB budget in `test_save`.
 
 **Write cadence — commit-on-beat** (D-UI-8): sleep is never the only
 checkpoint; a player who never presses Goodnight still keeps
@@ -73,8 +108,11 @@ everything. Mutating verbs call `Game.touch()` (dirty flag — the 1 s
 (`goodnight`, `advance_day`, `travel_to`), `setting()`,
 `NOTIFICATION_APPLICATION_FOCUS_OUT` (Android background = OS may
 reclaim), the desktop close path, and the quit dialog's Leave call
-`Game.commit()` — an immediate write. `bought_today` serializes so a
-mid-day resume keeps same-day return eligibility.
+`Game.commit()` — an immediate write. `bought_today` is a cache
+derived from the action log (`_refresh_bought()`): buy adds,
+return removes, undo replays — one truth, no parallel bookkeeping.
+v1 saves without an `actions` spine keep their stored list so a
+same-day return still works.
 
 ## 5. Scene flow
 
@@ -139,6 +177,7 @@ curves (wildlife ducks under storm). SFX pool is semantic
 | `--bare/--pose/--night/--morning/--board/--settings/--journal[=<tab>]` | pinewatch | shot staging |
 | `--weather=<p>`, `--storm` | pinewatch | weather QA lock |
 | `--reduced-motion` | pinewatch | exercises the UIFeel policy |
+| `--bench` | title/pinewatch | `BENCH boot_ms=N` — engine boot cost |
 
 `--check-only` can't resolve autoloads (`Audio`, `Catalog` errors
 are artifacts — real compile check is a scene run). Generated wavs:
@@ -204,12 +243,15 @@ sim/view split with ephemeral cast actors; engine/sim parity
 commit-on-beat persistence; facade + leaf subsystems (D-ARCH-2).
 
 **Watch list (not defects today):**
-- `game.gd` ~1.9k lines — state hub, not god-object yet; the
-  leaf-delegate pattern is the pressure valve. Watch ~2.5k.
+- `game.gd` ~2.1k lines post-split — state hub + delegate surface;
+  the purchase and journal verb layers moved to `systems/build.gd`
+  and `systems/journal.gd` (leaf pattern, suite-guarded).
 - `pinewatch_test.gd` ~2.3k lines — world-build + input + smoke +
   cue plumbing in one presenter; the actor-presenter work is the
   planned split (the smoke harness living in-scene is the smell).
-- `SAVE_VERSION=1` — migration machinery has never run for real;
-  the first bump is when §22's promise gets tested.
+- `SAVE_VERSION=2` — real migration path exercised: frozen v1 blob at
+  `tests/fixtures/save_v1.json` drives `test_save`'s fill + stability
+  + *load* checks (the fill also coerces type drift — v1
+  `personas_met` was an Array, now a Dictionary).
 - Sim `t` is float — fine for same-build replay; fixed-point is only
   needed for cross-platform lockstep (not our problem).

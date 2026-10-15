@@ -1,0 +1,38 @@
+[
+ {
+  "id": "lantern_rise",
+  "name": "Lantern Rise",
+  "note": "A hundred lanterns off the valley floor — the shot every photographer comes for.",
+  "coins": 14
+ },
+ {
+  "id": "bend_dusk",
+  "name": "The Bend at Dusk",
+  "note": "Golden hour folds the river in half. Lan says the bend only holds the light for ninety seconds.",
+  "coins": 10
+ },
+ {
+  "id": "night_heron",
+  "name": "Night Heron",
+  "note": "Still as a lantern post until it isn't. One frame, if you're lucky.",
+  "coins": 12
+ },
+ {
+  "id": "valley_fog",
+  "name": "Valley Fog",
+  "note": "The camp floats. Guests' lanterns hang in the white like embers that forgot to burn out.",
+  "coins": 8
+ },
+ {
+  "id": "ember_low",
+  "name": "Low Ember",
+  "note": "The fire at coal-time — Lan taught the warden to meter for the coals, not the flames.",
+  "coins": 10
+ },
+ {
+  "id": "first_lantern",
+  "name": "First Lantern",
+  "note": "The valley's own ritual: someone always lights the first one early, alone.",
+  "coins": 12
+ }
+]
