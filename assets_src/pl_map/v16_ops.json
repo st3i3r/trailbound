@@ -1,0 +1,24 @@
+{
+ "map_id": "819843d7-50f6-4883-a357-421c66027a59",
+ "ops": [
+  {"op": "rect", "terrain": "flat fresh spring-green grass wash, bright clean yellow-green, soft broad tonal patches only, nearly no interior texture, no speckles no blade clusters no repeating pattern, painterly pixel art, warm sunlight upper-left, Eastward style", "x": 0, "y": 0, "width": 24, "height": 16},
+
+  {"op": "rect", "terrain": "smooth flat golden-tan packed earth, warm ochre wash with broad soft tonal patches, almost no interior texture, very few subtle marks, no speckles, painterly pixel art, warm sunlight upper-left, Eastward style", "x": 0, "y": 0, "width": 24, "height": 3},
+  {"op": "rect", "terrain": "smooth flat golden-tan packed earth, warm ochre wash with broad soft tonal patches, almost no interior texture, very few subtle marks, no speckles, painterly pixel art, warm sunlight upper-left, Eastward style", "x": 20, "y": 3, "width": 4, "height": 3},
+  {"op": "rect", "terrain": "smooth flat golden-tan packed earth, warm ochre wash with broad soft tonal patches, almost no interior texture, very few subtle marks, no speckles, painterly pixel art, warm sunlight upper-left, Eastward style", "x": 19, "y": 6, "width": 5, "height": 3},
+  {"op": "rect", "terrain": "smooth flat golden-tan packed earth, warm ochre wash with broad soft tonal patches, almost no interior texture, very few subtle marks, no speckles, painterly pixel art, warm sunlight upper-left, Eastward style", "x": 14, "y": 8, "width": 5, "height": 1},
+  {"op": "rect", "terrain": "smooth flat golden-tan packed earth, warm ochre wash with broad soft tonal patches, almost no interior texture, very few subtle marks, no speckles, painterly pixel art, warm sunlight upper-left, Eastward style", "x": 14, "y": 9, "width": 5, "height": 4},
+  {"op": "rect", "terrain": "smooth flat golden-tan packed earth, warm ochre wash with broad soft tonal patches, almost no interior texture, very few subtle marks, no speckles, painterly pixel art, warm sunlight upper-left, Eastward style", "x": 15, "y": 13, "width": 3, "height": 1},
+  {"op": "rect", "terrain": "smooth flat golden-tan packed earth, warm ochre wash with broad soft tonal patches, almost no interior texture, very few subtle marks, no speckles, painterly pixel art, warm sunlight upper-left, Eastward style", "x": 10, "y": 3, "width": 2, "height": 1},
+  {"op": "rect", "terrain": "smooth flat golden-tan packed earth, warm ochre wash with broad soft tonal patches, almost no interior texture, very few subtle marks, no speckles, painterly pixel art, warm sunlight upper-left, Eastward style", "x": 14, "y": 3, "width": 2, "height": 1},
+
+  {"op": "rect", "terrain": "flat fresh spring-green grass wash, bright clean yellow-green, soft broad tonal patches only, nearly no interior texture, no speckles no blade clusters no repeating pattern, painterly pixel art, warm sunlight upper-left, Eastward style", "x": 2, "y": 1, "width": 5, "height": 3},
+
+  {"op": "rect", "terrain": "smooth flat saturated teal pond water, calm teal wash with very subtle broad tonal bands, nearly no texture, painterly pixel art, warm sunlight, Eastward style", "x": 3, "y": 2, "width": 3, "height": 2},
+  {"op": "rect", "terrain": "smooth flat saturated teal pond water, calm teal wash with very subtle broad tonal bands, nearly no texture, painterly pixel art, warm sunlight, Eastward style", "x": 2, "y": 4, "width": 7, "height": 6},
+  {"op": "rect", "terrain": "smooth flat saturated teal pond water, calm teal wash with very subtle broad tonal bands, nearly no texture, painterly pixel art, warm sunlight, Eastward style", "x": 2, "y": 10, "width": 6, "height": 1},
+  {"op": "rect", "terrain": "smooth flat saturated teal pond water, calm teal wash with very subtle broad tonal bands, nearly no texture, painterly pixel art, warm sunlight, Eastward style", "x": 2, "y": 11, "width": 4, "height": 1},
+  {"op": "rect", "terrain": "smooth flat saturated teal pond water, calm teal wash with very subtle broad tonal bands, nearly no texture, painterly pixel art, warm sunlight, Eastward style", "x": 2, "y": 12, "width": 3, "height": 1}
+ ],
+ "show": true
+}

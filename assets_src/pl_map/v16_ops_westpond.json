@@ -1,0 +1,13 @@
+{
+ "map_id": "819843d7-50f6-4883-a357-421c66027a59",
+ "ops": [
+  {"op": "rect", "terrain": "smooth flat saturated teal pond water, calm teal wash with very subtle broad tonal bands, nearly no texture, painterly pixel art, warm sunlight, Eastward style", "x": 0, "y": 4, "width": 2, "height": 6},
+  {"op": "rect", "terrain": "smooth flat saturated teal pond water, calm teal wash with very subtle broad tonal bands, nearly no texture, painterly pixel art, warm sunlight, Eastward style", "x": 0, "y": 10, "width": 2, "height": 2},
+  {"op": "rect", "terrain": "flat fresh spring-green grass wash, bright clean yellow-green, soft broad tonal patches only, nearly no interior texture, no speckles no blade clusters no repeating pattern, painterly pixel art, warm sunlight upper-left, Eastward style", "x": 5, "y": 4, "width": 2, "height": 6},
+  {"op": "rect", "terrain": "flat fresh spring-green grass wash, bright clean yellow-green, soft broad tonal patches only, nearly no interior texture, no speckles no blade clusters no repeating pattern, painterly pixel art, warm sunlight upper-left, Eastward style", "x": 4, "y": 10, "width": 2, "height": 1},
+  {"op": "rect", "terrain": "flat fresh spring-green grass wash, bright clean yellow-green, soft broad tonal patches only, nearly no interior texture, no speckles no blade clusters no repeating pattern, painterly pixel art, warm sunlight upper-left, Eastward style", "x": 3, "y": 11, "width": 1, "height": 1},
+  {"op": "rect", "terrain": "flat fresh spring-green grass wash, bright clean yellow-green, soft broad tonal patches only, nearly no interior texture, no speckles no blade clusters no repeating pattern, painterly pixel art, warm sunlight upper-left, Eastward style", "x": 5, "y": 2, "width": 1, "height": 2},
+  {"op": "rect", "terrain": "smooth flat golden-tan packed earth, warm ochre wash with broad soft tonal patches, almost no interior texture, very few subtle marks, no speckles, painterly pixel art, warm sunlight upper-left, Eastward style", "x": 21, "y": 9, "width": 2, "height": 7}
+ ],
+ "show": false
+}

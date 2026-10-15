@@ -1,0 +1,15 @@
+{
+ "map_id": "9d7020e7-6bc2-49ef-b55a-c3d25c7b1d69",
+ "ops": [
+  {"op": "rect", "terrain": "none", "x": 3, "y": -1, "width": 3, "height": 1},
+  {"op": "rect", "terrain": "warm ochre packed dirt ground with large soft tonal variation, a few scattered leaf-litter clusters at edges, calm flat wash, painterly pixel art, sun upper-left, warm filmic cast, Eastward cozy RPG style", "x": 2, "y": 0, "width": 5, "height": 1},
+  {"op": "rect", "terrain": "calm warm olive-yellow grass, large flat colour wash with very soft large-scale tonal patches, a rare sparse dither pocket near edges only, absolutely no flowers no tufts no speckles no repeating texture, painterly pixel art, sun upper-left, warm filmic cast, Eastward cozy RPG style", "x": 3, "y": 1, "width": 3, "height": 1},
+  {"op": "rect", "terrain": "calm warm olive-yellow grass, large flat colour wash with very soft large-scale tonal patches, a rare sparse dither pocket near edges only, absolutely no flowers no tufts no speckles no repeating texture, painterly pixel art, sun upper-left, warm filmic cast, Eastward cozy RPG style", "x": 0, "y": 3, "width": 10, "height": 1},
+  {"op": "rect", "terrain": "calm warm olive-yellow grass, large flat colour wash with very soft large-scale tonal patches, a rare sparse dither pocket near edges only, absolutely no flowers no tufts no speckles no repeating texture, painterly pixel art, sun upper-left, warm filmic cast, Eastward cozy RPG style", "x": 12, "y": 3, "width": 2, "height": 1},
+  {"op": "rect", "terrain": "calm warm olive-yellow grass, large flat colour wash with very soft large-scale tonal patches, a rare sparse dither pocket near edges only, absolutely no flowers no tufts no speckles no repeating texture, painterly pixel art, sun upper-left, warm filmic cast, Eastward cozy RPG style", "x": 16, "y": 3, "width": 4, "height": 1},
+  {"op": "rect", "terrain": "warm ochre packed dirt ground with large soft tonal variation, a few scattered leaf-litter clusters at edges, calm flat wash, painterly pixel art, sun upper-left, warm filmic cast, Eastward cozy RPG style", "x": 10, "y": 3, "width": 2, "height": 1},
+  {"op": "rect", "terrain": "warm ochre packed dirt ground with large soft tonal variation, a few scattered leaf-litter clusters at edges, calm flat wash, painterly pixel art, sun upper-left, warm filmic cast, Eastward cozy RPG style", "x": 14, "y": 3, "width": 2, "height": 1},
+  {"op": "rect", "terrain": "sandy-grey mossy flagstone path, large rounded cobbles with wide earth gaps, low-contrast joints, occasional moss patch clustered in one corner region, calm and readable, painterly pixel art, sun upper-left, warm filmic cast, Eastward cozy RPG style", "x": 21, "y": 7, "width": 2, "height": 2}
+ ],
+ "show": true
+}

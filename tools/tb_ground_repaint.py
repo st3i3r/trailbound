@@ -8,14 +8,15 @@ CURRENT composite so AI always sees painted context at shared edges.
 At composite time the tile's LEFT/TOP edges get a 24px feather toward
 the neighbor. Prompts are per-tile zone descriptions read from the mask.
 
-  python tools/tb_ground_repaint.py [out.png]
+  python tools/tb_ground_repaint.py [out.png] [mask.txt] [base.png]
 """
 import base64, io, json, subprocess, sys, time
 import numpy as np
 from PIL import Image
 
-BASE = "game/assets/pinewatch/terrain/ground_painted.png"
-MASKF = "assets_src/stage/pinewatch_mask.txt"
+BASE = sys.argv[3] if len(sys.argv) > 3 else \
+    "game/assets/pinewatch/terrain/ground_painted.png"
+MASKF = sys.argv[2] if len(sys.argv) > 2 else "assets_src/stage/pinewatch_mask.txt"
 OUT = sys.argv[1] if len(sys.argv) > 1 else "assets_src/stage/ground_ai.png"
 CLI = ["python", "tools/pixellab_mcp.py"]
 TILE = 32
