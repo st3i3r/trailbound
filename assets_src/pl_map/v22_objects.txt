@@ -1,0 +1,226 @@
+257 objects placed on trailbound_pinewatch_v16_fresh
+
+placed more than once (asset_id -> count):
+  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 27)  x45
+  7e5bbc75-3326-4942-91d3-86962187a3cd  base  x44
+  5dfe6b5c-e881-4933-a669-af5fcff44737  base  x33
+  a8e209be-9227-4666-9972-384711351dd7  base (Copy 60)  x23
+  01dbe303-940b-44ec-87b8-66ae1dc5db7c  base  x13
+  28bff839-17ae-4e59-9efc-786f7afe1503  base  x12
+  36dcc133-b25b-4f61-9e18-4012b1eed41d  base  x12
+  7a9292b3-fd1e-4785-8d48-41dbd41bcac5  tall grass tuft  x7
+  8fe50b37-d661-4f51-ac31-5f0d7431ae76  base  x7
+  3c52ae3b-8fcc-46f3-8809-07d477dda44e  base  x6
+  2daa8671-9a5b-4830-91cd-da15473c91f0  base  x4
+  d3c43bde-3d0d-4bb9-ab6a-43400a61bd93  base  x4
+  16f2219f-e770-4041-9750-ffd62b045f08  base (Copy)  x3
+  db6d70e8-88ff-4555-9cda-86695c0c5a8f  base  x3
+  5076d4a6-4d55-4a95-a0ce-0f44f3abd666  base  x3
+  4f2087b3-19ad-42a1-81e2-8e20558e014f  base  x3
+  29ba916e-298b-4250-8581-7257b0d356e6  base  x2
+  c6cc3d35-d0b1-4b3e-bc7d-3239a393faca  base  x2
+hint: remove_map_object(map_id="819843d7-50f6-4883-a357-421c66027a59", asset_id="<one above>") clears every placement of one asset in a single call
+
+placement_id                          asset_id                              name                  stands_on  size_cells  layer  status
+841b08bb-2719-40df-aa98-a818d66559bf  89c7cef0-b320-49db-9c71-406a6a48dff6  birdhouse on a short… (1,3)      1.3x1.3     45     ok
+2beb32d2-c37c-41d0-a2e9-7285adfb8080  929a352d-aa7f-4c11-b388-900ac5cbdae0  clothesline with two… (8,6)      1.3x1.3     28     ok
+8b9404f0-7015-422d-a90c-b0a79f0887ed  8d32b54c-3939-470c-81ba-e1a8934ec8c1  reception_board       (19,5)     2x2         14     ok
+1a58c7dc-0267-47a4-8889-4abbd9bf4361  9cbd19f4-dc24-4183-acc7-a6ae4f58e0ee  woven bamboo basket … (8,7)      1x1         90     ok
+48258750-6597-462a-ac17-0c2df15758a6  086e3ef4-c5bc-4bd4-9210-4ea590b1ab33  woven bamboo basket … (8,7)      1x1         90     ok
+b8f9b470-b6de-4140-8bc7-649b548a444f  f91277ee-0b83-44de-a74f-221b5441504a  house                 (-3,0)     2x2         16     ok
+cb9342d4-cb54-4bed-ba1a-111ce7790ec8  5d0ca814-2f06-47a3-a6fa-836814c62f62  clump of shore reeds… (2,4)      2.7x2.7     33     ok
+23cabaee-1e9c-44a5-a72b-3475118feadb  71c6c441-dca6-4fd0-92e8-701599f92cc4  heron                 (5,9)      1x1         100    ok
+0997ad7f-4def-4f58-827d-85e6aab2dc00  8a0700fa-4902-44da-b7b4-d50fce0e5254  kingfisher            (1,2)      1x1         50     ok
+984d7003-74ea-4d85-aa19-96c2de8fd007  d29b2ede-f5fb-4ed6-a057-aed6cc813b5c  pink wildflowers      (5,11)     0.5x0.5     130    ok
+3296772f-cf88-41ed-8f4d-00e0e32c46d6  0655b192-803a-49be-a94f-d299313cdf76  scatter of brown pin… (18,4)     0.5x0.5     30     ok
+24cf31db-fe27-425e-9519-f81d1340c270  45b77774-b4c4-4a3f-8ca6-5784d0c42c41  short grass tuft      (11,12)    0.5x0.5     120    ok
+b110c333-b4ed-40c4-87bf-4491e9a24d9e  7a9292b3-fd1e-4785-8d48-41dbd41bcac5  tall grass tuft       (19,4)     0.5x0.5     130    ok
+2ae181c0-3e22-40d0-b3e4-1618842f8052  3f53b577-fa05-4ad3-b042-e673d7b7ffba  base                  (17,4)     2x2         10     ok
+968f3859-979c-4991-b5a5-407497f6bcfa  2e5d5ea9-756c-4137-a7e4-d358bde4489b  base                  (1,11)     2x2         19     ok
+ccec12f6-cb09-46ed-80b6-411615b2780f  16f2219f-e770-4041-9750-ffd62b045f08  base (Copy)           (3,2)      2.7x2.7     19     ok
+d8f041da-a5dd-46f4-be54-caf10cb596d3  16f2219f-e770-4041-9750-ffd62b045f08  base (Copy 2)         (19,0)     2.7x2.7     6      ok
+eb9dbe23-ed6b-4cbe-9d0e-8ec65e4aa064  16f2219f-e770-4041-9750-ffd62b045f08  base (Copy 5)         (4,-1)     2.7x2.7     3      ok
+9ee557a0-bea3-46d2-8c5a-9f8c1975c8c0  a1c7533e-f914-4763-8a59-dc87774ae2d0  base                  (8,11)     1.3x1.3     23     ok
+cd5c3987-4a17-4f2c-a020-8d79ba0c3cdd  8ae7ba3e-7c4d-4753-9d76-fc3fd3f96f01  base                  (14,13)    2x2         12     ok
+00c816c8-0a1c-4a85-a327-0128ececc368  5dfe6b5c-e881-4933-a669-af5fcff44737  base                  (0,5)      1.3x1.3     25     ok
+77f772a3-f9fc-41e6-803b-54956c56f732  5dfe6b5c-e881-4933-a669-af5fcff44737  base                  (0,12)     1.3x1.3     9      ok
+ade4f51c-7cb5-483b-ad16-397a550a79cb  db6d70e8-88ff-4555-9cda-86695c0c5a8f  base                  (2,5)      2x2         43     ok
+6970d795-6488-4c78-9274-9e925cd1fb19  7e5bbc75-3326-4942-91d3-86962187a3cd  base                  (15,0)     3.0x3.3     7      ok
+00f2c0f9-6b1c-4c34-8df8-5df9da6a8b2a  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 4)         (9,0)      3.0x3.3     6      ok
+d38f68be-6638-4278-8a6a-bf00d935dc2c  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 7)         (8,-1)     3.0x3.3     4      ok
+8302f5ba-3990-47b5-ab69-ffac252a4d9b  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 9)         (11,-1)    3.0x3.3     3      ok
+6a21a279-bdfc-4f8d-a5c4-0ece6ed08593  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 10)        (14,-1)    3.0x3.3     5      ok
+6beafae3-2d3a-4706-822e-dbfa17ef2d78  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 13)        (-1,-2)    3.0x3.3     4      ok
+341638ed-854c-440c-bd0a-559aff6f145f  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 11)        (-3,-2)    3.0x3.3     3      ok
+cf04b644-1464-4dcf-838a-afbfcc4b5ba9  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 12)        (2,0)      3.0x3.3     4      ok
+fd9ff228-fc21-4cc2-a69e-2390f64a1a1a  2daa8671-9a5b-4830-91cd-da15473c91f0  base                  (-3,-1)    2.7x2.7     3      ok
+e8c48519-c697-42bf-aca0-ceae782bb5e2  2daa8671-9a5b-4830-91cd-da15473c91f0  base (Copy 3)         (-4,-1)    2.7x2.7     3      ok
+44ed7286-fcfc-421b-a42a-79c21c029f6c  2daa8671-9a5b-4830-91cd-da15473c91f0  base (Copy 8)         (10,-1)    2.7x2.7     2      ok
+80dfdfc4-f778-464c-9d97-064c52d2a3b5  2daa8671-9a5b-4830-91cd-da15473c91f0  base (Copy 14)        (18,-2)    2.7x2.7     2      ok
+e7288e5c-4b19-4947-b33e-4d3c5da752e3  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 15)        (13,0)     3.0x3.3     7      ok
+865d5a68-d538-4f76-b28c-ddc58a4643b6  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 16)        (16,-1)    3.0x3.3     4      ok
+6edde35b-365e-41b8-976a-437695f563b3  29ba916e-298b-4250-8581-7257b0d356e6  base                  (14,0)     1.2x1.2     4      ok
+baa48f50-2cd6-4999-b9cc-5c733c06b96c  db6d70e8-88ff-4555-9cda-86695c0c5a8f  base (Copy 17)        (5,9)      2x2         17     ok
+852273eb-0a7c-481f-99a6-ec9bab492b37  8fe50b37-d661-4f51-ac31-5f0d7431ae76  base                  (6,7)      1.2x1.2     15     ok
+0832dc19-6e70-4506-9b75-abb0780a2787  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 18)        (1,12)     1.3x1.3     14     ok
+23a2bad1-8888-411d-8a4e-d5787f62c1ac  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 6)         (1,5)      1.3x1.3     25     ok
+a5ea6877-29f6-432e-b8ee-21f48d4dfefe  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 19)        (19,-1)    3.0x3.3     3      ok
+b338c175-a64a-41a8-a5df-d070b1e46a1a  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 20)        (21,0)     3.0x3.3     6      ok
+86986fd9-1c1a-4056-acaf-af1e90f0a348  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 21)        (17,0)     3.0x3.3     7      ok
+4c767555-3a57-4f3e-b9e0-8fa5c9c7461a  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 22)        (18,-1)    3.0x3.3     5      ok
+610e0f59-756c-4065-be12-5f3417d6fb91  8fe50b37-d661-4f51-ac31-5f0d7431ae76  base                  (-2,0)     1.2x1.2     6      ok
+43b5d0b1-428c-45c8-955b-5c2e926ededa  6850b9be-179d-48a8-94aa-fcf1c06e3ec4  base                  (1,0)      2.7x2.7     2      ok
+10273727-35fd-4054-aa83-ee4753133f59  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 23)        (3,-2)     3.0x3.3     1      ok
+e714ca5b-cfd7-4c17-b856-b1c303327f44  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 24)        (2,-2)     3.0x3.3     2      ok
+97b896d3-dd6f-4fb1-87eb-5c06ef31c143  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 34)        (-1,5)     1.3x1.3     25     ok
+159d8cd3-7c7e-4b95-b8b4-9dcacc4bb680  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 35)        (-1,12)    1.3x1.3     14     ok
+3f36dacd-645b-4cc6-a5c9-3ac6e26dfa1e  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 36)        (-2,5)     1.3x1.3     25     ok
+eb72552f-ff7c-475e-9302-707285d49668  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 37)        (-2,12)    1.3x1.3     12     ok
+00ae1f09-6991-4174-86f6-34afaf8bdff3  40fe5b8b-059e-4ea2-a4d6-11b3fc0ee853  base                  (11,1)     2.7x2.7     4      ok
+f62fb685-dddc-437d-881b-b4d312c588cd  01dbe303-940b-44ec-87b8-66ae1dc5db7c  base                  (2,12)     1.3x1.3     18     ok
+1ec0b220-7cb6-4dfc-b82b-b315c4c687d6  01dbe303-940b-44ec-87b8-66ae1dc5db7c  base (Copy 32)        (2,11)     1.3x1.3     18     ok
+1640c70f-2459-414a-954d-c290ddfef11a  01dbe303-940b-44ec-87b8-66ae1dc5db7c  base (Copy 38)        (3,11)     1.3x1.3     25     ok
+25da3d34-2b65-44af-bc50-487312b9ae47  01dbe303-940b-44ec-87b8-66ae1dc5db7c  base (Copy 39)        (3,10)     1.3x1.3     26     ok
+5d3f837e-6f7f-432f-b34c-d8db4e27f7d8  01dbe303-940b-44ec-87b8-66ae1dc5db7c  base (Copy 40)        (4,10)     1.3x1.3     32     ok
+38249699-a4a5-4e4d-ae1c-1303ff70f0e5  01dbe303-940b-44ec-87b8-66ae1dc5db7c  base (Copy 41)        (4,10)     1.3x1.3     32     ok
+1996c437-a2ec-4f7b-9cd1-b69914016576  db6d70e8-88ff-4555-9cda-86695c0c5a8f  base (Copy 42)        (5,9)      2x2         29     ok
+5f4c58af-9289-45d7-b85e-8623399958bf  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 27)        (4,-1)     0.5x0.5     1      ok
+1a34513a-de73-49da-8b7b-c510206a6631  01dbe303-940b-44ec-87b8-66ae1dc5db7c  base (Copy 30)        (5,10)     1.3x1.3     32     ok
+49b29cc1-37e1-4a5f-838a-d99b78a1a75a  8fe50b37-d661-4f51-ac31-5f0d7431ae76  base (Copy 31)        (2,12)     1.2x1.2     22     ok
+619246d1-b79c-43ed-9cfe-25c8ecec0055  d3c43bde-3d0d-4bb9-ab6a-43400a61bd93  base                  (2,12)     1.2x1.2     14     ok
+ae0caa6b-1a9f-4371-a745-34097bfa8a1a  c6cc3d35-d0b1-4b3e-bc7d-3239a393faca  base                  (2,5)      1.2x1.2     78     ok
+70e1eeca-17c2-4155-ad9d-cc8a151f4756  6a4b5b8b-09dd-4ff8-b878-6e159925cf6c  base                  (6,14)     2x2         16     ok
+fbc701a0-6f60-462f-9cee-78bc8109e21f  3c52ae3b-8fcc-46f3-8809-07d477dda44e  base                  (15,14)    1.3x1.3     71     ok
+1510ebc0-7dfb-4314-a651-ad62908923a8  3c52ae3b-8fcc-46f3-8809-07d477dda44e  base (Copy 25)        (14,14)    1.3x1.3     71     ok
+0cd19835-a0a8-49c0-8848-4260204c513d  3c52ae3b-8fcc-46f3-8809-07d477dda44e  base (Copy 26)        (13,14)    1.3x1.3     71     ok
+727ef251-5db2-409b-96cb-5e922c4a6cf0  3c52ae3b-8fcc-46f3-8809-07d477dda44e  base (Copy 33)        (12,14)    1.3x1.3     71     ok
+9f59bc19-8a8f-42c2-af46-8571d67b068a  3c52ae3b-8fcc-46f3-8809-07d477dda44e  base (Copy 43)        (7,14)     1.3x1.3     71     ok
+980c3809-9279-4687-949c-50b224ed17df  3c52ae3b-8fcc-46f3-8809-07d477dda44e  base (Copy 44)        (8,14)     1.3x1.3     71     ok
+48c0b081-b67c-433f-b456-04cd445318e9  28bff839-17ae-4e59-9efc-786f7afe1503  base                  (10,4)     1.3x1.3     7      ok
+f26a2370-e01d-4089-af08-ac15743cf96d  28bff839-17ae-4e59-9efc-786f7afe1503  base (Copy 45)        (9,4)      1.3x1.3     7      ok
+ed473a2c-fe52-41e5-a8e4-40cda26ce03f  28bff839-17ae-4e59-9efc-786f7afe1503  base (Copy 46)        (8,4)      1.3x1.3     7      ok
+04d43ad2-8fbb-4937-82d1-440e1bcd0372  28bff839-17ae-4e59-9efc-786f7afe1503  base (Copy 47)        (14,4)     1.3x1.3     7      ok
+7f83a82b-d3b2-4f9c-82ae-61746faf4d3e  28bff839-17ae-4e59-9efc-786f7afe1503  base (Copy 48)        (19,4)     1.3x1.3     7      ok
+79203714-110b-42ab-adcb-4a6bd54bb448  28bff839-17ae-4e59-9efc-786f7afe1503  base (Copy 49)        (16,4)     1.3x1.3     7      ok
+3cdf3d55-62e6-44c3-b068-cf36f4bf3ecc  28bff839-17ae-4e59-9efc-786f7afe1503  base (Copy 50)        (15,4)     1.3x1.3     7      ok
+efc09282-cf9d-4fb7-bb78-4273ffb584b6  28bff839-17ae-4e59-9efc-786f7afe1503  base (Copy 51)        (24,4)     1.3x1.3     7      ok
+52ad4581-6eb2-4873-9356-aeb7144b9aab  28bff839-17ae-4e59-9efc-786f7afe1503  base (Copy 52)        (18,4)     1.3x1.3     7      ok
+ecec8eee-dd3e-4cf2-8fe3-9bb85802f08c  5076d4a6-4d55-4a95-a0ce-0f44f3abd666  base                  (1,8)      1.2x1.2     14     ok
+26e81056-78ca-4edd-a872-ea492875d89a  6001ebb7-91b9-43a8-9a33-c0bdbcb27190  base                  (7,5)      2.7x2.7     20     ok
+ae7debd4-92aa-475b-b908-1b03a96f2d42  01dbe303-940b-44ec-87b8-66ae1dc5db7c  base                  (7,8)      1.3x1.3     10     ok
+c73ff7cc-0f37-4ffa-9ebc-07a7032ae6ea  01dbe303-940b-44ec-87b8-66ae1dc5db7c  base (Copy 53)        (9,8)      1.3x1.3     11     ok
+8c3d2313-a755-4cfa-ade0-b22e8d2d516b  01dbe303-940b-44ec-87b8-66ae1dc5db7c  base (Copy 54)        (8,8)      1.3x1.3     10     ok
+a15f5c96-b59e-41da-a29e-091cfe72c3d6  01dbe303-940b-44ec-87b8-66ae1dc5db7c  base (Copy 55)        (11,8)     1.3x1.3     10     ok
+9cdee502-80ed-4e4f-8743-e2b08209b5b4  01dbe303-940b-44ec-87b8-66ae1dc5db7c  base (Copy 56)        (21,7)     1.3x1.3     12     ok
+decbccdc-c195-4e1c-951d-ee978153eb50  01dbe303-940b-44ec-87b8-66ae1dc5db7c  base (Copy 57)        (22,7)     1.3x1.3     12     ok
+17f240ea-88a5-4619-9920-dcad0ba3fe9b  5076d4a6-4d55-4a95-a0ce-0f44f3abd666  base (Copy 59)        (-1,7)     1.2x1.2     11     ok
+624ea009-1aaf-48fe-ac12-a44bb584f96f  031ce154-b8f1-49f6-9a03-72398c87d5e9  base                  (15,13)    1.3x1.3     17     ok
+8dc5b13c-88d4-43ab-a813-c53c382f995d  9e39ce41-bca0-4cd7-bd3c-4e398c07e085  base                  (23,4)     0.6x2.5     10     ok
+c0bba2e9-6a1d-49c0-8b11-aa62513605e8  28bff839-17ae-4e59-9efc-786f7afe1503  base (Copy 58)        (23,4)     1.3x1.3     7      ok
+789c6dfb-c06d-4e68-9038-d1cf3c4a2edf  49a56c61-db66-48bc-a476-bde0b7d27be9  base                  (6,10)     1.3x1.3     99     ok
+20817313-1fb6-4994-887f-72d0b2766651  a8e209be-9227-4666-9972-384711351dd7  base (Copy 60)        (5,12)     1.2x1.2     15     ok
+1ad6ff09-ace5-42d8-bf1e-d3f2a5df6b70  a8e209be-9227-4666-9972-384711351dd7  base (Copy 61)        (4,12)     1.2x1.2     15     ok
+17d06ade-78cf-4656-95cc-4a243f4feecb  a8e209be-9227-4666-9972-384711351dd7  base (Copy 62)        (22,7)     1.2x1.2     6      ok
+ac549d3e-1de8-41ee-80c2-fb686615acec  a8e209be-9227-4666-9972-384711351dd7  base (Copy 63)        (4,12)     1.2x1.2     15     ok
+0d845ae5-e5fe-441c-86d6-1bbda301f607  4f2087b3-19ad-42a1-81e2-8e20558e014f  base                  (18,0)     1.2x1.2     8      ok
+0fe38640-f4b5-4c1c-9454-7c9d029f95de  4f2087b3-19ad-42a1-81e2-8e20558e014f  base (Copy 64)        (0,-1)     1.2x1.2     3      ok
+22cde9df-6a28-4f82-accd-50220f14f617  4f2087b3-19ad-42a1-81e2-8e20558e014f  base (Copy 65)        (3,0)      1.2x1.2     3      ok
+04da36f9-439f-4626-bc1c-de4c3f9c02fe  c6cc3d35-d0b1-4b3e-bc7d-3239a393faca  base (Copy 67)        (6,-1)     1.2x1.2     78     ok
+7be46837-bd10-454b-a4a3-011311b848cb  be2e9fce-9686-491f-a83f-c482971b9745  base                  (8,0)      1.3x1.3     2      ok
+5a841acf-38b6-4c66-86ca-a9423f063760  3d04bd46-872c-4caf-8d30-6023b3b951ed  base                  (10,8)     4x4         8      ok
+b023ef46-54c0-4f24-b743-c671ae20765e  5dfe6b5c-e881-4933-a669-af5fcff44737  base                  (-2,1)     1.3x1.3     16     ok
+c0477cb1-e388-47c1-b788-57592cc921c9  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 68)        (0,1)      1.3x1.3     16     ok
+706754a6-3f6d-4d40-8d19-c1f2ffb97440  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 69)        (1,1)      1.3x1.3     16     ok
+777587b4-8bd4-4927-ae66-4e69dc969b2c  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 70)        (2,1)      1.3x1.3     16     ok
+679bdebe-da04-4a65-96f7-353ab2642187  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 71)        (3,1)      1.3x1.3     16     ok
+3185c24f-1f3e-4306-a43d-98e71cd87e3e  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 72)        (11,2)     1.3x1.3     16     ok
+9cc95f1e-5703-4cf7-86ee-21b59a7e2834  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 73)        (12,2)     1.3x1.3     16     ok
+563741e3-23b0-4b72-b237-afe21bab4aa4  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 74)        (15,2)     1.3x1.3     16     ok
+6ccc28c1-0f79-4f20-b52f-059252827796  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 75)        (16,2)     1.3x1.3     16     ok
+6e897f6e-800a-467d-b653-7f2de2208340  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 76)        (17,2)     1.3x1.3     16     ok
+c1485b2c-32ed-4bdb-be27-5dbd187ee6e0  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 77)        (18,2)     1.3x1.3     16     ok
+531089b0-b950-4f7a-aa51-d6aa9a3eb5f1  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 78)        (22,2)     1.3x1.3     16     ok
+15c2368f-4762-4e63-ac4f-8ce94106db26  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 79)        (20,2)     1.3x1.3     16     ok
+cd957e89-0f0b-4de0-aca8-269b6bda03a5  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 80)        (21,2)     1.3x1.3     16     ok
+c842d635-8644-4893-962a-864af052d76b  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 81)        (14,2)     1.3x1.3     16     ok
+54f1fa8d-0694-4f59-ba27-981da1ca5ece  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 82)        (8,2)      1.3x1.3     16     ok
+5a5f8a0f-24e5-4db3-bb2b-37d9395d4365  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 83)        (9,2)      1.3x1.3     16     ok
+e08720fa-82cd-4405-8225-be58cb6f6381  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 84)        (10,2)     1.3x1.3     16     ok
+be7e3612-0b95-4ed8-91c1-0d960b28c21d  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 85)        (23,2)     1.3x1.3     16     ok
+eb746d13-73d2-486c-930d-c2d440c47ad5  fe40b689-1092-46ed-a7a9-4b98bc278507  base                  (24,2)     0.5x0.5     17     ok
+d99b87a5-3fea-4717-8cc1-691ff0d4f1ea  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 86)        (23,2)     0.5x0.5     17     ok
+f447c694-2fc1-4602-8ba3-73bd25f8357d  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 87)        (23,2)     0.5x0.5     17     ok
+70facad7-2f17-46a3-8ab3-d3a755caa3ca  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 88)        (23,2)     0.5x0.5     17     ok
+50b25a75-e730-4df7-b28b-e393c9b17ad0  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 89)        (22,2)     0.5x0.5     17     ok
+8831c319-52e6-40fe-b08d-c95c79700ac6  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 90)        (22,2)     0.5x0.5     17     ok
+725abd9d-9f7f-4704-9fea-656791d77629  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 91)        (21,2)     0.5x0.5     17     ok
+4a7e7423-f91b-4936-82a4-b249fa39c9de  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 92)        (21,2)     0.5x0.5     17     ok
+5d407835-4b7e-46b8-9085-4d5297bf405d  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 93)        (20,2)     0.5x0.5     17     ok
+1456435c-b61a-4697-8b86-217dc2cb4a86  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 94)        (20,2)     0.5x0.5     17     ok
+651dd1ee-42f9-466e-8545-ce7da462904e  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 95)        (20,2)     0.5x0.5     17     ok
+aeca6d98-59a6-45c2-b889-ad00b14475c4  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 96)        (19,2)     0.5x0.5     17     ok
+9c70736e-05dc-448e-934c-057fd15541ab  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 97)        (19,2)     0.5x0.5     17     ok
+6f4b461c-450d-4765-a63f-0a1facb6ca80  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 98)        (18,2)     0.5x0.5     17     ok
+a132f714-73fe-47d4-9c2e-422b0284a4b1  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 99)        (18,2)     0.5x0.5     17     ok
+d175c96c-eb56-4e66-8056-bcfb0236727c  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 100)       (18,2)     0.5x0.5     17     ok
+a3e33d1b-37c8-4653-bc00-5a33b1644d24  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 101)       (17,2)     0.5x0.5     17     ok
+112f1390-d91d-40d4-9093-a2ecc1c7ac51  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 102)       (17,2)     0.5x0.5     17     ok
+6050fe14-268e-4252-bf88-831893076e7a  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 103)       (16,2)     0.5x0.5     17     ok
+dad2ec4b-c3c8-43c7-96aa-f6779bf1e16f  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 104)       (16,2)     0.5x0.5     17     ok
+eaeba3d8-9442-404d-900d-8a9665d4d35a  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 105)       (16,2)     0.5x0.5     17     ok
+83243d7d-d76c-4fa8-aee8-824d02691557  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 106)       (15,2)     0.5x0.5     17     ok
+985657d3-7b68-4b0b-8295-1012c9e44cd2  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 107)       (15,2)     0.5x0.5     17     ok
+afc149cb-2519-41fd-91c1-68470ed4cfc9  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 108)       (14,2)     0.5x0.5     17     ok
+04fa2237-77fb-4ecc-a86b-2d0cc8540d55  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 109)       (14,2)     0.5x0.5     17     ok
+7cb74d53-7784-434a-8c0d-2f2c3126f17a  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 110)       (13,2)     0.5x0.5     17     ok
+e3d46901-c94c-448f-90ea-429c138fc860  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 111)       (13,2)     0.5x0.5     17     ok
+cf6073ec-d736-48f3-b742-e9335e2b640d  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 112)       (13,2)     0.5x0.5     17     ok
+252b5861-c140-44f4-a3fc-f9fe01b36a03  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 113)       (12,2)     0.5x0.5     17     ok
+26cb4e16-b21a-4649-8464-388c19423ccb  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 114)       (12,2)     0.5x0.5     17     ok
+eff59a18-05e4-44f9-8142-6254ebe9ffc9  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 115)       (11,2)     0.5x0.5     17     ok
+8ceb242c-3d5e-4bd2-8fb9-7ba98314ff02  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 116)       (11,2)     0.5x0.5     17     ok
+3ec56d3b-0023-4309-8e49-88fa0db70a71  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 117)       (10,2)     0.5x0.5     17     ok
+d59b3734-2070-41df-941c-650b4eec92b1  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 118)       (10,2)     0.5x0.5     17     ok
+fd3df07d-37ff-45f7-9034-2d62cd80cc0c  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 119)       (9,2)      0.5x0.5     17     ok
+dc2172f8-23bb-47b3-b1d8-8166436f5e69  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 120)       (9,2)      0.5x0.5     17     ok
+8c689424-3e40-42c4-8498-68fa83cf4883  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 121)       (9,2)      0.5x0.5     17     ok
+cc037a79-d40a-4143-a9fa-2033c8d7f265  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 122)       (8,2)      0.5x0.5     17     ok
+7e757298-80bd-4c5e-98a5-1131ae11e9c8  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 124)       (8,2)      0.5x0.5     17     ok
+83fbf832-ef29-428a-939e-1412f74f8183  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 28)        (4,-1)     0.5x0.5     1      ok
+3abdb4df-efb6-4f97-b204-765f2c5d41a4  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 29)        (4,-1)     0.5x0.5     1      ok
+7359c689-52be-4c71-95bb-b676331891c0  142d23d7-1566-4048-96fe-497ecf595715  base                  (14,7)     2x2         168    ok
+347ac801-2a9f-4063-a2b0-7c59bbcf4cf0  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 123)       (24,2)     1.3x1.3     16     ok
+651f9a2b-59a5-4aab-8896-80886b62ce74  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 125)       (25,2)     0.5x0.5     17     ok
+e4ff96b6-c42a-4c26-ac07-89a2dd58d47e  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 126)       (24,2)     0.5x0.5     17     ok
+fca92cd1-eb33-494e-965d-bf71c1bb5397  28bff839-17ae-4e59-9efc-786f7afe1503  base (Copy 127)       (25,4)     1.3x1.3     7      ok
+21002f87-c1e9-4f13-a7f8-23a4fe76d15a  24bf3073-2a1b-4259-aaf9-748a193eaae6  base                  (8,3)      2x2         17     ok
+28828b73-311b-4b4e-a0cd-e36c97bf3c63  8fe50b37-d661-4f51-ac31-5f0d7431ae76  base                  (11,4)     1.2x1.2     7      ok
+17399461-bb39-43ad-ab8b-02c9b5a5ef1f  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 128)       (-4,12)    1.3x1.3     25     ok
+9575640a-7f6a-4805-99f4-51bd4f2ae31a  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 129)       (-3,12)    1.3x1.3     9      ok
+83d65e13-1a62-4bb8-b324-5f49e3ab133b  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 130)       (-3,5)     1.3x1.3     25     ok
+d3625fe9-f9c9-42e6-a6ca-9cbe665e16ed  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 131)       (-4,5)     1.3x1.3     25     ok
+21142d9b-ad22-44d0-918a-7aba894d8449  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 133)       (0,-2)     3.0x3.3     2      ok
+80d9db3c-a1b9-4e27-9e69-77090ffd8b63  7e5bbc75-3326-4942-91d3-86962187a3cd  base (Copy 134)       (0,0)      3.0x3.3     4      ok
+d13720ed-cb1c-45ac-9dab-2dfd1f85e218  a8e209be-9227-4666-9972-384711351dd7  base (Copy 132)       (22,7)     1.2x1.2     6      ok
+805beff9-e3bf-4b32-adf0-dfe7ddfbcf6e  a8e209be-9227-4666-9972-384711351dd7  base (Copy 135)       (20,6)     1.2x1.2     6      ok
+6c0e5f17-4548-45bd-a9a2-f3531a8b99b5  a8e209be-9227-4666-9972-384711351dd7  base (Copy 136)       (20,6)     1.2x1.2     6      ok
+277b622d-9f44-4204-ac82-cb1f24c480aa  a8e209be-9227-4666-9972-384711351dd7  base (Copy 137)       (21,7)     1.2x1.2     6      ok
+7b339d4e-80dc-4195-ba30-418e7d6f3d8e  a8e209be-9227-4666-9972-384711351dd7  base (Copy 138)       (23,4)     1.2x1.2     7      ok
+2d8ade7f-5ed3-4d23-9200-c04eb200e16e  a8e209be-9227-4666-9972-384711351dd7  base (Copy 139)       (21,13)    1.2x1.2     15     ok
+c8f34d49-3d34-4880-8bd8-efea29c0fb3e  a8e209be-9227-4666-9972-384711351dd7  base (Copy 140)       (-3,1)     1.2x1.2     15     ok
+f96cb011-4d6a-426f-a69a-3bba9f8a37ae  a8e209be-9227-4666-9972-384711351dd7  base (Copy 141)       (20,13)    1.2x1.2     15     ok
+8a816cbc-50bc-4264-b09c-3edf3a49c784  a8e209be-9227-4666-9972-384711351dd7  base (Copy 142)       (8,1)      1.2x1.2     15     ok
+38319eeb-e2ab-4095-ae8b-d3b9c369562c  a8e209be-9227-4666-9972-384711351dd7  base (Copy 143)       (15,14)    1.2x1.2     15     ok
+3efd5e4f-5bf3-4739-aa88-d5b10fe0d8f6  a8e209be-9227-4666-9972-384711351dd7  base (Copy 144)       (16,13)    1.2x1.2     15     ok
+3a1bbd61-f030-47ae-9b0b-0b95f2702cbe  fe40b689-1092-46ed-a7a9-4b98bc278507  base (Copy 145)       (4,-1)     0.5x0.5     1      ok
+50738582-c9ec-43c3-bbd8-ecfb6b89f5d4  5dfe6b5c-e881-4933-a669-af5fcff44737  base (Copy 146)       (-3,1)     1.3x1.3     16     ok
+d8b01582-618f-42ff-aea5-26e466c73f0c  28bff839-17ae-4e59-9efc-786f7afe1503  base (Copy 147)       (10,2)     1.3x1.3     19     ok
+14d65145-5850-4b53-bf21-20d9b7fe9e38  c4141b64-c212-4119-8f28-0df564038c76  base                  (9,8)      1.2x1.2     8      ok
+3b5f956b-3651-406b-a6a7-b49c06c90b49  32a6e4c0-6de9-47ba-ad46-9f9c97c89c3a  base                  (22,14)    4x4         17     ok
+c21a06e2-a0af-42ce-a2bc-02d3fca36dbf  d3c43bde-3d0d-4bb9-ab6a-43400a61bd93  base                  (-3,4)     1.2x1.2     197    ok
+f9ae9fd6-5a7b-46f1-9b39-6c8c5db4d371  d3c43bde-3d0d-4bb9-ab6a-43400a61bd93  base (Copy 148)       (-3,4)     1.2x1.2     197    ok
+acef1947-a646-4b12-ae02-139a48f1f0b9  d3c43bde-3d0d-4bb9-ab6a-43400a61bd93  base (Copy 149)       (1,4)      1.2x1.2     197    ok
+952312f8-15e5-470b-929b-766d11e07aeb  8fe50b37-d661-4f51-ac31-5f0d7431ae76  base (Copy 150)       (0,4)      1.2x1.2     7      ok
+386e67b1-97c1-488c-979c-64f05ee3f527  36dcc133-b25b-4f61-9e18-4012b1eed41d  base                  (10,-2)    4x4         1      ok
+
+next: list_map_objects(map_id="819843d7-50f6-4883-a357-421c66027a59", offset=200)

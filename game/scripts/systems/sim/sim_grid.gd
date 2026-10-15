@@ -36,10 +36,17 @@ static func walk_cells(layout: Dictionary) -> Dictionary:
 	return out
 
 
-static func reachable(cells: Dictionary) -> Dictionary:
+## BFS from `seed`; sentinel means "first inserted cell" (legacy callers).
+## Maps with isolated pockets (west bank, yard) must seed from a known
+## gameplay cell — the pads pass one explicitly.
+static func reachable(cells: Dictionary,
+		seed := Vector2i(-999, -999)) -> Dictionary:
 	if cells.is_empty():
 		return {}
-	var seed: Vector2i = cells.keys()[0]
+	if seed.x == -999:
+		seed = cells.keys()[0]
+	if not cells.has(seed):
+		return {}
 	var seen := {seed: true}
 	var queue := [seed]
 	while not queue.is_empty():
@@ -51,3 +58,18 @@ static func reachable(cells: Dictionary) -> Dictionary:
 				seen[n] = true
 				queue.append(n)
 	return seen
+
+
+## Largest connected component — the playable field when a layout has
+## isolated pockets (painted water/banks that are real cells but not
+## reachable from camp).
+static func largest_component(cells: Dictionary) -> Dictionary:
+	var rest: Dictionary = cells.duplicate()
+	var best := {}
+	while not rest.is_empty():
+		var comp := reachable(rest, rest.keys()[0])
+		if comp.size() > best.size():
+			best = comp
+		for c in comp:
+			rest.erase(c)
+	return best

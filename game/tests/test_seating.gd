@@ -91,13 +91,13 @@ func _ready() -> void:
 	st["campfire"]["radius"] = 2
 
 	# --- §5.4 worked examples ----------------------------------------
-	# Fire sits at cell (4,4) r2; p4 = (3,5) is inside its reach.
+	# Fire sits at cell (7,7) r2; p4 = (9,7) is inside its reach.
 	st["weather"] = "clear"
 	st["decor"] = []
 	st["assignments"] = {}
 	st["guests"] = {}
 	st["pads"]["p4"]["shelter"] = "platform"
-	_put("planter", "nature", 1, [Vector2i(4, 6)])
+	_put("planter", "nature", 1, [Vector2i(10, 7)])
 	var hiker := _inject("g_hiker", "hiker",
 		["chilly", "nature_lover"])
 	var r := Seating.resolve_guest(hiker, ["p4"], Game._world(), 1)
@@ -123,8 +123,8 @@ func _ready() -> void:
 		couple, ["p1"], Game._world(), 0)["comment"] == r["comment"])
 
 	# Same couple behind a hedge under a tarp, away from the noise.
-	_put("hedge", "privacy", 1, [Vector2i(7, 6)])
-	_put("tarp", "cover", 1, [Vector2i(5, 6)])
+	_put("hedge", "privacy", 1, [Vector2i(6, 9)])
+	_put("tarp", "cover", 1, [Vector2i(5, 9)])
 	r = Seating.resolve_guest(couple, ["p6"], Game._world(), 0)
 	check("3★: hedge privacy + covered in rain",
 		r["stars"] == 3 and r["needs_met"] == 1
@@ -143,17 +143,17 @@ func _ready() -> void:
 	_inject("g_b", "hiker", ["chilly"])
 	Game.site_state()["assignments"]["g_b"] = ["p2"]   # p1's neighbour
 	check("social met beside guest", _stars("g_a", ["p1"]) == 3)
-	_put("lantern", "light", 1, [Vector2i(6, 4)])
+	_put("lantern", "light", 1, [Vector2i(8, 9)])
 	_inject("g_owl", "scout", ["night_owl"])
 	check("night owl by lantern", _stars("g_owl", ["p5"]) == 3)
 	_inject("g_star", "scout", ["stargazer"])
-	_put("telescope", "stars", 1, [Vector2i(5, 6)])
+	_put("telescope", "stars", 1, [Vector2i(7, 9)])
 	r = Seating.resolve_guest(st["guests"]["g_star"], ["p5"],
 		Game._world(), 0)
 	check("stargazer: stars+light cancel",
 		r["needs_met"] == 1 and r["aversions"] == 1
 		and r["stars"] == 2, "got %s" % r)
-	_put("dog_bed", "dog", 2, [Vector2i(7, 2)])   # r2 reaches p2 (5,3)
+	_put("dog_bed", "dog", 2, [Vector2i(9, 4)])   # r2 reaches p2 (7,6)
 	_inject("g_wary", "couple", ["dog_wary"])
 	r = Seating.resolve_guest(st["guests"]["g_wary"], ["p2"],
 		Game._world(), 0)
@@ -312,7 +312,11 @@ func _ready() -> void:
 		if not walk.has(v):
 			bad_pad = pid
 	check("pads all walkable", bad_pad == null, str(bad_pad))
-	var reach := Game._reachable_set(walk)
+	# seed from a pad — walk.keys()[0] can land in an isolated pocket
+	# (west bank, fenced yard) that is legitimately cut off from camp
+	var first_pad: Array = spots.values()[0]
+	var reach := SimGrid.reachable(walk,
+		Vector2i(int(first_pad[0]), int(first_pad[1])))
 	var lost_pad: Variant = null
 	for pid in spots:
 		var v := Vector2i(int(spots[pid][0]), int(spots[pid][1]))

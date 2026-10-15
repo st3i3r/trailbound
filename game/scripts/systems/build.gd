@@ -54,13 +54,22 @@ func _reachable_set(cells: Dictionary) -> Dictionary:
 
 
 ## Placement deadlock guard: dropping pts must not strand any
-## previously-reachable walkable cell.
+## previously-reachable walkable cell.  Base = the largest component —
+## a first-key seed could land in an isolated pocket (bank, yard) and
+## leave the real playfield unprotected.
 func _strands_any(free: Dictionary, pts: Array) -> bool:
-	var base := _reachable_set(free)
+	var base := SimGrid.largest_component(free)
 	var left := free.duplicate()
 	for c in pts:
 		left.erase(c)
-	var after := _reachable_set(left)
+	var seed := Vector2i(-999, -999)
+	for c in base:
+		if left.has(c):
+			seed = c
+			break
+	if seed.x == -999:
+		return false                       # nothing of the field survives to strand
+	var after := SimGrid.reachable(left, seed)
 	for c in base:
 		if not pts.has(c) and not after.has(c):
 			return true

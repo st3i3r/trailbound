@@ -41,8 +41,8 @@ var GH := 12                                 # active site mask (pinewatch
 ## against each site's dressing — the layout supplies cells + errand
 ## anchors, these land the interactables inside it.
 const SITE_STAGE := {
-    "pinewatch": {"fire": Vector2(352, 320), "dog": Vector2(416, 416),
-        "board": Rect2(632, 176, 64, 64)},
+    "pinewatch": {"fire": Vector2(480, 512), "dog": Vector2(384, 592),
+        "board": Rect2(704, 224, 96, 96)},
     "whisper_river": {"fire": Vector2(288, 192), "dog": Vector2(352, 238),
         "board": Rect2(46, 222, 40, 46)},
     "lantern_valley": {"fire": Vector2(288, 192), "dog": Vector2(352, 238),
@@ -64,12 +64,12 @@ const PROPS_PINEWATCH := [
     # only the stateful/live pieces =====
     # crew hut — sits over the baked homestead on the court's east lobe;
     # _sync_crew_hut swaps its texture through the restore stages
-    ["props_large",  "cabin",             507, 392, 0.0, 1.05],
-    # scorched dirt under the runtime fire ring at cell (5,4)
-    ["props_medium", "dirt_patch",        352, 318],
+    ["props_large",  "cabin",             448, 384, 0.0, 1.05],
+    # scorched dirt under the runtime fire ring at cell (7,7)
+    ["props_medium", "dirt_patch",        480, 504],
     # junction signpost where the east lane meets the court — the
     # baked reception board sits below the frame edge
-    ["props_small",  "signpost",          672, 210],
+    ["props_small",  "signpost",          752, 320],
     # ===== BOUNDARY marks =====
 ]
 
@@ -159,9 +159,9 @@ const AmbientFX := preload("res://scripts/ambient_fx.gd")
 # Stage anchors moved per-site into SITE_STAGE (UI-034): _fire_pos,
 # _dog_pos and _board_rect are set from it in _ready once site_id is
 # known.  Pinewatch keeps the authored values every tool references.
-const WARDEN_POS := Vector2(416, 330)
-const MAI_POS := Vector2(608, 290)           # east meadow edge, by the lane
-const BOARD_POS := Vector2(672, 210)         # signpost at the lane junction (UI-023)
+const WARDEN_POS := Vector2(544, 424)
+const MAI_POS := Vector2(800, 416)           # east meadow edge, by the lane
+const BOARD_POS := Vector2(752, 320)         # signpost at the lane junction (UI-023)
 
 # scatter decal groups by visual family — a cluster commits to ONE so it
 # reads as a patch of something (tuft / flowers / dry grass / pebbles /
@@ -1100,6 +1100,7 @@ func _cell_mask(c: Vector2i) -> int:
     match _mask[c.y][c.x]:
         "D": return 1
         "W": return 2
+        "#": return 3                    # void — never a scatter target
         _:   return 0
 
 
