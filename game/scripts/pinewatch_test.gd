@@ -240,6 +240,8 @@ var _fish_spots: Array = []                  # [{key, node, spot}]
 var ground: Node2D
 var stage: Node2D                            # all world layers — centred on
                                              # wide viewports (aspect=expand)
+var _cam := Vector2.ZERO                     # view offset into the stage px
+var _mb_pan := false                         # mid/right mouse drag owns it
 var scatter: Node2D
 var pads_node: Node2D
 var shadows: Node2D                          # Phase 5.0 light model —
@@ -1056,15 +1058,31 @@ func _notification(what: int) -> void:
         _wake_chrome()
 
 
-## Centre the 640x360 map when the stretched viewport is larger —
-## aspect=expand shows extra room on wide phones (~800px virtual at
-## 20:9) and taller tablets; the empty margin paints with the dark
-## clear colour, not the mid-grey default.
+## Position the stage: centre when the map is smaller than the
+## viewport (aspect=expand shows margin on wide phones), pan by _cam
+## when it's larger (D-ARCH-8).  The dark clear colour paints any
+## margin, not the mid-grey default.
 func _fit_stage() -> void:
+    # smaller-than-viewport axes centre; larger axes pan inside _cam —
+    # everything under stage (ground/props/actors) is map-space so pan
+    # is just this offset, and pointer math `mouse - stage.position`
+    # stays correct at any cam
     var vp := get_viewport_rect().size
+    _cam = _cam.clamp(Vector2.ZERO, Vector2(
+        maxf(0.0, float(GW * T) - vp.x),
+        maxf(0.0, float(GH * T) - vp.y)))
     stage.position = Vector2(
         maxf(0.0, (vp.x - float(GW * T)) / 2.0),
-        maxf(0.0, (vp.y - float(GH * T)) / 2.0))
+        maxf(0.0, (vp.y - float(GH * T)) / 2.0)) - _cam
+
+
+func focus_cell(c: Vector2i) -> void:
+    ## scroll the view so a cell sits near centre — the UI seam for
+    ## "show me" affordances (seated guest, board, fire) once pans
+    ## leave the authored frame
+    _cam = Vector2(c) * CELL + Vector2(CELL * 0.5, CELL * 0.5) \
+        - get_viewport_rect().size * 0.5
+    _fit_stage()
 
 
 # ------------------------------------------------------------- scenery
@@ -4196,8 +4214,29 @@ func _guest_at(px: Vector2) -> String:
 
 func _unhandled_input(event: InputEvent) -> void:
     var st: Dictionary = Game.site_state()
+    # --- view pan (D-ARCH-8): touch drag on the map; middle/right
+    # drag on desktop.  A card press owns its finger first — panning
+    # never steals a guest drag, and panning cancels a pending card
+    # press so release can't tap it.
+    if event is InputEventScreenTouch:
+        return                         # taps ride the emulated mouse
+    if event is InputEventScreenDrag:
+        if _drag_ghost != null or not _press.is_empty():
+            return                     # a card/guest owns the gesture
+        _cam -= event.relative
+        _fit_stage()
+        return
+    if event is InputEventMouseButton \
+            and event.button_index in [MOUSE_BUTTON_MIDDLE,
+                MOUSE_BUTTON_RIGHT]:
+        _mb_pan = event.pressed
+        return
     if event is InputEventMouseMotion:
         _wake_chrome()
+        if _mb_pan:
+            _cam -= event.relative
+            _fit_stage()
+            return
         var sp: Vector2 = event.position              # viewport px (cards)
         var px := get_global_mouse_position() - stage.position
         _fire_near(px.distance_to(_fire_pos) <= 56.0)

@@ -208,7 +208,7 @@ are artifacts — real compile check is a scene run). Generated wavs:
 | D-ARCH-5 | QA flags are engine args (no `--` separator) — user args are invisible to `get_cmdline_args()` on 4.7 | Landed 2026-10-13 |
 | D-ARCH-6 | Commit-on-beat persistence: `touch()` on verbs (1 s tick coalesces to ≤1 write/s), `commit()` on day boundaries, focus-loss and quit paths — sleep is never a checkpoint (§4) | Landed 2026-10-13 |
 | D-ARCH-7 | Actor-presenter determinism contract: `SimWorld` ticks at **fixed dt via an accumulator** (never render delta), RNG only through `_rng_for` streams, iteration order = cast order — no `randf()`/wall-clock/dict-shuffle in sim code. Test ticks are already fixed-step; the live tick must match or replays drift | Contract 2026-10-13 — binds when the presenter lands (spec `specs/003` Dependency) |
-| D-ARCH-8 | Viewport is fixed at 640×360 (`scale_mode=integer`, `aspect=expand`) — no camera pan. Painted maps may be larger than the frame; `import_map --crop` chooses the playable window (~22×14 tiles ≈ 11×7 cells), overflow tiles are decorative bleed only — never place pads/decor/anchors outside the crop | Landed 2026-10-19 — keeps the whole camp glanceable (genre feel); denser viewport rejected mid-build cost |
+| D-ARCH-8 | Viewport fixed at 640×360 (`scale_mode=integer`, `aspect=expand`); maps may exceed it — `stage` pans by `_cam` (touch drag; mid/right mouse drag on desktop), card/guest gestures own their finger first, `focus_cell(c)` is the UI seam for scripted pans. `import_map --crop` = the full playable map, not a viewport sub-window | Landed 2026-10-19 — supersedes the no-pan interim call from the same day |
 
 ## 11. External design audits
 
