@@ -1,21 +1,21 @@
 {
   "version": "1.0.0",
   "name": "trailbound_pinewatch_v16_fresh",
-  "exportDate": "2026-10-15T05:31:22.096735Z",
+  "exportDate": "2026-10-15T14:22:56.839701Z",
   "engine": "pixellab-map-editor",
   "mapConfig": {
     "tileSize": 32,
     "dimensions": {
-      "width": 25,
-      "height": 18,
-      "pixelWidth": 800,
-      "pixelHeight": 576
+      "width": 36,
+      "height": 20,
+      "pixelWidth": 1152,
+      "pixelHeight": 640
     },
     "boundingBox": {
-      "maxX": 23,
+      "maxX": 30,
       "maxY": 15,
-      "minX": -1,
-      "minY": -2
+      "minX": -5,
+      "minY": -4
     }
   },
   "terrains": [
@@ -43,21 +43,6 @@
   ],
   "tilesets": [
     {
-      "id": "8f15db3f-f1d4-40e3-a5be-389b3c31b149",
-      "filename": "smooth flat saturated teal pond water, calm teal wash with very subtle broad tonal bands, n-78e6a1ec.png",
-      "lowerTerrain": "smooth flat saturated teal pond water, calm teal wash with very subtle broad tonal bands, nearly no texture, painterly pixel art, warm sunlight, Eastward style",
-      "upperTerrain": "flat fresh spring-green grass wash, bright clean yellow-green, soft broad tonal patches only, nearly no interior texture, no speckles no blade clusters no repeating pattern, painterly pixel art, warm sunlight upper-left, Eastward style",
-      "lowerTerrainId": 3,
-      "upperTerrainId": 2,
-      "transitionSize": 0,
-      "transitionDescription": "dark wet-earth rim then flat grass, a few pale foam flecks at the waterline only",
-      "tileSize": 32,
-      "gridLayout": "4x4",
-      "wangIndexMapping": "standard",
-      "view": "high top-down",
-      "metadataFilename": "8f15db3f-f1d4-40e3-a5be-389b3c31b149.json"
-    },
-    {
       "id": "1c8796b4-19f7-43bf-9f6a-3c14cde4a9eb",
       "filename": "smooth flat golden-tan packed earth, warm ochre wash with broad soft tonal patches, almost-b08c0d7e.png",
       "lowerTerrain": "smooth flat golden-tan packed earth, warm ochre wash with broad soft tonal patches, almost no interior texture, very few subtle marks, no speckles, painterly pixel art, warm sunlight upper-left, Eastward style",
@@ -71,6 +56,21 @@
       "wangIndexMapping": "standard",
       "view": "high top-down",
       "metadataFilename": "1c8796b4-19f7-43bf-9f6a-3c14cde4a9eb.json"
+    },
+    {
+      "id": "8f15db3f-f1d4-40e3-a5be-389b3c31b149",
+      "filename": "smooth flat saturated teal pond water, calm teal wash with very subtle broad tonal bands, n-78e6a1ec.png",
+      "lowerTerrain": "smooth flat saturated teal pond water, calm teal wash with very subtle broad tonal bands, nearly no texture, painterly pixel art, warm sunlight, Eastward style",
+      "upperTerrain": "flat fresh spring-green grass wash, bright clean yellow-green, soft broad tonal patches only, nearly no interior texture, no speckles no blade clusters no repeating pattern, painterly pixel art, warm sunlight upper-left, Eastward style",
+      "lowerTerrainId": 3,
+      "upperTerrainId": 2,
+      "transitionSize": 0,
+      "transitionDescription": "dark wet-earth rim then flat grass, a few pale foam flecks at the waterline only",
+      "tileSize": 32,
+      "gridLayout": "4x4",
+      "wangIndexMapping": "standard",
+      "view": "high top-down",
+      "metadataFilename": "8f15db3f-f1d4-40e3-a5be-389b3c31b149.json"
     }
   ],
   "overlays": [],

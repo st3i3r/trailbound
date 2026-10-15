@@ -178,9 +178,12 @@ func _ready() -> void:
 	test_layout["nav"] = test_layout.get("nav", {}).duplicate()
 	test_layout["nav"]["blocked"] = blocked_arr
 	var walk := SimGrid.walk_cells(test_layout)
-	var seen := SimGrid.reachable(walk)
-	_report(walk.size() == seen.size(),
-		"connectivity %d/%d walkable cells reachable" % [
+	# pockets are legal geography (west bank, gated cells) — the field
+	# that matters is the LARGEST component, seeded from itself so the
+	# check can't strand on a first-key pocket.
+	var seen := SimGrid.largest_component(walk)
+	_report(seen.size() >= int(walk.size() * 0.6),
+		"connectivity %d/%d walkable cells in main component" % [
 			seen.size(), walk.size()])
 	var pads: Dictionary = layout.get("pads", {}).get("spots", {})
 	for pid in pads:
@@ -188,10 +191,21 @@ func _ready() -> void:
 		_report(seen.has(Vector2i(s[0], s[1])), "pad %s reachable" % pid)
 	for dc in layout.get("decor_cells", []):
 		var d := Vector2i(dc[0], dc[1])
-		_report(walk.has(d), "decor cell %s walkable" % [dc])
+		_report(walk.has(d) and seen.has(d),
+			"decor cell %s walkable" % [dc])
 		if walk.has(d):
 			var w2 := walk.duplicate(); w2.erase(d)
-			_report(SimGrid.reachable(w2).size() == w2.size(),
+			var seed := Vector2i(-999, -999)
+			for c in seen:
+				if w2.has(c):
+					seed = c; break
+			var stranded := false
+			if seed.x != -999:
+				var m2 := SimGrid.reachable(w2, seed)
+				for c in seen:
+					if w2.has(c) and not m2.has(c):
+						stranded = true; break
+			_report(not stranded,
 				"decor cell %s strands nothing" % [dc])
 
 	# --- write ------------------------------------------------------------
@@ -219,6 +233,58 @@ func _ready() -> void:
 			out.save_png(ProjectSettings.globalize_path(gpath))
 			print("wrote %s (%dx%d)" % [gpath, out.get_width(),
 				out.get_height()])
+
+			# object manifest + images — the base bake is object-free,
+			# so map props ship as a runtime y-sorted layer: x,y = top-
+			# left px in crop space, foot = collider bottom-centre (the
+			# y-sort anchor), order = PixelLab's authored draw order.
+			var pmin := Vector2((crop.position.x - minx) * TILE,
+				(crop.position.y - miny) * TILE)
+			var odir := "res://assets/%s/objects" % site
+			DirAccess.make_dir_recursive_absolute(
+				ProjectSettings.globalize_path(odir))
+			var manifest := []
+			# authored escapes: props the runtime owns (stateful stage
+			# swaps, tap targets) must not double-draw over baked twins
+			var hide := {}
+			for hid in layout.get("objects", {}).get("hide", []):
+				hide[str(hid)] = true
+			for o in emap.get("objects", []):
+				if not o.get("visible", true) \
+						or hide.has(str(o.get("id", ""))):
+					continue
+				var ox := float(o["x"]) - pmin.x
+				var oy := float(o["y"]) - pmin.y
+				var ow := float(o["width"])
+				var oh := float(o["height"])
+				if ox + ow <= 0.0 or oy + oh <= 0.0 \
+						or ox >= crop.size.x * TILE \
+						or oy >= crop.size.y * TILE:
+					continue
+				var col: Dictionary = o.get("collider", {})
+				var fx := float(col.get("x", o["x"])) - pmin.x \
+					+ float(col.get("width", ow)) * 0.5
+				var fy := float(col.get("y", o["y"])) - pmin.y \
+					+ float(col.get("height", oh))
+				manifest.append({"img": "%s.png" % o["id"],
+					"x": int(ox), "y": int(oy),
+					"w": int(ow), "h": int(oh),
+					"order": int(o.get("drawOrder", 0)),
+					"foot": [int(fx), int(fy)]})
+				var opng := src.path_join("objects/%s.png" % o["id"])
+				if FileAccess.file_exists(opng):
+					DirAccess.copy_absolute(opng,
+						ProjectSettings.globalize_path(odir
+							).path_join("%s.png" % o["id"]))
+			manifest.sort_custom(func(a, b):
+				return a["order"] < b["order"])
+			# lives under assets/, NOT data/layouts/ — Catalog scans
+			# that dir for site layouts and would reject this file
+			var mpath := "res://assets/%s/objects.json" % site
+			var mf := FileAccess.open(mpath, FileAccess.WRITE)
+			mf.store_string(JSON.stringify(manifest, "  "))
+			mf.close()
+			print("wrote %s (%d objects)" % [mpath, manifest.size()])
 	elif write:
 		print("NOT writing — fix the fails above first")
 

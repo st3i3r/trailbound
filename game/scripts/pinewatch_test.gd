@@ -496,6 +496,10 @@ func _ready() -> void:
     world.name = "World"
     world.y_sort_enabled = true
     stage.add_child(world)
+    _build_objects()                       # PixelLab map props — the
+                                           # export's base bake is
+                                           # object-free, so they draw
+                                           # here, y-sorted with actors
     _rain = GPUParticles2D.new()             # slanted downpour ABOVE the
     _rain.name = "ScreenRain"                # y-sorted world, UNDER the
     _rain.amount = 1400                      # canopy crowns (added to
@@ -1268,6 +1272,38 @@ func _build_pads(rng: RandomNumberGenerator) -> void:
             pads_node.add_child(tuft)
     for pid in pad_cells:
         _sync_pad_visual(pid)                # loaded saves: shelters
+
+
+## PixelLab object layer (map import). Each entry becomes a Node2D
+## anchored at its collider's bottom-centre — that foot point is what
+## `world` y-sorts on, so actors pass in front of/behind props
+## correctly. Children are added in authored drawOrder so equal-foot-y
+## ties keep the editor's layering. Sites without an objects manifest
+## (lantern_valley, whisper_river) simply skip.
+func _build_objects() -> void:
+    var mpath := "res://assets/%s/objects.json" % _site_id
+    if not FileAccess.file_exists(mpath):
+        return
+    var list: Variant = JSON.parse_string(
+        FileAccess.get_file_as_string(mpath))
+    if not list is Array:
+        return
+    for o in list:
+        # Image.load_from_file over load(): importer-copied PNGs carry
+        # no .import metadata until the editor next scans the project
+        var img := Image.load_from_file(ProjectSettings.globalize_path(
+            "res://assets/%s/objects/%s" % [_site_id, o["img"]]))
+        if img == null:
+            continue
+        var tex := ImageTexture.create_from_image(img)
+        var anchor := Node2D.new()
+        anchor.position = Vector2(o["foot"][0], o["foot"][1])
+        var spr := Sprite2D.new()
+        spr.texture = tex
+        spr.centered = false
+        spr.position = Vector2(o["x"], o["y"]) - anchor.position
+        anchor.add_child(spr)
+        world.add_child(anchor)
 
 
 func _build_props() -> void:
