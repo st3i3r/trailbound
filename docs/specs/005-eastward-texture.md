@@ -108,6 +108,17 @@ asleep at the fire (`assignments.is_empty()`), and the morning
 after an all-5★ night `cast_day(prev_perfect)` opens its rounds
 with a play+heart wag.
 
+### E. Elevation cue — the 2.5D height read *(queued)*
+
+Eastward's verticality trick (a cliff/stone stripe + stairs
+mid-field) is the last unborrowed piece of their 2.5D grammar.
+For the painted map: a stone-outcrop or step band on one edge —
+pond's north bank or the treeline base — shaded as +1 elevation.
+**Blocked until the current integration pass closes** (shore
+rim + road→court spur + framed south exit + canopy wall land
+first); revisit once the ground bake is wired, then author as a
+terrain+prop pass on the PixelLab map, not scene code.
+
 ## Rejected — with reasons
 
 | Eastward pattern | Why it fails here |
