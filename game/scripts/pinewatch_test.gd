@@ -160,6 +160,11 @@ const AmbientFX := preload("res://scripts/ambient_fx.gd")
 const QaSmoke := preload("res://scripts/qa_smoke.gd")
 const WorldBuilder := preload("res://scripts/world_builder.gd")
 const InputPresenter := preload("res://scripts/input_presenter.gd")
+const GuestPresenter := preload("res://scripts/guest_presenter.gd")
+const SheetPresenter := preload("res://scripts/sheet_presenter.gd")
+const FlowPresenter := preload("res://scripts/flow_presenter.gd")
+const FxPresenter := preload("res://scripts/fx_presenter.gd")
+const CastPresenter := preload("res://scripts/cast_presenter.gd")
 # Stage anchors moved per-site into SITE_STAGE (UI-034): _fire_pos,
 # _dog_pos and _board_rect are set from it in _ready once site_id is
 # known.  Pinewatch keeps the authored values every tool references.
@@ -280,7 +285,6 @@ var _veil_chan := []                         #   outgoing fades on one
                                            #   on the other
 var _rain: GPUParticles2D                    # slanted 2.5D downpour
 var _leaves: GPUParticles2D                  # làn gió debris stream
-var _noise_cache := {}                       # seed -> FastNoiseLite tex
 var _weather_forced := false                 # --weather= locks the day
 var _booted := false                         # boot resolve done — phase
                                              # signals during our own
@@ -288,15 +292,12 @@ var _booted := false                         # boot resolve done — phase
                                              # (is_node_ready() is TRUE
                                              # inside _ready) and
                                              # ceremonies stay queued
-var _weather_tween: Tween
-var _overlay_fades := {}                     # rect -> live fade Tween
 var marks: Node2D                            # hover + star previews above world
 var hover: Sprite2D
 var hud: HUD                                 # chrome root (fades when idle)
 var hud_layer: CanvasLayer                   # HUD tier (hidden by --bare)
 var panel_mgr: PanelManager                  # modal panel stack (PANEL tier)
 var markers: WorldMarkers                    # floating world markers layer
-var hud_tween: Tween
 var idle_ms := 0.0
 var fire_bubble: Panel                       # marker content over the fire
 var _fire_on := false
@@ -310,7 +311,6 @@ var guest_nodes := {}                        # gid -> seated world Node2D
 var tent_nodes := {}                         # gid -> [Sprite2D]
 var star_labels := {}                        # pid -> preview Node2D
 var evening_open := true                     # Enter -> Goodnight
-var night_rating := ""
 var _trait_names := {}                       # tid -> name (lazy)
 var guest_bubbles := {}                      # gid -> trait-state marker token
 var board_anchor: Node2D                     # notice-board prop anchor (UI-023)
@@ -318,9 +318,6 @@ var _actor_map := {}                         # dialogue anchors (name -> node)
 var _sim: SimWorld                           # evening cast world (D4)
 var _actor_view: ActorView                   # presenter — sim -> sprites
 var _ceremony_layer: CanvasLayer             # UI-039 milestone overlay tier
-var _dlg_queue := []                         # pending morning dialogue rows
-var _dlg_tok := 0                            # live bubble marker token
-var _five_star_seen := false                 # session flag for cer_five
 var _board_tok := 0                          # morning "!" marker token
 
 # --- prep layer (§7): forage nodes + pond/lookout/dog taps, PREP only
@@ -333,7 +330,6 @@ var _errand_anchors := {}                    # "pond"|"lookout" -> Node2D
 var _decor_layer: Node2D                     # placed pieces, always drawn
 var _decor_nodes := {}                       # st["decor"] idx -> Sprite2D
 var _build_overlay: BuildGrid                # legal cells + candidate tint
-var _build_menu_tok := 0                     # piece context-row token
 
 var _pad_menu_tok := 0                       # pad context-row token
 var _pad_menu_pid := ""                      # pad the menu is parked on
@@ -359,6 +355,11 @@ var _dog_walking := false
 var _tex_cache := {}
 var _builder: RefCounted  # world passes (D-ARCH-9)
 var _input: RefCounted  # gesture + tap routing (D-ARCH-9)
+var _guest: RefCounted  # seating visuals + bubbles (D-ARCH-9)
+var _sheets: RefCounted  # sheets, menus + chips (D-ARCH-9)
+var _flow: RefCounted  # day flow + celebrations (D-ARCH-9)
+var _fxp: RefCounted  # weather/FX config + response (D-ARCH-9)
+var _cast: RefCounted  # sim cast + errands + dog (D-ARCH-9)
 
 
 func _tex(rel: String) -> Texture2D:
@@ -450,6 +451,11 @@ func _ready() -> void:
 
     _builder = WorldBuilder.new(self)
     _input = InputPresenter.new(self)
+    _guest = GuestPresenter.new(self)
+    _sheets = SheetPresenter.new(self)
+    _flow = FlowPresenter.new(self)
+    _fxp = FxPresenter.new(self)
+    _cast = CastPresenter.new(self)
     _build_ground()
     _build_backdrop()
     _build_scatter(rng)
@@ -551,7 +557,7 @@ func _ready() -> void:
     _fx.name = "WorldFX"
     add_child(_fx)
     _fx.bind(_grade, _rain, _leaves, WARM_MUL)
-    Game.phase_changed.connect(_on_phase_dusk)
+    Game.phase_changed.connect(_fxp.on_phase_dusk)
     # Post-grade — one screen pass shaping tone (contrast / split-tone
     # / vignette) on layer 7: above the world canvas + world markers,
     # below the HUD canvas.  Drives off the same WorldFX scalars.
@@ -829,36 +835,13 @@ const WEATHER_PROFILES := {
 
 
 func _set_weather(state: String, dur := 4.0) -> void:
-    var p: Dictionary = WEATHER_PROFILES[state]
-    var instant := dur <= 0.05
-    _fx.lightning = p.get("lightning", false)
-    # kill stale overlay fades before anything writes intensity —
-    # tracked overlays register during _apply_overlay below
-    if _weather_tween and _weather_tween.is_running():
-        _weather_tween.kill()
-    _weather_tween = null
-    # one fx tween owns the scalar channels (front + tint); the scene
-    # tween owns only flat overlay fades — every channel shares the
-    # same reduced-motion policy so nothing outpaces the front
-    var rdur := dur * (0.3 if UIFeel.reduced_motion else 1.0)
-    _fx.set_front(float(p.get("front", 0.0)), dur, p["color"])
-    if not instant:
-        _weather_tween = create_tween().set_parallel(true)
-    _apply_overlay(_warp_chan, p.get("warp"), rdur, instant)
-    _apply_overlay(_veil_chan, p.get("veil"), rdur, instant)
-
+    _fxp.set_weather(state, dur)
 
 ## Phase -> nightfall target.  Morning barely dims (dawn freshness),
 ## evening is golden hour, night is the deep blue the sleep summary
 ## sits on.  `dusk` rolls in on the scalar — no hard day/night swap.
 func _on_phase_dusk(p: int) -> void:
-    # signals fired during our own _ready resolve instantly — the
-    # first frame must already read as evening, not roll toward it
-    _fx.set_dusk(_dusk_target(p), 3.5 if _booted else 0.0)
-    _sync_night_props()
-    if p == Game.Phase.MORNING and not _weather_forced:
-        _apply_day_weather(6.0 if _booted else 0.0)
-
+    _fxp.on_phase_dusk(p)
 
 ## Batch H night read — at EVENING/NIGHT occupied tents glow from
 ## inside, occupied pallet decks gain the bedroll+lantern overlay,
@@ -866,202 +849,54 @@ func _on_phase_dusk(p: int) -> void:
 ## Day restores the day sprites.  Called on every phase flip and
 ## after seat/unseat so loaded saves and arrivals match the hour.
 func _sync_night_props() -> void:
-    var night := Game.phase in [Game.Phase.EVENING, Game.Phase.NIGHT]
-    var occupied := {}
-    for pid_list in Game.site_state()["assignments"].values():
-        for pid2 in pid_list:
-            occupied[pid2] = true
-    for gid2 in tent_nodes:
-        for t in tent_nodes[gid2]:
-            var key := String(t.get_meta("tent_key", ""))
-            if key == "":
-                continue
-            var want := key + "_night" if night else key
-            if ResourceLoader.exists(A + "props_medium/%s.png" % want):
-                t.texture = _tex("props_medium/" + want)
-    for pid in _pad_shelters:
-        var ov: Sprite2D = _pad_shelters[pid]
-        if ov.get_meta("shelter", "") != "platform":
-            continue
-        var want2 := "pallet_deck_occupied" \
-            if (night and occupied.has(pid)) else "pallet_deck"
-        if ResourceLoader.exists(A + "props_medium/%s.png" % want2):
-            ov.texture = _tex("props_medium/" + want2)
-    _sync_crew_hut()
-
+    _fxp.sync_night_props()
 
 func _dusk_target(p: int) -> float:
-    match p:
-        Game.Phase.MORNING: return 0.10
-        Game.Phase.PREP:    return 0.25
-        Game.Phase.EVENING: return 0.55
-        Game.Phase.NIGHT:   return 1.0
-    return 0.4
-
+    return _fxp.dusk_target(p)
 
 ## The day's rolled weather becomes a rolling front with the morning
 ## — the forecast the summary promised literally arrives on screen.
 func _apply_day_weather(dur := 6.0) -> void:
-    var st: Dictionary = Game.site_state()
-    var wkey: String = SIM_TO_FX.get(String(st["weather"]), "sunny")
-    _set_weather(wkey, dur)
-
+    _fxp.apply_day_weather(dur)
 
 ## spec = {"shader": path, "val": target intensity} or null. Every
 ## overlay shader exposes `uniform float intensity` so the profile
 ## row never names uniforms. `chan` is a [primary, twin] pair — a
 ## new effect rolls in on the free slot while the outgoing one dies
 ## on its own shader, so transitions crossfade instead of popping.
-func _apply_overlay(chan: Array, spec: Variant,
-                    dur: float, instant: bool) -> void:
-    var showing: ColorRect = null
-    var free: ColorRect = null
-    for r in chan:
-        if r.visible and showing == null:
-            showing = r
-        elif free == null:
-            free = r
-    if free == null:                           # both busy mid-fade —
-        free = chan[1]                         # overwrite the twin
-    if spec == null:
-        if showing != null:
-            _fade_out(showing, dur, instant)
-        return
-    var sm := (showing.material as ShaderMaterial) if showing else null
-    if sm != null and sm.shader != null \
-            and sm.shader.resource_path == spec["shader"]:
-        _kill_fade(showing)                    # a rect mid-fade-out can
-        var rr := String(spec.get("resp", "")) # be revived — kill the
-        if rr != "":                           # stale tween; tracked
-            _fx.track_overlay(sm, float(spec["val"]),  # specs rejoin
-                StringName(rr))                # the scalar instead
-        elif instant:
-            sm.set_shader_parameter("intensity", spec["val"])
-        else:
-            _weather_tween.tween_property(sm,  # hide callback fires on
-                "shader_parameter/intensity", spec["val"], dur)
-        return                                 # the reviving effect
-    _kill_fade(free)                           # same for a reused slot
-    var fm := free.material as ShaderMaterial  # different effect —
-    fm.shader = load(spec["shader"])           # incoming rolls in on
-    _bind_noise(fm, spec["shader"])            # the free slot while
-    free.visible = true                        # the old one dies fast
-    var resp := String(spec.get("resp", ""))
-    if instant:
-        if resp != "":
-            _fx.track_overlay(fm, float(spec["val"]),
-                StringName(resp))              # applies val x curve
-        else:
-            fm.set_shader_parameter("intensity", spec["val"])
-        if showing != null:
-            _kill_fade(showing)
-            showing.visible = false
-    else:
-        if resp != "":
-            # scalar owns intensity — it rises as the front rolls in
-            # (ripples accumulate, rays die with the light)
-            _fx.track_overlay(fm, float(spec["val"]),
-                StringName(resp))
-        else:
-            fm.set_shader_parameter("intensity", 0.0)
-            _weather_tween.tween_property(fm,
-                "shader_parameter/intensity", spec["val"], dur)
-        if showing != null:
-            _fade_out(showing, dur * 0.5, instant)
-
+func _apply_overlay(chan: Array, spec: Variant, dur: float, instant: bool) -> void:
+    _fxp.apply_overlay(chan, spec, dur, instant)
 
 ## Fade tweens are tracked per rect — a slot reused while a fade is
 ## still running must not let the stale tween drive the NEW effect's
 ## intensity to 0 or fire its hide callback.
 func _kill_fade(rect: ColorRect) -> void:
-    if _overlay_fades.has(rect):
-        _overlay_fades[rect].kill()
-        _overlay_fades.erase(rect)
-    # a killed/reused slot must not keep answering to the scalars —
-    # the caller re-tracks if the revived effect still wants it
-    _fx.untrack_overlay(rect.material as ShaderMaterial)
-
+    _fxp.kill_fade(rect)
 
 func _fade_out(rect: ColorRect, dur: float, instant: bool) -> void:
-    _kill_fade(rect)
-    var m := rect.material as ShaderMaterial
-    if m.shader == null or instant:
-        rect.visible = false
-        return
-    var ft := create_tween()                   # own tween: callback on
-    ft.tween_property(m,                       # a parallel tween has
-        "shader_parameter/intensity", 0.0, dur)   # fuzzy step timing
-    ft.tween_callback(func():
-        rect.visible = false
-        _overlay_fades.erase(rect))
-    _overlay_fades[rect] = ft
-
+    _fxp.fade_out(rect, dur, instant)
 
 func _bind_noise(m: ShaderMaterial, path: String) -> void:
-    ## Procedural FastNoiseLite fields — no binary noise assets
-    match path:
-        "res://shaders/sun_rays.gdshader":
-            m.set_shader_parameter("noise_tex", _noise_tex(11))
-        "res://shaders/layered_fog.gdshader":
-            m.set_shader_parameter("fog_noise_1", _noise_tex(11))
-            m.set_shader_parameter("fog_noise_2", _noise_tex(47))
-        "res://shaders/wind_gusts.gdshader":
-            m.set_shader_parameter("noise_tex", _noise_tex(23))
-
+    _fxp.bind_noise(m, path)
 
 func _noise_tex(nseed: int) -> Texture2D:
-    if not _noise_cache.has(nseed):
-        var n := FastNoiseLite.new()
-        n.seed = nseed
-        n.frequency = 0.035
-        n.fractal_octaves = 3
-        var img := Image.create(256, 256, false, Image.FORMAT_L8)
-        for y in 256:
-            for x in 256:
-                var v := clampf(n.get_noise_2d(x, y) * 0.5 + 0.5,
-                                0.0, 1.0)
-                img.set_pixel(x, y, Color(v, v, v))
-        _noise_cache[nseed] = ImageTexture.create_from_image(img)
-    return _noise_cache[nseed]
-
+    return _fxp.noise_tex(nseed)
 
 func _leaf_tex() -> Texture2D:
-    ## 8x8 autumn leaf pixel-blob; angular_velocity tumbles it
-    var img := Image.create(8, 8, false, Image.FORMAT_RGBA8)
-    img.fill(Color(0, 0, 0, 0))
-    for y in range(2, 6):
-        for x in range(2, 6):
-            img.set_pixel(x, y, Color(0.75, 0.45, 0.18, 0.9))
-    img.set_pixel(1, 3, Color(0.75, 0.45, 0.18, 0.9))
-    img.set_pixel(6, 3, Color(0.9, 0.6, 0.25, 0.9))
-    return ImageTexture.create_from_image(img)
-
+    return _fxp.leaf_tex()
 
 func _rain_tex() -> Texture2D:
-    ## 2x16 streak — bright leading tip fading toward the tail; the
-    ## particle flag aligns it to velocity so it draws as a rain line
-    var img := Image.create(2, 16, false, Image.FORMAT_RGBA8)
-    for y in 16:
-        var a := lerpf(0.55, 0.05, y / 15.0)
-        img.set_pixel(0, y, Color(1, 1, 1, a))
-        img.set_pixel(1, y, Color(1, 1, 1, a))
-    return ImageTexture.create_from_image(img)
-
+    return _fxp.rain_tex()
 
 func _fade_chrome(a: float) -> void:
-    if hud_tween and hud_tween.is_running():
-        hud_tween.kill()
-    hud_tween = UIFeel.apply(create_tween(), "chrome")
-    hud_tween.tween_property(hud, "modulate:a", a, UIFeel.dur("chrome"))
-
+    _fxp.fade_chrome(a)
 
 func _wake_chrome() -> void:
-    idle_ms = 0.0
-    if hud == null:                            # HUD not built yet
-        return
-    if hud.modulate.a < 0.99:
-        _fade_chrome(1.0)
-
+    # NOTIFICATION_WM_MOUSE_ENTER can fire mid-boot before _ready
+    # instantiates the helper — the old body was null-safe (hud null
+    # check), so the delegate stays null-safe too.
+    if _fxp != null:
+        _fxp.wake_chrome()
 
 func _notification(what: int) -> void:
     if what == NOTIFICATION_WM_MOUSE_ENTER:
@@ -1195,180 +1030,22 @@ const SWAY_KEYS := ["decals/tuft_", "decals/decal_fern",
     "decals/pad_overgrown"]
 
 var _amb: AmbientFX                          # null until built
-var _sway: ShaderMaterial
 
 
 func _sway_mat() -> ShaderMaterial:
-    if _sway == null:
-        _sway = ShaderMaterial.new()
-        _sway.shader = load("res://shaders/foliage_sway.gdshader")
-        _sway.set_shader_parameter("amp",
-            0.8 * (0.3 if UIFeel.reduced_motion else 1.0))
-    return _sway
-
+    return _fxp.sway_mat()
 
 func _sways(tex: Texture2D) -> bool:
-    var p := tex.resource_path
-    for k in SWAY_KEYS:
-        if k in p:
-            return true
-    return false
-
+    return _fxp.sways(tex)
 
 func _apply_sway() -> void:
-    for grp in [scatter, world, pads_node]:
-        if grp == null:
-            continue
-        for n in grp.get_children():
-            if n is Sprite2D and n.texture != null \
-                    and _sways(n.texture):
-                n.material = _sway_mat()
-
+    _fxp.apply_sway()
 
 func _build_ambient() -> void:
-    _apply_sway()
-    # lantern posts make moth anchors — the lamp head sits ~14px
-    # above the prop's ground anchor
-    var lamps: Array = []
-    for p in _props:
-        if p.size() > 1 and p[1] == "lantern_post":
-            lamps.append(Vector2(p[2], p[3] - 14.0))
-    # Pinewatch's pond rect is authored; other sites get a generous
-    # box around their pond errand spot, or nothing
-    var pond := Rect2(6, 195, 130, 105)
-    var es: Dictionary = layout.get("errand_spots", {})
-    if _site_id != "pinewatch":
-        if es.has("pond"):
-            var pp: Array = es["pond"]
-            pond = Rect2(pp[0] - 60, pp[1] - 40, 120, 80)
-        else:
-            pond = Rect2(-999, -999, 4, 4)
-    # smoke only exists where a crew structure does — sites without a
-    # hut never light a chimney
-    var smoke_at := _hut_px() + Vector2(-30, -58) \
-        if _hut != null else Vector2(-999, -999)
-    _amb = AmbientFX.new()
-    _amb.name = "AmbientFX"
-    _amb.bind(_fx, {
-        "pond": pond,
-        "treeline": Rect2(0, 30, GW * T, 70),
-        "flutter": Rect2(150, 110, 360, 160),
-        "lanterns": lamps,
-        "smoke_at": smoke_at})
-    stage.add_child(_amb)                    # over the world, under UI
-    _amb.set_smoke(_hut != null
-        and _crew_stage(_crew_sid()) > 0)
-
+    _fxp.build_ambient()
 
 func _build_actors() -> void:
-    var ch := WORLD_SCALE * 1.12    # ~0.9 — chars shrink slightly less
-                                  # than props so they stay readable
-    # Stone Fire Pit upgrade swaps the bare ground for the fitted
-    # ring — drawn first so the flame loop sorts over it.  Lazy via
-    # _sync_decor_world so a mid-session buy drops the ring in too.
-    _sync_fire_pit()
-    # fire loop — A1b cycle, frames 1..6 (frame 0 is the ignite lead-in)
-    var fire := _anchored_frames("fx",
-        ["fx/A1b_1", "fx/A1b_2", "fx/A1b_3", "fx/A1b_4", "fx/A1b_5",
-         "fx/A1b_6"], 6.0, _fire_pos)
-    fire.name = "FireLoop"
-    # reduced-flashing setting: the 6 fps flame cycle is the one real
-    # on-screen flicker — slow it to a breathing ember instead of
-    # killing the fire outright (still reads as fire, stops strobing)
-    if UIFeel.reduced_flashing:
-        fire.speed_scale = 0.35
-    fire.scale = Vector2(ch, ch)
-    world.add_child(fire)
-    # hearth light — the emit registry's first node row: a warm
-    # pool that only exists once real dark falls (the "ember"
-    # curve), so the fire pops against the night grade — the payoff
-    # matrix.txt's storm-night table sells.  Texture generated —
-    # radial falloff, no asset.
-    var gg := Gradient.new()
-    gg.set_color(0, Color(1, 1, 1, 1))
-    gg.set_color(1, Color(1, 1, 1, 0))
-    var gt := GradientTexture2D.new()
-    gt.gradient = gg
-    gt.width = 96
-    gt.height = 96
-    gt.fill = GradientTexture2D.FILL_RADIAL
-    gt.fill_from = Vector2(0.5, 0.5)
-    gt.fill_to = Vector2(1.0, 0.5)
-    _fire_light = PointLight2D.new()
-    _fire_light.name = "FireLight"
-    _fire_light.position = _fire_pos + Vector2(0, -8)  # flames ride
-                                                    # above the anchor
-    _fire_light.color = Color(1.0, 0.60, 0.32)
-    _fire_light.texture = gt
-    _fire_light.texture_scale = 1.7        # ~80px pool over the ring
-    _fire_light.energy = 0.0               # the ember curve owns it
-    world.add_child(_fire_light)
-    _fx.track_emit(&"fire", Color(1.5, 1.5, 1.5), &"ember",
-        _fire_light, &"energy", 0.06)  # §5.10 hearth flicker —
-                                       # storm turns it to sputter
-    # warden idle-south (A2, 4f breathing) beside the fire
-    var warden := _anchored_frames("chars",
-        ["characters/warden/A2_idle_south_0",
-         "characters/warden/A2_idle_south_1",
-         "characters/warden/A2_idle_south_2",
-         "characters/warden/A2_idle_south_3"], 4.0, WARDEN_POS)
-    warden.scale = Vector2(ch, ch)
-    world.add_child(warden)
-    # camp dog idle (A3, 8f) — bean_quad cast, feet anchor at (26,38)
-    var dog := _anchored_frames("chars",
-        ["characters/bean_quad/A3_idle_south_0",
-         "characters/bean_quad/A3_idle_south_1",
-         "characters/bean_quad/A3_idle_south_2",
-         "characters/bean_quad/A3_idle_south_3",
-         "characters/bean_quad/A3_idle_south_4",
-         "characters/bean_quad/A3_idle_south_5",
-         "characters/bean_quad/A3_idle_south_6",
-         "characters/bean_quad/A3_idle_south_7"], 5.0, _dog_pos,
-        Vector2(26, 38))
-    dog.scale = Vector2(ch, ch)
-    world.add_child(dog)
-    # ranger Mai keeps watch by the path bend
-    var mai := _anchored("characters/ranger_mai",
-                         "ranger_mai_south", MAI_POS)
-    mai.scale = Vector2(ch, ch)
-    world.add_child(mai)
-    _char_shadow(WARDEN_POS, 34.0)
-    _dog_shadow = _char_shadow(_dog_pos, 26.0)
-    _char_shadow(MAI_POS, 34.0)
-    actor_nodes = [warden, dog, mai]         # walk-behind fade set
-    _actor_map = {"warden": warden, "dog": dog, "mai": mai}
-    # §9 rounds — bean_quad walk anims swap in for the tween; the
-    # idle loop owns him while he's posted.
-    _dog_move = AnimatedSprite2D.new()
-    _dog_move.centered = false
-    _dog_move.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-    _dog_move.scale = Vector2(ch, ch)
-    _dog_move.offset = -Vector2(26, 38)
-    var dframes := SpriteFrames.new()
-    for d4 in ["east", "south", "west", "north"]:
-        dframes.add_animation(d4)
-        dframes.set_animation_speed(d4, 8.0)
-        for i in 8:
-            dframes.add_frame(d4,
-                _tex("characters/bean_quad/A3_walk_%s_%d" % [d4, i]))
-    _dog_move.sprite_frames = dframes
-    _dog_move.visible = false
-    world.add_child(_dog_move)
-    _dog_points = [_dog_pos,
-        _fire_pos + Vector2(40, 18),
-        _board_rect.get_center() + Vector2(10, 34)]
-    var fsp: Variant = layout.get("errand_spots", {}).get("forage")
-    if fsp != null:
-        _dog_points.append(Vector2(fsp[0], fsp[1]) + Vector2(22, 14))
-    _sync_decor_world()                      # placed pieces render always
-    _build_overlay = BuildGrid.new()         # UI-033 cell-tint layer
-    _build_overlay.org = origin
-    _build_overlay.cell_px = CELL
-    _build_overlay.visible = false
-    _build_overlay.z_as_relative = false
-    _build_overlay.z_index = 8               # tints ride above world art
-    stage.add_child(_build_overlay)
-
+    _cast.build_actors()
 
 # ----------------------------------------------------------------- UI
 # HUD/panels/markers live in game/ui/ — chrome builders are UIKit statics,
@@ -1415,9 +1092,9 @@ func _build_ui() -> void:
     Game.crew_stage_ready.connect(func(_s):
         hud.set_crew_badge(true)
         _sync_crew_hut())
-    Game.crew_collected.connect(_on_crew_collected)
+    Game.crew_collected.connect(_flow.on_crew_collected)
     _sync_crew_hut()                           # restore state on reload
-    Game.page_completed.connect(_on_page_completed)
+    Game.page_completed.connect(_flow.on_page_completed)
     # §8.3 journal badge: unread mail count; refreshed on delivery and
     # whenever the panel stack settles (reading happens inside the sheet)
     Game.letter_delivered.connect(_refresh_journal_badge.unbind(1))
@@ -1425,7 +1102,7 @@ func _build_ui() -> void:
     # spec 005: authored light cues — sheets declare WHAT cue is up
     # (vignette shown, ceremony playing, letter open); we apply it as
     # a moment-bound emit term on the scalar driver
-    Game.light_cue_changed.connect(_on_light_cue)
+    Game.light_cue_changed.connect(_fxp.on_light_cue)
 
     # fire proximity bubble — a world marker so it rides the canvas
     # transform (stage margins included); shown only while the pointer
@@ -1634,64 +1311,10 @@ func _spawn_board() -> void:
 
 
 func _seat_visual(gid: String, pads: Array) -> void:
-    var st: Dictionary = Game.site_state()
-    var arch: String = st["guests"][gid].get("archetype", "")
-    # a fresh world sprite joins the y-sort — feet just under the pad's
-    # bottom edge so it sorts in front of the tent
-    var g := Node2D.new()
-    g.name = "w_" + gid
-    # the seat sprite IS the evening cast face — persona_key picks
-    # identically on both sides; ungenerated personas fall back to the
-    # tinted stand-in
-    var pk := SimDirector.persona_key(gid, arch, _cast_seed(),
-        _actors_data())
-    var s: Sprite2D
-    if pk != "" and ResourceLoader.exists(
-            A + "characters/%s/%s_south.png" % [pk, pk]):
-        s = _anchored("characters/" + pk, pk + "_south", Vector2.ZERO)
-    else:
-        s = _anchored("characters/warden", "warden_south", Vector2.ZERO)
-        s.modulate = _tint(st["guests"][gid])
-    g.add_child(s)
-    g.position = pad_cells[pads[0]].position + Vector2(12, CELL + 4)
-    world.add_child(g)
-    guest_nodes[gid] = g
-    UIFeel.pop(g, Vector2(1.12, 0.85))   # landing squash — seats thud
-    tent_nodes[gid] = []
-    var idx := absi(hash(gid + arch) as int)
-    for pid in pads:
-        var tk: String = TENTS[idx % TENTS.size()]
-        var t := _anchored("props_medium", tk, Vector2.ZERO)
-        t.set_meta("tent_key", tk)      # night swap reads this
-        idx += 1
-        var r: Rect2 = pad_cells[pid]
-        t.position = r.position + Vector2(CELL / 2.0, CELL)
-        world.add_child(t)
-        tent_nodes[gid].append(t)
-    hud.tray.mark_seated(gid)
-    _refresh_bubbles()
-    _sync_marks()
-    _sync_night_props()                        # evening arrival = lit
-    _recast_if_evening()                       # the new guest walks in
-
+    _guest.seat_visual(gid, pads)
 
 func _unseat_visual(gid: String) -> void:
-    if guest_nodes.has(gid):
-        guest_nodes[gid].queue_free()
-        guest_nodes.erase(gid)
-    for t in tent_nodes.get(gid, []):
-        t.queue_free()
-    tent_nodes[gid] = []
-    _sync_night_props()                        # freed pads go dark
-    if guest_bubbles.has(gid):
-        markers.release(guest_bubbles[gid])
-        guest_bubbles.erase(gid)
-    _clear_served_mark(gid)                  # their plate goes back
-    hud.tray.mark_unseated(gid)
-    _refresh_bubbles()
-    _sync_marks()
-    _recast_if_evening()
-
+    _guest.unseat_visual(gid)
 
 ## UI-021: trait-state bubbles over seated guests.  Every trait gets a
 ## state glyph — "+" met, "−" tripped, "·" unresolved — never colour
@@ -1700,76 +1323,18 @@ func _unseat_visual(gid: String) -> void:
 ## seat/unseat re-evaluates ALL seated guests because neighbour effects
 ## move other people's states (social fills, loud trips light_sleeper).
 func _bubble_state(d: Dictionary) -> Dictionary:
-    if d.get("tripped", false):
-        return {"sign": "−", "color": UITokens.RED}
-    if d.get("met", false):
-        return {"sign": "+", "color": UITokens.GREEN}
-    return {"sign": "·", "color": UITokens.DIM}
-
+    return _guest.bubble_state(d)
 
 func _refresh_bubbles() -> void:
-    var st: Dictionary = Game.site_state()
-    for gid in st["assignments"]:
-        var r := Game.preview(gid, st["assignments"][gid])
-        if r.is_empty():
-            continue
-        var control: Control = null
-        if guest_bubbles.has(gid):
-            control = markers.marker_control(guest_bubbles[gid])
-            if not is_instance_valid(control):
-                control = null
-        if control == null:
-            var g: Node2D = guest_nodes.get(gid)
-            if g == null:
-                continue
-            var anchor := Node2D.new()
-            anchor.position = Vector2(0, -80)   # above the sprite's head
-            g.add_child(anchor)
-            guest_bubbles[gid] = markers.marker(anchor,
-                Vector2(-40, 0))
-            control = markers.marker_control(guest_bubbles[gid])
-        _fill_bubble(control, r["detail"])
-
+    _guest.refresh_bubbles()
 
 ## Rebuild one bubble's chips: trait icons in a slot-dark tag, each
 ## carrying its state sign on the lower edge.
 func _fill_bubble(control: Control, detail: Array) -> void:
-    for c in control.get_children():
-        c.queue_free()
-    var w := detail.size() * 18 + 10
-    var p := Panel.new()
-    p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    p.add_theme_stylebox_override("panel",
-        UIKit.flat("glass_chip", 1.0, 0.92))
-    p.position = Vector2(40 - w / 2.0, 0)        # centred on the anchor
-    p.size = Vector2(w, 22)
-    control.add_child(p)
-    var x := 5
-    for d in detail:
-        var st := _bubble_state(d)
-        var chip := Control.new()
-        chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-        chip.position = Vector2(x, 3)
-        chip.size = Vector2(16, 16)
-        var t := UIKit.icon_rect(String(d.get("trait", "")),
-            Color(1, 1, 1, 0.65) if st["sign"] == "·" else null)
-        chip.add_child(t)
-        var l := UIKit.label_for(st["sign"], UITokens.TypeRole.HEAD,
-            st["color"])
-        l.position = Vector2(9, 5)
-        chip.add_child(l)
-        p.add_child(chip)
-        x += 18
-
+    _guest.fill_bubble(control, detail)
 
 func _clear_bubbles() -> void:
-    for tok in guest_bubbles.values():
-        markers.release(tok)
-    guest_bubbles = {}
-    for tok in _served_marks.values():       # plates share the lifetime
-        markers.release(int(tok))
-    _served_marks = {}
-
+    _guest.clear_bubbles()
 
 ## §5.5 dinner: a meal chip toggles the arm; armed, a seated guest tap
 ## (world sprite or seated card) serves the plate.  Serving the same
@@ -1820,13 +1385,7 @@ func _update_strip(px: Vector2) -> void:
 ## Pad rings show on open pads with nobody seated — the tent itself
 ## is the occupied state (§5.1).
 func _sync_marks() -> void:
-    var st: Dictionary = Game.site_state()
-    for pid in pad_cells:
-        var mark := pads_node.get_node_or_null("mark_" + pid)
-        if mark:
-            mark.visible = st["pads"].get(pid, {}).get("open", false) \
-                and not _pad_occupied(pid)
-
+    _guest.sync_marks()
 
 ## Pads a guest would take starting at pid — one, or pid plus its
 ## first free neighbour for a two-pad party.
@@ -1843,153 +1402,33 @@ func _pad_occupied(pid: String) -> bool:
     return _input.pad_occupied(pid)
 
 func _status() -> void:
-    var st: Dictionary = Game.site_state()
-    # ranger's tips setting gates the [hint] tail; the status facts
-    # themselves always show
-    var hint := "   [%s]" % tr("tray_hint") \
-        if bool(Game.settings.get("rangers_tips", true)) else ""
-    hud.set_status(("day %d · site day %d · %s · %dc%s") % [
-        Game.day, Game.site_day(), st["weather"].to_upper(), Game.coins,
-        hint])
-    # ambience is a live mix owned by WorldFX — the dusk + front
-    # scalars crossfade day birds / night crickets / storm wash
-    hud.set_crew_badge(Game.is_stage_ready())
-    # the button is the phase action, not the phase name (§4 table:
-    # Evening -> Goodnight, Night -> Sleep, Morning -> Head out)
-    hud.set_phase(tr("hud_goodnight").to_upper() if evening_open \
-        else (tr("hud_headout").to_upper() \
-            if Game.phase == Game.Phase.PREP \
-            else (tr("hud_prep").to_upper() \
-                if Game.phase == Game.Phase.MORNING \
-                else tr("hud_sleep").to_upper())))
-    hud.set_rating(night_rating if night_rating else "—")
-    hud.set_coins(tr("hud_coins_short") % Game.coins)
-    hud.set_day("%s %d · %s" % [tr("hud_day").to_upper(), Game.day,
-        tr("weather_" + String(st["weather"])).to_upper()],
-        st["weather"])
-
+    _flow.status()
 
 func _goodnight() -> void:
-    # capture names before goodnight() clears st["guests"]
-    var names := {}
-    for gid in Game.site_state()["guests"]:
-        names[gid] = Game.site_state()["guests"][gid].get("name", gid)
-    var rep := Game.goodnight()
-    night_rating = "%.1f" % rep["rating"]
-    if rep["rating"] >= 4.99 and not _five_star_seen:
-        _five_star_seen = true              # first-ever 5★ earns the beat
-        _queue_ceremony("fivestar", tr("cer_five"), "", "star_full")
-    evening_open = false
-    _deselect()
-    _clear_bubbles()
-    hud.tray.reset()
-    hud.tray.visible = false
-    _status()
-    # spec 005 A: tonight's vignette is a beat — the card shows in the
-    # sheet and its `cue` light term grades the world behind it; clears
-    # whichever way the sheet leaves (Sleep or a dimmer-dismiss)
-    var vid := String(rep.get("vignette", ""))
-    if vid != "":
-        var vrow := _vignette_row(vid)
-        var cue: Dictionary = vrow.get("cue", {})
-        if not cue.is_empty():
-            Game.set_light_cue("vig_" + vid,
-                Color(String(cue.get("col", "e8c46a"))),
-                StringName(cue.get("w", "ember")))
-    # UI-022: the payoff sheet — reviews with breakdowns, totals,
-    # pages, forecast, Double-tips offer, Sleep
-    var sheet := NightSummary.make(rep, names, Game.day,
-        Game.forecast())
-    sheet.sleep_pressed.connect(_on_sleep)
-    if vid != "":
-        sheet.tree_exited.connect(
-            func(): Game.clear_light_cue("vig_" + vid))
-    panel_mgr.open(sheet)
-    sheet.run_count_up.call_deferred()
-
+    _flow.goodnight()
 
 func _vignette_row(vid: String) -> Dictionary:
-    for v in Catalog.data.get("vignettes", []):
-        if v.get("id") == vid:
-            return v
-    return {}
-
+    return _flow.vignette_row(vid)
 
 ## Sleep exits the night (§4 phase table): close the summary and roll
 ## into the next morning — same path the phase button takes.
 func _on_sleep() -> void:
-    UIFeel.haptic("confirm")
-    panel_mgr.close()
-    _advance_phase()
-
+    _flow.on_sleep()
 
 func _advance_phase() -> void:
-    if evening_open:
-        _goodnight()
-    elif Game.phase == Game.Phase.MORNING:
-        UIFeel.haptic("confirm")               # into the day's prep
-        UIFeel.sfx("confirm")
-        _start_prep()
-    elif Game.phase == Game.Phase.PREP:
-        UIFeel.haptic("confirm")               # Head out — guests arrive
-        UIFeel.sfx("confirm")
-        _start_evening()
-    else:                                      # Night -> next Morning
-        hud.set_report("")
-        Game.advance_day()                     # set_phase(MORNING) inside
-        Ads.show_interstitial()                # §24.2 pacing-gated mock
-        _start_morning()
-
+    _flow.advance_phase()
 
 ## UI-023 Morning: camp is quiet — the notice board is the interactive
 ## object.  A "!" marker floats over the signpost until Head out.
 func _start_morning() -> void:
-    evening_open = false
-    _clear_cast()                            # last night's cast is home
-    _cast_day()                              # morning ambience joins
-    _set_build(false)                          # build tools stay out
-    _clear_errands()                           # a new day re-rolls nodes
-    _sync_crew_hut()                           # day-2 crew may start here
-    _check_dog_adoption()                      # Friend bond → naming sheet
-    # "!" chip over the notice board — flat glass chip; gold glyph.
-    # offset places it just over the signpost's visible head — the
-    # prop is mostly occluded by the chest + warden tent
-    var bang := UIKit.label_for("!", UITokens.TypeRole.DISPLAY,
-        UITokens.GOLD)
-    bang.position = Vector2(8, -1)
-    var rc: Array = markers.icon_chip(board_anchor, bang,
-        Vector2(-11, -42), Vector2(22, 22))
-    _board_tok = rc[0]
-    var bub: Panel = rc[1]
-    # gentle bob so the marker reads alive, not painted on the prop.
-    # Gate: under reduced motion/flashing a set_loops() tween at the
-    # collapsed 1ms duration would be an infinite strobe — skip it.
-    bub.pivot_offset = bub.size / 2.0
-    if UIFeel.can_pulse():
-        # bound to the chip so the loop dies when the marker releases —
-        # a scene-bound loop would keep stepping a freed target
-        var bob := UIFeel.apply(bub.create_tween().set_loops(), "marker")
-        var bd := UIFeel.dur("marker")
-        bob.tween_property(bub, "scale", Vector2(1.12, 1.12), bd)
-        bob.tween_property(bub, "scale", Vector2.ONE, bd)
-    _check_dialogue()
-    _status()
-
+    _flow.start_morning()
 
 ## Authored light cue -> moment-bound emit term on WorldFX (spec 005).
 ## Single-slot in Game; we translate set/clear into track/untrack —
 ## "ember" warm beats, "dusk" night beats, "flat" held tints.
-var _cue_id := ""
 
 func _on_light_cue(cue: Dictionary) -> void:
-    if _cue_id != "":
-        _fx.untrack_emit(StringName(_cue_id))
-        _cue_id = ""
-    if not cue.is_empty() and _fx != null:
-        _cue_id = String(cue["id"])
-        _fx.track_emit(StringName(_cue_id), cue["col"],
-            StringName(cue["w"]))
-
+    _fxp.on_light_cue(cue)
 
 ## Morning dialogue (UI-038 world half): rows from data/dialogue.json
 ## whose site+day match and haven't run yet queue onto the actors'
@@ -1997,116 +1436,37 @@ func _on_light_cue(cue: Dictionary) -> void:
 ## last night's resolution — a matching conditional beats plain
 ## `day` rows to the front of the queue.
 func _check_dialogue() -> void:
-    _dlg_queue.clear()
-    var when_rows := []
-    var day_rows := []
-    var rows: Array = Catalog.data.get("dialogue", [])
-    for d in rows:
-        if d.get("site", "") != String(Game.site_id):
-            continue
-        if Game.dialogue_seen.get(d.get("id", ""), false):
-            continue
-        if not _actor_map.has(d.get("anchor", "")):
-            continue
-        var w: Dictionary = d.get("when", {})
-        if not w.is_empty():
-            if Game.dialogue_when_ok(w):
-                when_rows.append(d)
-        elif int(d.get("day", -1)) == Game.site_day():
-            day_rows.append(d)
-    _dlg_queue = when_rows + day_rows
-    _run_dialogue()
-
+    _flow.check_dialogue()
 
 func _run_dialogue() -> void:
-    if _dlg_queue.is_empty() or _dlg_tok != 0:
-        return
-    var d: Dictionary = _dlg_queue.pop_front()
-    var anchor: Node2D = _actor_map[d["anchor"]]
-    Game.dialogue_seen[d["id"]] = true
-    _dlg_tok = DialogueBubble.say(markers, anchor,
-        Vector2(-DialogueBubble.W / 2.0, -66), String(d.get("who", "")),
-        d.get("lines", []), func(): _dlg_tok = 0; _run_dialogue())
-
+    _flow.run_dialogue()
 
 # ---------------------------------------------------------- ceremonies
 
-func _on_crew_collected(_structure: StringName, keepsake: StringName,
-		_finished: bool) -> void:
-    hud.set_crew_badge(Game.is_stage_ready())
-    _sync_crew_hut(true)               # the cleared stage scatters off
-    _queue_ceremony("keepsake", tr("cer_keepsake"),
-        _keepsake_label(String(keepsake)), "keepsakes")
+func _on_crew_collected(_structure: StringName, keepsake: StringName, _finished: bool) -> void:
+    _flow.on_crew_collected(_structure, keepsake, _finished)
 
-
-func _on_page_completed(_site: StringName, _page: int, gift: int,
-		_unlocks: Array) -> void:
-    var sub := tr("cer_gift").format({"n": gift}) if gift > 0 else ""
-    _queue_ceremony("page", tr("cer_page"), sub, "journal")
-
+func _on_page_completed(_site: StringName, _page: int, gift: int, _unlocks: Array) -> void:
+    _flow.on_page_completed(_site, _page, gift, _unlocks)
 
 ## Milestones queue — a page completing on load or a keepsake landing
 ## the same tick as a 5★ night must never stack cards.  Held during
 ## boot (signals can fire inside _ready) and played one at a time.
-var _ceremony_q := []
-var _ceremony_busy := false
 
-func _queue_ceremony(kind: String, title: String, sub: String,
-		icon: String) -> void:
-    _ceremony_q.append([kind, title, sub, icon])
-    _drain_ceremonies()
-
+func _queue_ceremony(kind: String, title: String, sub: String, icon: String) -> void:
+    _flow.queue_ceremony(kind, title, sub, icon)
 
 ## spec 005 A3: ceremony kind -> authored light cue (the world grades
 ## while the card is up).  Warm for milestones, gold for the perfect
 ## night, a journal-blue for pages.
-const CEREMONY_CUE := {
-    "fivestar": {"col": Color("e8c46a"), "w": &"flat"},
-    "keepsake": {"col": Color("c9a45c"), "w": &"flat"},
-    "page":     {"col": Color("7a9ac4"), "w": &"flat"},
-}
-
 func _drain_ceremonies() -> void:
-    if _ceremony_busy or not _booted or _ceremony_q.is_empty():
-        return
-    _ceremony_busy = true
-    var c: Array = _ceremony_q.pop_front()
-    var kind := String(c[0])
-    # spec 005 A3: each ceremony kind grades the world while its card
-    # is up — the Eastward pattern of authored light on the beat
-    var cue: Dictionary = CEREMONY_CUE.get(kind, {})
-    if not cue.is_empty():
-        Game.set_light_cue("cer_" + kind, cue["col"], cue["w"])
-    Ceremony.play(_ceremony_layer, kind, String(c[1]),
-        String(c[2]), String(c[3]),
-        func() -> void:
-            Game.clear_light_cue("cer_" + kind)
-            _ceremony_busy = false
-            _drain_ceremonies())
-
+    _flow.drain_ceremonies()
 
 func _keepsake_label(kid: String) -> String:
-    var structures: Array = Catalog.data.get("crew", {}) \
-        .get("structures", [])
-    for s in structures:
-        for st in s.get("stages", []):
-            if st.get("keepsake", {}).get("id") == kid:
-                return String(st["keepsake"].get("label", kid))
-    return kid
-
+    return _flow.keepsake_label(kid)
 
 func _start_evening() -> void:
-    if _board_tok:
-        markers.release(_board_tok)
-        _board_tok = 0
-    _set_build(false)                          # tools down at dusk
-    _clear_errands()                           # prep closes at dusk
-    _sync_crew_hut()                           # porch glow wakes at dusk
-    Game.set_phase(Game.Phase.EVENING)
-    _spawn_board()
-    _cast_evening()                            # D4 — tonight's cast on
-    _status()
-
+    _flow.start_evening()
 
 # ------------------------------------------------- D4 actor layer (§17)
 #
@@ -2118,116 +1478,49 @@ func _start_evening() -> void:
 # just recasts and the new guest walks in.
 
 func _cast_seed() -> int:
-    return int(abs(hash("cast:%s:%d" % [Game.site_id, Game.day])))
-
+    return _cast.cast_seed()
 
 func _actors_data() -> Dictionary:
-    return Catalog.data.get("actors", {})
-
+    return _cast.actors_data()
 
 func _cast_evening() -> void:
-    _sim = SimDirector.cast_night(Game.site_state(), layout,
-        _cast_seed(), _actors_data())
-    if _actor_view == null:
-        _actor_view = ActorView.new()
-        add_child(_actor_view)
-    _actor_view.clear()
-    _actor_view.configure(_sim, _actors_data(), world, _tex,
-        func() -> bool: return panel_mgr.top() != null,
-        WORLD_SCALE * 1.12, _emote_show, _emote_hide)
-    _sync_seat_actors()
-
+    _cast.cast_evening()
 
 ## Day ambience (§3 "alive in ten seconds"): while the player reads
 ## the board or works prep, locals + the dog drift the errand loop.
 ## Same presenter, calmer cast — no guest parties until dusk.
 func _cast_day() -> void:
-    _sim = SimDirector.cast_day(Game.site_state(), layout,
-        _cast_seed(), _actors_data(), Game.last_night_perfect())
-    if _actor_view == null:
-        _actor_view = ActorView.new()
-        add_child(_actor_view)
-    _actor_view.clear()
-    _actor_view.configure(_sim, _actors_data(), world, _tex,
-        func() -> bool: return panel_mgr.top() != null,
-        WORLD_SCALE * 1.12, _emote_show, _emote_hide)
-
+    _cast.cast_day()
 
 func _recast_if_evening() -> void:
-    if Game.phase == Game.Phase.EVENING:
-        _cast_evening()
-    elif Game.phase in [Game.Phase.MORNING, Game.Phase.PREP]:
-        _cast_day()                            # build changed the set
-
+    _cast.recast_if_evening()
 
 ## The sim actor IS the guest once cast — the stand-in seat sprite
 ## hides (the node stays: bubbles/plates/taps anchor to the pad,
 ## not to the walking figure).
 func _sync_seat_actors() -> void:
-    var cast := {}
-    if _sim != null:
-        for eid in _sim.query(["persona"]):
-            var gid := String(_sim.getc(eid, "persona")
-                .get("guest", ""))
-            if gid != "":
-                cast[gid] = true
-    for gid in guest_nodes:
-        var n: Node2D = guest_nodes[gid]
-        if n.get_child_count() > 0:
-            (n.get_child(0) as CanvasItem).visible = not cast.has(gid)
-
+    _cast.sync_seat_actors()
 
 func _clear_cast() -> void:
-    if _actor_view != null:
-        _actor_view.clear()
-    _sim = null
-    for gid in guest_nodes:
-        var n: Node2D = guest_nodes[gid]
-        if n.get_child_count() > 0:
-            (n.get_child(0) as CanvasItem).visible = true
-
+    _cast.clear_cast()
 
 ## Emote chips — sim emote comp -> marker chip over the actor sprite.
 ## Icon strings route through the registry where they can, a glyph
 ## label otherwise.
 func _emote_show(anchor: Node2D, icon: String) -> int:
-    var map := {"!": "alert", "?": "question", "heart": "heart"}
-    var ik := String(map.get(icon, ""))
-    var content: Control
-    if ik != "":
-        content = UIKit.icon_rect(ik, UITokens.PAPER, 10)
-    else:
-        content = UIKit.label_for(icon, UITokens.TypeRole.DISPLAY,
-            UITokens.GOLD)
-    return int(markers.icon_chip(anchor, content, Vector2(8, -42))[0])
-
+    return _cast.emote_show(anchor, icon)
 
 func _emote_hide(tok: int) -> void:
-    markers.release(tok)
-
+    _cast.emote_hide(tok)
 
 ## Outfitter (UI-032) — the decor tab's Place rows hand off to build
 ## mode through the sheet's place_requested signal.
 func _open_outfitter(tab := "gear") -> void:
-    var s := OutfitterSheet.make(tab)
-    s.place_requested.connect(_on_place_requested)
-    panel_mgr.open(s)
-
+    _sheets.open_outfitter(tab)
 
 ## The notice board sheet (§17.2): tonight's requests + the forecast.
 func _open_booking() -> void:
-    var st: Dictionary = Game.site_state()
-    var open_n := 0
-    for pid in st["pads"]:
-        if st["pads"][pid].get("open", false):
-            open_n += 1
-    var cooked := {}
-    for r in Game.recipes_cooked:
-        cooked[r] = true
-    panel_mgr.open(BookingBoard.make(st["board"],
-        String(st["weather"]), open_n, _card_sprite, _trait_map(),
-        cooked))
-
+    _sheets.open_booking()
 
 # ------------------------------------------------------------- prep (§7)
 #
@@ -2237,176 +1530,53 @@ func _open_booking() -> void:
 # hint chip, not silence — they advertise the outfitter (UI-032).
 
 func _start_prep() -> void:
-    Game.set_phase(Game.Phase.PREP)
-    _cast_day()                              # recast over any build edits
-    _spawn_errands()
-    _status()
-
+    _flow.start_prep()
 
 ## Decal reads the node's contents at a glance; gold pops for the rare.
 func _errand_decal(node: Dictionary) -> String:
-    var items: Array = node.get("items", [])
-    var first := String(items[0]) if not items.is_empty() else ""
-    if "goldcap" in items:
-        return "decal_mushroom_orange"         # the rare one reads gold
-    match first:
-        "berries":  return "decal_berries_red"
-        "mushroom": return "decal_mushroom_brown"
-        "honey":    return "decal_flowers_white"
-        _:          return "decal_plantain"    # herb / generic forage
-
+    return _cast.errand_decal(node)
 
 func _spawn_errands() -> void:
-    _clear_errands()
-    _errand_layer = Node2D.new()
-    _errand_layer.name = "Errands"
-    world.add_child(_errand_layer)
-    _sync_errand_nodes()
-    var es: Dictionary = layout.get("errand_spots", {})
-    # fishing water is authored per site: pinewatch's lone "pond" anchor
-    # or whisper_river's named banks — each spot keeps its own daily
-    # catch count in the sim
-    _fish_spots = []
-    if es.has("pond"):
-        _add_errand_spot("pond", es["pond"], "fish", "pond")
-    for k in es.get("fishing", {}):
-        _add_errand_spot("fish_" + String(k), es["fishing"][k],
-            "fish", String(k))
-    if es.has("lookout"):
-        _add_errand_spot("lookout", es["lookout"], "eye", "lookout")
-    _sync_dog_chip()
-    _sync_pad_chips()
+    _cast.spawn_errands()
 
-
-func _add_errand_spot(key: String, a: Variant, icon: String,
-		spot := "") -> void:
-    var anchor := Node2D.new()
-    anchor.position = Vector2(float(a[0]), float(a[1])).round()
-    _errand_layer.add_child(anchor)
-    _errand_anchors[key] = anchor
-    _afford_chip(anchor, icon, key)
-    if spot != "" and icon == "fish":
-        _fish_spots.append({"key": key, "node": anchor, "spot": spot})
-
+func _add_errand_spot(key: String, a: Variant, icon: String, spot := "") -> void:
+    _cast.add_errand_spot(key, a, icon, spot)
 
 ## One forage node = one decal + one leaf affordance chip above it.
 func _spawn_errand_node(node: Dictionary) -> void:
-    var nid := String(node["id"])
-    var p: Array = node.get("px", [0, 0])
-    var spr := _anchored("decals", _errand_decal(node),
-        Vector2(float(p[0]), float(p[1])))
-    _errand_layer.add_child(spr)
-    _errand_nodes[nid] = spr
-    _afford_chip(spr, "leaf", nid)
-
+    _cast.spawn_errand_node(node)
 
 ## Spotting can append a bonus node mid-prep — spawn visuals for any
 ## sim node that doesn't have one yet.
 func _sync_errand_nodes() -> void:
-    if _errand_layer == null:
-        return
-    for node in Game.site_state()["forage_nodes"]:
-        var nid := String(node["id"])
-        if not _errand_nodes.has(nid):
-            _spawn_errand_node(node)
-
+    _cast.sync_errand_nodes()
 
 ## The stray advertises a pet only while today's pet is unspent.
 func _sync_dog_chip() -> void:
-    var tok := int(_errand_marks.get("dog", 0))
-    var want := bool(Game.dog.get("met", false)) \
-        and not bool(Game.dog.get("pet_today", false))
-    if tok != 0 and not want:
-        markers.release(tok)
-        _errand_marks.erase("dog")
-    elif tok == 0 and want and _actor_map.has("dog"):
-        _afford_chip(_actor_map["dog"], "dog", "dog")
-
+    _cast.sync_dog_chip()
 
 ## The quiet affordance: a small icon chip riding the node's marker.
 func _afford_chip(anchor: Node2D, icon: String, key: String) -> void:
-    var ic := UIKit.icon_rect(icon, UITokens.PAPER, 12)
-    ic.position = Vector2(3, 3)
-    _errand_marks[key] = markers.icon_chip(anchor, ic,
-        Vector2(-9, -30))[0]
-
+    _cast.afford_chip(anchor, icon, key)
 
 ## Result feedback: a chip pops over the spot, holds a readable beat,
 ## veils out, releases its marker.  Reduced motion keeps the hold —
 ## the fade is the motion, not the point.
 func _float_chip(anchor: Node2D, text: String, icon := "") -> void:
-    var tok := markers.marker(anchor, Vector2(-40, -48))
-    var chip := PanelContainer.new()
-    chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    chip.add_theme_stylebox_override("panel", UIKit.flat("glass_chip"))
-    var h := HBoxContainer.new()
-    h.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    h.add_theme_constant_override("separation", UITokens.SP1)
-    chip.add_child(h)
-    if icon != "":
-        h.add_child(UIKit.icon_rect(icon, UITokens.GOLD, 12))
-    if text != "":
-        h.add_child(UIKit.label_for(text, UITokens.TypeRole.CAPTION,
-            UITokens.PAPER))
-    var host: Control = markers.marker_control(tok)
-    host.add_child(chip)
-    chip.resized.connect(func():
-        chip.position.x = -chip.size.x / 2.0   # centre once measured
-        chip.pivot_offset = chip.size / 2.0)   # and pop around centre
-    UIFeel.pop(chip)
-    var tw := create_tween()
-    tw.tween_interval(0.75)
-    UIFeel.apply(tw, "veil_out")
-    tw.tween_property(chip, "modulate:a", 0.0, UIFeel.dur("veil_out"))
-    tw.tween_callback(func(): markers.release(tok))
-
+    _sheets.float_chip(anchor, text, icon)
 
 func _ing_name(item_id: String) -> String:
-    for r in Catalog.data.get("ingredients", []):
-        if r.get("id") == item_id:
-            return String(r.get("name", item_id))
-    return item_id
-
+    return _sheets.ing_name(item_id)
 
 ## "+2 Berries" — per-kind counts, ingredient names match the pantry.
 func _gain_text(items: Array) -> String:
-    var counts := {}
-    for i in items:
-        var k := String(i)
-        counts[k] = int(counts.get(k, 0)) + 1
-    var parts := []
-    for k in counts:
-        parts.append("+%d %s" % [counts[k], _ing_name(k)])
-    return "  ".join(parts)
-
+    return _sheets.gain_text(items)
 
 func _free_errand(nid: String) -> void:
-    var spr: Node2D = _errand_nodes.get(nid)
-    if spr != null:
-        var tw := UIFeel.apply(create_tween(), "veil_out")
-        tw.tween_property(spr, "modulate:a", 0.0, UIFeel.dur("veil_out"))
-        tw.tween_callback(spr.queue_free)
-        _errand_nodes.erase(nid)
-    var tok := int(_errand_marks.get(nid, 0))
-    if tok != 0:
-        markers.release(tok)
-        _errand_marks.erase(nid)
-
+    _cast.free_errand(nid)
 
 func _clear_errands() -> void:
-    for tok in _errand_marks.values():
-        markers.release(int(tok))
-    _errand_marks = {}
-    _errand_nodes = {}
-    _errand_anchors = {}
-    for tok in _pad_chips.values():
-        markers.release(int(tok))
-    _pad_chips = {}
-    _close_pad_menu()
-    if _errand_layer != null:
-        _errand_layer.queue_free()
-        _errand_layer = null
-
+    _cast.clear_errands()
 
 ## PREP tap routing.  Returns a tag for the smoke harness; hit-test
 ## order is pads (fixed landmarks) -> forage -> pond -> lookout -> dog.
@@ -2420,77 +1590,25 @@ func _prep_tap(px: Vector2) -> String:
 ## walk.  Adoption: Friend-level bond opens the naming prompt once.
 
 func _dog_walk(dog: AnimatedSprite2D) -> void:
-    if _dog_points.is_empty():
-        return
-    # pick from reachable waypoints only — choosing his own spot used
-    # to no-op the tick (and flaked the smoke assert ~25% of runs)
-    var cands: Array = []
-    for p in _dog_points:
-        if (p as Vector2).distance_to(dog.position) >= 10.0:
-            cands.append(p)
-    if cands.is_empty():
-        return
-    var next: Vector2 = cands[randi() % cands.size()]
-    _dog_walking = true
-    var dir := next - dog.position
-    _dog_move.animation = _dir4(dir)
-    _dog_move.position = dog.position
-    _dog_move.visible = true
-    _dog_move.play()
-    dog.visible = false
-    var dur := dir.length() / 36.0           # ~36px/s waddle
-    var tw := dog.create_tween().set_parallel()
-    tw.tween_property(dog, "position", next, dur)
-    tw.tween_property(_dog_move, "position", next, dur)
-    if _dog_shadow != null:
-        tw.tween_property(_dog_shadow, "position",
-            next + Vector2(2.0, -1.0), dur)
-    tw.chain().tween_callback(func():
-        _dog_move.visible = false
-        dog.visible = true
-        _dog_walking = false)
-
+    _cast.dog_walk(dog)
 
 ## 8-way direction name -> camp_dog_<dir>.png still.
 func _dir8(d: Vector2) -> String:
-    var oct: int = int(round(d.angle() / (PI / 4.0))) & 7
-    return ["east", "south-east", "south", "south-west",
-        "west", "north-west", "north", "north-east"][oct]
-
+    return _cast.dir8(d)
 
 ## 4-way direction name -> bean_quad A3_walk_<dir> anim (diagonals
 ## fold to the nearest cardinal).
 func _dir4(d: Vector2) -> String:
-    var q: int = int(round(d.angle() / (PI / 2.0))) & 3
-    return ["east", "south", "west", "north"][q]
-
+    return _cast.dir4(d)
 
 func _check_dog_adoption() -> void:
-    if not bool(Game.dog.get("met", false)) or Game.dog_adopted() \
-            or Game.dog_level() < 2:
-        return
-    call_deferred("_open_adopt")
-
+    _sheets.check_dog_adoption()
 
 func _open_adopt() -> void:
-    if Game.dog_adopted() or panel_mgr == null:
-        return
-    var cur := String(Game.dog.get("name", "Bean"))
-    if TranslationServer.get_locale().begins_with("vi"):
-        cur = String(Catalog.data.get("dog", {}).get("name_vi", cur))
-    var s := AdoptSheet.make(cur)
-    s.named.connect(_on_dog_named)
-    panel_mgr.open(s)
-
+    _sheets.open_adopt()
 
 func _on_dog_named(n: String) -> void:
-    Game.adopt_dog(n)
-    UIFeel.sfx("confirm")
-    UIFeel.haptic("confirm")
-    var dog: Node2D = _actor_map.get("dog")
-    if dog != null:
-        _float_chip(dog, String(Game.dog.get("name", "")), "heart")
-
+    _sheets.on_dog_named(n)
 
 ## Generic row-name lookup (birds etc.) — same convention as _ing_name.
 func _ing_name_row(list_name: String, rid: String) -> String:
@@ -2620,21 +1738,7 @@ func _build_hint_show() -> void:
 ## Screen-space nudge for "wrong phase" presses — same glass chip,
 ## pinned bottom-centre (no world anchor to ride).
 func _hud_hint(text: String) -> void:
-    var chip := PanelContainer.new()
-    chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-    chip.add_theme_stylebox_override("panel", UIKit.flat("glass_chip"))
-    chip.add_child(UIKit.label_for(text, UITokens.TypeRole.CAPTION,
-        UITokens.PAPER))
-    chip.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-    chip.position.y -= UITokens.MIN_TOUCH + 24
-    hud_layer.add_child(chip)
-    UIFeel.pop(chip)
-    var tw := create_tween()
-    tw.tween_interval(0.9)
-    UIFeel.apply(tw, "veil_out")
-    tw.tween_property(chip, "modulate:a", 0.0, UIFeel.dur("veil_out"))
-    tw.tween_callback(chip.queue_free)
-
+    _sheets.hud_hint(text)
 
 ## Hand-off from the outfitter's Place button: sheet closes, PREP arms.
 func _on_place_requested(item_id: String, from_stored: bool) -> void:
@@ -2668,247 +1772,40 @@ func _decor_idx_at(px: Vector2) -> int:
 ## Context row on a tapped piece: Move re-arms the ghost with kind
 ## "move", Store packs it, today's buys return for the full price.
 func _open_piece_menu(idx: int) -> void:
-    _close_piece_menu()
-    var d: Dictionary = Game.site_state()["decor"][idx]
-    var tok := markers.marker(_decor_nodes[idx], Vector2(-72, -66))
-    var chip := PanelContainer.new()
-    chip.add_theme_stylebox_override("panel", UIKit.flat("glass_chip"))
-    var h := HBoxContainer.new()
-    h.add_theme_constant_override("separation", 2)
-    chip.add_child(h)
-    var item_id := String(d["id"])
-    var mv := UIKit.icon_btn(h, "edit")
-    mv.tooltip_text = tr("bld_move")
-    mv.pressed.connect(func():
-        _close_piece_menu()
-        _arm_build({"id": item_id, "kind": "move", "idx": idx}))
-    var sb := UIKit.icon_btn(h, "box")
-    sb.tooltip_text = tr("bld_store")
-    sb.pressed.connect(func():
-        if Game.store_decor(idx):
-            UIFeel.sfx("close")
-            _close_piece_menu()
-            _sync_decor_world()
-            _build_overlay.free_cells = Game.decor_cells_free()
-            _build_overlay.queue_redraw())
-    if item_id in Game.bought_today:
-        var row := _decor_row_for(item_id)
-        var rb := UIKit.btn(h, Vector2(64, UITokens.MIN_TOUCH),
-            tr("bld_return").format({"p": int(row.get("price", 0))}),
-            "pill", Control.SIZE_SHRINK_CENTER)
-        rb.tooltip_text = tr("bld_return")
-        rb.pressed.connect(func():
-            if Game.return_bought(item_id):
-                UIFeel.sfx("coin")
-                _close_piece_menu()
-                _sync_decor_world()
-                _build_overlay.free_cells = Game.decor_cells_free()
-                _build_overlay.queue_redraw()
-                _status())
-    markers.marker_control(tok).add_child(chip)
-    _build_menu_tok = tok
-
+    _sheets.open_piece_menu(idx)
 
 func _close_piece_menu() -> void:
-    if _build_menu_tok != 0:
-        markers.release(_build_menu_tok)
-        _build_menu_tok = 0
-
+    _sheets.close_piece_menu()
 
 # ------------------------------------------------------------- pads
 
 ## Pad state -> sprite + shelter overlay.  Called on load (restore),
 ## after clear_pad, and after upgrade_pad.
 func _sync_pad_visual(pid: String) -> void:
-    var st: Dictionary = Game.site_state()["pads"].get(pid, {})
-    var spr: Sprite2D = pads_node.get_node_or_null("mark_" + pid)
-    if spr == null:
-        return
-    spr.texture = _tex("pad_open" if st.get("open", false) \
-        else "pad_locked")
-    # ground tile: open pads sit on packed pitch earth.  The clear
-    # scatter shrinks the overgrown tile away; this resurfaces it in
-    # its cleared outfit (the marker pop carries the beat — pop
-    # tweens to scale 1.0 which would break a shrunken decal).
-    var gnd: Sprite2D = pads_node.get_node_or_null("ground_" + pid)
-    if gnd != null and st.get("open", false):
-        gnd.texture = _tex("decals/pad_cleared")
-        gnd.rotation = 0.0
-        gnd.modulate.a = 1.0
-        gnd.scale = Vector2.ONE * float(gnd.get_meta("s0", 1.0))
-    var shelter := String(st.get("shelter", "bare"))
-    if shelter == "bare" or _pad_shelters.has(pid):
-        return
-    var ov := _anchored("props_medium" if shelter == "platform" \
-        else "props_large",
-        "pallet_deck" if shelter == "platform" else "cottage_shed",
-        pad_cells[pid].position + Vector2(CELL / 2.0, CELL))
-    ov.set_meta("shelter", shelter)           # night swap reads this
-    var w := ov.texture.get_width() * ov.scale.x
-    if w > CELL * 1.05:                      # pad furniture, not a prop
-        ov.scale *= CELL * 1.05 / w
-    pads_node.add_child(ov)                  # under tents when seated
-    _pad_shelters[pid] = ov
-
+    _sheets.sync_pad_visual(pid)
 
 ## PREP affordances on pads that still need work: muted lock while
 ## locked, accent hand once it's paid-and-waiting.
 func _sync_pad_chips() -> void:
-    for tok in _pad_chips.values():
-        markers.release(int(tok))
-    _pad_chips = {}
-    if Game.phase != Game.Phase.PREP:
-        return
-    var pads: Dictionary = Game.site_state()["pads"]
-    for pid in pad_cells:
-        var st: Dictionary = pads.get(pid, {})
-        if st.get("open", false) or _pad_clearing.has(pid):
-            continue
-        var node := pads_node.get_node_or_null("mark_" + pid)
-        if node == null:
-            continue
-        var paid: bool = st.get("paid", false)
-        var pair: Array = markers.icon_chip(node,
-            UIKit.icon_rect("hand" if paid else "lock",
-                UITokens.GOLD if paid else UITokens.MUTE, 12),
-            Vector2(CELL / 2.0 - 9, -26))
-        _pad_chips[pid] = pair[0]
-
+    _sheets.sync_pad_chips()
 
 ## Tap on a pad -> context row: locked sells the unlock, paid offers
 ## Clear, open+bare lists shelter upgrades.  Nothing actionable -> no
 ## menu (the tap falls through to a dismiss).
 func _open_pad_menu(pid: String) -> void:
-    _close_pad_menu()
-    var st: Dictionary = Game.site_state()["pads"].get(pid, {})
-    var node := pads_node.get_node_or_null("mark_" + pid)
-    if node == null:
-        return
-    var chip := PanelContainer.new()
-    chip.add_theme_stylebox_override("panel", UIKit.flat("glass_chip"))
-    var h := HBoxContainer.new()
-    h.add_theme_constant_override("separation", 2)
-    chip.add_child(h)
-    var n := 0
-    if not st.get("open", false):
-        if st.get("paid", false):
-            var cb := UIKit.btn(h, Vector2(64, UITokens.MIN_TOUCH),
-                tr("pad_clear"), "pill", Control.SIZE_SHRINK_CENTER)
-            cb.pressed.connect(func():
-                _close_pad_menu()
-                _play_clear(pid))
-            n += 1
-        else:
-            var price := Game.pad_unlock_price(pid)
-            if price >= 0:
-                var ub := UIKit.btn(h, Vector2(96, UITokens.MIN_TOUCH),
-                    tr("pad_unlock").format({"p": price}), "pill",
-                    Control.SIZE_SHRINK_CENTER)
-                ub.disabled = Game.coins < price
-                ub.pressed.connect(func():
-                    if Game.unlock_pad(pid):
-                        UIFeel.sfx("coin")
-                        UIFeel.haptic("medium")
-                        _status()
-                        _sync_pad_chips()
-                        _open_pad_menu(pid))   # row rebuilds: now Clear
-                n += 1
-    else:
-        for opt in Game.pad_shelter_options(pid):
-            var sh := String(opt["shelter"])
-            var ob := UIKit.btn(h, Vector2(110, UITokens.MIN_TOUCH),
-                tr("pad_shelter_" + sh).format({"p": int(opt["price"])}),
-                "pill", Control.SIZE_SHRINK_CENTER)
-            ob.disabled = (not opt["unlocked"]) \
-                or Game.coins < int(opt["price"])
-            ob.pressed.connect(func():
-                if Game.upgrade_pad(pid, sh):
-                    UIFeel.sfx("coin")
-                    UIFeel.haptic("medium")
-                    _status()
-                    _sync_pad_visual(pid)
-                    _close_pad_menu())
-            n += 1
-    if n == 0:
-        return
-    var tok := markers.marker(node, Vector2(-50, -66))
-    markers.marker_control(tok).add_child(chip)
-    _pad_menu_tok = tok
-    _pad_menu_pid = pid
-    UIFeel.pop(chip)
-
+    _sheets.open_pad_menu(pid)
 
 func _close_pad_menu() -> void:
-    if _pad_menu_tok != 0:
-        markers.release(_pad_menu_tok)
-        _pad_menu_tok = 0
-    _pad_menu_pid = ""
-
+    _sheets.close_pad_menu()
 
 ## Paid pad -> the clear transform is the reward: weeds and leaf litter
 ## scatter off, the pad brightens, then clear_pad lands the state and
 ## the open texture swaps in.  Skipped shells under reduced motion.
 func _play_clear(pid: String) -> void:
-    _pad_clearing[pid] = true
-    _sync_pad_chips()
-    var spr := pads_node.get_node_or_null("mark_" + pid)
-    var tuft := pads_node.get_node_or_null("tuft_" + pid)
-    var gnd := pads_node.get_node_or_null("ground_" + pid)
-    var r: Rect2 = pad_cells[pid]
-    if UIFeel.reduced_motion:
-        if tuft != null:
-            tuft.queue_free()
-        _finish_clear(pid)
-        return
-    var litter := ["decal_fern_frond", "decal_leaf_single", "decal_twig"]
-    for i in 3:
-        var d := _anchored("decals", litter[i],
-            r.position + Vector2(10 + i * 20, 28 + (i % 2) * 14))
-        pads_node.add_child(d)
-        var tw := d.create_tween()
-        tw.set_parallel()
-        tw.tween_property(d, "position",
-            d.position + Vector2((i - 1) * 24.0, -30.0), 0.6)\
-            .set_delay(0.06 * i)
-        tw.tween_property(d, "rotation_degrees",
-            (i - 1) * 160.0, 0.6).set_delay(0.06 * i)
-        tw.chain().tween_property(d, "modulate:a", 0.0, 0.16)
-        tw.finished.connect(d.queue_free)
-    if tuft != null:
-        var tw2 := tuft.create_tween()
-        tw2.set_parallel()
-        tw2.tween_property(tuft, "rotation_degrees", 200.0, 0.55)
-        tw2.tween_property(tuft, "scale", Vector2.ZERO, 0.55)
-        tw2.tween_property(tuft, "modulate:a", 0.0, 0.55)
-        tw2.finished.connect(tuft.queue_free)
-    if gnd != null:
-        # the overgrown plot shrinks into the earth — _finish_clear
-        # resurfaces it as the packed pitch tile
-        var twg := gnd.create_tween()
-        twg.set_parallel()
-        twg.tween_property(gnd, "rotation_degrees", 120.0, 0.55)
-        twg.tween_property(gnd, "scale", Vector2.ZERO, 0.55)
-        twg.tween_property(gnd, "modulate:a", 0.0, 0.55)
-    if spr != null:
-        var tw3 := spr.create_tween()
-        tw3.tween_property(spr, "modulate",
-            Color(1.35, 1.3, 1.1), 0.25).set_delay(0.3)
-    get_tree().create_timer(0.58).timeout.connect(
-        _finish_clear.bind(pid))
-
+    _sheets.play_clear(pid)
 
 func _finish_clear(pid: String) -> void:
-    if Game.clear_pad(pid):
-        UIFeel.sfx("confirm")
-        UIFeel.haptic("medium")
-    _sync_pad_visual(pid)
-    var spr := pads_node.get_node_or_null("mark_" + pid)
-    if spr != null:
-        spr.modulate = Color.WHITE
-        UIFeel.pop(spr, Vector2(1.15, 0.85))
-    _pad_clearing.erase(pid)
-    _sync_pad_chips()
-
+    _sheets.finish_clear(pid)
 
 # ----------------------------------------------------- crew structure
 ## §8.4/UI-035 world presence: the site's crew structure (Pinewatch =
@@ -2961,22 +1858,13 @@ func _hut_rect() -> Rect2:
     return _input.hut_rect()
 
 func _open_crew() -> void:
-    panel_mgr.open(CrewSheet.make())
-
+    _sheets.open_crew()
 
 ## UI-034: the trail map is a morning act (§8.2) — the verb enforces
 ## it; a true return reloads the scene so layout/props/anchors rebuild
 ## for the new site in one _ready pass.
 func _on_travel(site: StringName) -> void:
-    if not Game.travel_to(site):
-        UIFeel.sfx("warn")
-        _hud_hint(tr("map_morning"))
-        return
-    UIFeel.sfx("confirm")
-    UIFeel.haptic("confirm")
-    panel_mgr.close()
-    Transition.to_scene(get_tree().current_scene.scene_file_path)
-
+    _flow.on_travel(site)
 
 func _hut_tap(px: Vector2) -> bool:
     return _input.hut_tap(px)
