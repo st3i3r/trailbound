@@ -1,0 +1,28 @@
+{
+  "expect": {
+    "site.event": "memorial_night"
+  },
+  "hash": 3927115516,
+  "id": "festival_day",
+  "seed": 31,
+  "setup": {
+    "coins": 200,
+    "day": 6,
+    "phase": 2,
+    "sites_visited": {
+      "pinewatch": 0
+    }
+  },
+  "site": "pinewatch",
+  "steps": [
+    {
+      "op": "new_day"
+    },
+    {
+      "op": "expect",
+      "site.event": "memorial_night"
+    }
+  ],
+  "title": "Festival: site_day 7 lands Grandpa's Memorial Night",
+  "twice": true
+}

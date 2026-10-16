@@ -1,24 +1,23 @@
 {
-  "_file": "day1_seat_serve.json",
   "expect": {
-    "coins>=": 300.0,
+    "coins>=": 300,
     "phase": "night",
-    "site.assignments.count": 0.0,
-    "site.guests.count": 0.0
+    "site.assignments.count": 0,
+    "site.guests.count": 0
   },
   "hash": 3688508973,
   "id": "day1_seat_serve",
-  "seed": 7.0,
+  "seed": 7,
   "setup": {
-    "coins": 300.0,
-    "day": 1.0,
+    "coins": 300,
+    "day": 1,
     "pantry": {
-      "herb": 1.0,
-      "mushroom": 1.0
+      "herb": 1,
+      "mushroom": 1
     },
-    "phase": 3.0,
+    "phase": 3,
     "sites_visited": {
-      "pinewatch": 0.0
+      "pinewatch": 0
     }
   },
   "site": "pinewatch",
@@ -27,7 +26,7 @@
       "key": "pages_done",
       "op": "site_set",
       "value": [
-        1.0
+        1
       ]
     },
     {
@@ -35,7 +34,7 @@
       "op": "buy_staple"
     },
     {
-      "coins": 295.0,
+      "coins": 295,
       "op": "expect",
       "pantry.has": [
         "tea",
@@ -46,10 +45,10 @@
     {
       "arch": "hiker",
       "favourite": "trail_stew",
-      "fee": 40.0,
+      "fee": 40,
       "id": "hiker",
       "op": "inject_guest",
-      "pads": 1.0
+      "pads": 1
     },
     {
       "guest": "hiker",
@@ -60,7 +59,7 @@
     },
     {
       "op": "expect",
-      "site.assignments.count": 1.0,
+      "site.assignments.count": 1,
       "site.assignments.has": "hiker"
     },
     {
@@ -69,7 +68,7 @@
       "op": "cook"
     },
     {
-      "meals.count": 1.0,
+      "meals.count": 1,
       "op": "expect",
       "pantry.has!=": "mushroom"
     },
@@ -91,7 +90,7 @@
     },
     {
       "op": "expect",
-      "site.assignments.count": 1.0,
+      "site.assignments.count": 1,
       "site.served.hiker": "trail_stew"
     },
     {

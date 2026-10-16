@@ -1,0 +1,69 @@
+{
+  "expect": {
+    "site.fish_taken.pond": 3
+  },
+  "hash": 2649102714,
+  "id": "fish_day",
+  "seed": 29,
+  "setup": {
+    "coins": 400,
+    "day": 3,
+    "phase": 3,
+    "sites_visited": {
+      "pinewatch": 0
+    }
+  },
+  "site": "pinewatch",
+  "steps": [
+    {
+      "must_fail": true,
+      "op": "fish",
+      "spot": "pond"
+    },
+    {
+      "key": "pages_done",
+      "op": "site_set",
+      "value": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "fishing_rod",
+      "op": "buy_gear"
+    },
+    {
+      "coins": 250,
+      "gear.has": "fishing_rod",
+      "op": "expect"
+    },
+    {
+      "op": "fish",
+      "spot": "pond"
+    },
+    {
+      "op": "fish",
+      "spot": "pond"
+    },
+    {
+      "op": "fish",
+      "spot": "pond"
+    },
+    {
+      "op": "expect",
+      "site.fish_taken.pond": 3
+    },
+    {
+      "must_fail": true,
+      "op": "fish",
+      "spot": "pond"
+    },
+    {
+      "op": "expect",
+      "site.fish_taken.pond": 3
+    }
+  ],
+  "title": "Fishing: rod-gated casts, 3 per spot per day",
+  "twice": true
+}

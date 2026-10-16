@@ -126,6 +126,9 @@ func _do(step: Dictionary, id: String) -> void:
 		"crew_tick": Game.crew_tick(int(step["now"]))
 		"crew_set": Game.crew[String(step["key"])] = _intify(step.get("value"))
 		"dog_pet": ok = Game.dog_pet()
+		"gather": ok = not Game.gather(String(step["node"])).is_empty()
+		"fish": ok = Game.fish_catch(String(step["spot"])) != ""
+		"read_letter": Game.read_letter(String(step["id"]))
 		"inject_guest": _inj_guest(step)
 		"inject_decor": _inj_decor(step)
 		"site_set": Game.site_state()[String(step["key"])] = \
@@ -235,15 +238,21 @@ func _expect(spec: Dictionary, id: String) -> bool:
 
 func _resolve(path: String) -> Variant:
 	var parts := path.split(".")
-	var st: Dictionary = Game.site_state()
 	var view := {"site_id": String(Game.site_id),
 		"coins": Game.coins, "day": Game.day,
 		"phase": Game.Phase.keys()[Game.phase].to_lower(),
 		"meals": Game.meals, "pantry": Game.pantry,
 		"gear": Game.gear, "recipes": Game.recipes_cooked,
 		"fund_total": Game.fund_total, "crew": Game.crew,
-		"dog": Game.dog, "site": st}
+		"dog": Game.dog, "letters": Game.letters_for(),
+		"unread_letters": Game.unread_letters(),
+		"site": Game.site_state()}
 	var cur: Variant = view
+	# `at.<site>.<key>...` reads another site's state — per-site
+	# separation is a law (leaving whisper_river can't lose its day)
+	if parts.size() > 2 and parts[0] == "at":
+		cur = {"site": Game.site_state(StringName(parts[1]))}
+		parts = PackedStringArray(["site"]) + parts.slice(2)
 	for p in parts:
 		if p == "count" and (cur is Array or cur is Dictionary):
 			return cur.size()
@@ -340,8 +349,11 @@ func _merge(dst: Dictionary, src: Dictionary) -> void:
 func _write_hash(scn: Dictionary, id: String, state: Dictionary) -> void:
 	var path := SCN_DIR + String(scn.get("_file", ""))
 	scn["hash"] = _canon_hash(state)
+	scn.erase("_file")                        # runner bookkeeping stays out of the file
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	if f != null:
-		f.store_string(JSON.stringify(scn, "  ") + "\n")
+		# _intify keeps the recorded file clean — JSON round-trips
+		# whole numbers as floats otherwise and diffs fill with ".0"
+		f.store_string(JSON.stringify(_intify(scn), "  ") + "\n")
 		f.close()
 		print("    .. %s hash -> %s" % [id, scn["hash"]])

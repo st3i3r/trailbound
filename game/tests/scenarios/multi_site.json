@@ -1,0 +1,62 @@
+{
+  "expect": {
+    "at.whisper_river.guests.count": 1,
+    "site_id": "pinewatch"
+  },
+  "hash": 3081419575,
+  "id": "multi_site",
+  "seed": 41,
+  "setup": {
+    "coins": 300,
+    "day": 4,
+    "phase": 2,
+    "sites_visited": {
+      "pinewatch": 0,
+      "whisper_river": 0
+    }
+  },
+  "site": "pinewatch",
+  "steps": [
+    {
+      "key": "pages_done",
+      "op": "site_set",
+      "value": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "op": "travel",
+      "site": "whisper_river"
+    },
+    {
+      "arch": "fisher",
+      "fee": 45,
+      "id": "angler",
+      "op": "inject_guest",
+      "pads": 1
+    },
+    {
+      "op": "expect",
+      "site_id": "whisper_river"
+    },
+    {
+      "op": "travel",
+      "site": "pinewatch"
+    },
+    {
+      "op": "expect",
+      "site.guests.count>=": 0,
+      "site_id": "pinewatch"
+    },
+    {
+      "at.whisper_river.guests.angler.id": "angler",
+      "op": "expect"
+    }
+  ],
+  "title": "Per-site separation: whisper_river keeps its day after leaving",
+  "twice": true
+}

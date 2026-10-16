@@ -1,18 +1,17 @@
 {
-  "_file": "pad_unlock.json",
   "expect": {
-    "site.assignments.count": 1.0,
+    "site.assignments.count": 1,
     "site.pads.p5.open": true
   },
   "hash": 2481940882,
   "id": "pad_unlock",
-  "seed": 5.0,
+  "seed": 5,
   "setup": {
-    "coins": 600.0,
-    "day": 1.0,
-    "phase": 3.0,
+    "coins": 600,
+    "day": 1,
+    "phase": 3,
     "sites_visited": {
-      "pinewatch": 0.0
+      "pinewatch": 0
     }
   },
   "site": "pinewatch",
@@ -23,10 +22,10 @@
     },
     {
       "arch": "hiker",
-      "fee": 30.0,
+      "fee": 30,
       "id": "pair",
       "op": "inject_guest",
-      "pads": 1.0
+      "pads": 1
     },
     {
       "guest": "pair",

@@ -1,19 +1,18 @@
 {
-  "_file": "travel_day.json",
   "expect": {
-    "coins": 200.0,
+    "coins": 200,
     "site_id": "pinewatch"
   },
   "hash": 278173668,
   "id": "travel_day",
-  "seed": 17.0,
+  "seed": 17,
   "setup": {
-    "coins": 200.0,
-    "day": 3.0,
-    "phase": 2.0,
+    "coins": 200,
+    "day": 3,
+    "phase": 2,
     "sites_visited": {
-      "pinewatch": 0.0,
-      "whisper_river": 0.0
+      "pinewatch": 0,
+      "whisper_river": 0
     }
   },
   "site": "pinewatch",
@@ -31,11 +30,11 @@
       "key": "pages_done",
       "op": "site_set",
       "value": [
-        1.0,
-        2.0,
-        3.0,
-        4.0,
-        5.0
+        1,
+        2,
+        3,
+        4,
+        5
       ]
     },
     {
@@ -44,7 +43,7 @@
     },
     {
       "op": "expect",
-      "site.assignments.count": 0.0,
+      "site.assignments.count": 0,
       "site_id": "whisper_river"
     },
     {

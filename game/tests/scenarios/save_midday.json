@@ -1,32 +1,31 @@
 {
-  "_file": "save_midday.json",
   "expect": {
-    "coins>=": 280.0,
+    "coins>=": 280,
     "phase": "night"
   },
   "hash": 2325523397,
   "id": "save_midday",
-  "seed": 11.0,
+  "seed": 11,
   "setup": {
-    "coins": 250.0,
-    "day": 2.0,
+    "coins": 250,
+    "day": 2,
     "pantry": {
-      "herb": 1.0,
-      "mushroom": 2.0
+      "herb": 1,
+      "mushroom": 2
     },
-    "phase": 3.0,
+    "phase": 3,
     "sites_visited": {
-      "pinewatch": 0.0
+      "pinewatch": 0
     }
   },
   "site": "pinewatch",
   "steps": [
     {
       "arch": "scout",
-      "fee": 35.0,
+      "fee": 35,
       "id": "scout",
       "op": "inject_guest",
-      "pads": 1.0
+      "pads": 1
     },
     {
       "guest": "scout",
@@ -44,10 +43,10 @@
       "op": "save_load"
     },
     {
-      "coins": 250.0,
-      "meals.count": 1.0,
+      "coins": 250,
+      "meals.count": 1,
       "op": "expect",
-      "site.assignments.count": 1.0
+      "site.assignments.count": 1
     },
     {
       "op": "set_phase",
@@ -72,7 +71,7 @@
       "op": "save_load"
     },
     {
-      "meals.count": 0.0,
+      "meals.count": 0,
       "op": "expect",
       "phase": "night"
     }

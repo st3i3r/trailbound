@@ -1,0 +1,67 @@
+{
+  "expect": {
+    "pantry.count>=": 1
+  },
+  "hash": 315418585,
+  "id": "forage_day",
+  "seed": 23,
+  "setup": {
+    "coins": 100,
+    "day": 1,
+    "phase": 3,
+    "sites_visited": {
+      "pinewatch": 0
+    }
+  },
+  "site": "pinewatch",
+  "steps": [
+    {
+      "op": "new_day"
+    },
+    {
+      "op": "expect",
+      "site.forage_nodes.count>=": 6
+    },
+    {
+      "node": "f0_d2",
+      "op": "gather"
+    },
+    {
+      "op": "expect",
+      "pantry.count>=": 1,
+      "site.forage_nodes.count<=": 6
+    },
+    {
+      "must_fail": true,
+      "node": "f0_d2",
+      "op": "gather"
+    },
+    {
+      "key": "forage_nodes",
+      "op": "site_set",
+      "value": [
+        {
+          "id": "fx",
+          "items": [
+            "mushroom"
+          ],
+          "px": [
+            800,
+            416
+          ]
+        }
+      ]
+    },
+    {
+      "node": "fx",
+      "op": "gather"
+    },
+    {
+      "op": "expect",
+      "pantry.has": "mushroom",
+      "site.forage_nodes.count": 0
+    }
+  ],
+  "title": "Forage: morning rolls nodes, a gather empties one into the pantry",
+  "twice": true
+}

@@ -1,0 +1,37 @@
+{
+  "expect": {
+    "unread_letters.count": 0
+  },
+  "hash": 381331854,
+  "id": "letters_morning",
+  "seed": 37,
+  "setup": {
+    "coins": 100,
+    "day": 1,
+    "phase": 2,
+    "sites_visited": {
+      "pinewatch": 0
+    }
+  },
+  "site": "pinewatch",
+  "steps": [
+    {
+      "op": "new_day"
+    },
+    {
+      "op": "expect",
+      "unread_letters.count": 1
+    },
+    {
+      "id": "p01",
+      "op": "read_letter"
+    },
+    {
+      "letters.count": 1,
+      "op": "expect",
+      "unread_letters.count": 0
+    }
+  ],
+  "title": "Mail: the arrival letter lands on the first morning",
+  "twice": true
+}

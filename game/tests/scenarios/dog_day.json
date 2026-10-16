@@ -1,24 +1,23 @@
 {
-  "_file": "dog_day.json",
   "expect": {
     "dog.pet_today": true
   },
   "hash": 2382297727,
   "id": "dog_day",
-  "seed": 19.0,
+  "seed": 19,
   "setup": {
-    "coins": 100.0,
-    "day": 2.0,
+    "coins": 100,
+    "day": 2,
     "dog": {
       "adopted": false,
-      "bond": 0.0,
+      "bond": 0,
       "met": true,
       "name": "Bean",
       "pet_today": false
     },
-    "phase": 3.0,
+    "phase": 3,
     "sites_visited": {
-      "pinewatch": 0.0
+      "pinewatch": 0
     }
   },
   "site": "pinewatch",
@@ -27,7 +26,7 @@
       "op": "dog_pet"
     },
     {
-      "dog.bond>=": 1.0,
+      "dog.bond>=": 1,
       "dog.pet_today": true,
       "op": "expect"
     },
@@ -36,7 +35,7 @@
       "op": "dog_pet"
     },
     {
-      "dog.bond>=": 1.0,
+      "dog.bond>=": 1,
       "op": "expect"
     }
   ],
