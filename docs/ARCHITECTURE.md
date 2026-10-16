@@ -220,6 +220,7 @@ are artifacts — real compile check is a scene run). Generated wavs:
 | D-ARCH-14 | Day flow + celebrations live in `scripts/flow_presenter.gd` (status readout, goodnight/sleep, phase advance, morning/prep/evening starts, travel, dialogue queue, crew/page handlers, ceremony queue/drain, keepsake labels, `CEREMONY_CUE`) — same helper shape; the scene keeps nodes, camera, evening/board/selection UI state and the three signal connects (rewired to `_flow.*`). Moved state (`night_rating`, fivestar flag, ceremony + dialogue queues) travels with the code; loop var shadowing the scene param renamed. Multi-line signatures joined in delegates | Landed 2026-10-16 — `pinewatch_test.gd` 2729→2525, `--smoke` incl. ceremony/dialogue paths green, 14 suites green |
 | D-ARCH-15 | Weather/FX config + response live in `scripts/fx_presenter.gd` (profile application, overlay crossfades, procedural textures, sway assignment, chrome fades, light-cue track/untrack) — same helper shape; the scene keeps the frame tick, all FX nodes and data tables (`WEATHER_PROFILES`), plus delegates. Scene-const classes need their own preload in helpers (`AmbientFX`). Delegates callable pre-ready stay null-safe (`_wake_chrome` guards `_fxp` — mouse-enter can fire mid-boot). Tooling note: this env's `re` drops `)` after `.*`, so extractor tooling must not put literal parens in `.*`-patterns — parse defs with explicit `chr(0x28/0x29)` walks | Landed 2026-10-16 — `pinewatch_test.gd` 2525→2294, `--smoke` identical, 14 suites green |
 | D-ARCH-16 | Sim cast + errands + dog rounds live in `scripts/cast_presenter.gd` (cast build/configure day + evening, seat-actor sync, emote chips, errand spawn/sync/free, dog rounds + direction names) — same helper shape; the scene keeps the frame tick, all nodes and sim/view state. Bare method refs (`configure()` emote args) rename like calls; node `add_child` routes via `s`; scene inner classes stay put (`s.BuildGrid` resolves); `_anchored` vs `_anchored_frames` return different types (Sprite2D vs AnimatedSprite2D — annotate from the callee, not the shape) | Landed 2026-10-16 — `pinewatch_test.gd` 2294→2020, `--smoke` incl. cast/errand/dog paths green, 14 suites green |
+| D-ARCH-17 | Crew structure + hut visuals live in `scripts/crew_presenter.gd` (queries `crew_sid` / `crew_rows` / `crew_stage`, `hut_px` / `hut_engaged`, the state->view pass `sync_crew_hut`, plus the hut stage-art table) — same helper shape; the scene keeps the `CrewDress`/`_hut` node ownership and the `_hut_tok` / `_hut_ready` token state so the smoke harness reads them directly (D-ARCH-12 precedent), plus the `_sync_crew_hut` / `_crew_sid` / `_crew_stage` / `_hut_px` / `_hut_engaged` delegates. Note `_hut_rect` is deliberately NOT part of this slice — it belongs to the already-extracted `input_presenter`, with a `hut_px` in both (input from the tap layout, crew from the structure plots) so presenters never reach into each other's logic | Landed 2026-10-16 — `pinewatch_test.gd` 2020→1920, `--smoke` incl. crew hut paths green, 14 suites green |
 
 ## 11. External design audits
 
@@ -259,7 +260,7 @@ commit-on-beat persistence; facade + leaf subsystems (D-ARCH-2).
   purchase/journal/crew verb layers moved to `systems/build.gd`,
   `systems/journal.gd` and `systems/crew.gd` (leaf pattern,
   suite-guarded). Next: hosting, night, kitchen leaves.
-- `pinewatch_test.gd` 4493→2020 lines — the `--smoke` drive moved to
+- `pinewatch_test.gd` 4493→1920 lines — the `--smoke` drive moved to
   `scripts/qa_smoke.gd` (D-ARCH-9), the six world-build passes to
   `scripts/world_builder.gd` (D-ARCH-10), gesture + tap routing to
   `scripts/input_presenter.gd` (D-ARCH-11), seating visuals + bubbles
@@ -267,8 +268,10 @@ commit-on-beat persistence; facade + leaf subsystems (D-ARCH-2).
   to `scripts/sheet_presenter.gd` (D-ARCH-13), day flow + celebrations
   to `scripts/flow_presenter.gd` (D-ARCH-14), weather/FX config to
   `scripts/fx_presenter.gd` (D-ARCH-15), sim cast + errands + dog to
-  `scripts/cast_presenter.gd` (D-ARCH-16); remaining crew visuals,
-  then `game.gd` leaves (hosting/night/kitchen).
+  `scripts/cast_presenter.gd` (D-ARCH-16), crew structure + hut to
+  `scripts/crew_presenter.gd` (D-ARCH-17); remaining shared world
+  primitives (texture anchors, shadow mounts, `BuildGrid`) stay per
+  D-ARCH-10, then `game.gd` leaves (hosting/night/kitchen).
 - `SAVE_VERSION=2` — real migration path exercised: frozen v1 blob at
   `tests/fixtures/save_v1.json` drives `test_save`'s fill + stability
   + *load* checks (the fill also coerces type drift — v1

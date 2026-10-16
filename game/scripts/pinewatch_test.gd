@@ -165,6 +165,7 @@ const SheetPresenter := preload("res://scripts/sheet_presenter.gd")
 const FlowPresenter := preload("res://scripts/flow_presenter.gd")
 const FxPresenter := preload("res://scripts/fx_presenter.gd")
 const CastPresenter := preload("res://scripts/cast_presenter.gd")
+const CrewPresenter := preload("res://scripts/crew_presenter.gd")
 # Stage anchors moved per-site into SITE_STAGE (UI-034): _fire_pos,
 # _dog_pos and _board_rect are set from it in _ready once site_id is
 # known.  Pinewatch keeps the authored values every tool references.
@@ -192,8 +193,6 @@ const DECAL_FAMILIES := {
     "moss":   ["tuft_moss_patch", "decal_soil_patch", "decal_soil_mound"],
 }
 const TENTS := ["dome_tent_sage", "dome_tent_amber", "dome_tent_slate"]
-# Batch H: hut stage art (index = crew stage, last = restored cabin)
-const HUT_STAGES := ["cabin_s0", "cabin_s1", "cabin_s2", "cabin"]
 const PAD_OVERGROWN := ["pad_overgrown_a", "pad_overgrown_b"]
 
 # ------------------------------------------------------------- grade pass
@@ -360,6 +359,7 @@ var _sheets: RefCounted  # sheets, menus + chips (D-ARCH-9)
 var _flow: RefCounted  # day flow + celebrations (D-ARCH-9)
 var _fxp: RefCounted  # weather/FX config + response (D-ARCH-9)
 var _cast: RefCounted  # sim cast + errands + dog (D-ARCH-9)
+var _crew: RefCounted  # crew structure + hut (D-ARCH-9)
 
 
 func _tex(rel: String) -> Texture2D:
@@ -456,6 +456,7 @@ func _ready() -> void:
     _flow = FlowPresenter.new(self)
     _fxp = FxPresenter.new(self)
     _cast = CastPresenter.new(self)
+    _crew = CrewPresenter.new(self)
     _build_ground()
     _build_backdrop()
     _build_scatter(rng)
@@ -1816,42 +1817,25 @@ func _finish_clear(pid: String) -> void:
 ## keepsakes so a swapped-out active structure can't desync the prop.
 
 func _crew_sid() -> String:
-    var plots: Array = layout.get("crew_plots", [])
-    for p in plots:
-        if p.get("kind") == "structure":
-            return String(p.get("structure", ""))
-    return ""
-
-
-func _crew_rows(sid: String) -> Dictionary:
-    for s in Catalog.data.get("crew", {}).get("structures", []):
-        if s.get("id") == sid:
-            return s
-    return {}
+    return _crew.crew_sid()
 
 
 ## Stage = count of this structure's keepsakes already collected —
 ## crew["stage"] only describes the ACTIVE structure, collected[] is
 ## the durable record.
 func _crew_stage(sid: String) -> int:
-    var n := 0
-    var got: Array = Game.crew.get("collected", [])
-    for st in _crew_rows(sid).get("stages", []):
-        if got.has(st.get("keepsake", {}).get("id", "")):
-            n += 1
-    return n
+    return _crew.crew_stage(sid)
 
 
 func _hut_px() -> Vector2:
-    return _input.hut_px()
+    return _crew.hut_px()
+
 
 ## The hut is anonymous scenery until the crew engages (day-2 start or
 ## any collected stage) — a "!" on a ruin the player was never told
 ## about reads as a bug, not a mystery.
 func _hut_engaged() -> bool:
-    var sid := _crew_sid()
-    return sid != "" and (Game.crew.get("structure", "") == sid
-        or _crew_stage(sid) > 0)
+    return _crew.hut_engaged()
 
 
 func _hut_rect() -> Rect2:
@@ -1878,93 +1862,9 @@ func _painted_map() -> bool:
 
 ## Idempotent state->view pass: debris + dim by stage, porch glow once
 ## restored (evening/night only), chip by work state.  animate=true on
-## collect so the cleared stage visibly scatters before the rebuild.
+## collect so the stage visibly scatters before the rebuild.
 func _sync_crew_hut(animate := false) -> void:
-    var sid := _crew_sid()
-    if _hut == null or sid == "":
-        return
-    var stage := _crew_stage(sid)
-    var total: int = _crew_rows(sid).get("stages", []).size()
-    var restored := total > 0 and stage >= total
-    if _amb != null:                         # kitchen smoke = crew
-        _amb.set_smoke(stage > 0)            # living/working in it
-    # stage art swap (Batch H): the sprite itself carries the state —
-    # ruin -> cleared -> roof fixed -> restored cabin.  A lit-window
-    # night variant lands at dusk once the hut is whole again.
-    # Painted maps: the authored house is the visual; no sprite swaps.
-    var painted := _painted_map()
-    if not painted:
-        var day_tex: String = HUT_STAGES[mini(stage,
-            HUT_STAGES.size() - 1)]
-        var want := String(day_tex)
-        if restored and Game.phase in [Game.Phase.EVENING,
-                Game.Phase.NIGHT] and ResourceLoader.exists(
-                A + "props_large/cabin_night.png"):
-            want = "cabin_night"
-        if ResourceLoader.exists(A + "props_large/%s.png" % want):
-            _hut.texture = _tex("props_large/" + want)
-    if _hut_dress != null:
-        var old := _hut_dress
-        _hut_dress = null
-        if animate and not UIFeel.reduced_motion:
-            var tw := old.create_tween().set_parallel()
-            for c in old.get_children():
-                tw.tween_property(c, "position",
-                    c.position + Vector2(randf_range(-26.0, 26.0),
-                        randf_range(4.0, 14.0)), 0.55) \
-                    .set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-                tw.tween_property(c, "modulate:a", 0.0, 0.55)
-            tw.chain().tween_callback(old.queue_free)
-        else:
-            old.queue_free()
-    _hut_dress = Node2D.new()
-    _hut_dress.name = "CrewDress"
-    _hut_dress.position = _hut_px()          # sorts with the hut itself
-    world.add_child(_hut_dress)
-    _hut.modulate = Color.WHITE              # sprite carries state
-    if stage == 0 and not painted:
-        # ruin reads through the litter on its footprint
-        for spec in [["props_medium", "debris_brambles", -26, 8],
-                ["props_medium", "debris_branch_pile", 20, 12],
-                ["props_medium", "debris_brambles", 4, 18]]:
-            var d := _anchored(spec[0], spec[1],
-                Vector2(spec[2], spec[3]))
-            _hut_dress.add_child(d)
-    elif restored:
-        # the porch light: a small lantern by the door, warm pool at dusk
-        var lamp := _anchored("props_medium", "lantern_post",
-            Vector2(34, 14))
-        _hut_dress.add_child(lamp)
-        var glow := Sprite2D.new()
-        glow.texture = _shadow_texture()
-        glow.modulate = Color(0.95, 0.78, 0.42, 0.55)
-        glow.position = Vector2(30, 16)
-        glow.scale = Vector2(0.9, 0.5)
-        glow.visible = Game.phase in [Game.Phase.EVENING,
-            Game.Phase.NIGHT]
-        _hut_dress.add_child(glow)
-    # --- affordance chip: "!" while a stage waits on the player
-    var show := _hut_engaged() and not restored
-    _hut_ready = show and Game.crew.get("structure", "") == sid \
-        and Game.is_stage_ready()
-    if show:
-        var content: Control
-        if _hut_ready:
-            var bang := UIKit.label_for("!", UITokens.TypeRole.HEAD,
-                UITokens.GOLD)
-            bang.position = Vector2(6, -2)
-            content = bang
-        else:
-            content = UIKit.icon_rect("crew", UITokens.DIM, 12)
-            content.position = Vector2(3, 3)
-        var pair: Array = markers.icon_chip(_hut, content,
-            Vector2(0, -88))
-        if _hut_tok:
-            markers.release(_hut_tok)
-        _hut_tok = int(pair[0])
-    elif _hut_tok:
-        markers.release(_hut_tok)
-        _hut_tok = 0
+    _crew.sync_crew_hut(animate)
 
 
 # ------------------------------------------------------------- input
