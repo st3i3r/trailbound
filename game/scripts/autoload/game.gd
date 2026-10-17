@@ -28,6 +28,7 @@ const SysBuild := preload("res://scripts/systems/build.gd")
 const SysJournal := preload("res://scripts/systems/journal.gd")
 const SysCrew := preload("res://scripts/systems/crew.gd")
 const SysPantry := preload("res://scripts/systems/pantry.gd")
+const SysHosting := preload("res://scripts/systems/hosting.gd")
 const SysNight := preload("res://scripts/systems/night.gd")
 
 const SPEEDUP_MIN_CHUNK := 900.0   # §6.10: chunk = max(15 min, stage / 6)
@@ -73,6 +74,7 @@ var journal: RefCounted
 var night_sys: RefCounted
 var crew_sys: RefCounted
 var pantry_sys: RefCounted
+var hosting_sys: RefCounted
 var passport_stamps: Array = []             # §33.5: one per scored Daily
 var days_log: Array = []                    # §8.3 journal — one row/day
 var personas_met := {}                      # archetype -> display name
@@ -94,6 +96,7 @@ func _ready() -> void:
 	night_sys = SysNight.new(self)
 	crew_sys = SysCrew.new(self)
 	pantry_sys = SysPantry.new(self)
+	hosting_sys = SysHosting.new(self)
 	_crew_reset()
 	# settings live outside the run state — read them off disk at boot
 	# so prefs apply on the title screen too (UI-036). Single load:
@@ -442,30 +445,13 @@ func advance_day() -> void:
 
 
 func visit_site(site: StringName) -> void:
-	site_id = site
-	if sites.has(site):
-		_reconcile_map(site)             # lazy map-drift check on
-		                                 # arrival — no-op when map_rev
-		                                 # still matches the layout
-	if site not in sites_visited:
-		sites_visited[site] = day
-		_try_start_next()
+	hosting_sys.visit_site(site)
 
 
 ## §8.2: the morning trail map. Gated by chapter completion; re-rolls
 ## the day at the chosen site so the board/weather are the new site's.
 func travel_to(site: StringName) -> bool:
-	if phase != Phase.MORNING \
-			or not site_state()["assignments"].is_empty():
-		return false                    # the trail map is a morning act (§8.2)
-	if not site_reachable(site):
-		return false
-	visit_site(site)
-	_log("travel", {"to": String(site)})
-	Analytics.log_event(&"site_unlock", {"site": String(site)})
-	new_day()
-	commit()
-	return true
+	return hosting_sys.travel_to(site)
 
 
 ## §Wishes: the kinds tonight's camp can actually grant — the board never
@@ -759,41 +745,14 @@ func crew_done() -> bool:
 # shelters, decor, seats, reviews — survives.
 
 func site_day(site := site_id) -> int:
-	return day - int(sites_visited.get(site, day)) + 1
+	return hosting_sys.site_day(site)
 
 
 func site_row(site := site_id) -> Dictionary:
-	for s in Catalog.data.get("sites", []):
-		if s.get("id") == site:
-			return s
-	return {}
-
-
-## Trail-map card (display read — the verb is travel_to): everything a
-## map row needs, derived from the same predicates the verb checks so
-## the UI can never promise a trip the sim would refuse.
+	return hosting_sys.site_row(site)
 func site_card(site: StringName) -> Dictionary:
-	var row := site_row(site)
-	if row.is_empty():
-		return {}
-	var pages: Array = site_state(site)["pages_done"]
-	var done := pages.filter(func(n): return int(n) <= 5).size()
-	return {"id": site, "name": row.get("name", site),
-		"chapter": int(row.get("chapter", 0)),
-		"pages_done": done, "pages_total": 5,
-		"current": site == site_id,
-		"reachable": site_reachable(site),
-		"visited": sites_visited.has(site)}
-
-
-## Sites in chapter order — the map sheet's row order.
-func site_order() -> Array:
-	var rows: Array = Catalog.data.get("sites", [])
-	rows = rows.duplicate()
-	rows.sort_custom(func(a, b):
-		return int(a.get("chapter", 0)) < int(b.get("chapter", 0)))
-	return rows.map(func(r): return StringName(r["id"]))
-
+	return hosting_sys.site_card(site)
+func site_order() -> Array:	return hosting_sys.site_order()
 
 func _row(list_name: String, item_id: String) -> Dictionary:
 	for item in Catalog.data.get(list_name, []):
@@ -803,47 +762,13 @@ func _row(list_name: String, item_id: String) -> Dictionary:
 
 
 func site_state(site := site_id) -> Dictionary:
-	if site not in sites:
-		sites[site] = _fresh_site(site)
-	if not sites[site].has("served"):   # saves pre-dating dinner
-		sites[site]["served"] = {}
-	return sites[site]
+	return hosting_sys.site_state(site)
 
 
 func _fresh_site(site: StringName) -> Dictionary:
-	var layout: Dictionary = Catalog.data.get("layouts", {}).get(site, {})
-	var pads := {}
-	var open: Array = layout.get("pads", {}).get("open", [])
-	for pid in layout.get("pads", {}).get("spots", {}):
-		pads[pid] = {"open": pid in open, "shelter": "bare"}
-	var fire: Dictionary = layout.get("campfire",
-		{"cell": [0, 0], "radius": 2})
-	var fcell: Array = fire.get("cell", [0, 0])
-	return {"pads": pads, "decor": [], "stored": [],
-		"map_rev": String(layout.get("map_rev", "")),
-		"campfire": {"cell": Vector2i(fcell[0], fcell[1]),
-			"radius": int(fire.get("radius", 2))},
-		"seats": 0, "reviews": [], "weather": "clear",
-		"board": [], "guests": {}, "assignments": {}, "served": {},
-		"blogger_bonus": false, "forage_nodes": [], "fish_taken": {},
-		"fire_stoked": false, "tucked_in": "", "photos": [],
-		"photo_day": -1, "margins_read": [], "margin_day": -1,
-		"fetch_day": -1,
-		"weather_streak": {"kind": "", "days": 0},
-		"spot_day": -1,
-		"pages_done": [], "letters_delivered": [],
-		"vignette_restored": "",
-		"restored": [], "pad_tags": {}, "walk_bonus": 0,
-		"gathering_gifts": [],
-		"counters": {"guests_welcomed": 0, "families": 0,
-			"anglers_water": 0, "fish_kinds": [], "oven_recipes": 0,
-			"gatherings_met": 0,
-			"arch_visits": {},
-			"regular_visits": {}, "events": {}}}
+	return hosting_sys._fresh_site(site)
 
 
-## §21.3: every stream is seeded by save + site + site day + stream
-## name, so a reload always rebuilds the same morning.
 func _rng_for(stream: String, site := site_id) -> RandomNumberGenerator:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = ("%d|%s|%d|%s" % [seed, site, site_day(site),
@@ -1995,35 +1920,7 @@ func _sites_from_json(raw: Dictionary) -> Dictionary:
 ## storage, never deleted.  Restoration auras are exempt — they follow
 ## their restored structure, not the decor grid.
 func _reconcile_map(site: StringName) -> void:
-	var st: Dictionary = sites[site]
-	var layout: Dictionary = _layout(site)
-	var rev := String(layout.get("map_rev", ""))
-	if rev == "" or String(st.get("map_rev", "")) == rev:
-		return            # unstamped layout has no opinion / already ok
-	if not st.has("stored"):
-		st["stored"] = []
-	var moved := []
-	for i in range(st.get("decor", []).size() - 1, -1, -1):
-		var d: Dictionary = st["decor"][i]
-		var row: Dictionary = _row("decor", String(d.get("id", "")))
-		if d.get("aura", false) or (not row.is_empty()
-				and _footprint_ok(row, d["cells"], i)):
-			continue
-		var kept := {"id": d["id"], "effect": d.get("effect", ""),
-			"reach": int(d.get("reach", 1))}
-		if d.get("variant", "") != "":
-			kept["variant"] = d["variant"]
-		st["stored"].append(kept)
-		st["seats"] = maxi(0, int(st.get("seats", 0))
-			- int(row.get("seats", 0)))
-		st["decor"].remove_at(i)
-		moved.append(d["id"])
-		_log("map_shift", {"site": site, "id": d["id"]})
-	if not moved.is_empty():
-		print("map reconcile %s: %d decor back to storage %s" % [
-			site, moved.size(), moved])
-	st["map_rev"] = rev
-
+	hosting_sys._reconcile_map(site)
 
 func load_state(state: Dictionary) -> void:
 	day = int(state.get("day", day))

@@ -25,7 +25,7 @@ One responsibility each; scenes never reach across boundaries.
 ## 2. Systems layer — leaf subsystems (`scripts/systems/`)
 
 `daily`, `dog`, `errands`, `gatherings`, `restore`, `build`,
-`journal`, `crew`, `night`, `pantry`: each is a `RefCounted` owned by Game. **They hold no save
+`journal`, `crew`, `night`, `pantry`, `hosting`: each is a `RefCounted` owned by Game. **They hold no save
 state** — the state dict stays on Game (so `state_dict()` stays the
 one schema); the object reads `g.<state>` and mutates it; Game keeps
 one-line delegate methods as the public API. New subsystem = same
@@ -40,7 +40,11 @@ for `restore.gd`. `night` owns the nightly settle — stars, fees, tips,
 walk-ins, pages and vignette selection — behind `Game.goodnight()`'s
 delegate (§4/§13.4); state stays on Game. `pantry` owns the pantry
 count/capacity and add/remove/ingredient helpers behind `Game`'s
-`pantry_*` delegates (§7.4); state stays on Game. `postcard` is
+`pantry_*` delegates (§7.4); state stays on Game. `hosting` owns the
+per-site state container (`visit_site`/`travel_to`/`site_state`/
+`_fresh_site`/`_reconcile_map`/card/order/day) behind `Game`'s
+delegates (§5); `sites`/`sites_visited` stay on Game for the save
+schema. `postcard` is
 the exception — pure static codec (§33.5 Camp Postcards): packs
 {version, site, seed, decor placements} into a Crockford-base32
 code with an FNV checksum, ~15 chars for a typical camp; decode
@@ -227,6 +231,7 @@ are artifacts — real compile check is a scene run). Generated wavs:
 | D-ARCH-17 | Crew structure + hut visuals live in `scripts/crew_presenter.gd` (queries `crew_sid` / `crew_rows` / `crew_stage`, `hut_px` / `hut_engaged`, the state->view pass `sync_crew_hut`, plus the hut stage-art table) — same helper shape; the scene keeps the `CrewDress`/`_hut` node ownership and the `_hut_tok` / `_hut_ready` token state so the smoke harness reads them directly (D-ARCH-12 precedent), plus the `_sync_crew_hut` / `_crew_sid` / `_crew_stage` / `_hut_px` / `_hut_engaged` delegates. Note `_hut_rect` is deliberately NOT part of this slice — it belongs to the already-extracted `input_presenter`, with a `hut_px` in both (input from the tap layout, crew from the structure plots) so presenters never reach into each other's logic | Landed 2026-10-16 — `pinewatch_test.gd` 2020→1920, `--smoke` incl. crew hut paths green, 14 suites green |
 | D-ARCH-18 | Nightly settle + vignette selection live in `systems/night.gd` (`goodnight()` now a 1-line delegate returning `night_sys.goodnight()`, with `_pick_vignette`/`_vignette_weight` travelling with the code) — same leaf-subsystem shape (D-ARCH-2): `night` owns no save state (`vignettes_seen`, `night` numbers, `days_log`, `coins` all stay on Game), calls Game's other delegates via `g.`; Game keeps the public `goodnight()`/`double_tips()` surface, cross-subsystem readers still route through `g._check_pages()` (journal leaf) | Landed 2026-10-16 — `game.gd` goodnight inlined 164 lines → delegate, smoke + 14 suites green |
 | D-ARCH-19 | Pantry helpers live in `systems/pantry.gd` (`pantry_count`/`pantry_capacity`/`pantry_add`/`pantry_remove`/`_ingredients_of_kind`/`_favourite_pool`) — same leaf-subsystem shape (D-ARCH-2): `pantry` owns no save state (the `pantry` dict stays on Game), Game keeps the public `pantry_*` surface so errands/build/dog/gatherings callers never move; `PANTRY_BASE`/`PANTRY_COOLER` tuning consts stay on Game | Landed 2026-10-17 — `game.gd` 2122→2085, smoke + 5 suites green |
+| D-ARCH-20 | Per-site hosting/state container lives in `systems/hosting.gd` (`visit_site`/`travel_to`/`site_state`/`_fresh_site`/`site_day`/`site_row`/`site_card`/`site_order`/`_reconcile_map`) — same leaf-subsystem shape (D-ARCH-2): `hosting` owns no save state (`sites`/`sites_visited` stay on Game for the save schema), Game keeps the public `site_*`/`visit_site`/`travel_to` surface so callers never move; `site_reachable` was already a journal delegate and stays put | Landed 2026-10-17 — `game.gd` 2085→1982, smoke + 4 suites green |
 
 ## 11. External design audits
 
@@ -262,10 +267,10 @@ sim/view split with ephemeral cast actors; engine/sim parity
 commit-on-beat persistence; facade + leaf subsystems (D-ARCH-2).
 
 **Watch list (not defects today):**
-- `game.gd` ~2.1k lines post-split (night settled) — state hub + delegate surface;
+- `game.gd` ~1.9k lines post-split (hosting/night/pantry settled) — state hub + delegate surface;
   purchase/journal/crew verb layers moved to `systems/build.gd`,
   `systems/journal.gd` and `systems/crew.gd` (leaf pattern,
-  suite-guarded). Next: hosting leaves (night and kitchen shipped per D-ARCH-18/19).
+  suite-guarded). Next: shared world primitives in `pinewatch_test.gd`, then non-refactor queue (CI sim guardrail, store readiness).
 - `pinewatch_test.gd` 4493→1920 lines — the `--smoke` drive moved to
   `scripts/qa_smoke.gd` (D-ARCH-9), the six world-build passes to
   `scripts/world_builder.gd` (D-ARCH-10), gesture + tap routing to
