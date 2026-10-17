@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+env:
+  GODOT_VERSION: 4.7.2-stable
+  GODOT_URL: https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}/Godot_v${{ env.GODOT_VERSION }}_linux.x86_64.zip
+  GODOT_BIN: ${{ runner.temp }}/godot/Godot_v${{ env.GODOT_VERSION }}_linux.x86_64
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Cache Godot
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/godot
+          key: godot-${{ env.GODOT_VERSION }}
+
+      - name: Install Godot headless (4.7.2)
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ${{ runner.temp }}/godot
+          curl -L -o ${{ runner.temp }}/godot.zip "${{ env.GODOT_URL }}"
+          unzip -q ${{ runner.temp }}/godot.zip -d ${{ runner.temp }}/godot
+          chmod +x "${{ env.GODOT_BIN }}"
+          rm -f ${{ runner.temp }}/godot.zip
+
+      - name: Economy sim guardrails (GDD §6.9)
+        run: python tools/sim.py
+
+      - name: Smoke test
+        run: |
+          set -euo pipefail
+          out=$("${{ env.GODOT_BIN }}" --headless --path game res://scenes/pinewatch_test.tscn --smoke 2>&1)
+          printf '%s\n' "$out" | tail -20
+          echo "$out" | grep -q "SMOKE save commit writes:true"
+
+      - name: Test suites
+        run: |
+          set -euo pipefail
+          cd game
+          fails=0
+          for t in tests/*.tscn; do
+            case "$t" in *daily_check*) continue;; esac
+            name=$(basename "$t" .tscn)
+            out=$("${{ env.GODOT_BIN }}" --headless --path . "res://tests/$name.tscn" 2>&1) || true
+            if printf '%s\n' "$out" | grep -q "=== ALL CHECKS PASS ===" && ! printf '%s\n' "$out" | grep -q "  XX"; then
+              echo "PASS $name"
+            else
+              echo "FAIL $name"
+              printf '%s\n' "$out" | grep "  XX" | head -8 || true
+              fails=$((fails + 1))
+            fi
+          done
+          echo "---"
+          if [ "$fails" -gt 0 ]; then echo "$fails SUITE(S) FAILED"; exit 1; fi
+          echo "ALL SUITES PASS"
