@@ -27,6 +27,7 @@ const SysGatherings := preload("res://scripts/systems/gatherings.gd")
 const SysBuild := preload("res://scripts/systems/build.gd")
 const SysJournal := preload("res://scripts/systems/journal.gd")
 const SysCrew := preload("res://scripts/systems/crew.gd")
+const SysPantry := preload("res://scripts/systems/pantry.gd")
 const SysNight := preload("res://scripts/systems/night.gd")
 
 const SPEEDUP_MIN_CHUNK := 900.0   # §6.10: chunk = max(15 min, stage / 6)
@@ -71,6 +72,7 @@ var build: RefCounted
 var journal: RefCounted
 var night_sys: RefCounted
 var crew_sys: RefCounted
+var pantry_sys: RefCounted
 var passport_stamps: Array = []             # §33.5: one per scored Daily
 var days_log: Array = []                    # §8.3 journal — one row/day
 var personas_met := {}                      # archetype -> display name
@@ -91,6 +93,7 @@ func _ready() -> void:
 	journal = SysJournal.new(self)
 	night_sys = SysNight.new(self)
 	crew_sys = SysCrew.new(self)
+	pantry_sys = SysPantry.new(self)
 	_crew_reset()
 	# settings live outside the run state — read them off disk at boot
 	# so prefs apply on the title screen too (UI-036). Single load:
@@ -1557,43 +1560,26 @@ func _unlock_rank(unlock: String) -> int:
 
 
 func pantry_count() -> int:
-	var n := 0
-	for k in pantry:
-		n += int(pantry[k])
-	return n
+	return pantry_sys.pantry_count()
 
 
 func pantry_capacity() -> int:
-	return PANTRY_COOLER if "cooler" in gear else PANTRY_BASE
+	return pantry_sys.pantry_capacity()
 
 
 ## Returns how many actually fit (§7.4: nodes keep what's left over).
 func pantry_add(item_id: String, n := 1) -> int:
-	var room := pantry_capacity() - pantry_count()
-	var take := mini(n, room)
-	if take > 0:
-		pantry[item_id] = int(pantry.get(item_id, 0)) + take
-	return take
+	return pantry_sys.pantry_add(item_id, n)
 
 
 ## Inverse of pantry_add — used by refund inverses; returns how many
 ## came out (0 when the staple already went into a meal).
 func pantry_remove(item_id: String, n := 1) -> int:
-	var have := int(pantry.get(item_id, 0))
-	var take := mini(n, have)
-	if take > 0:
-		pantry[item_id] = have - take
-		if pantry[item_id] <= 0:
-			pantry.erase(item_id)
-	return take
+	return pantry_sys.pantry_remove(item_id, n)
 
 
 func _ingredients_of_kind(kind: String, site := site_id) -> Array:
-	var out := []
-	for i in Catalog.data.get("ingredients", []):
-		if i.get("kind") == kind and site in i.get("sites", []):
-			out.append(i)
-	return out
+	return pantry_sys._ingredients_of_kind(kind, site)
 
 
 ## Errands delegates — §7.1–7.3 live in systems/errands.gd.
@@ -1728,30 +1714,7 @@ func spot() -> Dictionary:
 ## every ingredient obtainable here, oven recipes only once Lantern
 ## Valley makes them possible.
 func _favourite_pool(site := site_id) -> Array:
-	var rank := _site_rank(site)
-	var fish := _ingredients_of_kind("fish", site)
-	var out := []
-	for r in Catalog.data.get("recipes", []):
-		if r.get("fallback", false) or r.has("festival"):
-			continue                          # festival dishes are never craved
-		if r.get("station") == "oven" and rank < 2:
-			continue
-		var ok := true
-		for ing in r.get("pair", []):
-			if ing == "any_fish":
-				ok = ok and not fish.is_empty()
-			else:
-				var row := _row("ingredients", ing)
-				if row.get("kind") == "staple":
-					ok = ok and _unlock_rank(
-						row.get("unlock", "P1")) <= rank
-				else:
-					ok = ok and site in row.get("sites", [])
-			if not ok:
-				break
-		if ok:
-			out.append(r["id"])
-	return out
+	return pantry_sys._favourite_pool(site)
 
 
 func _slot(want: String, have_id: String) -> bool:
