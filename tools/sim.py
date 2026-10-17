@@ -1016,7 +1016,7 @@ def main():
         if a.show or a.variant:
             mid = out[(lab, A)]['mid']
             print(f'  pages: {mid["pages"]}')
-    guardrails(out, out_runs)
+    ok = guardrails(out, out_runs)
     if a.show:
         key = ('median', 0.0) if ('median', 0.0) in out \
             else next(iter(out))
@@ -1028,7 +1028,8 @@ def main():
                   f"{sum(d['stars'])/max(1,len(d['stars'])):.2f}" if d['stars'] else '-',
                   d['net'], d['coins'], d['pages'], '|', ' '.join(d['bought']),
                   ' RAIN' if d['rain'] else '')
+    return ok
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    sys.exit(0 if main() else 1)
