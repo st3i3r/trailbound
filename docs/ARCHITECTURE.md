@@ -270,7 +270,7 @@ commit-on-beat persistence; facade + leaf subsystems (D-ARCH-2).
 - `game.gd` ~1.9k lines post-split (hosting/night/pantry settled) — state hub + delegate surface;
   purchase/journal/crew verb layers moved to `systems/build.gd`,
   `systems/journal.gd` and `systems/crew.gd` (leaf pattern,
-  suite-guarded). Next: shared world primitives in `pinewatch_test.gd`, then non-refactor queue (CI sim guardrail, store readiness) — see `PLAN_gameplay.md` (redesign v2, approved 2026-10-17).
+  suite-guarded). Next: shared world primitives in `pinewatch_test.gd`, then non-refactor queue (CI sim guardrail, store readiness) — see `PLAN_gameplay.md` (post-launch plan v2, approved 2026-10-17; GDD D-29).
 - `pinewatch_test.gd` 4493→1920 lines — the `--smoke` drive moved to
   `scripts/qa_smoke.gd` (D-ARCH-9), the six world-build passes to
   `scripts/world_builder.gd` (D-ARCH-10), gesture + tap routing to

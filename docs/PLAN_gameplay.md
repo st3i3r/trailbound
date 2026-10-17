@@ -1,296 +1,177 @@
-# Trailbound — Redesign Plan (production-grade v2)
+# Trailbound — Post-launch Plan (v1.0 → v1.4+)
 
-**Date:** 2026-10-17
-**Status:** Approved for implementation (user: "Approve, write the details plan")
-**Supersedes:** `PLAN_gameplay.md` (2026-10-13 depth audit — every item listed
-there is now shipped; that file is replaced by this one).
+| | |
+|---|---|
+| Date | 2026-10-17 |
+| Status | Approved. Replaces the same-day "redesign v2" draft, which pulled v1.1+ content into launch scope |
+| Amends | `GAME_DESIGN.md` §29 Phase 7 and §33.2 via **D-29** (2026-10-17); D-26 and D-28 amended; Q14/Q15 re-dated |
+| Schedule of record | `GAME_DESIGN.md` §33.2, as reordered here. This plan adds the file/test detail behind it |
 
-This plan is the product/engineering delta on top of `GAME_DESIGN.md` v3.1
-and `ARCHITECTURE.md`. It does **not** rewrite the design; it adds the
-systems that make the game production-grade: stakes, replayability, a 4th
-site, a cosmetic IAP, social, accessibility, audio, cloud save, CI, and
-store readiness. It respects the cozy contract (no energy, no premium
-currency, no gacha, no fail state, no paywalls).
+**Headline:** v1.0 ships exactly the design (three sites, ~34 days, ads + Remove Ads). The first
+update is a small, data-driven **depth update** — Reputation soft-fail, night modifiers, Glasscoast —
+then the design's own post-launch priorities follow: Volume II, platform, Seasons, the coast.
 
-## 0. Non-negotiables (inherited)
+## 0. Why this order
 
-- Deterministic seating puzzle with full preview + breakdown strip.
-- Single currency, no debt/upkeep/decay. Refund-until-Goodnight.
-- No fail state, no energy, no premium currency, no paywalls.
-- Real-time crew never blocks the arc and never expires.
-- Ethical ads: rewarded only (double tips, crew speed-up), occasional
-  interstitial between days, one-time Remove Ads.
-- Leaf-subsystem pattern (D-ARCH-2): new systems ship as `systems/*.gd`
-  leaves with one-line delegates on Game. No new autoloads.
-- 14 test suites + `--smoke` stay green at every commit.
+- **v1.0 is done content-wise.** The design's remaining pre-launch work is store readiness (§29
+  Phases 5–6). Nothing in this plan enters the launch build.
+- **v1.1 fixes the game's known soft spots with real data in hand**: a 1★ night still pays (no
+  consequence texture) and every site plays the same puzzle shape (no night variety). Reputation +
+  modifiers are cheap relative to Volume II and address exactly that.
+- **v1.2+ follows the design doc's priorities**: Volume II is the finale's promise and the coin
+  sink; platform + social come next; Seasons are festival-timed and cannot be rushed.
+- Everything new ships as a leaf subsystem (D-ARCH-2): one scene stays, no new autoloads, one-line
+  delegates on Game. [S] items are Should; [C] items are Could.
 
-## 1. Vision delta (what changes vs. v3.1)
+## 1. Non-negotiables (inherited, unchanged)
 
-| Area | v3.1 | Redesign |
-|---|---|---|
-| Arc length | 3 sites, ~34 days | 4 sites (add Glasscoast), ~40 days |
-| Stakes | none (a 1★ night still pays) | soft-fail Reputation (no game over) |
-| Puzzle variety | identical shape, different numbers | night modifiers (Storm/Quiet/Full house/Festival) |
-| Post-arc | Volume II (v1.1) | restorations integrated into the arc; + New Game+ |
-| Monetization | rewarded ads + Remove Ads | + one cosmetic "Trail Pass" IAP ($4.99) |
-| Social | none | photo postcards (share a camp code) |
-| Retention | Trail Daily (1/day) | + Weekly Trail (7-day seeded arc) |
-| Accessibility | reduced motion/flashing, text scale, left-handed | + color-blind, dynamic type, calm mode, screen-reader labels |
-| Audio | generated WAVs | licensed/CC0 set |
-| Platform | mock SDKs | real UMP/IAP/Firebase/crash/cloud save |
-| Ops | local runs only | CI (sim + 14 suites + smoke) |
+- Deterministic seating puzzle, full preview, breakdown strip. No RNG in scoring.
+- Single currency; no debt, upkeep, decay; refund-until-Goodnight.
+- No fail state, no energy, no premium currency, no paywalls, no streaks, no FOMO (§33.6).
+- Real-time crew never blocks the arc; coins never buy time.
+- Ethical ads only: rewarded (double tips, crew speed-up), capped interstitial between days, one-time
+  Remove Ads (§24).
+- Every update re-runs the sim and its guardrails before release (§33.6); full `--smoke` + all
+  suites stay green at every commit.
 
-## 2. Phase plan (4 weeks each, with gates)
+## 2. Phase 0 — Guardrails (before any feature work)
 
-Each phase ends with a re-plan checkpoint (per §29 of GAME_DESIGN). No
-phase starts until the previous one's tests are green and the sim guardrails
-hold.
+Goal: every later change is CI-guarded, and release data exists to steer v1.1.
 
-### Phase 1 — production floor (4 weeks)
-**Goal:** the game is shippable to a closed test without embarrassment.
+1. **CI workflow** — `.github/workflows/ci.yml`: headless Godot 4.7.2, run the 14 suites +
+   `--smoke`, and `python tools/sim.py` in guardrail mode (the report exists; add a nonzero exit
+   when a §6.9 guardrail breaks).
+2. **Push `master` to `origin`** and enable branch protection so a red build blocks merges.
+   (Master is currently local-only ahead; this is the one user-side prerequisite.)
+3. **Analytics event schema** defined now so Phase 1's Firebase wiring implements it on day one:
+   `day_complete`, `phase_enter`, `ad_impression`/`ad_fill`, `iap_funnel`, `daily_played`,
+   `session_start`. The Phase 2 gate reads these; do not ship Phase 1 without them.
 
-1. **Reputation soft-fail** (`systems/reputation.gd` leaf)
-   - New `reputation` float (0–5) per site, derived from rolling 15-review
-     mean (already computed in `rating()`).
-   - Below 2.0: next morning's board shows one fewer request.
-   - Below 1.0: one regular skips that night.
-   - Never ends the run; recoverable in 2–3 good nights.
-   - "Demand at the gate" becomes functional: turning away 2+ parties in a
-     night reduces tomorrow's board by one.
-   - Files: `systems/reputation.gd`, `game.gd` delegates, `seating.gd` (board
-     size), `pinewatch_test.gd` (gate visual already exists).
-   - Tests: `test_reputation.tscn` (new) — below-threshold board shrink,
-     recovery, gate visual.
-   - Guardrail: median arc still completes day 30–40.
+**Done when:** green CI on master; a deliberately perturbed guardrail turns the job red;
+event schema checked into the repo.
 
-2. **Night modifiers** (data + scoring hook)
-   - New `modifiers` table in `data/modifiers.json` (Storm/Quiet/Full house/
-     Festival). Rolled at morning, seeded by save+site+day.
-   - `Seating.resolve_guest` gains a `modifier` param applied to the stars
-     formula (one term delta per modifier).
-   - UI: chip on the booking board + night summary.
-   - Files: `data/modifiers.json`, `seating.gd`, `game.gd` (roll), UI sheets.
-   - Tests: extend `test_seating` with modifier cases.
-   - Guardrail: modifier nights must not break the 1.4 purchases/day floor.
+## 3. Phase 1 — Store readiness → v1.0 ships
 
-3. **Glasscoast (4th site)**
-   - New layout `layouts/glasscoast.json`, site row in `sites.json`,
-     `SITE_STAGE`/`SITE_PROPS` entries, painted ground + object layer.
-   - New archetypes? Reuse existing mix; add "Photographer" (already in
-     Volume II draft) as a Glasscoast regular.
-   - Art: reuse the PixelLab pipeline; one new ground bake + objects.
-   - Tests: extend `test_content` (layout lint), add `test_glasscoast.tscn`
-     smoke (travel there, seat, goodnight).
-   - Guardrail: arc complete day ≤ 45 with Glasscoast.
+This is §29 Phases 5–6, executed as written. No new product scope.
 
-4. **SDK wiring (Platform real impls)**
-   - UMP consent (Ads autoload), Remove Ads IAP (Platform.iap_restore +
-     entitlement), Firebase Analytics, crash capture (report_nonfatal).
-   - Replace mocks behind the same seams; no gameplay change.
-   - Files: `autoload/ads.gd`, `autoload/platform.gd`, new `platform_android.gd`.
-   - Tests: `test_platform` extended with consent/IAP mocks.
+- **Platform SDKs** (GDD §29 Phase 5): AdMob + UMP consent and privacy options; Remove Ads
+  (purchase, pending, restore, refund — verified with license testers); Firebase
+  Analytics/Crashlytics/Remote Config; the Daily reminder and crew notification with quiet hours and
+  caps. Acceptance: the §29 Phase 5 row, verbatim (test units incl. no fill, EEA debug geography,
+  §23 budgets with ads on).
+- **Privacy/legal**: policy + Play data-safety updated for the SDKs; `LEGAL/` docs refreshed.
+- **Store**: closed test (12 testers × 14 days, English + Vietnamese), listing, pre-launch report,
+  staged rollout 10/50/100%, vitals watch. Acceptance: §29 Phase 6 row (crash-free ≥ 99.5%).
+- **Cloud save**: not in v1.0 by design — Android Auto Backup covers device moves (§22); Play Games
+  Saved Games arrives with v1.2. Residual risk accepted and tracked (see §7).
+- **Do start Phase 2's sim work during the closed test** — GDD already plans this, and it is the
+  only way v1.1 ships 4–6 weeks after rollout.
 
-5. **Cloud save + account**
-   - Anonymous Google Play Games sign-in; `cloud_save_push/pull` already
-     fed by `Save.commit`. Add pull-on-boot + conflict resolution
-     (newer-wins by day).
-   - Files: `autoload/save.gd`, `autoload/platform.gd`.
+**Cut rule:** if the closed test slips, postpone v1.1's start, never the store fixes.
 
-6. **CI**
-   - GitHub Actions job: run `tools/sim.py` guardrails + all 14 suites +
-     `--smoke`. Fail the build on regression.
-   - Files: `.github/workflows/ci.yml`, `tools/sim.py` (add guardrail mode).
+## 4. Phase 2 — v1.1 "Depth update"
 
-**Phase 1 gate:** closed-test build, crash-free ≥99%, sim guardrails green
-in CI, store listing draft.
+Order matters. Sim before UI, always.
 
-### Phase 2 — depth + delight (4 weeks)
-**Goal:** the game has a reason to come back daily and weekly.
+0. **Sim-first (mandatory, gate).** Extend `tools/sim.py` with the Reputation and modifier terms and
+   run all variants × seeds **before** writing UI or shipping data. Per the GDD convention, any
+   change to §6 re-runs Appendix C; this plan re-runs §6.9 and reports before/after medians. If a
+   guardrail cannot hold (arc 30–40, casual ≤ 50, purchase floor), tune the terms — not the
+   guardrail — until approved.
+1. **Reputation soft-fail** — new leaf `systems/reputation.gd`, state `reputation` per site
+   (derived from the existing rolling 15-review mean). Below 2.0: next morning's board is one
+   request smaller. Below 1.0: one regular skips the night. Never ends the run; recovers in 2–3 good
+   nights. The trailhead queue (already visual) becomes functional: 2+ parties turned away in a
+   night shave tomorrow's board by one. Game keeps 1-line delegates; save schema bump + migration
+   fixture (§30).
+2. **Night modifiers** — `data/modifiers.json` + one term in `Seating.resolve_guest`, rolled seeded
+   at morning, shown on the board and in the night summary. Storm / Quiet / Full house / Festival
+   first. **Solver check:** every modifier night must be solvable to at least its star target for
+   the current build (the sim's seating solver already exists — reuse it in CI).
+3. **Glasscoast** — site 4: layout, painted ground + objects via the existing PixelLab pipeline,
+   site row, one new regular (reuse the Volume II draft archetypes). Unlocks from the Volume I
+   finale, as the map teaser already promises. **Art-gated:** if the ground bake/objects are not
+   ready at the cut, Glasscoast slides to v1.2 and the systems half ships alone. Cut order: Glasscoast
+   → accessibility polish → nothing else (Reputation + modifiers are the core).
+4. **Accessibility pass** — deliverables: color-blind-safe trait/socket shapes (not hue alone),
+   dynamic type beyond large/small, calm mode (demotes the demand queue + ambient motion). Screen
+   reader: **research spike only** — no public promise until the spike proves deliverable on Godot
+   Android.
+5. **Strings**: every new string EN + VI from day one; VI width lint stays advisory.
 
-7. **Trail Pass cosmetic IAP** ($4.99)
-   - Campfire skins, tent variants, dog bandanas, hut paint. Zero gameplay
-     effect. Stackable with Remove Ads.
-   - Files: `autoload/ads.gd` (entitlement), `ui/settings_sheet.gd`,
-     decor catalog rows with `unlock: "iap:trail_pass"`.
+**Gate:** sim guardrails green (or an approved §6.9 amendment); suites + new
+`test_reputation`/modifier cases green; crash-free holds on the update; D1/D7 read against v1.0.
 
-8. **Weekly Trail**
-   - A 7-day seeded arc with a completion score (time + stars). Weekly
-     leaderboard via Play Games (optional, opt-in).
-   - Reuses the seeded-board + seeded-weather machinery; no new sim.
+## 5. Phase 3 — v1.2 "Volume II + platform"
 
-9. **Photo postcards (social)**
-   - `Postcard.materialize(code)` already exists (§33.5). Add a "share camp"
-     button in settings that copies a code; "visit camp" imports a
-     wanderer guest into tonight's board.
-   - No accounts, no servers — code-based, like Animal Crossing dream codes.
+- **Volume II** (§33.3) as designed: 5 pages/site, two restorations per site, Gatherings (~24
+  briefs, solver-checked). Post-arc sim mode checks §6.11 guardrails (§6.11 numbers stand).
+- **Trail Passport** (§33.5) + **Play Games**: achievements, the opt-in Trail Daily star
+  leaderboard, Saved Games (cloud save). This is where cross-device sync lands, by design.
+- Camp tier-ups and the staff/service layer remain parked unless their sim probes land.
 
-10. **Accessibility pass**
-    - Color-blind palette swap (distinct shapes, not just hues).
-    - Dynamic type beyond large/small (system font scale).
-    - Screen-reader labels on the seating strip.
-    - Calm mode (disables demand-queue visual + ambient pressure).
-    - Files: `ui/ui_tokens.gd`, `ui/ui_kit.gd`, `ui/ui_feel.gd`,
-      `pinewatch_test.gd` (calm mode flag).
+**Gate:** §6.11 guardrails hold; leaderboard reset/date behaviour verified (Q6 note in §33.5).
 
-11. **Licensed audio**
-    - Replace generated WAVs with a licensed/CC0 set (2–3 tracks + SFX).
-    - Budget: ~$500–1500. Keep the file-API loader (D-ARCH-4) so un-imported
-      assets still work.
+## 6. Phase 4 — v1.3 "Seasons"
 
-**Phase 2 gate:** closed-test retention data (D1/D7), audio + accessibility
-review, store listing final.
+- Seasons of the Trail + first festival week (§33.4), timed for the next festival after v1.2
+  (Mid-Autumn 2027 / Lunar New Year 2028 — re-verify dates against the real launch).
+- **Camp Postcards [C]** (§33.5), the share-a-night code; `Postcard.materialize` already exists and
+  is tested (`test_postcard`), so this is UI + import plumbing, not new codec work.
 
-### Phase 3 — content + polish (4 weeks)
-**Goal:** v1 ships complete.
+**Gate:** §33.4 seasonal guardrails (every season re-runs the sim); live-ops rules §33.6.
 
-12. **Volume II restorations integrated into the arc**
-    - The 6 restorations (Fire Tower, Pond Dock, Bamboo Treehouse,
-      Bathhouse, Observatory, Long Table) become part of the arc: each site's
-      restoration stages unlock the next site's pad tags. Coins flow into
-      structure, not hoard.
-    - Cut the "Bamboo Treehouse 9th pad" if it doesn't fit the 640px view
-      (verify first).
-    - Cut camp tier-ups (Signpost→Trail Gate, etc.) if the sim pass doesn't
-      land.
+## 7. Phase 5 — v1.4+ "The coast"
 
-13. **New Game+**
-    - Replay the arc with a different trait-weight seed and a "veteran board"
-      (more conflicts, tighter pads). Cheap content multiplier.
+The hidden cove, Snowpass and the "B." collar-tag reveal (Appendix D). Content only, same rules,
+Q8 must be decided first (the cove's story gates the Pinewatch letters' foreshadowing).
 
-14. **Content polish**
-    - Simplify the Food Blogger elite mechanic (3 traits, no elite flag).
-    - Replace Moped/Chicken Coop cosmetics with 2 higher-quality hero
-      cosmetics.
-    - Verify VI string coverage; expand if thin.
+## 8. Parked (not scheduled; each needs a design reason + sign-off)
 
-15. **Phase 1 re-plan gate (§29)** — re-plan after Phase 1 data; this plan
-    is a draft until then.
+- **Weekly Trail** (7-day seeded arc): dropped as originally drafted. If ever built: personal-best
+  only, no competitive leaderboard, no streaks.
+- **Cosmetic IAP** — renamed **"Camp Kit"** (the draft's "Trail Pass" collided with the Trail
+  Passport). Zero-effect supporter pack; would need a §24/§26 amendment and explicit sign-off. Not
+  scheduled, not in any version above.
+- **Licensed audio swap** — budget-gated (~$500–1500). Only if playtests show the generated set is
+  the ceiling; keep the file-API loader (D-ARCH-4) either way.
+- **New Game+**, camp tier-ups, photo mode / shareable camp image (Appendix D "Later").
 
-**Phase 3 gate:** store submission, launch.
+## 9. Explicitly not doing
 
-## 3. Detailed task list (file-level)
+- No premium currency, gacha, energy, paywalls, streaks, FOMO, timed exclusives.
+- No competitive leaderboards beyond the design's opt-in Trail Daily stars board (v1.2).
+- No more traits (13 is the number); depth comes from modifiers.
+- No engine rewrite; no new autoloads (leaf subsystems only, D-ARCH-2).
 
-### 3.1 Reputation subsystem
-- New `systems/reputation.gd` (leaf, D-ARCH-2).
-- `Game` fields: `reputation: Dictionary` (site → float). State in save.
-- `reputation_tick(site, rating)` called from `goodnight()` flow.
-- `Game.reputation(site)` public delegate.
-- `Seating.board` takes a `reputation` param to shrink the board.
-- `pinewatch_test.gd`: gate visual (already exists as queue at trailhead).
-- Tests: `test_reputation.tscn`.
+## 10. Verification per phase
 
-### 3.2 Night modifiers
-- New `data/modifiers.json`.
-- `Game.roll_modifier(site, day) -> String` (seeded).
-- `Seating.resolve_guest(..., modifier)` applies the delta.
-- UI: chip on booking board + night summary.
-- Tests: extend `test_seating`.
+- **Every commit:** full `--smoke` + all suites; **every release:** sim guardrails + §30 device
+  passes (§30 matrix incl. ads on/off, no fill, consent declined, Remove Ads refunded).
+- **v1.0:** §29 Phases 5–6 acceptance rows; crash-free ≥ 99.5% in closed test.
+- **v1.1:** sim-first report approved; solver-checked modifier nights; accessibility checklist;
+  save migration fixtures green.
+- **v1.2:** §6.11 guardrails; Play Games leaderboard date check.
+- **v1.3+:** §33.6 ("every update re-runs the sim and its guardrails").
 
-### 3.3 Glasscoast site
-- `layouts/glasscoast.json`, `sites.json` row, `SITE_STAGE`/`SITE_PROPS`.
-- Painted ground + object layer (existing pipeline).
-- Art: ground bake + objects (PixelLab).
-- Tests: `test_content` lint + `test_glasscoast.tscn`.
-
-### 3.4 SDK wiring
-- `autoload/platform_android.gd` (real impl behind `Platform` seam).
-- UMP consent, IAP (Remove Ads + Trail Pass), Firebase Analytics, crash
-  capture.
-- Tests: extend `test_platform`.
-
-### 3.5 Cloud save
-- Anonymous Play Games sign-in; pull-on-boot + conflict resolution.
-
-### 3.6 CI
-- `.github/workflows/ci.yml`: sim guardrails + 14 suites + smoke.
-- `tools/sim.py`: add guardrail mode.
-
-### 3.7 Trail Pass IAP
-- Entitlement in `ads.gd`; catalog rows with `unlock: "iap:trail_pass"`.
-- UI in settings sheet.
-
-### 3.8 Weekly Trail
-- New `systems/weekly.gd` leaf; 7-day seeded arc; completion score.
-- Optional Play Games leaderboard (opt-in).
-
-### 3.9 Photo postcards (social)
-- "Share camp" button → code; "visit camp" → wanderer guest.
-- Reuses `Postcard.materialize`.
-
-### 3.10 Accessibility
-- Color-blind palette, dynamic type, screen-reader labels, calm mode.
-- Files: `ui/ui_tokens.gd`, `ui/ui_kit.gd`, `ui/ui_feel.gd`,
-  `pinewatch_test.gd`.
-
-### 3.11 Licensed audio
-- Replace generated WAVs; keep file-API loader.
-
-### 3.12 Volume II integrated
-- Restorations unlock pad tags; coins flow into structure.
-- Cut Treehouse 9th pad if it doesn't fit.
-
-### 3.13 New Game+
-- Replay with different seed + veteran board.
-
-### 3.14 Content polish
-- Simplify Food Blogger; replace Moped/Chicken Coop; verify VI.
-
-## 4. What I'm explicitly NOT doing
-
-- No multiplayer, PvP, or competitive leaderboards.
-- No premium currency or gacha.
-- No more traits (13 is the right number; depth comes from modifiers).
-- No engine rewrite (it's good; finish SDK + CI).
-- No new autoloads (leaf subsystems only, D-ARCH-2).
-
-## 5. Risks & mitigations
+## 11. Risks
 
 | Risk | Mitigation |
 |---|---|
-| Solo dev scope creep | Phase 1 re-plan gate (§29) is mandatory; cut aggressively |
-| Glasscoast art bottleneck | Reuse PixelLab pipeline; one ground bake + objects |
-| SDK wiring complexity | Platform seam already exists; real impls slot in behind mocks |
-| Reputation breaks sim guardrails | Run sim with reputation enabled; adjust guardrails if needed |
-| Modifiers make puzzles unfair | Modifiers are known at morning (seeded); player adapts |
-| Cloud save conflicts | Newer-wins by day; document in Save.md |
-| Licensed audio cost | Budget ~$500–1500; CC0 fallback exists |
+| Reputation/modifiers break §6.9 guardrails | Sim-first mandate; tune terms, not guardrails; before/after report is a gate |
+| Modifier nights feel unfair | Seeded + shown at morning; solver-checked; §6.9 asks the player to adapt |
+| Glasscoast art slips | Art-gated slide to v1.2; systems update ships regardless |
+| SDK wiring drags (UMP/IAP/review) | It is already §29 Phases 5–6; accounts + testers early ("Do now", §29) |
+| v1.1 doesn't move retention | It is cheap; D1/D7 + finisher share decide v1.2 scope, not vibes |
+| Repo push / CI setup | Phase 0; branch protection; one user-side prerequisite |
+| Solo-dev scope | Parked list is explicit; phase gates; cut Glasscoast first, never the sim |
 
-## 6. Verification per phase
+## 12. Status
 
-- Every phase: full `--smoke` identical, all 14 suites + new suites green.
-- Phase 1: CI green on a PR; closed-test crash-free ≥99%.
-- Phase 2: D1/D7 retention data; accessibility review.
-- Phase 3: store submission; launch.
-
-## 7. Out of scope / cuts (if time runs short)
-
-Cut in this order: camp tier-ups → Treehouse 9th pad → Weekly Trail →
-photo postcards → New Game+. Keep: Reputation, modifiers, Glasscoast,
-SDK, cloud save, CI, Trail Pass, accessibility, audio. The core game
-ships with Phase 1 + 2 essentials; Phase 3 is polish.
-
-## 8. Related docs
-
-- `GAME_DESIGN.md` v3.1 — source of truth for rules (unchanged by this plan).
-- `ARCHITECTURE.md` — D-ARCH-9..20 landed; this plan adds leaves
-  `reputation`, `weekly` (new subsystems, D-ARCH-2 pattern).
-- `UI_PRODUCTION.md` — production checklist; update as items ship.
-- `LEGAL/PRIVACY.md`, `LEGAL/TERMS.md` — update for SDK wiring (Phase 1).
-
-## 9. Status
-
-- [ ] Phase 1.1 Reputation
-- [ ] Phase 1.2 Modifiers
-- [ ] Phase 1.3 Glasscoast
-- [ ] Phase 1.4 SDK wiring
-- [ ] Phase 1.5 Cloud save
-- [ ] Phase 1.6 CI
-- [ ] Phase 2.7 Trail Pass
-- [ ] Phase 2.8 Weekly Trail
-- [ ] Phase 2.9 Photo postcards
-- [ ] Phase 2.10 Accessibility
-- [ ] Phase 2.11 Licensed audio
-- [ ] Phase 3.12 Volume II integrated
-- [ ] Phase 3.13 New Game+
-- [ ] Phase 3.14 Content polish
-- [ ] Phase 3.15 Re-plan gate (§29)
+- [x] Plan v2 approved; GDD §33.2 / §29 Phase 7 / D-26 / D-28 / Q14 / Q15 amended via D-29
+- [ ] Phase 0 — CI + sim guardrail mode + push + event schema
+- [ ] Phase 1 — store readiness; v1.0 ships
+- [ ] Phase 2 — v1.1 depth update (sim-first → Reputation → modifiers → Glasscoast → a11y)
+- [ ] Phase 3 — v1.2 Volume II + Trail Passport + Play Games
+- [ ] Phase 4 — v1.3 Seasons + Camp Postcards
+- [ ] Phase 5 — v1.4+ the cove, Snowpass, "B." reveal
